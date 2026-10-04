@@ -4,7 +4,7 @@
 
 | Step | Deliverable | Current state |
 | --- | --- | --- |
-| P0 | Repeatable environment capture, build, and DRM access check | DRM check passed; runner being established |
+| P0 | Repeatable environment capture, build, and DRM access check | Implemented; see baseline evidence in `results/` |
 | P1 | Read-only Asahi parameter query and confirmed GPU identity | Planned |
 | P2 | Minimal GPU compute submission with deterministic memory readback | Planned; Linux execution backend needed |
 | P3 | Execute a known AGX instruction sequence and compare against a host oracle | Planned; depends on P2 |

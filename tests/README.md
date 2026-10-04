@@ -4,7 +4,15 @@
 the installed Linux UAPI headers. It requires a C compiler, but not libdrm.
 This checks device access and ioctl communication; it does not execute GPU code.
 
-Build and run from scratch:
+The shared runner builds in scratch and records environment, commands, output,
+and exit status:
+
+```sh
+make check
+make smoke
+```
+
+Manual build and run from scratch:
 
 ```sh
 cp /save/workspace/apple-documentation-playground/tests/drm_smoke.c /scratch/drm_smoke.c

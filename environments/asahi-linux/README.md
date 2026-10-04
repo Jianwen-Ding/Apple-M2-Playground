@@ -22,5 +22,9 @@ Keep binaries and run directories under `/scratch/apple-m2-playground/`.
 An optional explicit device path lets the same smoke test run if node numbering
 changes. Kernel permissions or container device exposure can affect access.
 
-See [the smoke-test instructions](../../tests/README.md) for the current
-manual build/run command. Shared runner commands will be added with the tooling.
+Run `make env`, `make check`, and `make smoke` from the repository. Each command
+prints its scratch run directory, with environment metadata, command logs,
+return codes, source hashes, and a summary. Missing optional tools are recorded
+without failing environment capture. A build or DRM failure fails its probe.
+
+See [the smoke-test instructions](../../tests/README.md) for manual equivalents.

@@ -29,6 +29,18 @@ across sessions but has no version control.
 
 ## Starting points
 
+From this repository:
+
+```sh
+make env     # Record available tools, device nodes, kernel, and header hashes
+make check   # Python/C syntax checks; no GPU device access
+make smoke   # Build and run the DRM driver-access test
+```
+
+Run records and binaries go to `/scratch/apple-m2-playground/runs/`.
+Override with `make smoke DEVICE=/dev/dri/renderD128 SCRATCH_ROOT=/scratch/other`.
+Python-only equivalents are documented in [scripts/README.md](scripts/README.md).
+
 - [Probe plan](docs/probe-plan.md)
 - [Asahi Linux environment](environments/asahi-linux/README.md)
 - [Offline environment](environments/offline/README.md)

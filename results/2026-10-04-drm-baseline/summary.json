@@ -1,0 +1,40 @@
+{
+  "command": "drm-smoke",
+  "started_utc": "2026-10-04T06:51:22.848487+00:00",
+  "device": "/dev/dri/renderD128",
+  "source_sha256": {
+    "tests/drm_smoke.c": "3c9549ef5ce3e4e40fded9d669cd5cdd895727b830ab37cfc0971040ae98d291",
+    "scripts/collect_environment.py": "120be2a7da615138e36c58658bec4eac9fb1cbb0be8c9ea0c257ecd506ad33d0",
+    "scripts/run.py": "0b035bcbaf65c182cfd68c9c3ca94b082e0ef3b03b29eada00a19f5a449c5d82"
+  },
+  "passed": true,
+  "commands": [
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "tests/drm_smoke.c",
+        "-o",
+        "/scratch/apple-m2-playground/runs/20261004T065122Z-drm-smoke-kz_jx_m7/drm_smoke"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.04817564900076832
+    },
+    {
+      "argv": [
+        "/scratch/apple-m2-playground/runs/20261004T065122Z-drm-smoke-kz_jx_m7/drm_smoke",
+        "/dev/dri/renderD128"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.00031858500005910173
+    }
+  ],
+  "completed_utc": "2026-10-04T06:51:22.909626+00:00",
+  "scope": "DRM open/version query only; no shader execution."
+}

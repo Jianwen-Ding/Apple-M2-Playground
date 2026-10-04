@@ -1,0 +1,5 @@
+Device: /dev/dri/renderD128
+Driver: asahi
+Version: 0.0.0
+Description: Apple AGX Graphics
+PASS: opened DRM device and queried driver successfully.
