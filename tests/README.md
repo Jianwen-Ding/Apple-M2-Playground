@@ -74,3 +74,16 @@ through `python3 -B scripts/run_compute.py`.
 
 Concurrent Vulkan/timer probes may be present. The shared check only parses or
 syntax-checks them; execution and review belong to their respective owners.
+
+## Pinned native AGX instruction delivery
+
+`vulkan_compute.c` creates shader objects from validated SPIR-V or opaque binary
+imports, checks the exact Asahi identity/UUID, and verifies bounded completion
+before coherent host readback. `make agx-instruction` runs the combined baseline
+and single move-immediate variation. Its full-buffer oracle includes guards,
+rounded inactive lanes and a patterned tail in the same allocation.
+
+[Hardware report](../experiments/arithmetic/first-agx-instruction.md) and
+[stored verifier](../results/2026-10-04-vulkan-binary-roundtrip/verify_stored.py)
+retain the narrow validated field, unchanged controls and stale-digest rejection.
+No new GPU run occurred during integration review.

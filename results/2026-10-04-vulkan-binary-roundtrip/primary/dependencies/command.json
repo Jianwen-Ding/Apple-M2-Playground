@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "ldd",
+    "/usr/lib64/libvulkan_asahi.so"
+  ],
+  "timeout_seconds": 15,
+  "returncode": 0
+}

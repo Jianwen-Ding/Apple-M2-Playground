@@ -193,3 +193,35 @@ Concrete patcher review concerns for the coordinator:
   buffers and independent modulo-2^32 expected output. Preserve imported/exported
   hashes and a minimal byte diff; stop on import, completion or oracle failure.
   Successful import or changed output alone does not establish intended semantics.
+
+## Native move-immediate integration
+
+Agent6151 finished packaging; final reports/manifests and a passing combined
+record were reviewed after its process exited. The requested acm result tool
+was unavailable in this session. No owned file was edited/staged while packaging
+was active. The completed independent native-placement report is included as
+source/model review, not a second modified-instruction hardware observation.
+
+Independent stored checks matched **1,984 words across 15 readbacks**. Ten
+baseline dispatches establish unchanged opaque export/import; four move-test
+imports include unchanged before/after controls and patched counts 33/257.
+Payload changes `0x12345678→0x12345679`; guards, inactive lanes and patterned
+same-buffer tail remain intact. Wrapper SHA1 was recomputed independently; only
+blob byte `0x954` (instruction bit 16) and digest bytes differ. Destination r2,
+kill=0, code/metadata/preamble and the data-only store path are preserved.
+Stale digest returned 1000482000 at shader creation with no queue submission.
+
+One integration fix suppresses vendor bytecode writes in the offline patcher.
+Offline regression reproduces identical patched/stale bytes and disassembly;
+the stored verifier explicitly permits only this reviewed source change and
+preserves original snapshots. `make check` and the new `make agx-instruction`
+entry's command expansion passed. No extra GPU, capability or timer run occurred.
+[Review evidence](../results/2026-10-04-vulkan-binary-roundtrip/integration-review/verification.json)
+and [hardware scope](../experiments/arithmetic/first-agx-instruction.md) are linked.
+
+P3/P4 now have a precise G14C B1 move-immediate field observation, not a novel
+architecture discovery or validation of every decoded surrounding instruction.
+Next: separately test the independently decoded index imadd addend 0→1, preserving
+its cached/sign-extended operands and exact modulo-2^32/XOR oracle. That site is
+an offline proposal in the independent report; subsequent concurrent ALU work is
+outside this integration. Broader register/operand coverage remains pending.

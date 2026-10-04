@@ -91,5 +91,20 @@ Completed standalone `run_vulkan_caps.py` and `run_gles_time.py` retain their
 [capability](../experiments/baseline/vulkan-runtime.md) and
 [failed calibration](../experiments/timing/gles-timer-calibration.md) evidence.
 Their syntax/evidence was reviewed here; no capability or timer GPU rerun occurred.
-Execution/patching runners still owned by the instruction agent are outside this
-integration.
+The subsequent instruction integration adds the completed pinned execution path
+below.
+
+`make agx-instruction` runs the recorded Vulkan baseline plus the pinned move-
+immediate variation: ten unchanged baseline dispatches, four instruction/control
+dispatches and one no-dispatch readback. It requires the existing isolated runtime
+under `SCRATCH_ROOT/vulkan-runtime/usr/lib64`, uses `CC`, `PROBE_INCLUDE` and the
+`MESA_ROOT` SPIR-V grammar, and creates unique output under the standalone runner's
+scratch root. It downloads/installs nothing. `run_vulkan_compute.py --output`,
+`--runtime`, `--include`, `--grammar` and `--cc` allow explicit paths.
+
+The patcher accepts only the exact constant blob/decoder hashes, walks the main
+instruction boundary, changes immediate bit 16, and refreshes the actual Mesa
+25.3.6 SHA1 wrapper. It suppresses vendor bytecode writes and emits patch artifacts
+without GPU access. Hardware reproduction requires `--probe-mov`; import failure,
+completion failure or any whole-buffer mismatch stops the suite. See
+[execution scope](../experiments/arithmetic/first-agx-instruction.md).

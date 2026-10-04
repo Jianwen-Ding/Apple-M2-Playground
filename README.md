@@ -8,8 +8,10 @@ logic interprets this as M2 Max; the 64 GB capacity has not been measured.
 
 The goal is reproducible hardware observations that can guide PTX translation
 and an AGX compiler backend. Device parameters, driver time, and Mesa-compiled
-GLES compute with exact readback now establish the baseline. No raw AGX
-instruction execution, native encoding semantics, or shader counter is established.
+GLES compute with exact readback establish the baseline. A pinned native AGX
+move-immediate bit edit now executes on G14C B1 with exact guarded readback.
+This confirms that existing field interpretation in one shader; broader ISA
+semantics, shader counters and instruction timing remain unvalidated.
 
 ## Layout
 
@@ -41,6 +43,7 @@ make params  # Three read-only Asahi identity/topology queries
 make time    # 264 bounded driver timestamp queries; no shader execution
 make compute # Two GLES dispatches, guards/control readback and negative checks
 make instruction-candidates # Export offline ALU byte changes and uint32 oracles
+make agx-instruction # Reproduce the pinned G14C move-immediate hardware suite
 ```
 
 Run records and binaries go to scratch. Baseline/DRM runs use
@@ -57,6 +60,9 @@ are documented in [scripts/README.md](scripts/README.md).
 - [Offline environment](environments/offline/README.md)
 - [DRM probe tests](tests/README.md)
 - [Device parameters and evidence](experiments/baseline/device-params.md)
+- [First G14C native move-immediate observation](experiments/arithmetic/first-agx-instruction.md)
+- [Vulkan unchanged binary roundtrip](experiments/baseline/vulkan-binary-roundtrip.md)
+- [Independent native instruction placement review](experiments/arithmetic/native-control-disassembly.md)
 - [Offline AGX integer candidates](experiments/arithmetic/agx-instruction-candidates.md)
 - [Vulkan runtime/capability evidence](experiments/baseline/vulkan-runtime.md)
 - [Failed GLES elapsed calibration](experiments/timing/gles-timer-calibration.md)
@@ -74,9 +80,10 @@ query proves device access; it does not prove shader execution.
 
 The initial `test.txt` is the repository push smoke-test artifact.
 
-Current priority is **actual AGX instruction execution**: validate an unchanged
-shader-object binary roundtrip, identify a decoded live arithmetic instruction,
-then compare one immediate-only variation with exact guarded host readback.
-[Six offline candidates](results/2026-10-04-agx-instruction-candidates/README.md)
-supply bytes and mathematical oracles; their G14 validity remains untested.
-The separately owned instruction patcher/roundtrip work is still in progress.
+Current priority is **actual AGX instruction execution**. The first pinned
+move-immediate experiment passed: toggling immediate bit 0 changed active uint32
+results from `0x12345678` to `0x12345679` at counts 33 and 257, preserving guards,
+padding and the untouched tail. Unchanged controls and stale-integrity rejection
+also passed. [Evidence and limits](novel-results/2026-10-04-first-agx-instruction/README.md)
+keep this distinct from a novel architecture discovery. The independently decoded
+index `imadd` addend site is a future one-field test, not a hardware finding.

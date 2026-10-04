@@ -27,3 +27,8 @@ No novel ISA finding is implied by a successful environment or DRM access test.
   isolated runtime repair, physical-device and shader-object reports; no binary import.
 - [2026-10-04 GLES calibration](2026-10-04-gles-timing/README.md):
   checked compute readback with invalid loaded elapsed results; pairs uncalibrated.
+
+- [2026-10-04 Vulkan binary roundtrip](2026-10-04-vulkan-binary-roundtrip/README.md):
+  exact unchanged imports, guarded readbacks and one native move-immediate variation.
+- [First G14C move-immediate observation](../novel-results/2026-10-04-first-agx-instruction/README.md):
+  one existing field supported by hardware; no novel architecture or broad ISA claim.

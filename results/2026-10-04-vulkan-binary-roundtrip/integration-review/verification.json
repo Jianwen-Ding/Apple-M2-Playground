@@ -1,0 +1,1 @@
+{"passed": true, "scope": "Stored evidence only; no GPU rerun", "successful_readbacks": 15, "output_words_verified": 1984, "patched_counts": [33, 257], "changed_instruction_bits": [16], "destination_and_kill_preserved": true, "preamble_and_non_target_bytes_preserved": true, "stale_sha1_rejected_before_submission": true}

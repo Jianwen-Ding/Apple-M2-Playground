@@ -1,0 +1,1 @@
+{"result": 0, "target": "vulkan1.3", "version": "SPIRV-Tools v2025.2 unknown hash, 2025-05-07T00:00:00+00:00", "sha256": "bb05b286ce434c908796ce55a335d7826e9083de8fbe09200d7a2e51dc8d32a5"}

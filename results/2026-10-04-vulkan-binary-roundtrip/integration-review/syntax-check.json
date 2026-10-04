@@ -1,0 +1,169 @@
+{
+  "command": "check",
+  "started_utc": "2026-10-04T21:59:47.556527+00:00",
+  "device": null,
+  "source_sha256": {
+    "tests/agx_iadd.c": "50ef97adc94f02812001b5635ecadcd26f5d4fe01247b2b0ffdccc5ea1896e8b",
+    "tests/drm_params.c": "464bff1d31f0418966c8dd3b837ee9710864c10e3eda23efd4de22f250427c23",
+    "tests/drm_smoke.c": "3c9549ef5ce3e4e40fded9d669cd5cdd895727b830ab37cfc0971040ae98d291",
+    "tests/drm_time.c": "79127e8d1870ae11f497dcbc49eb97272f92e711acd7211a6c1807b28e0aa826",
+    "tests/gles_compute.c": "b96202306293ccb00f589a51413f10bc704c8a0d0a1d5df187237bfdd5a79bc3",
+    "tests/gles_time.c": "995252bfa3dbd4fbf5c6bb9f4c5fc9d9e65e5200418a5773f996387625fdda1c",
+    "tests/vulkan_caps.c": "d52f2aefc3ce6aee14eddbb2b8c1c292ae8c012b5e8b06676ce611ce3a51dd43",
+    "tests/vulkan_compute.c": "41a1cf2e25306f058d864bb60aeedabb469bd6ef7eec64bce08e78650c9c51b1",
+    "scripts/agx_instruction_candidates.py": "690b7004459b875124fdca52a9c2021e2d08eb85e92aadb043242c9b1a5a6b18",
+    "scripts/collect_environment.py": "120be2a7da615138e36c58658bec4eac9fb1cbb0be8c9ea0c257ecd506ad33d0",
+    "scripts/patch_agx_imadd.py": "3188a4e146245cbd730170a75d8c7bc90d9bbb17e5027a8317449e111ea2de0f",
+    "scripts/patch_agx_shader.py": "98b60ab9724c1f7754a0ea04f597ba63bcd4b4d9a718356357b18f3de1424edc",
+    "scripts/run.py": "2709307dcf4cb0a9de67937497803470e76dae6a56c8daadc6386ee9396d31f9",
+    "scripts/run_agx_imadd.py": "98856dafecd9b2ba5f774f23e9c5f0bfb4b24af0108fd1288c1e2c8d21d8f555",
+    "scripts/run_compute.py": "3e46d519b52daddf88be8fe646f44db97ec08263e91627241748a8fc580580b0",
+    "scripts/run_gles_time.py": "2687ff1883a50d4875f0e6095b4fddee35e688e8616f4dfdf25b230fc43afdc7",
+    "scripts/run_params.py": "54c669a279852f859375ba0ef07c6863ee1226c844a450678ccee5fb5e2a4147",
+    "scripts/run_time.py": "77809d99785104516e6a57de4f96ca1d29b9e3e41fa3584dd7083214def78197",
+    "scripts/run_vulkan_caps.py": "76a3f749635563a6ae51a10f1380126f1d935cac1e431107f17f3bfd6c73c3b1",
+    "scripts/run_vulkan_compute.py": "1fb90a504281682d3177e612ad27f10316383951c0eca88e9c1eb0c9c914263a"
+  },
+  "passed": true,
+  "commands": [
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/agx_iadd.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.04086197600008745
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_params.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.013640407999901072
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_smoke.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.018546129999776895
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_time.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.021734595999987505
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/gles_compute.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.03035970000019006
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/gles_time.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.03394708400037416
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/vulkan_caps.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.02726098399989496
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.02897519700036355
+    }
+  ],
+  "sources_unchanged": true,
+  "completed_utc": "2026-10-04T21:59:47.803042+00:00",
+  "scope": "Python and C syntax checks only; no hardware execution."
+}

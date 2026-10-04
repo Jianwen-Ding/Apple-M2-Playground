@@ -1,0 +1,8 @@
+{
+  "scope": "Offline patcher regression only; no driver calls or GPU work",
+  "passed": true,
+  "patched_and_stale_bytes_match_hardware_suite": true,
+  "patch_json_and_disassembly_match": true,
+  "change": "Suppress vendor bytecode writes; patch algorithm unchanged",
+  "current_patcher_sha256": "98b60ab9724c1f7754a0ea04f597ba63bcd4b4d9a718356357b18f3de1424edc"
+}

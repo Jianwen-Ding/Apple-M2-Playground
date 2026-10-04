@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/vulkan-compute-runs/20261004T215043174006Z/vulkan_compute",
+    "import",
+    "/scratch/apple-m2-playground/vulkan-compute-runs/20261004T215043174006Z/index.bin",
+    "257",
+    "/dev/dri/renderD128",
+    "/scratch/apple-m2-playground/vulkan-compute-runs/20261004T215043174006Z/index-import-257.readback",
+    "/scratch/apple-m2-playground/vulkan-compute-runs/20261004T215043174006Z/index.bin"
+  ],
+  "timeout_seconds": 15,
+  "returncode": 0
+}

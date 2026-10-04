@@ -1,0 +1,626 @@
+{
+  "verified_mesa_archive_sha256": "59217efeac3b64e7ced958324b9db7494f1e0741aeb22d780276514cc1b8f206",
+  "status": "OFFLINE_SOURCE_AND_RETAINED_HARDWARE_REVIEW",
+  "gpu_work_launched": false,
+  "sources": {
+    "/scratch/apple-m2-playground/native-control-review/agx_pack.c": "3443a8d1d183f27e4efdc812b6fbff789623e17f3a56224374c102dc66021b0c",
+    "/scratch/apple-m2-playground/native-control-review/agx_opcodes.py": "23d6d6312784a96e67aa9073deb55415c079b915899367c8b9a4075763f92446",
+    "/scratch/apple-m2-playground/native-control-review/agx_compile.c": "fe87b7f499b8e700073fe03c5fb5025190523d25af009ec723a9a8fc6c54a4fd",
+    "/scratch/apple-m2-playground/native-control-review/shader_enums.h": "8743df01fda2a9338d3db79ef01d35c99fa389907d4d873db5c3485a3e299aac",
+    "/scratch/apple-m2-playground/native-control-review/agx_compile.h": "82ef127e695dbc30d1a47e7fc3d05eda05d3166bbbc680ae7d5fe31a944e0d25",
+    "/scratch/apple-m2-playground/native-control-review/hk_shader.h": "3b1ded7dce2beaf9d90482c5f64fa3671369b1d30985a39ad19e782450284ff6",
+    "/scratch/apple-m2-playground/native-control-review/hk_shader.c": "5ca39d6b3437f62118936d67eb232424112b99b6ae79d884739159ed0d98630e",
+    "/scratch/apple-m2-playground/native-control-review/vk_shader.c": "f25aa38cca6303d6f014f5c48db1a2cf8028415bfd1a36adbc1bf9a83f93ecba",
+    "/scratch/apple-m2-playground/native-control-review/blob.c": "f418d2c72a60e09f1df77ff6a8d8a54b92a676c60b63e6e2f97668aba88403c6",
+    "/save/workspace/AGX_Probe/applegpu/applegpu.py": "986f6c6ec5547c5f61e357c7c0df614cb05b3382eed705d4ef7a79c4d3a2c46f",
+    "/save/workspace/AGX_Probe/applegpu/assemble.py": "6954f39ea05462ba67b1bba93b101470210268e96b3c6de748909db38d940425",
+    "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "41a1cf2e25306f058d864bb60aeedabb469bd6ef7eec64bce08e78650c9c51b1",
+    "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "1fb90a504281682d3177e612ad27f10316383951c0eca88e9c1eb0c9c914263a",
+    "/save/workspace/apple-documentation-playground/scripts/agx_instruction_candidates.py": "690b7004459b875124fdca52a9c2021e2d08eb85e92aadb043242c9b1a5a6b18"
+  },
+  "shaders": {
+    "constant": {
+      "binary_sha256": "b79bd25941bdea1a0095b219fe0333ac5c18822225de811c9308a38702e9e098",
+      "native_sha256": "f5aac4fd738295fa9443bb868df4ab8819517cd5f94c1a9dbed4743f5c15aeaa",
+      "code_start": 2236,
+      "main_size": 70,
+      "metadata_base": 1049,
+      "rodata_offset_uniform16_size16": [
+        0,
+        16,
+        2
+      ],
+      "main": [
+        {
+          "code_offset": 128,
+          "blob_offset": 2364,
+          "hex": "f2051004",
+          "assembly": "get_sr           r1.cache, sr80 (thread_position_in_grid.x)",
+          "fields": {
+            "Dt": 3,
+            "D": 2,
+            "SR": 80
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 132,
+          "blob_offset": 2368,
+          "hex": "0e05c28658000000",
+          "assembly": "iadd             r1, r1.discard.sx, u4.sx",
+          "fields": {
+            "S": 0,
+            "N": 0,
+            "Dt": 2,
+            "D": 2,
+            "At": 11,
+            "As": 1,
+            "A": 2,
+            "Bt": 6,
+            "Bs": 1,
+            "B": 8,
+            "s": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 140,
+          "blob_offset": 2376,
+          "hex": "62000000",
+          "assembly": "mov_imm          r0l, 0",
+          "fields": {
+            "Dt": 0,
+            "D": 0,
+            "imm16": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 144,
+          "blob_offset": 2380,
+          "hex": "522842a21800",
+          "assembly": "if_icmp          r0l, ult, r1, u5, 1",
+          "fields": {
+            "Dt": 0,
+            "cc": 1,
+            "ccn": 0,
+            "At": 9,
+            "A": 2,
+            "Bt": 6,
+            "B": 10,
+            "n": 1
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 150,
+          "blob_offset": 2386,
+          "hex": "620978563412",
+          "assembly": "mov_imm          r2, 305419896, 0b0",
+          "fields": {
+            "Dt": 2,
+            "D": 4,
+            "imm32": 305419896,
+            "kill": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 156,
+          "blob_offset": 2392,
+          "hex": "0e05082064000000",
+          "assembly": "iadd             r1, 8, r1.sx",
+          "fields": {
+            "S": 0,
+            "N": 0,
+            "Dt": 2,
+            "D": 2,
+            "At": 0,
+            "As": 0,
+            "A": 8,
+            "Bt": 9,
+            "Bs": 1,
+            "B": 2,
+            "s": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 164,
+          "blob_offset": 2400,
+          "hex": "45112c0e00c01200",
+          "assembly": "device_store     0, i32, x, r2, u6_u7, r1, unsigned, 0",
+          "fields": {
+            "g": 0,
+            "F": 2,
+            "mask": 1,
+            "Rt": 1,
+            "R": 4,
+            "At": 1,
+            "A": 12,
+            "Ot": 0,
+            "O": 2,
+            "Ou": 1,
+            "s": 0,
+            "u6": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 172,
+          "blob_offset": 2408,
+          "hex": "3800",
+          "assembly": "wait             0",
+          "fields": {
+            "i": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 174,
+          "blob_offset": 2410,
+          "hex": "520e00000000",
+          "assembly": "pop_exec         r0l, 1",
+          "fields": {
+            "Dt": 0,
+            "n": 1
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 180,
+          "blob_offset": 2416,
+          "hex": "8800",
+          "assembly": "stop",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 182,
+          "blob_offset": 2418,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 184,
+          "blob_offset": 2420,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 186,
+          "blob_offset": 2422,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 188,
+          "blob_offset": 2424,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 190,
+          "blob_offset": 2426,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 192,
+          "blob_offset": 2428,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 194,
+          "blob_offset": 2430,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 196,
+          "blob_offset": 2432,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        }
+      ],
+      "patch": {
+        "old": "620978563412",
+        "new": "620979563412",
+        "assembly": "mov_imm          r2, 305419897, 0b0",
+        "fields": {
+          "Dt": 2,
+          "D": 4,
+          "imm32": 305419897,
+          "kill": 0
+        },
+        "changed_instruction_bit": 16,
+        "changed_blob_byte": 2388
+      }
+    },
+    "index": {
+      "binary_sha256": "d0b99dace1de6eb2467c64ce872e8f5c02458d1edae0a3f74b9ed2c17cff0ba3",
+      "native_sha256": "a11d470fe43e3df8c0bdbc2a98da1b1ac6d676fb052aac7d0024fad21aa57fa3",
+      "code_start": 2236,
+      "main_size": 78,
+      "metadata_base": 1049,
+      "rodata_offset_uniform16_size16": [
+        0,
+        16,
+        4
+      ],
+      "main": [
+        {
+          "code_offset": 128,
+          "blob_offset": 2364,
+          "hex": "f2051004",
+          "assembly": "get_sr           r1.cache, sr80 (thread_position_in_grid.x)",
+          "fields": {
+            "Dt": 3,
+            "D": 2,
+            "SR": 80
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 132,
+          "blob_offset": 2368,
+          "hex": "0e05c28658000000",
+          "assembly": "iadd             r1, r1.discard.sx, u4.sx",
+          "fields": {
+            "S": 0,
+            "N": 0,
+            "Dt": 2,
+            "D": 2,
+            "At": 11,
+            "As": 1,
+            "A": 2,
+            "Bt": 6,
+            "Bs": 1,
+            "B": 8,
+            "s": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 140,
+          "blob_offset": 2376,
+          "hex": "62000000",
+          "assembly": "mov_imm          r0l, 0",
+          "fields": {
+            "Dt": 0,
+            "D": 0,
+            "imm16": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 144,
+          "blob_offset": 2380,
+          "hex": "522842a21800",
+          "assembly": "if_icmp          r0l, ult, r1, u5, 1",
+          "fields": {
+            "Dt": 0,
+            "cc": 1,
+            "ccn": 0,
+            "At": 9,
+            "A": 2,
+            "Bt": 6,
+            "B": 10,
+            "n": 1
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 150,
+          "blob_offset": 2386,
+          "hex": "9e09820659000000",
+          "assembly": "imadd            r2.cache, r1.cache.sx, u8.sx, 0",
+          "fields": {
+            "S": 0,
+            "N": 0,
+            "Dt": 3,
+            "D": 4,
+            "At": 10,
+            "As": 1,
+            "A": 2,
+            "Bt": 6,
+            "Bs": 1,
+            "B": 16,
+            "Ct": 0,
+            "Cs": 0,
+            "C": 0,
+            "s": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 158,
+          "blob_offset": 2394,
+          "hex": "7e09442a5900",
+          "assembly": "xor              r2, r2, u9",
+          "fields": {
+            "tt0": 0,
+            "tt1": 1,
+            "tt2": 1,
+            "tt3": 0,
+            "Dt": 2,
+            "D": 4,
+            "At": 9,
+            "A": 4,
+            "Bt": 6,
+            "B": 18
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 164,
+          "blob_offset": 2400,
+          "hex": "0e05082064000000",
+          "assembly": "iadd             r1, 8, r1.sx",
+          "fields": {
+            "S": 0,
+            "N": 0,
+            "Dt": 2,
+            "D": 2,
+            "At": 0,
+            "As": 0,
+            "A": 8,
+            "Bt": 9,
+            "Bs": 1,
+            "B": 2,
+            "s": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 172,
+          "blob_offset": 2408,
+          "hex": "45112c0e00c01200",
+          "assembly": "device_store     0, i32, x, r2, u6_u7, r1, unsigned, 0",
+          "fields": {
+            "g": 0,
+            "F": 2,
+            "mask": 1,
+            "Rt": 1,
+            "R": 4,
+            "At": 1,
+            "A": 12,
+            "Ot": 0,
+            "O": 2,
+            "Ou": 1,
+            "s": 0,
+            "u6": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 180,
+          "blob_offset": 2416,
+          "hex": "3800",
+          "assembly": "wait             0",
+          "fields": {
+            "i": 0
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 182,
+          "blob_offset": 2418,
+          "hex": "520e00000000",
+          "assembly": "pop_exec         r0l, 1",
+          "fields": {
+            "Dt": 0,
+            "n": 1
+          },
+          "remainder": 0
+        },
+        {
+          "code_offset": 188,
+          "blob_offset": 2424,
+          "hex": "8800",
+          "assembly": "stop",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 190,
+          "blob_offset": 2426,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 192,
+          "blob_offset": 2428,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 194,
+          "blob_offset": 2430,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 196,
+          "blob_offset": 2432,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 198,
+          "blob_offset": 2434,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 200,
+          "blob_offset": 2436,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 202,
+          "blob_offset": 2438,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        },
+        {
+          "code_offset": 204,
+          "blob_offset": 2440,
+          "hex": "0800",
+          "assembly": "trap",
+          "fields": {},
+          "remainder": 0
+        }
+      ],
+      "patch": {
+        "old": "9e09820659000000",
+        "new": "9e09820659010000",
+        "assembly": "imadd            r2.cache, r1.cache.sx, u8.sx, 1",
+        "fields": {
+          "S": 0,
+          "N": 0,
+          "Dt": 3,
+          "D": 4,
+          "At": 10,
+          "As": 1,
+          "A": 2,
+          "Bt": 6,
+          "Bs": 1,
+          "B": 16,
+          "Ct": 0,
+          "Cs": 0,
+          "C": 1,
+          "s": 0
+        },
+        "changed_instruction_bit": 40,
+        "changed_blob_byte": 2391
+      }
+    }
+  },
+  "retained_readback_checks": [
+    {
+      "name": "constant-import-1",
+      "words": 64,
+      "sha256": "94a9bdb43620f725caddfb1e87bf25e7c7266ded867ce03e5042facf356c129f",
+      "passed": true
+    },
+    {
+      "name": "constant-import-257",
+      "words": 320,
+      "sha256": "2ea9b61f81ec71e593fd45b5b557d0946c377b5cbf52827e3f18be5717b6e044",
+      "passed": true
+    },
+    {
+      "name": "constant-import-32",
+      "words": 64,
+      "sha256": "c51884272391062cba017f782248b4457cbffdf3608bd600e8793a4de988dbb4",
+      "passed": true
+    },
+    {
+      "name": "constant-import-33",
+      "words": 96,
+      "sha256": "e0ebe2ad7a152a23d7900e614a3697415f6cdc248c82ac0f018877f20e6cc924",
+      "passed": true
+    },
+    {
+      "name": "constant-source-33",
+      "words": 96,
+      "sha256": "e0ebe2ad7a152a23d7900e614a3697415f6cdc248c82ac0f018877f20e6cc924",
+      "passed": true
+    },
+    {
+      "name": "index-import-1",
+      "words": 64,
+      "sha256": "94a9bdb43620f725caddfb1e87bf25e7c7266ded867ce03e5042facf356c129f",
+      "passed": true
+    },
+    {
+      "name": "index-import-257",
+      "words": 320,
+      "sha256": "bfee50b2bdcf12dfdbf8f108e0afd20bc3ff3c68318d4ec3a5ced75bd2618578",
+      "passed": true
+    },
+    {
+      "name": "index-import-32",
+      "words": 64,
+      "sha256": "15cd2bbfc2bb10e638f8ed63964ae45fcd14a7eb6d638a1c5781a84b06ae7a77",
+      "passed": true
+    },
+    {
+      "name": "index-import-33",
+      "words": 96,
+      "sha256": "ac28bb344417d7efd5bad65118332e22ecad5b6b711878f0143437dfb00b4fcc",
+      "passed": true
+    },
+    {
+      "name": "index-source-33",
+      "words": 96,
+      "sha256": "ac28bb344417d7efd5bad65118332e22ecad5b6b711878f0143437dfb00b4fcc",
+      "passed": true
+    },
+    {
+      "name": "no-dispatch",
+      "words": 96,
+      "sha256": "1bbecebd1c663b6e8d9ec2c16ac2ba30edf3146f43844e750854aef51619910a",
+      "passed": true
+    }
+  ],
+  "predicted_index_addend1": [
+    {
+      "i": 0,
+      "expected": 305419897
+    },
+    {
+      "i": 1,
+      "expected": 2349019074
+    },
+    {
+      "i": 2,
+      "expected": 777692427
+    },
+    {
+      "i": 31,
+      "expected": 981723920
+    },
+    {
+      "i": 32,
+      "expected": 3571147097
+    },
+    {
+      "i": 256,
+      "expected": 625864569
+    }
+  ]
+}
