@@ -1,0 +1,4 @@
+{
+  "pass": true,
+  "scope": "host-only runner failure path; no GPU or driver calls"
+}

@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "cc",
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-O2",
+    "-MD",
+    "-MF",
+    "/scratch/apple-m2-playground/compute-runs/20261004T202352.121942Z-4219/build/dependencies.d",
+    "-I/scratch/intentionally-missing-compute-headers",
+    "/scratch/apple-m2-playground/compute-runs/20261004T202352.121942Z-4219/sources/gles_compute.c",
+    "-ldl",
+    "-o",
+    "/scratch/apple-m2-playground/compute-runs/20261004T202352.121942Z-4219/gles_compute"
+  ],
+  "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202352.121942Z-4219/build",
+  "elapsed_seconds": 0.004013471000007485,
+  "returncode": 1,
+  "timed_out": false,
+  "timeout_seconds": 30
+}

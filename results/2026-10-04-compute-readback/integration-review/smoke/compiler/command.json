@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "cc",
+    "--version"
+  ],
+  "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/compiler",
+  "elapsed_seconds": 0.0006630850002693478,
+  "returncode": 0,
+  "timed_out": false,
+  "timeout_seconds": 10
+}

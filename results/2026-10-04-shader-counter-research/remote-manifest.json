@@ -1,0 +1,94 @@
+[
+  {
+    "file": "khronos-timer.txt",
+    "url": "https://registry.khronos.org/OpenGL/extensions/EXT/EXT_disjoint_timer_query.txt",
+    "retrieved_utc": "2026-10-04T20:16:27Z",
+    "error": "<HTTPError 403: 'Forbidden'>"
+  },
+  {
+    "file": "mesa-25.1.9-agx_pipe.c",
+    "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/gallium/drivers/asahi/agx_pipe.c",
+    "retrieved_utc": "2026-10-04T20:16:27Z",
+    "resolved_url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/gallium/drivers/asahi/agx_pipe.c",
+    "status": 200,
+    "size": 82583,
+    "sha256": "cfc4d926eae985b0d97aa97eef280f6ddf9c6cc2f9cfbe06de2c4f69e11fabea"
+  },
+  {
+    "file": "applegpu-upstream.py",
+    "url": "https://raw.githubusercontent.com/dougallj/applegpu/4c5bae61086b8067231120c98b4756d7696d399c/applegpu.py",
+    "retrieved_utc": "2026-10-04T20:16:29Z",
+    "resolved_url": "https://raw.githubusercontent.com/dougallj/applegpu/4c5bae61086b8067231120c98b4756d7696d399c/applegpu.py",
+    "status": 200,
+    "size": 163402,
+    "sha256": "986f6c6ec5547c5f61e357c7c0df614cb05b3382eed705d4ef7a79c4d3a2c46f"
+  },
+  {
+    "file": "mesa-25.1.9-src__gallium__drivers__asahi__agx_batch.c",
+    "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/gallium/drivers/asahi/agx_batch.c",
+    "retrieved_utc": "2026-10-04T20:17:10Z",
+    "status": 200,
+    "size": 33546,
+    "sha256": "3bd195245e1041548ff9609f32a75888d85e174e9ffc375469bce2c68d1c073a"
+  },
+  {
+    "file": "mesa-25.1.9-src__gallium__drivers__asahi__agx_query.c",
+    "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/gallium/drivers/asahi/agx_query.c",
+    "retrieved_utc": "2026-10-04T20:17:10Z",
+    "status": 200,
+    "size": 17892,
+    "sha256": "0ae4e77fef405878e0d5e4a4d94fd7d112a9cf2fef5fe22bc011139da9237fcc"
+  },
+  {
+    "file": "mesa-25.1.9-src__mesa__main__get.c",
+    "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/mesa/main/get.c",
+    "retrieved_utc": "2026-10-04T20:17:10Z",
+    "status": 200,
+    "size": 105263,
+    "sha256": "249a012d734036880e7b9a1cd84329df3731e8723f7b93363293018047c75f39"
+  },
+  {
+    "file": "mesa-25.1.9-src__mesa__state_tracker__st_cb_queryobj.c",
+    "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/mesa/state_tracker/st_cb_queryobj.c",
+    "retrieved_utc": "2026-10-04T20:17:10Z",
+    "error": "<HTTPError 404: ''>"
+  },
+  {
+    "file": "mesa-25.1.9-src__gallium__drivers__asahi__agx_state.h",
+    "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/gallium/drivers/asahi/agx_state.h",
+    "retrieved_utc": "2026-10-04T20:17:10Z",
+    "status": 200,
+    "size": 36657,
+    "sha256": "95ee7ec5410c61368a392dd9e9352e0f3e4cc487b8342a38f410cd0ab04115ff"
+  },
+  {
+    "file": "mesa-25.1.9-src__asahi__isa__AGX2.xml",
+    "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/asahi/isa/AGX2.xml",
+    "retrieved_utc": "2026-10-04T20:17:11Z",
+    "error": "<HTTPError 404: ''>"
+  },
+  {
+    "file": "mesa-25.1.9-src__asahi__compiler__agx_opcodes.py",
+    "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/asahi/compiler/agx_opcodes.py",
+    "retrieved_utc": "2026-10-04T20:17:11Z",
+    "status": 200,
+    "size": 18506,
+    "sha256": "8ce345884ad659f10ba19574445a61db6039733800bfb68ee0cabed6c6e2c3f6"
+  },
+  {
+    "file": "mesa-25.1.9-src__mesa__main__queryobj.c",
+    "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/mesa/main/queryobj.c",
+    "retrieved_utc": "2026-10-04T20:17:11Z",
+    "status": 200,
+    "size": 41274,
+    "sha256": "1be7320c2bbb398d945809b8ab047800c5604e95f9e70c95dcee72dd4b5c0bdc"
+  },
+  {
+    "file": "khronos-timer.txt",
+    "url": "https://raw.githubusercontent.com/KhronosGroup/OpenGL-Registry/main/extensions/EXT/EXT_disjoint_timer_query.txt",
+    "retrieved_utc": "2026-10-04T20:18:11Z",
+    "status": 200,
+    "sha256": "0f9629d3d6e623084cadfe095f72d4070b09836343b635930f22f1f49b2c8004",
+    "size": 34949
+  }
+]

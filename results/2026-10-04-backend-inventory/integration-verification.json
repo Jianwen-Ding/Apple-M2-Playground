@@ -1,0 +1,7 @@
+{
+  "scope": "Read-only original evidence/hash review; no API execution",
+  "passed": true,
+  "original_inventory_file_hashes_checked": 13,
+  "original_source_hashes_checked": 18,
+  "binary_omitted": true
+}

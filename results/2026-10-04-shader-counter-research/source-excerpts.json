@@ -1,0 +1,362 @@
+{
+  "scope": "Selected original source snapshots, not installed binary equivalence or hardware counter proof",
+  "sources": [
+    {
+      "source": "/save/workspace/AGX_Probe/applegpu/applegpu.py",
+      "snapshot": "local/applegpu/applegpu.py",
+      "sha256": "986f6c6ec5547c5f61e357c7c0df614cb05b3382eed705d4ef7a79c4d3a2c46f",
+      "size": 163402,
+      "excerpts": [
+        {
+          "first_line": 24,
+          "last_line": 68,
+          "text": "SR_NAMES = {\n\t0:  'threadgroup_position_in_grid.x',\n\t1:  'threadgroup_position_in_grid.y',\n\t2:  'threadgroup_position_in_grid.z',\n\t4:  'threads_per_threadgroup.x',\n\t5:  'threads_per_threadgroup.y',\n\t6:  'threads_per_threadgroup.z',\n\t8:  'dispatch_threads_per_threadgroup.x',\n\t9:  'dispatch_threads_per_threadgroup.y',\n\t10: 'dispatch_threads_per_threadgroup.z',\n\t20: 'core_index',\n\t21: 'vm_slot',\n\t48: 'thread_position_in_threadgroup.x',\n\t49: 'thread_position_in_threadgroup.y',\n\t50: 'thread_position_in_threadgroup.z',\n\t51: 'thread_index_in_threadgroup',\n\t52: 'thread_index_in_simdgroup',\n\t53: 'simdgroup_index_in_threadgroup',\n\t56: 'active_thread_index_in_quadgroup',\n\t58: 'active_thread_index_in_simdgroup',\n\t# sample coverage mask in fragment shaders?\n\t# MSAA lowering uses this\n\t60: 'internal_coverage_mask',\n\t# [sample_mask] input in Metal\n\t124: 'input_coverage_mask',\n        # In fragment shaders. Invert for front facing\n\t62: 'backfacing',\n\t63: 'is_active_thread', # compare to zero for simd/quad_is_helper_thread\n        # 80, 81 also used for calculating fragcoord.xy\n\t80: 'thread_position_in_grid.x',\n\t81: 'thread_position_in_grid.y',\n\t82: 'thread_position_in_grid.z',\n\t124: 'input_sample_mask',\n\t144: 'opfifo_cmd',\n\t146: 'opfifo_data_l',\n\t147: 'opfifo_data_h',\n\n}\n\ndef opcode_to_number(opcode):\n\tn = 0\n\tfor i, c in enumerate(opcode[:MAX_OPCODE_LEN]):\n\t\tn |= c << (8 * i)\n\treturn n\n\n"
+        },
+        {
+          "first_line": 2210,
+          "last_line": 2246,
+          "text": "#\t\tif not isinstance(r, Reg16): # (Reg64, UReg64)):\n#\t\t\traise Exception('invalid ThreadgroupMemoryBaseDesc %r' % (opstr,))\n#\n#\t\tfields[self.name + 't'] = 0 if isinstance(r, Reg16) else 0b10\n#\t\tfields[self.name] = r.n << 1\n\nclass SReg32Desc(OperandDesc):\n\tdef __init__(self, name, start, start_ex):\n\t\tsuper().__init__(name)\n\t\tself.add_merged_field(self.name, [\n\t\t\t(start, 6, self.name),\n\t\t\t(start_ex, 2, self.name + 'x'),\n\t\t])\n\n\tpseudocode = '''\n\t{name}(value):\n\t\treturn SpecialRegister(value)\n\t'''\n\tdef decode(self, fields):\n\t\treturn SReg32(fields[self.name])\n\n\tdef encode_string(self, fields, opstr):\n\t\ts = opstr\n\t\tif ' (' in s and ')' in s:\n\t\t\ts = s.split(' (')[0]\n\t\tif s.startswith('sr'):\n\t\t\ttry:\n\t\t\t\tv = int(s[2:])\n\t\t\texcept ValueError:\n\t\t\t\traise Exception('invalid SReg32Desc %r' % (opstr,))\n\t\t\tif 0 <= v < 256:\n\t\t\t\tfields[self.name] = v\n\t\t\t\treturn\n\t\traise Exception('invalid SReg32Desc %r' % (opstr,))\n\n\n\n"
+        },
+        {
+          "first_line": 2370,
+          "last_line": 2401,
+          "text": "\t\tself.operands['D'].set_thread(fields, corestate, thread, a)\n\n@register\nclass MovFromSrInstructionDesc(MaskedInstructionDesc):\n\t#documentation_begin_group = 'Miscellaneous Instructions'\n\tdocumentation_name = 'Move From Special Register'\n\tdef __init__(self):\n\t\tsuper().__init__('get_sr', size=4)\n\n\t\tself.add_constant(0, 7, 0b1110010)\n\t\tself.add_constant(15, 1, 0)\n\t\tself.add_operand(ALUDstDesc('D', 28))\n\t\tself.add_operand(SReg32Desc('SR', 16, 26))\n\n\tpseudocode = '''\n\tfor each active thread:\n\t\tD[thread] = SR.read(thread)\n\t'''\n\n\tdef exec_thread(self, instr, corestate, thread):\n\t\tfields = dict(self.decode_fields(instr))\n\n\t\tif fields['SR'] == 80:\n\t\t\tself.operands['D'].set_thread(fields, corestate, thread, thread)\n\t\telse:\n\t\t\tassert False, 'TODO'\n\n\ndef icompare_thread(desc, fields, corestate, thread):\n\ta = desc.operands['A'].evaluate_thread(fields, corestate, thread)\n\tb = desc.operands['B'].evaluate_thread(fields, corestate, thread)\n\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/applegpu/hwtest.py",
+      "snapshot": "local/applegpu/hwtest.py",
+      "sha256": "a3b1da0407f1e28f5979d04bf18634c067e3f550ded7b7c4113a434560811896",
+      "size": 39778,
+      "excerpts": [
+        {
+          "first_line": 33,
+          "last_line": 56,
+          "text": "\ndef test(test_opcodes, state=None, n=32, extra_data=b''):\n\t# load r0-r3 from in0.bin\n\t# load r4-r7 from in1.bin\n\t# r8 = thread position in grid\n\tcode = bytes.fromhex(\n\t\t'72211004'         # get_sr           r8, sr80 (thread_position_in_grid.x)\n\t\t'0501000e01c8f200' # device_load      3, 0, i32, quad, 4, r0_r1_r2_r3, u0_u1, r8, lsl 2\n\t\t'0521040e01c8f200' # device_load      3, 0, i32, quad, 4, r4_r5_r6_r7, u2_u3, r8, lsl 2\n\t\t'3800'             # wait             0\n\t)\n\n\tfor i in range(9, 32):\n\t\tcode += mov_imm(i, 0)\n\n\tcode += test_opcodes\n\n\tcode += bytes.fromhex((\n\t  'F2 7d 10 04'             # get_sr           $r31, sr80 (thread_position_in_grid.x)\n\t  '45 01 e0 0E 03 C8 F2 00' # device_store     3, 0, i32, quad, 4, r0_r1_r2_r3, u0_u1, r31, lsl 2\n\t  '45 21 e4 0E 03 C8 F2 00' # device_store     3, 0, i32, quad, 4, r4_r5_r6_r7, u2_u3, r31, lsl 2\n\t  '45 41 e8 0E 03 C8 F2 00' # device_store     3, 0, i32, quad, 4, r8_r9_r10_r11, u4_u5, r31, lsl 2\n\t  '45 61 eC 0E 03 C8 F2 00' # device_store     3, 0, i32, quad, 4, r12_r13_r14_r15, u6_u7, r31, lsl 2\n\t  '45 81 e0 0E 13 C8 F2 00' # device_store     3, 0, i32, quad, 4, r16_r17_r18_r19, u8_u9, r31, lsl 2\n"
+        },
+        {
+          "first_line": 618,
+          "last_line": 628,
+          "text": "\n\tcode = b''.join(assemble.assemble_line('mov r%dh, u%dl' % (i, i+20)) for i in range(3))\n\trun_test(code, RANDOM_INITIAL_STATE)\n\ndef test_sr80():\n\trun_test(assemble.assemble_line('get_sr r0, sr80'), RANDOM_INITIAL_STATE)\n\ndef test_memory():\n\t# TODO: document what each of these are testing\n\textra_data = bytes(range(256))*2\n\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/applegpu/hwtestbed.py",
+      "snapshot": "local/applegpu/hwtestbed.py",
+      "sha256": "ebf24189f15985602637df0575a8e877e324b9a1648207e5ce69dd1ed72d2f8d",
+      "size": 11137,
+      "excerpts": [
+        {
+          "first_line": 164,
+          "last_line": 189,
+          "text": "\t\tcode = assemble.assemble_file(args.input, args.binary)\n\telse:\n\t\tif args.binary:\n\t\t\tcode = bytes.fromhex(' '.join(args.instructions))\n\t\telse:\n\t\t\tcode = assemble.assemble_multiline(' '.join(args.instructions).split(';'))\n\tbefore = bytes.fromhex(\n\t\t'f2791004'         # get_sr       r30.cache, sr80 (thread_position_in_grid.x)\n\t\t'9e7bfc02009c0102' # imadd        r30_r31.cache, r30.discard, 128, u14\n\t\t'0e7dfee219000000' # iadd         r31, r31.discard, u15\n\t\t'05010c0730c8f200' # device_load  0, i32, xyzw, r0_r1_r2_r3, r30_r31, 0, unsigned, lsl 2\n\t\t'05211c0730c8f200' # device_load  0, i32, xyzw, r4_r5_r6_r7, r30_r31, 1, unsigned, lsl 2\n\t\t'05412c0730c8f200' # device_load  0, i32, xyzw, r8_r9_r10_r11, r30_r31, 2, unsigned, lsl 2\n\t\t'05613c0730c8f200' # device_load  0, i32, xyzw, r12_r13_r14_r15, r30_r31, 3, unsigned, lsl 2\n\t\t'05814c0730c8f200' # device_load  0, i32, xyzw, r16_r17_r18_r19, r30_r31, 4, unsigned, lsl 2\n\t\t'05a15c0730c8f200' # device_load  0, i32, xyzw, r20_r21_r22_r23, r30_r31, 5, unsigned, lsl 2\n\t\t'05c16c0730c8f200' # device_load  0, i32, xyzw, r24_r25_r26_r27, r30_r31, 6, unsigned, lsl 2\n\t\t'05e17c0730c8f200' # device_load  0, i32, xyzw, r28_r29_r30_r31, r30_r31, 7, unsigned, lsl 2\n\t\t'3800'             # wait         0\n\t)\n\tafter = bytes.fromhex(\n\t\t'f2791004'         # get_sr       r30.cache, sr80 (thread_position_in_grid.x)\n\t\t'9e7bfc02009c0102' # imadd        r30_r31.cache, r30.discard, 128, u14\n\t\t'0e7dfee219000000' # iadd         r31, r31.discard, u15\n\t\t'45010c0730c8f200' # device_store 0, i32, xyzw, r0_r1_r2_r3, r30_r31, 0, unsigned, lsl 2, 0\n\t\t'45211c0730c8f200' # device_store 0, i32, xyzw, r4_r5_r6_r7, r30_r31, 1, unsigned, lsl 2, 0\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/asahi/compiler/agx_opcodes.py",
+      "snapshot": "local/mesa/src/asahi/compiler/agx_opcodes.py",
+      "sha256": "23d6d6312784a96e67aa9073deb55415c079b915899367c8b9a4075763f92446",
+      "size": 17626,
+      "excerpts": [
+        {
+          "first_line": 112,
+          "last_line": 152,
+          "text": "NEST = immediate(\"nest\")\nTARGET = immediate(\"target\", \"agx_block *\")\nZS = immediate(\"zs\")\nSR = enum(\"sr\", {\n   0:  'threadgroup_position_in_grid.x',\n   1:  'threadgroup_position_in_grid.y',\n   2:  'threadgroup_position_in_grid.z',\n   4:  'threads_per_threadgroup.x',\n   5:  'threads_per_threadgroup.y',\n   6:  'threads_per_threadgroup.z',\n   8:  'dispatch_threads_per_threadgroup.x',\n   9:  'dispatch_threads_per_threadgroup.y',\n   10: 'dispatch_threads_per_threadgroup.z',\n   14: 'samples_log2',\n   20: 'core_id',\n   21: 'vm_slot',\n   48: 'thread_position_in_threadgroup.x',\n   49: 'thread_position_in_threadgroup.y',\n   50: 'thread_position_in_threadgroup.z',\n   51: 'thread_index_in_threadgroup',\n   52: 'thread_index_in_subgroup',\n   53: 'subgroup_index_in_threadgroup',\n   56: 'active_thread_index_in_quad',\n   57: 'total_active_threads_in_quad',\n   58: 'active_thread_index_in_subgroup',\n   59: 'total_active_threads_in_subgroup',\n   60: 'coverage_mask',\n   62: 'backfacing',\n   63: 'is_active_thread',\n   80: 'thread_position_in_grid.x',\n   81: 'thread_position_in_grid.y',\n   82: 'thread_position_in_grid.z',\n   124: 'input_sample_mask',\n   144: 'helper_op',\n   146: 'helper_arg_l',\n   147: 'helper_arg_h',\n})\n\nATOMIC_OPC = enum(\"atomic_opc\", {\n\t0: 'add',\n\t1: 'sub',\n"
+        },
+        {
+          "first_line": 320,
+          "last_line": 331,
+          "text": "      can_eliminate = False)\n\nop(\"wait\", (0x38, 2, _), dests = 0,\n      can_eliminate = False, imms = [SCOREBOARD], schedule_class = \"invalid\")\n\nfor (suffix, schedule_class) in [(\"\", \"none\"), (\"_coverage\", \"coverage\"), (\"_barrier\", \"barrier\")]:\n    op(f\"get_sr{suffix}\", (0x72, 4, _), dests = 1, imms = [SR],\n       schedule_class = schedule_class, can_reorder = schedule_class == \"none\")\n\nop(\"sample_mask\", (0x7fc1, 6, _), dests = 0, srcs = 2,\n    can_eliminate = False, schedule_class = \"coverage\")\n\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/asahi/compiler/agx_pack.c",
+      "snapshot": "local/mesa/src/asahi/compiler/agx_pack.c",
+      "sha256": "f594448db4ccfe5d4f98f849c3f1e08b662264702f5de40a4c97d34be180cf00",
+      "size": 42609,
+      "excerpts": [
+        {
+          "first_line": 490,
+          "last_line": 510,
+          "text": "      pack_assert(I, I->shift <= 4);\n      raw |= (uint64_t)(I->shift & 1) << 39;\n      raw |= (uint64_t)(I->shift >> 1) << 52;\n   } else if (info.immediates & AGX_IMMEDIATE_BFI_MASK) {\n      raw |= (uint64_t)(I->bfi_mask & 0x3) << 38;\n      raw |= (uint64_t)((I->bfi_mask >> 2) & 0x3) << 50;\n      raw |= (uint64_t)((I->bfi_mask >> 4) & 0x1) << 63;\n   } else if (info.immediates & AGX_IMMEDIATE_SIMD_OP) {\n      raw |= (uint64_t)(I->simd_op & 0x1) << 28;\n      raw |= (uint64_t)((I->simd_op >> 1) & 0x7) << 38;\n      raw |= (uint64_t)((I->simd_op >> 4) & 0x1) << 47;\n   } else if (info.immediates & AGX_IMMEDIATE_SR) {\n      raw |= (uint64_t)(I->sr & 0x3F) << 16;\n      raw |= (uint64_t)(I->sr >> 6) << 26;\n   } else if (info.immediates & AGX_IMMEDIATE_WRITEOUT)\n      raw |= (uint64_t)(I->imm) << 8;\n   else if (info.immediates & AGX_IMMEDIATE_IMM)\n      raw |= (uint64_t)(I->imm) << 16;\n   else if (info.immediates & AGX_IMMEDIATE_ROUND)\n      raw |= (uint64_t)(I->imm) << 26;\n   else if (info.immediates & (AGX_IMMEDIATE_FCOND | AGX_IMMEDIATE_ICOND))\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/asahi/compiler/agx_compile.c",
+      "snapshot": "local/mesa/src/asahi/compiler/agx_compile.c",
+      "sha256": "1a5b056a18ffdd1fa6d3813129221e0ead2bf114c794844bbc14bdcd5ebc0c27",
+      "size": 122919,
+      "excerpts": [
+        {
+          "first_line": 1718,
+          "last_line": 1738,
+          "text": "      agx_emit_store_scratch(b, instr);\n      return NULL;\n\n   case nir_intrinsic_load_core_id:\n      return agx_get_sr_to(b, dst, AGX_SR_CORE_ID);\n\n   case nir_intrinsic_load_helper_op_id_agx:\n      assert(b->shader->key->is_helper);\n      return agx_get_sr_barrier_to(b, dst, AGX_SR_HELPER_OP);\n\n   case nir_intrinsic_load_helper_arg_lo_agx:\n      assert(b->shader->key->is_helper);\n      return agx_get_sr_barrier_to(b, dst, AGX_SR_HELPER_ARG_L);\n\n   case nir_intrinsic_load_helper_arg_hi_agx:\n      assert(b->shader->key->is_helper);\n      return agx_get_sr_barrier_to(b, dst, AGX_SR_HELPER_ARG_H);\n\n   case nir_intrinsic_load_exported_agx:\n      return agx_load_exported_to(b, dst, nir_intrinsic_base(instr),\n                                  instr->def.num_components);\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/asahi/isa/AGX2.xml",
+      "snapshot": "local/mesa/src/asahi/isa/AGX2.xml",
+      "sha256": "4d90bdd84a7941f1c9be3013eb9bff4e12091028f0c29ef3333aea0456a0209b",
+      "size": 46631,
+      "excerpts": [
+        {
+          "first_line": 710,
+          "last_line": 752,
+          "text": "      <exact bit=\"8\">1</exact>\n      <immediate name=\"reg\" bit=\"0:7\"/>\n    </case>\n  </encoding>\n\n  <enum kind=\"sr\" name=\"Special registers\">\n    <value value=\"0\">threadgroup_in_grid_x</value>\n    <value value=\"1\">threadgroup_in_grid_y</value>\n    <value value=\"2\">threadgroup_in_grid_z</value>\n    <value value=\"4\">threads_per_threadgroup_x</value>\n    <value value=\"5\">threads_per_threadgroup_y</value>\n    <value value=\"6\">threads_per_threadgroup_z</value>\n    <value value=\"8\">dispatch_threads_per_threadgroup_x</value>\n    <value value=\"9\">dispatch_threads_per_threadgroup_y</value>\n    <value value=\"10\">dispatch_threads_per_threadgroup_z</value>\n    <value value=\"12\">threadgroup_width</value>\n    <value value=\"13\">threadgroup_height</value>\n    <value value=\"14\">samples_log2</value>\n    <value value=\"20\">core_index</value>\n    <value value=\"21\">vm_slot</value>\n    <value value=\"48\">thread_in_threadgroup_x</value>\n    <value value=\"49\">thread_in_threadgroup_y</value>\n    <value value=\"50\">thread_in_threadgroup_z</value>\n    <value value=\"51\">thread_index_in_threadgroup</value>\n    <value value=\"52\">thread_index_in_simdgroup</value>\n    <value value=\"53\">simdgroup_index_in_threadgroup</value>\n    <value value=\"56\">active_thread_index_in_quadgroup</value>\n    <value value=\"57\">total_active_threads_in_quadgroup</value>\n    <value value=\"58\">active_thread_index_in_simdgroup</value>\n    <value value=\"59\">total_active_threads_in_simdgroup</value>\n    <value value=\"60\" label=\"Sample coverage mask used to lower MSAA\">internal_coverage_mask</value>\n    <value value=\"62\" label=\"Inverted from front facing\">backfacing</value>\n    <value value=\"63\" label=\"Compare to zero to check if a helper\">is_active_thread</value>\n    <value value=\"80\">thread_in_grid_x</value>\n    <value value=\"81\">thread_in_grid_y</value>\n    <value value=\"82\">thread_in_grid_z</value>\n    <value value=\"124\">input_sample_mask</value>\n    <value value=\"144\">helper_op</value>\n    <value value=\"146\">helper_arg_l</value>\n    <value value=\"147\">helper_arg_h</value>\n  </enum>\n\n  <enum kind=\"round\" name=\"Round modes\">\n"
+        },
+        {
+          "first_line": 884,
+          "last_line": 896,
+          "text": "  <ins name=\"ldimm32\" length=\"6/8\" display=\"ldimm\">\n    <exact bit=\"0:6 8\">11100010</exact>\n    <dest1/>\n    <immediate name=\"imm\" bit=\"16:47\"/>\n  </ins>\n\n  <ins name=\"mfsr\" length=\"4\" lavel=\"Move From Special Register\" display=\"mov\">\n    <exact bit=\"0:6 15\">01110010</exact>\n    <dest1/>\n    <modifier name=\"sr\" kind=\"sr\" bit=\"16:21 26:27\"/>\n  </ins>\n\n  <group name=\"iadd\" length=\"8\">\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/asahi/lib/decode.c",
+      "snapshot": "local/mesa/src/asahi/lib/decode.c",
+      "sha256": "9dd8acb0b79e48cd936e06aadbb414ca177149b1863903f61df374dce87b6f9f",
+      "size": 37507,
+      "excerpts": [
+        {
+          "first_line": 23,
+          "last_line": 37,
+          "text": "\nstruct libagxdecode_config lib_config;\n\nstatic void\nagx_disassemble(void *_code, size_t maxlen, FILE *fp)\n{\n   bool errors = agx2_disassemble(_code, maxlen, fp);\n   assert(!errors);\n}\n\nFILE *agxdecode_dump_stream;\n\nstruct agxdecode_ctx {\n   struct util_dynarray mmap_array;\n   uint64_t shader_base;\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/asahi/lib/wrap.c",
+      "snapshot": "local/mesa/src/asahi/lib/wrap.c",
+      "sha256": "d26c89383017ea62897b253c20bb74a5ed49949c5a7eb8fb0c0836729242065c",
+      "size": 14455,
+      "excerpts": [
+        {
+          "first_line": 19,
+          "last_line": 36,
+          "text": "#include \"dyld_interpose.h\"\n#include \"util.h\"\n\n#define HANDLE(x) (x ^ (1 << 29))\n\n/*\n * This section contains the minimal set of definitions to trace the macOS\n * (IOKit) interface to the AGX accelerator.\n * They are not used under Linux.\n *\n * Information is this file was originally determined independently. More\n * recently, names have been augmented via the oob_timestamp code sample from\n * Project Zero [1]\n *\n * [1] https://bugs.chromium.org/p/project-zero/issues/detail?id=1986\n */\n\n#define AGX_SERVICE_TYPE 0x100005\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/asahi/libagx/query.cl",
+      "snapshot": "local/mesa/src/asahi/libagx/query.cl",
+      "sha256": "5665be4a2e4df0c72d0ca9321dc5233127bfc44caa07cceaa847f118cf7ffcda",
+      "size": 4250,
+      "excerpts": [
+        {
+          "first_line": 133,
+          "last_line": 152,
+          "text": "KERNEL(32)\nlibagx_write_u32s(constant struct libagx_imm_write *p)\n{\n   uint id = cl_global_id.x;\n   *(p[id].address) = p[id].value;\n}\n\n/*\n * We set the source as volatile since the caching situation around timestamps\n * is a bit unclear. It might not be necessary but - absent hardware/firmware\n * documentation - this gives me peace of mind.\n */\nKERNEL(1)\nlibagx_copy_timestamp(global uint64_t *dest, volatile global uint64_t *src)\n{\n   *dest = *src;\n}\n\nKERNEL(1)\nlibagx_write_u32(global uint32_t *address, uint32_t value)\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/asahi/libagx/helper.cl",
+      "snapshot": "local/mesa/src/asahi/libagx/helper.cl",
+      "sha256": "ab6486d6e8460b03e81f65a20dadc8edf883fff8f6443a5a86bb6a3790e0c18d",
+      "size": 2533,
+      "excerpts": [
+        {
+          "first_line": 19,
+          "last_line": 43,
+          "text": "};\n\nKERNEL(1)\nlibagx_helper(void)\n{\n   uint64_t arg =\n      nir_load_helper_arg_lo_agx() | (((uint64_t)nir_load_helper_arg_hi_agx()) << 32);\n\n   global struct agx_helper_header *hdr =\n      (global struct agx_helper_header *)arg;\n\n   uint32_t core_index = nir_load_core_id();\n   uint32_t subgroups = hdr->subgroups;\n   global struct agx_helper_core *core = &hdr->cores[core_index];\n\n   while (1) {\n      nir_doorbell_agx(DB_NEXT);\n      uint32_t op = nir_load_helper_op_id_agx();\n      uint32_t arg = nir_load_helper_arg_lo_agx();\n\n      switch (op) {\n      case OP_STACK_ALLOC: {\n         uint32_t idx = core->alloc_cur;\n         if (idx >= subgroups) {\n            core->alloc_failed++;\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_physical_device.c",
+      "snapshot": "local/mesa/src/asahi/vulkan/hk_physical_device.c",
+      "sha256": "da726684350674540311ce2c943fec617d4c936afd751359a0449eb032c002ee",
+      "size": 58068,
+      "excerpts": [
+        {
+          "first_line": 106,
+          "last_line": 121,
+          "text": "#endif\n      .KHR_push_descriptor = true,\n      .KHR_relaxed_block_layout = true,\n      .KHR_robustness2 = true,\n      .KHR_sampler_mirror_clamp_to_edge = true,\n      .KHR_sampler_ycbcr_conversion = true,\n      .KHR_separate_depth_stencil_layouts = true,\n      .KHR_shader_atomic_int64 = false,\n      .KHR_shader_clock = false,\n      .KHR_shader_draw_parameters = true,\n      .KHR_shader_expect_assume = true,\n      .KHR_shader_float_controls = true,\n      .KHR_shader_float_controls2 = true,\n      .KHR_shader_float16_int8 = true,\n      .KHR_shader_fma = true,\n      .KHR_shader_integer_dot_product = true,\n"
+        },
+        {
+          "first_line": 438,
+          "last_line": 451,
+          "text": "\n      /* VK_KHR_present_wait */\n      .presentWait = true,\n\n      /* VK_KHR_present_wait2 */\n      .presentWait2 = true,\n\n      /* VK_KHR_shader_clock */\n      .shaderSubgroupClock = false,\n      .shaderDeviceClock = false,\n\n      /* VK_KHR_shader_expect_assume */\n      .shaderExpectAssume = true,\n\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_query_pool.c",
+      "snapshot": "local/mesa/src/asahi/vulkan/hk_query_pool.c",
+      "sha256": "40342a2e425870f22eacb17aa077183e4c503c62a3c7253bb15b24beb98174cd",
+      "size": 22283,
+      "excerpts": [
+        {
+          "first_line": 378,
+          "last_line": 415,
+          "text": "   struct hk_device *dev = hk_cmd_buffer_device(cmd);\n\n   uint64_t report_addr = hk_query_report_addr(dev, pool, query);\n   bool after_gfx = cmd->current_cs.gfx != NULL;\n\n   /* When writing timestamps for compute, we split the control stream at each\n    * write. This ensures we never need to copy compute timestamps, which would\n    * require an extra control stream anyway. Unlike graphics, splitting compute\n    * control streams is inexpensive so there's not a strong performance reason\n    * to do otherwise. Finally, batching multiple timestamp writes (like we do\n    * for graphics) would destroy the ability to profile individual compute\n    * dispatches. While that's allowed by the Vulkan spec, it's pretty mean to\n    * apps. So.. don't do that.\n    */\n   if (!after_gfx && cmd->current_cs.cs &&\n       cmd->current_cs.cs->timestamp.end.addr) {\n\n      perf_debug(cmd, \"Splitting for compute timestamp\");\n      hk_cmd_buffer_end_compute(cmd);\n   }\n\n   struct hk_cs *cs = hk_cmd_buffer_get_cs_general(\n      cmd, after_gfx ? &cmd->current_cs.gfx : &cmd->current_cs.cs, true);\n   if (!cs)\n      return;\n\n   if (cs->timestamp.end.addr) {\n      assert(after_gfx && \"compute is handled above\");\n\n      libagx_copy_timestamp(cmd, agx_1d(1), AGX_BARRIER_ALL | AGX_POSTGFX,\n                            report_addr, cs->timestamp.end.addr);\n   } else {\n      cs->timestamp.end = (struct agx_timestamp_req){\n         .addr = report_addr,\n         .handle = pool->handle,\n         .offset_B = hk_query_offset(pool, query),\n      };\n   }\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_pipe.c",
+      "snapshot": "local/mesa/src/gallium/drivers/asahi/agx_pipe.c",
+      "sha256": "7583eaed2ee995a6a3a92d253cf6fdeafb559c757faa10f35079b0621b4ba510",
+      "size": 84626,
+      "excerpts": [
+        {
+          "first_line": 1534,
+          "last_line": 1550,
+          "text": "      cmdbuf->helper.cfg = batch->cs_preamble_scratch << 16;\n      // cmdbuf->helper.cfg |= 0x40;\n      cmdbuf->helper.binary = agx_helper_program(&batch->ctx->bg_eot);\n   }\n\n   if (batch->timestamps.size > 0) {\n      cmdbuf->ts.start.handle = ctx->timestamp_handle;\n      cmdbuf->ts.end.handle = ctx->timestamp_handle;\n      cmdbuf->ts.start.offset = timestamp_offset(batch, comp_start);\n      cmdbuf->ts.end.offset = timestamp_offset(batch, comp_start);\n   }\n}\n\nstatic void\nagx_flush_render(struct agx_context *ctx, struct agx_batch *batch,\n                 struct drm_asahi_cmd_render *cmdbuf)\n{\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_batch.c",
+      "snapshot": "local/mesa/src/gallium/drivers/asahi/agx_batch.c",
+      "sha256": "b99fac69d414e0f34420ef38243d31da644745f62d88a50835d734e627997778",
+      "size": 33397,
+      "excerpts": [
+        {
+          "first_line": 205,
+          "last_line": 232,
+          "text": "static void\nagx_batch_cleanup(struct agx_context *ctx, struct agx_batch *batch, bool reset)\n{\n   struct agx_device *dev = agx_device(ctx->base.screen);\n   struct agx_screen *screen = agx_screen(ctx->base.screen);\n\n   assert(batch->ctx == ctx);\n   assert(agx_batch_is_submitted(batch));\n\n   assert(ctx->batch != batch);\n\n   uint64_t begin_ts = ~0, end_ts = 0;\n   if (batch->timestamps.size) {\n      struct agx_timestamps *ts = agx_batch_timestamps(batch);\n\n      if (batch->cdm.bo) {\n         begin_ts = MIN2(begin_ts, ts->comp_start);\n         end_ts = MAX2(end_ts, ts->comp_end);\n      }\n\n      if (batch->vdm.bo) {\n         begin_ts = MIN2(begin_ts, ts->vtx_start);\n         end_ts = MAX2(end_ts, ts->frag_end);\n      }\n   }\n\n   agx_finish_batch_queries(batch, begin_ts, end_ts);\n\n"
+        }
+      ]
+    },
+    {
+      "source": "/save/workspace/AGX_Probe/mesa/src/mesa/main/get.c",
+      "snapshot": "local/mesa/src/mesa/main/get.c",
+      "sha256": "e790af8cd7446d8de00a0c1464899e3eb30af9df07ed6b144ad0d49640cee95f",
+      "size": 107001,
+      "excerpts": [
+        {
+          "first_line": 1352,
+          "last_line": 1368,
+          "text": "      }\n      break;\n   /* ARB_spirv_extensions */\n   case GL_NUM_SPIR_V_EXTENSIONS:\n      v->value_int = _mesa_get_spirv_extension_count(ctx);\n      break;\n   /* GL_EXT_disjoint_timer_query */\n   case GL_GPU_DISJOINT_EXT:\n      {\n         v->value_int = 0;\n      }\n      break;\n   /* GL_ARB_sample_locations */\n   case GL_SAMPLE_LOCATION_SUBPIXEL_BITS_ARB:\n   case GL_SAMPLE_LOCATION_PIXEL_GRID_WIDTH_ARB:\n   case GL_SAMPLE_LOCATION_PIXEL_GRID_HEIGHT_ARB:\n      {\n"
+        }
+      ]
+    },
+    {
+      "source": "/usr/include/drm/asahi_drm.h",
+      "snapshot": "asahi_drm.h",
+      "sha256": "69fe416b7294dfec4794217bd11379effd53caff4e86010bb803f1b34bdf5e89",
+      "size": 35836,
+      "excerpts": [
+        {
+          "first_line": 837,
+          "last_line": 880,
+          "text": "\t */\n\t__u32 comp_stride;\n};\n\n/**\n * struct drm_asahi_timestamp - Describe a timestamp write.\n *\n * The firmware can optionally write the GPU timestamp at render pass\n * granularities, but it needs to be mapped specially via\n * DRM_IOCTL_ASAHI_GEM_BIND_OBJECT. This structure therefore describes where to\n * write as a handle-offset pair, rather than a GPU address like normal.\n *\n * This struct is embedded in other structs and therefore is not extensible.\n */\nstruct drm_asahi_timestamp {\n\t/**\n\t * @handle: Handle of the timestamp buffer, or 0 to skip this\n\t * timestamp. If nonzero, this must equal the value returned in\n\t * drm_asahi_gem_bind_object::object_handle.\n\t */\n\t__u32 handle;\n\n\t/** @offset: Offset to write into the timestamp buffer */\n\t__u32 offset;\n};\n\n/**\n * struct drm_asahi_timestamps - Describe timestamp writes.\n *\n * Each operation that can be timestamped, can be timestamped at the start and\n * end. Therefore, drm_asahi_timestamp structs always come in pairs, bundled\n * together into drm_asahi_timestamps.\n *\n * This struct is embedded in other structs and therefore is not extensible.\n */\nstruct drm_asahi_timestamps {\n\t/** @start: Timestamp recorded at the start of the operation */\n\tstruct drm_asahi_timestamp start;\n\n\t/** @end: Timestamp recorded at the end of the operation */\n\tstruct drm_asahi_timestamp end;\n};\n\n/**\n"
+        },
+        {
+          "first_line": 1107,
+          "last_line": 1160,
+          "text": "\n\t/** @ts_frag: Timestamps for the fragment portion of the render */\n\tstruct drm_asahi_timestamps ts_frag;\n};\n\n/**\n * struct drm_asahi_cmd_compute - Command to submit compute\n *\n * This command submits a control stream consisting of compute dispatches. There\n * is essentially no limit on how many compute dispatches may be included in a\n * single compute command, although timestamps are at command granularity.\n */\nstruct drm_asahi_cmd_compute {\n\t/** @flags: MBZ */\n\t__u32 flags;\n\n\t/** @sampler_count: Number of samplers in the sampler heap. */\n\t__u32 sampler_count;\n\n\t/**\n\t * @cdm_ctrl_stream_base: CDM_CTRL_STREAM_BASE register value. GPU\n\t * address to the beginning of the CDM control stream.\n\t */\n\t__u64 cdm_ctrl_stream_base;\n\n\t/**\n\t * @cdm_ctrl_stream_end: GPU base address to the end of the hardware\n\t * control stream. Note this only considers the first contiguous segment\n\t * of the control stream, as the stream might jump elsewhere.\n\t */\n\t__u64 cdm_ctrl_stream_end;\n\n\t/** @sampler_heap: Base address of the sampler heap. */\n\t__u64 sampler_heap;\n\n\t/** @helper: Helper program used for this compute command */\n\tstruct drm_asahi_helper_program helper;\n\n\t/** @ts: Timestamps for the compute command */\n\tstruct drm_asahi_timestamps ts;\n};\n\n/**\n * struct drm_asahi_get_time - Arguments passed to DRM_IOCTL_ASAHI_GET_TIME\n */\nstruct drm_asahi_get_time {\n\t/** @flags: MBZ. */\n\t__u64 flags;\n\n\t/** @gpu_timestamp: On return, the GPU timestamp in nanoseconds. */\n\t__u64 gpu_timestamp;\n};\n\n/**\n"
+        }
+      ]
+    },
+    {
+      "file": "mesa-25.1.9-agx_pipe.c",
+      "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/gallium/drivers/asahi/agx_pipe.c",
+      "retrieved_utc": "2026-10-04T20:16:27Z",
+      "resolved_url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/gallium/drivers/asahi/agx_pipe.c",
+      "status": 200,
+      "size": 82583,
+      "sha256": "cfc4d926eae985b0d97aa97eef280f6ddf9c6cc2f9cfbe06de2c4f69e11fabea",
+      "excerpts": [
+        {
+          "first_line": 1542,
+          "last_line": 1562,
+          "text": "      // helper. Disable them for now.\n\n      // cmdbuf->iogpu_unk_40 = 0x1c;\n      cmdbuf->helper.data = ctx->scratch_cs.buf->va->addr;\n      cmdbuf->helper.cfg = batch->cs_preamble_scratch << 16;\n      // cmdbuf->helper.cfg |= 0x40;\n      cmdbuf->helper.binary = agx_helper_program(&batch->ctx->bg_eot);\n   }\n\n   if (batch->timestamps.size > 0) {\n      cmdbuf->ts.start.handle = ctx->timestamp_handle;\n      cmdbuf->ts.end.handle = ctx->timestamp_handle;\n      cmdbuf->ts.start.offset = timestamp_offset(batch, comp_start);\n      cmdbuf->ts.end.offset = timestamp_offset(batch, comp_start);\n   }\n}\n\nstatic void\nagx_flush_render(struct agx_context *ctx, struct agx_batch *batch,\n                 struct drm_asahi_cmd_render *cmdbuf)\n{\n"
+        }
+      ]
+    },
+    {
+      "file": "mesa-25.1.9-src__gallium__drivers__asahi__agx_batch.c",
+      "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/gallium/drivers/asahi/agx_batch.c",
+      "retrieved_utc": "2026-10-04T20:17:10Z",
+      "status": 200,
+      "size": 33546,
+      "sha256": "3bd195245e1041548ff9609f32a75888d85e174e9ffc375469bce2c68d1c073a",
+      "excerpts": [
+        {
+          "first_line": 205,
+          "last_line": 232,
+          "text": "static void\nagx_batch_cleanup(struct agx_context *ctx, struct agx_batch *batch, bool reset)\n{\n   struct agx_device *dev = agx_device(ctx->base.screen);\n   struct agx_screen *screen = agx_screen(ctx->base.screen);\n\n   assert(batch->ctx == ctx);\n   assert(agx_batch_is_submitted(batch));\n\n   assert(ctx->batch != batch);\n\n   uint64_t begin_ts = ~0, end_ts = 0;\n   if (batch->timestamps.size) {\n      struct agx_timestamps *ts = agx_batch_timestamps(batch);\n\n      if (batch->cdm.bo) {\n         begin_ts = MIN2(begin_ts, ts->comp_start);\n         end_ts = MAX2(end_ts, ts->comp_end);\n      }\n\n      if (batch->vdm.bo) {\n         begin_ts = MIN2(begin_ts, ts->vtx_start);\n         end_ts = MAX2(end_ts, ts->frag_end);\n      }\n   }\n\n   agx_finish_batch_queries(batch, begin_ts, end_ts);\n\n"
+        }
+      ]
+    },
+    {
+      "file": "mesa-25.1.9-src__gallium__drivers__asahi__agx_query.c",
+      "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/gallium/drivers/asahi/agx_query.c",
+      "retrieved_utc": "2026-10-04T20:17:10Z",
+      "status": 200,
+      "size": 17892,
+      "sha256": "0ae4e77fef405878e0d5e4a4d94fd7d112a9cf2fef5fe22bc011139da9237fcc",
+      "excerpts": [
+        {
+          "first_line": 326,
+          "last_line": 360,
+          "text": "   case PIPE_QUERY_SO_OVERFLOW_ANY_PREDICATE:\n      ctx->tf_any_overflow = NULL;\n      return true;\n   case PIPE_QUERY_TIME_ELAPSED:\n      ctx->time_elapsed = NULL;\n      return true;\n   case PIPE_QUERY_PIPELINE_STATISTICS_SINGLE:\n      assert(query->index < ARRAY_SIZE(ctx->pipeline_statistics));\n      ctx->pipeline_statistics[query->index] = NULL;\n      return true;\n   case PIPE_QUERY_TIMESTAMP: {\n      /* Timestamp logically written now, set up batches to MAX their finish\n       * time in. If there are no batches, it's just the current time stamp.\n       */\n      agx_add_timestamp_end_query(ctx, query);\n\n      uint64_t *value = query->ptr.cpu;\n      *value = agx_get_gpu_timestamp(dev);\n\n      return true;\n   }\n   default:\n      return false;\n   }\n}\n\nenum query_copy_type {\n   QUERY_COPY_NORMAL,\n   QUERY_COPY_BOOL32,\n   QUERY_COPY_BOOL64,\n   QUERY_COPY_TIMESTAMP,\n   QUERY_COPY_TIME_ELAPSED,\n};\n\nstatic enum query_copy_type\n"
+        },
+        {
+          "first_line": 552,
+          "last_line": 598,
+          "text": "      util_dynarray_append(&batch->timestamps, struct agx_ptr, q->ptr);\n   }\n}\n\nuint16_t\nagx_get_oq_index(struct agx_batch *batch, struct agx_query *query)\n{\n   agx_add_query_to_batch(batch, query);\n   return agx_oq_index(batch->ctx, query);\n}\n\nuint64_t\nagx_get_query_address(struct agx_batch *batch, struct agx_query *query)\n{\n   if (query) {\n      agx_add_query_to_batch(batch, query);\n      return query->ptr.gpu;\n   } else {\n      return 0;\n   }\n}\n\nvoid\nagx_finish_batch_queries(struct agx_batch *batch, uint64_t begin_ts,\n                         uint64_t end_ts)\n{\n   /* Remove the batch as write from all queries by incrementing the generation\n    * of the batch.\n    */\n   batch->ctx->batches.generation[agx_batch_idx(batch)]++;\n\n   /* Write out timestamps */\n   util_dynarray_foreach(&batch->timestamps, struct agx_ptr, it) {\n      uint64_t *ptr = it->cpu;\n\n      ptr[0] = MAX2(ptr[0], end_ts);\n      ptr[1] = MIN2(ptr[1], begin_ts);\n   }\n}\n\nvoid\nagx_query_increment_cpu(struct agx_context *ctx, struct agx_query *query,\n                        uint64_t increment)\n{\n   if (!query)\n      return;\n\n"
+        }
+      ]
+    },
+    {
+      "file": "mesa-25.1.9-src__mesa__main__get.c",
+      "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/mesa/main/get.c",
+      "retrieved_utc": "2026-10-04T20:17:10Z",
+      "status": 200,
+      "size": 105263,
+      "sha256": "249a012d734036880e7b9a1cd84329df3731e8723f7b93363293018047c75f39",
+      "excerpts": [
+        {
+          "first_line": 1330,
+          "last_line": 1353,
+          "text": "   case GL_SHADER_BINARY_FORMATS:\n      assert(ctx->Const.NumShaderBinaryFormats <= 1);\n      v->value_int_n.n = MIN2(ctx->Const.NumShaderBinaryFormats, 1);\n      if (ctx->Const.NumShaderBinaryFormats > 0) {\n         v->value_int_n.ints[0] = GL_SHADER_BINARY_FORMAT_SPIR_V;\n      }\n      break;\n   /* ARB_spirv_extensions */\n   case GL_NUM_SPIR_V_EXTENSIONS:\n      v->value_int = _mesa_get_spirv_extension_count(ctx);\n      break;\n   /* GL_EXT_disjoint_timer_query */\n   case GL_GPU_DISJOINT_EXT:\n      {\n         v->value_int = 0;\n      }\n      break;\n   /* GL_ARB_sample_locations */\n   case GL_SAMPLE_LOCATION_SUBPIXEL_BITS_ARB:\n   case GL_SAMPLE_LOCATION_PIXEL_GRID_WIDTH_ARB:\n   case GL_SAMPLE_LOCATION_PIXEL_GRID_HEIGHT_ARB:\n      {\n         GLuint bits, width, height;\n\n"
+        }
+      ]
+    },
+    {
+      "file": "mesa-25.1.9-src__gallium__drivers__asahi__agx_state.h",
+      "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/gallium/drivers/asahi/agx_state.h",
+      "retrieved_utc": "2026-10-04T20:17:10Z",
+      "status": 200,
+      "size": 36657,
+      "sha256": "95ee7ec5410c61368a392dd9e9352e0f3e4cc487b8342a38f410cd0ab04115ff",
+      "excerpts": [
+        {
+          "first_line": 353,
+          "last_line": 367,
+          "text": "   unsigned sampler_count, texture_count;\n   uint32_t valid_samplers;\n};\n\nstruct agx_timestamps {\n   uint64_t vtx_start;\n   uint64_t vtx_end;\n   uint64_t frag_start;\n   uint64_t frag_end;\n   uint64_t comp_start;\n   uint64_t comp_end;\n};\n\n/* This is a firmware limit. It should be possible to raise to 2048 in the\n * future... still not good enough for VK though :-(\n"
+        }
+      ]
+    },
+    {
+      "file": "mesa-25.1.9-src__asahi__compiler__agx_opcodes.py",
+      "url": "https://gitlab.freedesktop.org/mesa/mesa/-/raw/mesa-25.1.9/src/asahi/compiler/agx_opcodes.py",
+      "retrieved_utc": "2026-10-04T20:17:11Z",
+      "status": 200,
+      "size": 18506,
+      "sha256": "8ce345884ad659f10ba19574445a61db6039733800bfb68ee0cabed6c6e2c3f6",
+      "excerpts": [
+        {
+          "first_line": 112,
+          "last_line": 151,
+          "text": "INVERT_COND = immediate(\"invert_cond\")\nNEST = immediate(\"nest\")\nTARGET = immediate(\"target\", \"agx_block *\")\nZS = immediate(\"zs\")\nSR = enum(\"sr\", {\n   0:  'threadgroup_position_in_grid.x',\n   1:  'threadgroup_position_in_grid.y',\n   2:  'threadgroup_position_in_grid.z',\n   4:  'threads_per_threadgroup.x',\n   5:  'threads_per_threadgroup.y',\n   6:  'threads_per_threadgroup.z',\n   8:  'dispatch_threads_per_threadgroup.x',\n   9:  'dispatch_threads_per_threadgroup.y',\n   10: 'dispatch_threads_per_threadgroup.z',\n   14: 'samples_log2',\n   20: 'core_id',\n   21: 'vm_slot',\n   48: 'thread_position_in_threadgroup.x',\n   49: 'thread_position_in_threadgroup.y',\n   50: 'thread_position_in_threadgroup.z',\n   51: 'thread_index_in_threadgroup',\n   52: 'thread_index_in_subgroup',\n   53: 'subgroup_index_in_threadgroup',\n   56: 'active_thread_index_in_quad',\n   57: 'total_active_threads_in_quad',\n   58: 'active_thread_index_in_subgroup',\n   59: 'total_active_threads_in_subgroup',\n   60: 'coverage_mask',\n   62: 'backfacing',\n   63: 'is_active_thread',\n   80: 'thread_position_in_grid.x',\n   81: 'thread_position_in_grid.y',\n   82: 'thread_position_in_grid.z',\n   124: 'input_sample_mask',\n   144: 'helper_op',\n   146: 'helper_arg_l',\n   147: 'helper_arg_h',\n})\n\nATOMIC_OPC = enum(\"atomic_opc\", {\n"
+        },
+        {
+          "first_line": 327,
+          "last_line": 346,
+          "text": "op(\"device_load\",\n      encoding = (0x05, 0x7F, 6, 8),\n      srcs = 2, imms = [FORMAT, MASK, SHIFT, SCOREBOARD, COHERENT], can_reorder = False,\n      schedule_class = \"load\")\n\n# sources are base (relative to workgroup memory), index\nop(\"local_load\",\n      encoding = (0b1101001, 0, 6, 8),\n      srcs = 2, imms = [FORMAT, MASK], can_reorder = False,\n      schedule_class = \"load\")\n\n# sources are value, base, index\n# TODO: Consider permitting the short form\nop(\"device_store\",\n      encoding = (0x45 | (1 << 47), 0, 8, _),\n      dests = 0, srcs = 3, imms = [FORMAT, MASK, SHIFT, SCOREBOARD, COHERENT], can_eliminate = False,\n      schedule_class = \"store\")\n\n# sources are value, base, index\nop(\"local_store\",\n"
+        }
+      ]
+    }
+  ]
+}

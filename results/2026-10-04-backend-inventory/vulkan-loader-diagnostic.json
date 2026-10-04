@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/backend-inventory/vulkan-capabilities"
+  ],
+  "timeout_seconds": 15,
+  "env_overrides": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json",
+    "VK_ICD_FILENAMES": "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json",
+    "VK_LOADER_LAYERS_DISABLE": "~implicit~",
+    "VK_LOADER_DEBUG": "error,warn,driver"
+  },
+  "returncode": 3,
+  "stdout": "vkCreateInstance=-9\n",
+  "stderr": "[Vulkan Loader] WARNING | LAYER: Layer \"VK_LAYER_MESA_device_select\" forced disabled because name matches filter of env var 'VK_LOADER_LAYERS_DISABLE'.\n[Vulkan Loader] DRIVER:         Searching for driver manifest files\n[Vulkan Loader] DRIVER:            In following locations:\n[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/asahi_icd.aarch64.json\n[Vulkan Loader] DRIVER:            Found the following files:\n[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/asahi_icd.aarch64.json\n[Vulkan Loader] DRIVER:         Found ICD manifest file /usr/share/vulkan/icd.d/asahi_icd.aarch64.json, version 1.0.1\n[Vulkan Loader] DEBUG | DRIVER: Searching for ICD drivers named /usr/lib64/libvulkan_asahi.so\n[Vulkan Loader] ERROR:          libdisplay-info.so.2: cannot open shared object file: No such file or directory\n[Vulkan Loader] ERROR | DRIVER: loader_icd_scan: Failed loading library associated with ICD JSON /usr/lib64/libvulkan_asahi.so. Ignoring this JSON\n[Vulkan Loader] ERROR | DRIVER: vkCreateInstance: Found no drivers!\n"
+}

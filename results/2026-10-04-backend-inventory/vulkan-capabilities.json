@@ -1,0 +1,42 @@
+[
+  {
+    "utc": "2026-10-04T20:09:58.733690+00:00",
+    "argv": [
+      "cc",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-O2",
+      "-I/save/workspace/AGX_Probe/mesa/include",
+      "/scratch/apple-m2-playground/backend-inventory/vulkan-capabilities.c",
+      "-ldl",
+      "-o",
+      "/scratch/apple-m2-playground/backend-inventory/vulkan-capabilities"
+    ],
+    "timeout_seconds": 15,
+    "env_overrides": {
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json",
+      "VK_ICD_FILENAMES": "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json",
+      "VK_LOADER_LAYERS_DISABLE": "~implicit~"
+    },
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "utc": "2026-10-04T20:09:58.814054+00:00",
+    "argv": [
+      "/scratch/apple-m2-playground/backend-inventory/vulkan-capabilities"
+    ],
+    "timeout_seconds": 15,
+    "env_overrides": {
+      "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json",
+      "VK_ICD_FILENAMES": "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json",
+      "VK_LOADER_LAYERS_DISABLE": "~implicit~"
+    },
+    "returncode": 3,
+    "stdout": "vkCreateInstance=-9\n",
+    "stderr": ""
+  }
+]

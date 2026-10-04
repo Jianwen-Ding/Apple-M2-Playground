@@ -1,0 +1,14 @@
+{
+  "utc": "2026-10-04T20:12:04.030547+00:00",
+  "argv": [
+    "python3",
+    "/scratch/apple-m2-playground/backend-inventory/egl-capabilities.py"
+  ],
+  "timeout_seconds": 15,
+  "env_overrides": {
+    "LIBGL_ALWAYS_SOFTWARE": "false"
+  },
+  "returncode": 0,
+  "stdout": "{\n  \"scope\": \"Surfaceless EGL capability/context query; no shader creation or dispatch\",\n  \"calls\": {\n    \"eglGetPlatformDisplay\": {\n      \"ok\": true,\n      \"error\": \"0x3000\"\n    },\n    \"eglInitialize\": {\n      \"ok\": true,\n      \"error\": \"0x3000\",\n      \"version\": [\n        1,\n        5\n      ]\n    },\n    \"eglQueryDisplayAttribEXT_device\": {\n      \"ok\": true,\n      \"error\": \"0x3000\"\n    },\n    \"eglBindAPI_ES\": true,\n    \"eglChooseConfig_ES3\": {\n      \"ok\": true,\n      \"count\": 1,\n      \"error\": \"0x3000\"\n    },\n    \"eglCreateContext_ES31\": {\n      \"ok\": true,\n      \"error\": \"0x3000\"\n    },\n    \"eglMakeCurrent_surfaceless\": {\n      \"ok\": true,\n      \"error\": \"0x3000\"\n    }\n  },\n  \"device_extensions\": \"EGL_EXT_device_drm EGL_EXT_device_drm_render_node\",\n  \"drm_device_file\": \"/dev/dri/card1\",\n  \"drm_render_node_file\": \"/dev/dri/renderD128\",\n  \"vendor\": \"Mesa Project\",\n  \"version\": \"1.5\",\n  \"extensions\": \"EGL_ANDROID_blob_cache EGL_ANDROID_native_fence_sync EGL_EXT_config_select_group EGL_EXT_create_context_robustness EGL_EXT_image_dma_buf_import EGL_EXT_image_dma_buf_import_modifiers EGL_EXT_query_reset_notification_strategy EGL_EXT_surface_compression EGL_IMG_context_priority EGL_KHR_cl_event2 EGL_KHR_config_attribs EGL_KHR_context_flush_control EGL_KHR_create_context EGL_KHR_create_context_no_error EGL_KHR_fence_sync EGL_KHR_get_all_proc_addresses EGL_KHR_gl_colorspace EGL_KHR_gl_renderbuffer_image EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_3D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_image_base EGL_KHR_no_config_context EGL_KHR_reusable_sync EGL_KHR_surfaceless_context EGL_EXT_pixel_format_float EGL_KHR_wait_sync EGL_MESA_configless_context EGL_MESA_drm_image EGL_MESA_gl_interop EGL_MESA_image_dma_buf_export EGL_MESA_query_driver EGL_MESA_x11_native_visual_id EGL_NV_context_priority_realtime EGL_WL_bind_wayland_display \",\n  \"client_apis\": \"OpenGL OpenGL_ES \",\n  \"gl_vendor\": \"Mesa\",\n  \"gl_renderer\": \"Apple M2 Max (G14C B1)\",\n  \"gl_version\": \"OpenGL ES 3.2 Mesa 25.1.9\",\n  \"glsl_version\": \"OpenGL ES GLSL ES 3.20\",\n  \"limits\": {\n    \"max_compute_work_group_invocations\": 1024,\n    \"max_shader_storage_buffer_bindings\": 80\n  },\n  \"compute_function_addresses\": {\n    \"glDispatchCompute\": true,\n    \"glBindBufferBase\": true,\n    \"glMemoryBarrier\": true,\n    \"glFenceSync\": true,\n    \"glClientWaitSync\": true,\n    \"glMapBufferRange\": true\n  }\n}\n",
+  "stderr": ""
+}

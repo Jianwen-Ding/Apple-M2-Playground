@@ -1,0 +1,96 @@
+{
+  "utc": "2026-10-04T20:15:12.333313+00:00",
+  "mesa_revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+  "files": [
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/compiler/agx_compile.c",
+      "sha256": "1a5b056a18ffdd1fa6d3813129221e0ead2bf114c794844bbc14bdcd5ebc0c27",
+      "size": 122919
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/lib/agx_device.c",
+      "sha256": "0f7304919dc4cd0a274817d4d02fa9e90941195cc07b2e8e17c27758c3ea7132",
+      "size": 28082
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/lib/agx_linker.c",
+      "sha256": "6a908e85655a32b6279fc3ba7cd5f529b44218faba022ba5c474a20a1a1a07cd",
+      "size": 8374
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/libagx/libagx_dgc.h",
+      "sha256": "ab8db337b1c95bec23aebcbf92521a98f862a4fb7b23a0f2828e20ffd336eecc",
+      "size": 16343
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_cmd_buffer.c",
+      "sha256": "09619ec9dba0bec4b35057e154ca4e0c1d18dedbd5ebe69911d681d8fa8ca3e6",
+      "size": 30510
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_cmd_dispatch.c",
+      "sha256": "72b355507830a84705da3bfdb63507b22ee34ecd5bef3830e9beed408a25f0dd",
+      "size": 5317
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_physical_device.c",
+      "sha256": "da726684350674540311ce2c943fec617d4c936afd751359a0449eb032c002ee",
+      "size": 58068
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_queue.c",
+      "sha256": "8f528cdbfb9c8d44ba6a69bc99a7ca493ffc9def9649ef1d1110a6dd9d245fa0",
+      "size": 33266
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_shader.c",
+      "sha256": "666fac7fd33c8b68ecc385d038f4affcac01ba1dec815fa6cc054b4bbfd78004",
+      "size": 63548
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_batch.c",
+      "sha256": "b99fac69d414e0f34420ef38243d31da644745f62d88a50835d734e627997778",
+      "size": 33397
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_pipe.c",
+      "sha256": "7583eaed2ee995a6a3a92d253cf6fdeafb559c757faa10f35079b0621b4ba510",
+      "size": 84626
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_state.c",
+      "sha256": "5015b75863202a170f8d6015eb82a76a70ecd4b92204894fa3d1886b1baa94ba",
+      "size": 191469
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/vulkan/runtime/vk_shader.c",
+      "sha256": "130ad5eb563e2815639e77e93cd2b7cf0a76b226c673a186d61ba587dd4c34a3",
+      "size": 28066
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/include/drm-uapi/asahi_drm.h",
+      "sha256": "69fe416b7294dfec4794217bd11379effd53caff4e86010bb803f1b34bdf5e89",
+      "size": 35836
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_core.h",
+      "sha256": "2f64fd6c7c3f342b0e44f039f1c359b7f0e6cfcb71a7dca1cc5156282faa3b51",
+      "size": 1362950
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/include/EGL/egl.h",
+      "sha256": "a7c24c828bf2e1a4dfe6511b4f4812b948a285eb54787074015896976d4da076",
+      "size": 19286
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/include/GLES3/gl31.h",
+      "sha256": "612fc3a3c483baa3b04dfa6be3cb44217ad5ebb92c3af05531dcac2c159b177a",
+      "size": 106404
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/VERSION",
+      "sha256": "dfa4bc32f65bd0873a06548da087f1575db14d494ce9a7929d73d40a845ddad2",
+      "size": 13
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "actual_from": "23-index-257/output.bin",
+  "pass": true,
+  "rejection": {
+    "first_mismatches": [
+      {
+        "actual": 305419896,
+        "expected": 305419897,
+        "word": 8
+      }
+    ],
+    "mismatch_count": 1
+  }
+}

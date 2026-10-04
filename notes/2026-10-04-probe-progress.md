@@ -1,9 +1,11 @@
-# Task 1 progress — 2026-10-04 integration review
+# Task 1 progress — 2026-10-04 integration reviews
 
 Canonical source is `/save/workspace/apple-documentation-playground`; scratch
 contains regenerable runs only. Reviewed the completed params/time C probes,
 runners, reports, raw evidence, and provenance. Vendor Mesa/applegpu sources
-were not modified. The separately owned backend report was not edited or staged.
+were not modified. The first params/time review left the separately owned backend report untouched.
+The follow-up review below integrates the subsequently completed P2/backend/
+counter reports and selected evidence.
 
 ## Findings and milestone status
 
@@ -21,8 +23,9 @@ were not modified. The separately owned backend report was not edited or staged.
   Source review found the retained 24 MHz configuration excerpt is T6022/G14D,
   while P1 reports T6021/G14C. The report now makes that mismatch explicit;
   the lattice compatibility does not prove this device's physical timer frequency.
-- P2–P4 remain pending; P5 has a driver baseline only. No shader execution,
-  instruction behavior, ISA latency, or new physical counter semantics claimed.
+- P2 is now complete through Mesa GLES compute/readback (follow-up below).
+  P3/P4 remain pending; P5 has a driver baseline only. Raw instruction execution,
+  ISA latency and shader-counter semantics remain unestablished.
 
 Primary reports and retained evidence:
 [parameters](../experiments/baseline/device-params.md),
@@ -31,7 +34,7 @@ Primary reports and retained evidence:
 [time rerun](../results/2026-10-04-driver-time/integration-review/hardware/summary.json).
 Original source/header hashes remain historical; reruns record reviewed code.
 
-## Changes and verification
+## First review: params/time changes and verification
 
 Added `make params` / `make time` and matching shared runner commands. `make check`
 now parses all current script Python files and syntax-checks all current C probes
@@ -42,7 +45,7 @@ default `make check` correctly failed on missing system EGL headers. All four
 current probes passed with
 `make check CC='cc -I/save/workspace/AGX_Probe/mesa/include'`, reading unchanged
 vendor headers. This is syntax verification only; the GLES file remains outside
-this integration commit. Selected check summaries are retained alongside the
+the first integration commit. Selected check summaries are retained alongside the
 integration evidence. Shared command logging retains partial output on timeout.
 
 Corrected time runner false-PASS paths: each phase must contain exactly its
@@ -70,18 +73,78 @@ and [results](../results/2026-10-04-driver-time/integration-review/verification.
 are retained. Failure injections are software tests; no malformed hardware
 response, permission denial, timeout, reset, or failed GPU submission was induced.
 
+## Follow-up: P2, backend and shader-counter review
+
+Reviewed `tests/gles_compute.c`, `scripts/run_compute.py`, and the completed
+[P2 report](../experiments/baseline/compute-readback.md)/evidence. The C probe's
+identity, allocation, barriers, bounded completion, whole-buffer copy/unmap and
+cleanup gates were inspected; no material C defect required an edit. The runner
+hardcoded `cc`; it now honors `CC` and `PROBE_INCLUDE`/`--mesa-include` and adds
+`--smoke`. `make compute` performs two dispatches (constant 32 and index 33),
+two initialization-only readback controls and three negative checks. The full
+original matrix remains available separately.
+
+Independent read-only rederivation matched **all 3,328 main/control output words**
+across 26 retained primary cases (22 dispatches, four readback controls), including
+all guards/padding. Original retained and primary manifests matched (418 and
+365 files respectively), and wrong-oracle/invalid-shader/wrong-device checks
+were verified. The selected P2 primary snapshots/hashes remain original evidence;
+updated runner snapshots are retained with the smoke rerun.
+[Verification script](../results/2026-10-04-compute-readback/integration-review/verify_stored.py)
+and [results](../results/2026-10-04-compute-readback/integration-review/verification.json)
+are versioned. The C probe remains byte-identical to the original snapshot.
+
+One bounded `make compute` rerun passed both dispatches, every readback word,
+pre/post controls and all three negative checks. Build bound was 30 s, each
+API child bound 15 s, fence wait deadline 5 s. No full GPU matrix was rerun.
+A missing `CC` override produced compile-launch failure and FAIL/status 1 with
+no API child or dispatch. [Smoke evidence](../results/2026-10-04-compute-readback/integration-review/smoke/summary.json)
+and compiler-failure logs are retained. No unexpected GPU fault/reset occurred.
+
+Added `PROBE_INCLUDE` (default unchanged vendor Mesa include root) to the Make
+and shared runner interface; `CC` remains independently configurable/exported.
+Normal `make check` passed all six `tests/*.c` and all seven `scripts/*.py` present
+at its snapshot, including in-progress `vulkan_caps.c`/`gles_time.c` syntax only.
+The source hashes did not change during that check. Those owners can continue
+editing afterward; this check does not certify their final code or execute their
+probes. A changed source set/hash during a future check now produces FAIL.
+[Check snapshot](../results/2026-10-04-compute-readback/integration-review/syntax-check.json)
+identifies the checked source versions. `tests/vulkan_compute.c` appeared after
+that snapshot and passed one separate syntax-only check with unchanged source
+hash during compilation. It was not run, reviewed for execution correctness,
+or staged. Neither ongoing file/runner/report/result set was edited or staged
+in this review. Further concurrent additions/edits are outside these snapshots.
+
+Reviewed and preserved [backend inventory](../results/2026-10-04-backend-inventory/README.md)
+and [counter research](../results/2026-10-04-shader-counter-research/README.md).
+Original capability/source hashes were verified before selecting compact JSON,
+small probe sources and relevant source excerpts. Historical original manifests
+are distinguished from new retained manifests. Findings now have versioned
+support; bulk vendor source snapshots and executables remain in scratch.
+
+P2 now demonstrates real Mesa-compiled GLES compute with exact readback on the
+checked Asahi node/renderer. It does not identify emitted native instructions
+or validate raw AGX bytes. Counter research found no justified timer selector.
+Inspected source's compute timestamp offset mismatch and zero disjoint getter
+predict timing hazards if they match the installed build; no loaded timing
+result was produced by this review. The counter report's 24 MHz host-counter
+claim was corrected to retain the T6022/G14D versus T6021/G14C provenance limit.
+The backend report now links completed P2 without treating its earlier capability
+inventory as execution evidence.
+
 ## Next tasks
 
-1. Review the separately owned Linux compute backend investigation when complete.
-2. Establish P2 with bounded allocation/submission/completion and exact constant
-   buffer readback; preserve Asahi identity and header hashes in each run.
-3. Validate command timestamp writes/readback using the reported 1 GHz command
-   timestamp frequency. This remains distinct from GET_TIME and instruction cycles.
-4. Identify a justified G14 shader counter candidate with primary provenance,
-   then validate bounded reads and memory results before timing instruction chains.
-   G13 encodings and source timer mechanisms remain hypotheses until exercised.
+1. Separately review ongoing Vulkan capability/runtime and GLES timer work when
+   their owners finish; do not infer extension support from source or proc addresses.
+2. Preserve P2 guards/control oracle while obtaining exact installed-driver native
+   code provenance and, if available, an unchanged shader binary export/import path.
+3. Validate command timestamp writes/completion/readback with the queried timebase;
+   distinguish firmware command time, GL API time, host elapsed time and ISA cycles.
+4. Seek primary provenance for an exact G14 timer instruction/selector before a
+   bounded shader-counter experiment. No arbitrary SR scan is justified here.
 
-Only finished params/time and integration files are eligible for the explicitly
-authorized integration commit/push. No backend or unrelated concurrent work is
-included. Staged whitespace checking passed for code/docs; four raw compiler
-stdout logs retain their original trailing blank line to preserve evidence hashes. Commit identity and remote verification are reported in the final handoff.
+The first commit was `79f2b3438595db556623ebc21f8bc4670e09b688`. Follow-up staging
+is restricted to completed P2/backend/counter files and shared integration work;
+ongoing Vulkan/timer work is excluded. Code/doc whitespace checks pass; original
+raw logs may retain trailing blank lines to preserve evidence. Commit and remote
+verification are reported in the handoff.

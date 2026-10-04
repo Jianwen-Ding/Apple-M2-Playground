@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "scope": "source/capability/document checks only; no shader execution",
+  "local_snapshot_hashes_checked": 22,
+  "remote_hashes_checked": 9,
+  "vendor_inspected_file_hashes_unchanged": true,
+  "egl_status": 0,
+  "timestamp_deltas_ns": [
+    10066167,
+    10061291
+  ],
+  "xml_named_sr_count": 34,
+  "no_timer_named_in_xml": true,
+  "upstream_25_1_9_compute_offset_mismatch": true,
+  "upstream_25_1_9_constant_zero_disjoint": true,
+  "local_links": [
+    "/save/workspace/apple-documentation-playground/experiments/timing/driver-time.md",
+    "/save/workspace/apple-documentation-playground/experiments/baseline/device-params.md"
+  ],
+  "report_sha256": "f2df0f4753b6570b71d3004f48830c982f84e6b84b2b5a5040facbf552f21d00"
+}

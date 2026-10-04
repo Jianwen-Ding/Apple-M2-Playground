@@ -1,0 +1,269 @@
+{
+  "scope": "Local source evidence; not exact installed Mesa binary implementation",
+  "sources": [
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/compiler/agx_compile.c",
+      "sha256": "1a5b056a18ffdd1fa6d3813129221e0ead2bf114c794844bbc14bdcd5ebc0c27",
+      "size": 122919,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 30,
+          "last_line": 75,
+          "text": "#include \"shader_enums.h\"\n\n/* Cache-line align shader programs. This matches the prop compiler. */\n#define AGX_CODE_ALIGN 0x80\n\n/* clang-format off */\nstatic const struct debug_named_value agx_debug_options[] = {\n   {\"shaders\",   AGX_DBG_SHADERS,\t\"Dump shaders in NIR and AIR\"},\n   {\"shaderdb\",  AGX_DBG_SHADERDB,\t\"Print statistics\"},\n   {\"verbose\",   AGX_DBG_VERBOSE,\t\"Disassemble verbosely\"},\n   {\"internal\",  AGX_DBG_INTERNAL,\t\"Dump even internal shaders\"},\n   {\"novalidate\",AGX_DBG_NOVALIDATE,\"Skip IR validation in debug builds\"},\n   {\"noopt\",     AGX_DBG_NOOPT,     \"Disable backend optimizations\"},\n   {\"wait\",      AGX_DBG_WAIT,      \"Wait after all async instructions\"},\n   {\"nopreamble\",AGX_DBG_NOPREAMBLE,\"Do not use shader preambles\"},\n   {\"demand\",    AGX_DBG_DEMAND,    \"Bound tightly to register demand\"},\n   {\"nosched\",   AGX_DBG_NOSCHED,   \"Do not schedule the shader\"},\n   {\"spill\",     AGX_DBG_SPILL,     \"Spill (almost) everything\"},\n   {\"nopromote\", AGX_DBG_NOPROMOTE, \"Do not promote constants to uniforms\"},\n   DEBUG_NAMED_VALUE_END\n};\n/* clang-format on */\n\nDEBUG_GET_ONCE_FLAGS_OPTION(agx_compiler_debug, \"AGX_MESA_DEBUG\",\n                            agx_debug_options, 0)\n\nint agx_compiler_debug = 0;\n\n/*\n * Pad binary to a given alignment and return aligned offset into the binary.\n */\nstatic unsigned\nagx_pad_binary(struct util_dynarray *dyn, uint32_t align)\n{\n   if (dyn->size % align) {\n      unsigned ngrow = align - (dyn->size % align);\n      memset(util_dynarray_grow_bytes(dyn, ngrow, 1), 0, ngrow);\n   }\n\n   assert((dyn->size % align) == 0);\n   return dyn->size;\n}\n\nuint64_t\nagx_get_compiler_debug(void)\n{\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/lib/agx_device.c",
+      "sha256": "0f7304919dc4cd0a274817d4d02fa9e90941195cc07b2e8e17c27758c3ea7132",
+      "size": 28082,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 100,
+          "last_line": 126,
+          "text": "   /* Reset the handle. This has to happen before the GEM close to avoid a race.\n    */\n   memset(bo, 0, sizeof(*bo));\n   __sync_synchronize();\n\n   struct drm_gem_close args = {.handle = handle};\n   drmIoctl(dev->fd, DRM_IOCTL_GEM_CLOSE, &args);\n}\n\nstatic int\nagx_drm_bo_bind(struct agx_device *dev, struct drm_asahi_gem_bind_op *ops,\n                uint32_t count)\n{\n   struct drm_asahi_vm_bind vm_bind = {\n      .num_binds = count,\n      .vm_id = dev->vm_id,\n      .userptr = (uintptr_t)ops,\n      .stride = sizeof(*ops),\n   };\n\n   int ret = drmIoctl(dev->fd, DRM_IOCTL_ASAHI_VM_BIND, &vm_bind);\n   if (ret) {\n      fprintf(stderr, \"DRM_IOCTL_ASAHI_VM_BIND failed\\n\");\n   }\n\n   return ret;\n}\n"
+        },
+        {
+          "first_line": 158,
+          "last_line": 182,
+          "text": "   };\n\n   int ret = dev->ops.bo_bind_object(dev, &bind);\n   *handle = bind.object_handle;\n   return ret;\n}\n\nstatic struct agx_bo *\nagx_bo_alloc(struct agx_device *dev, size_t size, size_t align,\n             enum agx_bo_flags flags)\n{\n   struct agx_bo *bo;\n   unsigned handle = 0;\n\n   /* executable implies low va */\n   assert(!(flags & AGX_BO_EXEC) || (flags & AGX_BO_LOW_VA));\n\n   struct drm_asahi_gem_create gem_create = {.size = size};\n\n   if (flags & AGX_BO_WRITEBACK)\n      gem_create.flags |= DRM_ASAHI_GEM_WRITEBACK;\n\n   if (!(flags & (AGX_BO_SHARED | AGX_BO_SHAREABLE))) {\n      gem_create.flags |= DRM_ASAHI_GEM_VM_PRIVATE;\n      gem_create.vm_id = dev->vm_id;\n"
+        },
+        {
+          "first_line": 224,
+          "last_line": 251,
+          "text": "      return NULL;\n   }\n\n   return bo;\n}\n\nstatic void\nagx_bo_mmap(struct agx_device *dev, struct agx_bo *bo, void *fixed_addr)\n{\n   assert(bo->_map == NULL && \"not double mapped\");\n\n   struct drm_asahi_gem_mmap_offset gem_mmap_offset = {.handle =\n                                                          bo->uapi_handle};\n   int ret, flags;\n\n   ret = drmIoctl(dev->fd, DRM_IOCTL_ASAHI_GEM_MMAP_OFFSET, &gem_mmap_offset);\n   if (ret) {\n      fprintf(stderr, \"DRM_IOCTL_ASAHI_MMAP_BO failed: %m\\n\");\n      assert(0);\n   }\n\n   flags = MAP_SHARED | (fixed_addr ? MAP_FIXED : 0);\n   bo->_map = os_mmap(fixed_addr, bo->size, PROT_READ | PROT_WRITE, flags,\n                      dev->fd, gem_mmap_offset.offset);\n   if (bo->_map == MAP_FAILED) {\n      bo->_map = NULL;\n      fprintf(stderr,\n              \"mmap failed: result=%p size=0x%llx fd=%i offset=0x%llx %m\\n\",\n"
+        },
+        {
+          "first_line": 450,
+          "last_line": 483,
+          "text": "   memset(buf, 0, size);\n\n   int ret = drmIoctl(dev->fd, DRM_IOCTL_ASAHI_GET_PARAMS, &get_param);\n   if (ret) {\n      fprintf(stderr, \"DRM_IOCTL_ASAHI_GET_PARAMS failed: %m\\n\");\n      return -EINVAL;\n   }\n\n   return get_param.size;\n}\n\nstatic int\nagx_submit(struct agx_device *dev, struct drm_asahi_submit *submit,\n           struct agx_submit_virt *virt)\n{\n   return drmIoctl(dev->fd, DRM_IOCTL_ASAHI_SUBMIT, submit);\n}\n\nconst agx_device_ops_t agx_device_drm_ops = {\n   .bo_alloc = agx_bo_alloc,\n   .bo_bind = agx_drm_bo_bind,\n   .bo_mmap = agx_bo_mmap,\n   .get_params = agx_get_params,\n   .submit = agx_submit,\n   .bo_bind_object = agx_bo_bind_object,\n   .bo_unbind_object = agx_bo_unbind_object,\n};\n\nstatic uint64_t\ngcd(uint64_t n, uint64_t m)\n{\n   while (n != 0) {\n      uint64_t remainder = m % n;\n      m = n;\n"
+        },
+        {
+          "first_line": 502,
+          "last_line": 524,
+          "text": "agx_open_device(void *memctx, struct agx_device *dev)\n{\n   dev->debug =\n      debug_get_flags_option(\"ASAHI_MESA_DEBUG\", agx_debug_options, 0);\n\n   dev->ops = agx_device_drm_ops;\n\n   ssize_t params_size = -1;\n\n   /* DRM version check */\n   {\n      drmVersionPtr version = drmGetVersion(dev->fd);\n      if (!version) {\n         fprintf(stderr, \"cannot get version: %s\", strerror(errno));\n         return NULL;\n      }\n\n      if (!strcmp(version->name, \"asahi\")) {\n         dev->is_virtio = false;\n         dev->ops = agx_device_drm_ops;\n      } else if (!strcmp(version->name, \"virtio_gpu\")) {\n         dev->is_virtio = true;\n         if (!agx_virtio_open_device(dev)) {\n"
+        },
+        {
+          "first_line": 733,
+          "last_line": 775,
+          "text": "   util_vma_heap_finish(&dev->usc_heap);\n   glsl_type_singleton_decref();\n\n   close(dev->fd);\n}\n\nuint32_t\nagx_create_command_queue(struct agx_device *dev,\n                         enum drm_asahi_priority priority)\n{\n\n   if (dev->debug & AGX_DBG_1QUEUE) {\n      // Abuse this lock for this, it's debug only anyway\n      simple_mtx_lock(&dev->vma_lock);\n      if (dev->queue_id) {\n         simple_mtx_unlock(&dev->vma_lock);\n         return dev->queue_id;\n      }\n   }\n\n   struct drm_asahi_queue_create queue_create = {\n      .vm_id = dev->vm_id,\n      .priority = priority,\n      .usc_exec_base = dev->shader_base,\n   };\n\n   int ret =\n      asahi_simple_ioctl(dev, DRM_IOCTL_ASAHI_QUEUE_CREATE, &queue_create);\n   if (ret) {\n      fprintf(stderr, \"DRM_IOCTL_ASAHI_QUEUE_CREATE failed: %m\\n\");\n      assert(0);\n   }\n\n   if (dev->debug & AGX_DBG_1QUEUE) {\n      dev->queue_id = queue_create.queue_id;\n      simple_mtx_unlock(&dev->vma_lock);\n   }\n\n   return queue_create.queue_id;\n}\n\nint\nagx_destroy_command_queue(struct agx_device *dev, uint32_t queue_id)\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/lib/agx_linker.c",
+      "sha256": "6a908e85655a32b6279fc3ba7cd5f529b44218faba022ba5c474a20a1a1a07cd",
+      "size": 8374,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 80,
+          "last_line": 107,
+          "text": "/* clang-format on */\n\nvoid\nagx_fast_link(struct agx_linked_shader *linked, struct agx_device *dev,\n              bool fragment, struct agx_shader_part *main,\n              struct agx_shader_part *prolog, struct agx_shader_part *epilog,\n              unsigned nr_samples_shaded)\n{\n   size_t size = 0;\n   unsigned nr_gprs = 0, scratch_size = 0;\n   bool reads_tib = false, writes_sample_mask = false,\n        disable_tri_merging = false, tag_write_disable = true;\n\n   if (nr_samples_shaded) {\n      size += sizeof(sample_loop_header);\n\n      if (nr_samples_shaded > 1)\n         size += sizeof(sample_loop_footer);\n      else\n         size += sizeof(stop);\n   }\n\n   struct agx_shader_part *parts[] = {prolog, main, epilog};\n\n   for (unsigned i = 0; i < ARRAY_SIZE(parts); ++i) {\n      struct agx_shader_part *part = parts[i];\n      if (!part)\n         continue;\n"
+        },
+        {
+          "first_line": 119,
+          "last_line": 166,
+          "text": "   }\n\n   assert(size > 0 && \"must stop\");\n\n   linked->bo = agx_bo_create(dev, size, 0, AGX_BO_EXEC | AGX_BO_LOW_VA,\n                              \"Linked executable\");\n   uint8_t *linked_map = agx_bo_map(linked->bo);\n\n   size_t offset = 0;\n\n   /* FS prolog happens per-pixel, outside the sample loop */\n   if (prolog) {\n      size_t sz = prolog->info.main_size;\n      memcpy(linked_map + offset, prolog->binary, sz);\n      offset += sz;\n   }\n\n   if (nr_samples_shaded) {\n      memcpy(linked_map + offset, sample_loop_header,\n             sizeof(sample_loop_header));\n      offset += sizeof(sample_loop_header);\n   }\n\n   size_t sample_loop_begin = offset;\n\n   /* Main shader and epilog happen in the sample loop, so start from i=1 */\n   for (unsigned i = 1; i < ARRAY_SIZE(parts); ++i) {\n      struct agx_shader_part *part = parts[i];\n      if (!part)\n         continue;\n\n      size_t sz = part->info.main_size;\n      memcpy(linked_map + offset, part->binary + part->info.main_offset, sz);\n      offset += sz;\n   }\n\n   if (nr_samples_shaded > 1) {\n      assert(sample_loop_footer[SAMPLE_LOOP_FOOTER_COUNT_PATCH_OFFS] == 0);\n\n      /* Make a stack copy of the footer so we can efficiently patch it */\n      uint8_t footer[sizeof(sample_loop_footer)];\n      memcpy(footer, sample_loop_footer, sizeof(footer));\n\n      /* Patch in sample end */\n      uint8_t end = (1u << nr_samples_shaded) - 1;\n      footer[SAMPLE_LOOP_FOOTER_COUNT_PATCH_OFFS] =\n         end << SAMPLE_LOOP_FOOTER_COUNT_SHIFT;\n\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/libagx/libagx_dgc.h",
+      "sha256": "ab8db337b1c95bec23aebcbf92521a98f862a4fb7b23a0f2828e20ffd336eecc",
+      "size": 16343,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 219,
+          "last_line": 250,
+          "text": "   AGX_CHIP_G14G,\n   AGX_CHIP_G14X,\n};\n\nstatic inline GLOBAL uint32_t *\nagx_cdm_launch(GLOBAL uint32_t *out, enum agx_chip chip, struct agx_grid grid,\n               struct agx_workgroup wg,\n               struct agx_cdm_launch_word_0_packed launch, uint32_t usc)\n{\n#ifndef __OPENCL_VERSION__\n   struct agx_cdm_launch_word_0_packed mode;\n   agx_pack(&mode, CDM_LAUNCH_WORD_0, cfg) {\n      cfg.mode = grid.mode;\n   }\n\n   agx_merge(launch, mode, CDM_LAUNCH_WORD_0);\n#endif\n\n   agx_push_packed(out, launch, CDM_LAUNCH_WORD_0);\n\n   agx_push(out, CDM_LAUNCH_WORD_1, cfg) {\n      cfg.pipeline = usc;\n   }\n\n   if (chip == AGX_CHIP_G14X) {\n      agx_push(out, CDM_UNK_G14X, cfg)\n         ;\n   }\n\n   if (agx_is_indirect(grid)) {\n      agx_push(out, CDM_INDIRECT, cfg) {\n         cfg.address_hi = grid.ptr >> 32;\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_cmd_buffer.c",
+      "sha256": "09619ec9dba0bec4b35057e154ca4e0c1d18dedbd5ebe69911d681d8fa8ca3e6",
+      "size": 30510,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 671,
+          "last_line": 698,
+          "text": "   mesa_shader_stage sw_stage = s->info.stage;\n\n   unsigned constant_push_ranges = DIV_ROUND_UP(s->b.info.rodata.size_16, 64);\n   unsigned push_ranges = 2;\n   unsigned stage_ranges = 3;\n\n   size_t usc_size =\n      agx_usc_size(constant_push_ranges + push_ranges + stage_ranges + 4);\n   struct agx_ptr t = hk_pool_usc_alloc(cmd, usc_size, 64);\n   if (!t.cpu)\n      return 0;\n\n   struct agx_usc_builder b = agx_usc_builder(t.cpu, usc_size);\n\n   uint64_t root_ptr;\n\n   if (sw_stage == MESA_SHADER_COMPUTE) {\n      root_ptr = hk_cmd_buffer_upload_root(cmd, VK_PIPELINE_BIND_POINT_COMPUTE);\n   } else {\n      root_ptr = cmd->state.gfx.root;\n   }\n\n   static_assert(offsetof(struct hk_root_descriptor_table, root_desc_addr) == 0,\n                 \"self-reflective\");\n\n   unsigned root_unif = 0;\n   if (sw_stage == MESA_SHADER_VERTEX) {\n      unsigned count =\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_cmd_dispatch.c",
+      "sha256": "72b355507830a84705da3bfdb63507b22ee34ecd5bef3830e9beed408a25f0dd",
+      "size": 5317,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 50,
+          "last_line": 71,
+          "text": "\n   cs->current = agx_cdm_barrier(cs->current, dev->dev.chip);\n   cs->stats.flushes++;\n}\n\nvoid\nhk_dispatch_with_usc_launch(struct hk_device *dev, struct hk_cs *cs,\n                            struct agx_cdm_launch_word_0_packed launch,\n                            uint32_t usc, struct agx_grid grid,\n                            struct agx_workgroup wg)\n{\n   hk_ensure_cs_has_space(cs->cmd, cs, 0x2000 /* TODO */);\n   cs->stats.cmds++;\n\n   cs->current =\n      agx_cdm_launch(cs->current, dev->dev.chip, grid, wg, launch, usc);\n\n   hk_cdm_cache_flush(dev, cs);\n}\n\nvoid\nhk_dispatch_with_usc(struct hk_device *dev, struct hk_cs *cs,\n"
+        },
+        {
+          "first_line": 85,
+          "last_line": 107,
+          "text": "}\n\nstatic void\ndispatch(struct hk_cmd_buffer *cmd, struct agx_grid grid)\n{\n   struct hk_shader *s = hk_only_variant(cmd->state.cs.shader);\n   if (agx_is_shader_empty(&s->b))\n      return;\n\n   struct hk_cs *cs = hk_cmd_buffer_get_cs(cmd, true /* compute */);\n   if (!cs)\n      return;\n\n   struct agx_workgroup local_size =\n      agx_workgroup(s->b.info.workgroup_size[0], s->b.info.workgroup_size[1],\n                    s->b.info.workgroup_size[2]);\n\n   uint64_t stat = hk_pipeline_stat_addr(\n      cmd, VK_QUERY_PIPELINE_STATISTIC_COMPUTE_SHADER_INVOCATIONS_BIT);\n\n   if (hk_stat_enabled(stat)) {\n      perf_debug(cmd, \"CS invocation statistic\");\n      uint64_t grid = cmd->state.cs.descriptors.root.cs.group_count_addr;\n"
+        },
+        {
+          "first_line": 118,
+          "last_line": 145,
+          "text": "\n   hk_dispatch_with_local_size(cmd, cs, s, grid, local_size);\n   cs->stats.calls++;\n}\n\nVKAPI_ATTR void VKAPI_CALL\nhk_CmdDispatchBase(VkCommandBuffer commandBuffer, uint32_t baseGroupX,\n                   uint32_t baseGroupY, uint32_t baseGroupZ,\n                   uint32_t groupCountX, uint32_t groupCountY,\n                   uint32_t groupCountZ)\n{\n   VK_FROM_HANDLE(hk_cmd_buffer, cmd, commandBuffer);\n   struct hk_descriptor_state *desc = &cmd->state.cs.descriptors;\n   if (desc->push_dirty)\n      hk_cmd_buffer_flush_push_descriptors(cmd, desc);\n\n   desc->root.cs.base_group[0] = baseGroupX;\n   desc->root.cs.base_group[1] = baseGroupY;\n   desc->root.cs.base_group[2] = baseGroupZ;\n\n   /* We don't want to key the shader to whether we're indirectly dispatching,\n    * so treat everything as indirect.\n    */\n   VkDispatchIndirectCommand group_count = {\n      .x = groupCountX,\n      .y = groupCountY,\n      .z = groupCountZ,\n   };\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_physical_device.c",
+      "sha256": "da726684350674540311ce2c943fec617d4c936afd751359a0449eb032c002ee",
+      "size": 58068,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 200,
+          "last_line": 215,
+          "text": "      .EXT_provoking_vertex = true,\n      .EXT_queue_family_foreign = true,\n      .EXT_robustness2 = true,\n      .EXT_sample_locations = true,\n      .EXT_sampler_filter_minmax = false,\n      .EXT_scalar_block_layout = true,\n      .EXT_separate_stencil_usage = true,\n      .EXT_shader_image_atomic_int64 = false,\n      .EXT_shader_demote_to_helper_invocation = true,\n      .EXT_shader_module_identifier = true,\n      .EXT_shader_object = true,\n      .EXT_shader_replicated_composites = true,\n      .EXT_shader_stencil_export = true,\n      .EXT_shader_subgroup_ballot = true,\n      .EXT_shader_subgroup_vote = true,\n      .EXT_shader_uniform_buffer_unsized_array = true,\n"
+        },
+        {
+          "first_line": 1328,
+          "last_line": 1346,
+          "text": "   pdev->mem_heaps[sysmem_heap_idx] = (struct hk_memory_heap){\n      .size = sysmem_size_B,\n      .flags = VK_MEMORY_HEAP_DEVICE_LOCAL_BIT,\n   };\n\n   pdev->mem_types[pdev->mem_type_count++] = (VkMemoryType){\n      .propertyFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |\n                       VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |\n                       VK_MEMORY_PROPERTY_HOST_CACHED_BIT |\n                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,\n      .heapIndex = sysmem_heap_idx,\n   };\n\n   pdev->mem_types[pdev->mem_type_count++] = (VkMemoryType){\n      .propertyFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |\n                       VK_MEMORY_PROPERTY_HOST_COHERENT_BIT |\n                       VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,\n      .heapIndex = sysmem_heap_idx,\n   };\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_queue.c",
+      "sha256": "8f528cdbfb9c8d44ba6a69bc99a7ca493ffc9def9649ef1d1110a6dd9d245fa0",
+      "size": 33266,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 260,
+          "last_line": 283,
+          "text": "queue_submit_single(struct hk_device *dev, struct drm_asahi_submit *submit,\n                    unsigned ring_idx)\n{\n   struct agx_submit_virt virt = {.ring_idx = ring_idx};\n\n   if (dev->dev.is_virtio) {\n      u_rwlock_rdlock(&dev->external_bos.lock);\n      virt.extres_count = util_dynarray_num_elements(\n         &dev->external_bos.list, struct asahi_ccmd_submit_res);\n      virt.extres = util_dynarray_begin(&dev->external_bos.list);\n   }\n\n   int ret = dev->dev.ops.submit(&dev->dev, submit, &virt);\n\n   if (dev->dev.is_virtio)\n      u_rwlock_rdunlock(&dev->external_bos.lock);\n\n   /* XXX: don't trap */\n   if (ret) {\n      fprintf(stderr, \"DRM_IOCTL_ASAHI_SUBMIT failed: %m\\n\");\n      assert(0);\n   }\n\n   return VK_SUCCESS;\n"
+        },
+        {
+          "first_line": 882,
+          "last_line": 906,
+          "text": "   util_dynarray_fini(&payload);\n   return result;\n}\n\nstatic VkResult\nhk_queue_submit(struct vk_queue *vk_queue, struct vk_queue_submit *submit)\n{\n   struct hk_queue *queue = container_of(vk_queue, struct hk_queue, vk);\n   struct hk_device *dev = hk_queue_device(queue);\n\n   if (vk_queue_is_lost(&queue->vk))\n      return VK_ERROR_DEVICE_LOST;\n\n   VkResult result = queue_submit(dev, queue, submit);\n   if (result != VK_SUCCESS)\n      result = vk_queue_set_lost(&queue->vk, \"Submit failed\");\n\n   if (dev->dev.debug & AGX_DBG_SYNC) {\n      /* Wait for completion */\n      int err = drmSyncobjTimelineWait(\n         dev->dev.fd, &queue->drm.syncobj, &queue->drm.timeline_value, 1,\n         INT64_MAX, DRM_SYNCOBJ_WAIT_FLAGS_WAIT_FOR_SUBMIT, NULL);\n\n      if (err) {\n         result = vk_queue_set_lost(&queue->vk, \"Wait failed\");\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_shader.c",
+      "sha256": "666fac7fd33c8b68ecc385d038f4affcac01ba1dec815fa6cc054b4bbfd78004",
+      "size": 63548,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 935,
+          "last_line": 967,
+          "text": "   };\n   NIR_PASS(_, nir, nir_opt_peephole_select, &peephole_select_options);\n   NIR_PASS(_, nir, nir_opt_if,\n            nir_opt_if_optimize_phi_true_false | nir_opt_if_avoid_64bit_phis);\n}\n\nstatic void\nhk_upload_shader(struct hk_device *dev, struct hk_shader *shader)\n{\n   if (shader->b.info.has_preamble || shader->b.info.rodata.size_16) {\n      /* TODO: Do we wnat to compact? Revisit when we rework prolog/epilogs. */\n      size_t size = shader->b.info.binary_size;\n      assert(size > 0);\n\n      shader->bo = agx_bo_create(&dev->dev, size, 0,\n                                 AGX_BO_EXEC | AGX_BO_LOW_VA, \"Preamble\");\n      memcpy(agx_bo_map(shader->bo), shader->b.binary, size);\n      shader->preamble_addr =\n         shader->bo->va->addr + shader->b.info.preamble_offset;\n   }\n\n   if (!shader->linked.ht) {\n      /* If we only have a single variant, link now. */\n      shader->only_linked = hk_fast_link(dev, false, shader, NULL, NULL, 0);\n   }\n\n   if (shader->info.stage == MESA_SHADER_FRAGMENT) {\n      agx_pack_fragment_face_2(&shader->frag_face, 0, &shader->b.info);\n   }\n\n   agx_pack(&shader->counts, COUNTS, cfg) {\n      cfg.uniform_register_count = shader->b.info.push_count;\n      cfg.preshader_register_count = shader->b.info.nr_preamble_gprs;\n"
+        },
+        {
+          "first_line": 1190,
+          "last_line": 1216,
+          "text": "\n   if (lock)\n      simple_mtx_lock(lock);\n\n   assert(nir->info.io_lowered);\n   agx_compile_shader_nir(nir, &backend_key, &shader->b);\n\n   if (lock)\n      simple_mtx_unlock(lock);\n\n   shader->code_ptr = shader->b.binary;\n   shader->code_size = shader->b.info.binary_size;\n\n   shader->info.stage = sw_stage;\n   shader->info.clip_distance_array_size = nir->info.clip_distance_array_size;\n   shader->info.cull_distance_array_size = nir->info.cull_distance_array_size;\n   shader->b.info.outputs = outputs;\n\n   if (xfb_info) {\n      assert(xfb_info->output_count < ARRAY_SIZE(shader->info.xfb_outputs));\n\n      memcpy(&shader->info.xfb_info, xfb_info,\n             nir_xfb_info_size(xfb_info->output_count));\n\n      typed_memcpy(shader->info.xfb_stride, nir->info.xfb_stride, 4);\n   }\n\n"
+        },
+        {
+          "first_line": 1590,
+          "last_line": 1640,
+          "text": "   }\n\n   return VK_SUCCESS;\n}\n\nstatic VkResult\nhk_deserialize_shader(struct hk_device *dev, struct blob_reader *blob,\n                      struct hk_shader *shader)\n{\n   struct hk_shader_info info;\n   blob_copy_bytes(blob, &info, sizeof(info));\n\n   struct agx_shader_info b_info;\n   blob_copy_bytes(blob, &b_info, sizeof(b_info));\n\n   const uint32_t code_size = blob_read_uint32(blob);\n   const uint32_t data_size = blob_read_uint32(blob);\n   if (blob->overrun)\n      return vk_error(dev, VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT);\n\n   VkResult result = hk_init_link_ht(shader, info.stage);\n   if (result != VK_SUCCESS)\n      return vk_error(dev, VK_ERROR_OUT_OF_HOST_MEMORY);\n\n   simple_mtx_init(&shader->linked.lock, mtx_plain);\n\n   shader->b.info = b_info;\n   shader->info = info;\n   shader->code_size = code_size;\n   shader->data_size = data_size;\n   shader->b.info.binary_size = code_size;\n\n   shader->code_ptr = malloc(code_size);\n   if (shader->code_ptr == NULL)\n      return vk_error(dev, VK_ERROR_OUT_OF_HOST_MEMORY);\n\n   shader->data_ptr = malloc(data_size);\n   if (shader->data_ptr == NULL)\n      return vk_error(dev, VK_ERROR_OUT_OF_HOST_MEMORY);\n\n   blob_copy_bytes(blob, (void *)shader->code_ptr, shader->code_size);\n   blob_copy_bytes(blob, (void *)shader->data_ptr, shader->data_size);\n   if (blob->overrun)\n      return vk_error(dev, VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT);\n\n   shader->b.binary = (void *)shader->code_ptr;\n   hk_upload_shader(dev, shader);\n   return VK_SUCCESS;\n}\n\nstatic VkResult\n"
+        },
+        {
+          "first_line": 1670,
+          "last_line": 1725,
+          "text": "   *shader_out = &obj->vk;\n   return VK_SUCCESS;\n}\n\nstatic void\nhk_shader_serialize(struct vk_device *vk_dev, const struct hk_shader *shader,\n                    struct blob *blob)\n{\n   blob_write_bytes(blob, &shader->info, sizeof(shader->info));\n   blob_write_bytes(blob, &shader->b.info, sizeof(shader->b.info));\n\n   blob_write_uint32(blob, shader->code_size);\n   blob_write_uint32(blob, shader->data_size);\n   blob_write_bytes(blob, shader->code_ptr, shader->code_size);\n   blob_write_bytes(blob, shader->data_ptr, shader->data_size);\n}\n\nstatic bool\nhk_api_shader_serialize(struct vk_device *vk_dev,\n                        const struct vk_shader *vk_shader, struct blob *blob)\n{\n   struct hk_api_shader *obj =\n      container_of(vk_shader, struct hk_api_shader, vk);\n\n   blob_write_uint8(blob, vk_shader->stage);\n\n   hk_foreach_variant(obj, shader) {\n      hk_shader_serialize(vk_dev, shader, blob);\n   }\n\n   return !blob->out_of_memory;\n}\n\nstatic VkResult\nhk_shader_get_executable_properties(\n   UNUSED struct vk_device *device, const struct vk_shader *vk_shader,\n   uint32_t *executable_count, VkPipelineExecutablePropertiesKHR *properties)\n{\n   struct hk_api_shader *obj =\n      container_of(vk_shader, struct hk_api_shader, vk);\n\n   VK_OUTARRAY_MAKE_TYPED(VkPipelineExecutablePropertiesKHR, out, properties,\n                          executable_count);\n\n   vk_outarray_append_typed(VkPipelineExecutablePropertiesKHR, &out, props)\n   {\n      props->stages = mesa_to_vk_shader_stage(obj->vk.stage);\n      props->subgroupSize = 32;\n      VK_COPY_STR(props->name, _mesa_shader_stage_to_string(obj->vk.stage));\n      VK_PRINT_STR(props->description, \"%s shader\",\n                   _mesa_shader_stage_to_string(obj->vk.stage));\n   }\n\n   return vk_outarray_status(&out);\n}\n\n"
+        },
+        {
+          "first_line": 1810,
+          "last_line": 1834,
+          "text": "   .deserialize = hk_deserialize_api_shader,\n   .cmd_set_dynamic_graphics_state = vk_cmd_set_dynamic_graphics_state,\n   .cmd_bind_shaders = hk_cmd_bind_shaders,\n};\n\nstruct hk_linked_shader *\nhk_fast_link(struct hk_device *dev, bool fragment, struct hk_shader *main,\n             struct agx_shader_part *prolog, struct agx_shader_part *epilog,\n             unsigned nr_samples_shaded)\n{\n   struct hk_linked_shader *s = rzalloc(NULL, struct hk_linked_shader);\n   agx_fast_link(&s->b, &dev->dev, fragment, &main->b, prolog, epilog,\n                 nr_samples_shaded);\n\n   if (fragment) {\n      unsigned samplers = main->b.info.sampler_state_count;\n      if (s->b.uses_txf)\n         samplers = MAX2(samplers, 1);\n\n      agx_pack(&s->fs_counts, FRAGMENT_SHADER_WORD_0, cfg) {\n         cfg.cf_binding_count = s->b.cf.nr_bindings;\n         cfg.uniform_register_count = main->b.info.push_count;\n         cfg.preshader_register_count = main->b.info.nr_preamble_gprs;\n         cfg.texture_state_register_count = main->b.info.texture_state_count;\n         cfg.sampler_state_register_count =\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_batch.c",
+      "sha256": "b99fac69d414e0f34420ef38243d31da644745f62d88a50835d734e627997778",
+      "size": 33397,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 638,
+          "last_line": 658,
+          "text": "      .pointer = agx_map_gpu(rsrc),\n   };\n}\n\nvoid\nagx_batch_submit(struct agx_context *ctx, struct agx_batch *batch,\n                 struct drm_asahi_cmd_compute *compute,\n                 struct drm_asahi_cmd_render *render)\n{\n   struct agx_device *dev = agx_device(ctx->base.screen);\n   struct agx_screen *screen = agx_screen(ctx->base.screen);\n\n   /* We allocate the worst-case sync array size since this won't be excessive\n    * for most workloads\n    */\n   unsigned max_syncs = batch->bo_list.bit_count + 2;\n   unsigned in_sync_count = 0;\n   unsigned shared_bo_count = 0;\n   struct drm_asahi_sync *syncs =\n      malloc((max_syncs * sizeof(struct drm_asahi_sync)) + 2);\n   struct agx_bo **shared_bos = malloc(max_syncs * sizeof(struct agx_bo *));\n"
+        },
+        {
+          "first_line": 860,
+          "last_line": 889,
+          "text": "         false, compute ? DRM_ASAHI_BARRIER_NONE : 0, compute ? 1 : 0);\n\n      util_dynarray_append(&cmdbuf, header);\n      util_dynarray_append(&cmdbuf, *render);\n   }\n\n   struct drm_asahi_submit submit = {\n      .flags = 0,\n      .queue_id = ctx->queue_id,\n      .in_sync_count = in_sync_count,\n      .out_sync_count = 2,\n      .syncs = (uint64_t)(uintptr_t)(syncs),\n      .cmdbuf = (uint64_t)(uintptr_t)(cmdbuf.data),\n      .cmdbuf_size = cmdbuf.size,\n   };\n\n   int ret = dev->ops.submit(dev, &submit, &virt);\n\n   u_rwlock_rdunlock(&screen->destroy_lock);\n\n   if (ret) {\n      if (compute) {\n         fprintf(stderr, \"DRM_IOCTL_ASAHI_SUBMIT compute failed: %m\\n\");\n      }\n\n      if (render) {\n         struct drm_asahi_cmd_render *c = render;\n         fprintf(\n            stderr,\n            \"DRM_IOCTL_ASAHI_SUBMIT render failed: %m (%dx%d tile %dx%d layers %d samples %d)\\n\",\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_pipe.c",
+      "sha256": "7583eaed2ee995a6a3a92d253cf6fdeafb559c757faa10f35079b0621b4ba510",
+      "size": 84626,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 704,
+          "last_line": 726,
+          "text": "   /* Reemit descriptors using this resource */\n   agx_dirty_all(ctx);\n   return true;\n}\n\n/*\n * Perform the required synchronization before a transfer_map operation can\n * complete. This may require syncing batches.\n */\nstatic void\nagx_prepare_for_map(struct agx_context *ctx, struct agx_resource *rsrc,\n                    unsigned level,\n                    unsigned usage, /* a combination of PIPE_MAP_x */\n                    const struct pipe_box *box, bool staging_blit)\n{\n   /* GPU access does not require explicit syncs, as the batch tracking logic\n    * will ensure correct ordering automatically.\n    */\n   if (staging_blit)\n      return;\n\n   /* If the level has not been written, we may freely do CPU access (writes),\n    * even if other levels are being written by the GPU. This lets us write some\n"
+        },
+        {
+          "first_line": 905,
+          "last_line": 929,
+          "text": "   blit.mask = util_format_get_mask(blit.dst.format);\n   blit.filter = PIPE_TEX_FILTER_NEAREST;\n\n   agx_blit(pctx, &blit);\n}\n\nstatic void *\nagx_transfer_map(struct pipe_context *pctx, struct pipe_resource *resource,\n                 unsigned level,\n                 unsigned usage, /* a combination of PIPE_MAP_x */\n                 const struct pipe_box *box,\n                 struct pipe_transfer **out_transfer)\n{\n   struct agx_context *ctx = agx_context(pctx);\n   struct agx_resource *rsrc = agx_resource(resource);\n\n   /* Can't map tiled/compressed directly */\n   if ((usage & PIPE_MAP_DIRECTLY) && rsrc->modifier != DRM_FORMAT_MOD_LINEAR)\n      return NULL;\n\n   /* Can't transfer out of bounds mip levels */\n   if (level >= rsrc->layout.levels)\n      return NULL;\n\n   /* For compression, we use a staging blit as we do not implement AGX\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_state.c",
+      "sha256": "5015b75863202a170f8d6015eb82a76a70ecd4b92204894fa3d1886b1baa94ba",
+      "size": 191469,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 1472,
+          "last_line": 1507,
+          "text": "   }\n\n   if (nir->info.stage == MESA_SHADER_FRAGMENT) {\n      key.fs.cf_base = cf_base;\n   }\n\n   agx_compile_shader_nir(nir, &key, &compiled->b);\n\n   agx2_stats_util_debug(debug, _mesa_shader_stage_to_abbrev(nir->info.stage),\n                         &compiled->b.info.stats);\n\n   if (compiled->b.info.binary_size && !secondary) {\n      compiled->bo = agx_bo_create(dev, compiled->b.info.binary_size, 0,\n                                   AGX_BO_EXEC | AGX_BO_LOW_VA, \"Executable\");\n\n      memcpy(agx_bo_map(compiled->bo), compiled->b.binary,\n             compiled->b.info.binary_size);\n   }\n\n   return compiled;\n}\n\nstatic struct agx_compiled_shader *\nagx_build_meta_shader_internal(struct agx_context *ctx,\n                               meta_shader_builder_t builder, void *data,\n                               size_t data_size, bool prolog, bool epilog,\n                               unsigned cf_base, bool internal_kernel);\n\n/* Does not take ownership of key. Clones if necessary. */\nstatic struct agx_compiled_shader *\nagx_compile_variant(struct agx_device *dev, struct pipe_context *pctx,\n                    struct agx_uncompiled_shader *so,\n                    union asahi_shader_key *key_)\n{\n   struct blob_reader reader;\n   blob_reader_init(&reader, so->serialized_nir.data, so->serialized_nir.size);\n"
+        },
+        {
+          "first_line": 1956,
+          "last_line": 1988,
+          "text": "\n      agx_compile_variant(dev, pctx, so, &key);\n   }\n\n   return so;\n}\n\nstatic void *\nagx_create_compute_state(struct pipe_context *pctx,\n                         const struct pipe_compute_state *cso)\n{\n   struct agx_context *ctx = agx_context(pctx);\n   struct agx_device *dev = agx_device(pctx->screen);\n   struct agx_uncompiled_shader *so =\n      rzalloc(NULL, struct agx_uncompiled_shader);\n\n   if (!so)\n      return NULL;\n\n   so->variants = _mesa_hash_table_create(so, asahi_cs_shader_key_hash,\n                                          asahi_cs_shader_key_equal);\n\n   union asahi_shader_key key = {0};\n\n   assert(cso->ir_type == PIPE_SHADER_IR_NIR && \"TGSI kernels unsupported\");\n   nir_shader *nir = (void *)cso->prog;\n\n   agx_shader_initialize(dev, so, nir, ctx->support_lod_bias, ctx->robust);\n   agx_get_shader_variant(agx_screen(pctx->screen), pctx, so, &key);\n\n   /* We're done with the NIR, throw it away */\n   ralloc_free(nir);\n   return so;\n"
+        },
+        {
+          "first_line": 5274,
+          "last_line": 5309,
+          "text": "   /* Framebuffer fetch is coherent, so barriers are a no-op. */\n   if (flags == PIPE_TEXTURE_BARRIER_FRAMEBUFFER)\n      return;\n\n   agx_flush_all(ctx, \"Texture barrier\");\n}\n\nvoid\nagx_launch(struct agx_batch *batch, struct agx_grid grid,\n           struct agx_workgroup wg, struct agx_compiled_shader *cs,\n           struct agx_linked_shader *linked, mesa_shader_stage stage,\n           unsigned variable_shared_mem)\n{\n   struct agx_context *ctx = batch->ctx;\n   if (!linked && agx_is_shader_empty(&cs->b))\n      return;\n\n   /* To implement load_num_workgroups, the number of workgroups needs to be\n    * available in GPU memory. This is either the indirect buffer, or just a\n    * buffer we upload ourselves if not indirect.\n    */\n   if (grid.mode == AGX_CDM_MODE_DIRECT) {\n      uint32_t groups[3] = {\n         grid.count[0] / wg.x,\n         grid.count[1] / wg.y,\n         grid.count[2] / wg.z,\n      };\n\n      batch->uniforms.tables[AGX_SYSVAL_TABLE_GRID] =\n         agx_pool_upload_aligned(&batch->pool, groups, sizeof(groups), 4);\n   } else {\n      batch->uniforms.tables[AGX_SYSVAL_TABLE_GRID] = grid.ptr;\n   }\n\n   util_dynarray_foreach(&ctx->global_buffers, struct pipe_resource *, res) {\n      if (!*res)\n"
+        },
+        {
+          "first_line": 5347,
+          "last_line": 5370,
+          "text": "   }\n\n   agx_launch_internal(batch, grid, wg, launch, stage, usc);\n}\n\nstatic void\nagx_launch_grid(struct pipe_context *pipe, const struct pipe_grid_info *info)\n{\n   struct agx_context *ctx = agx_context(pipe);\n   if (unlikely(!ctx->compute_blitter.active &&\n                !agx_render_condition_check(ctx)))\n      return;\n\n   struct agx_batch *batch = agx_get_compute_batch(ctx);\n\n   uint64_t indirect = 0;\n   if (info->indirect) {\n      struct agx_resource *rsrc = agx_resource(info->indirect);\n      agx_batch_reads(batch, rsrc);\n      indirect = agx_map_gpu(rsrc) + info->indirect_offset;\n   }\n\n   /* Increment the pipeline stats query.\n    *\n"
+        }
+      ]
+    },
+    {
+      "path": "/save/workspace/AGX_Probe/mesa/src/vulkan/runtime/vk_shader.c",
+      "sha256": "130ad5eb563e2815639e77e93cd2b7cf0a76b226c673a186d61ba587dd4c34a3",
+      "size": 28066,
+      "revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "excerpts": [
+        {
+          "first_line": 370,
+          "last_line": 445,
+          "text": "      .mesavkshaderbin = \"MesaVkShaderBin\",\n      .driver_id = device->properties.driverID,\n   };\n\n   memcpy(header->uuid, device->properties.shaderBinaryUUID, VK_UUID_SIZE);\n   header->version = device->properties.shaderBinaryVersion;\n}\n\nstatic VkResult\nvk_shader_serialize(struct vk_device *device,\n                    struct vk_shader *shader,\n                    struct blob *blob)\n{\n   struct vk_shader_bin_header header;\n   vk_shader_bin_header_init(&header, device->physical);\n\n   ASSERTED intptr_t header_offset = blob_reserve_bytes(blob, sizeof(header));\n   assert(header_offset == 0);\n\n   bool success = shader->ops->serialize(device, shader, blob);\n   if (!success || blob->out_of_memory)\n      return VK_INCOMPLETE;\n\n   /* Finalize and write the header */\n   header.size = blob->size;\n   if (blob->data != NULL) {\n      assert(sizeof(header) <= blob->size);\n\n      blake3_hasher blake3_ctx;\n      _mesa_blake3_init(&blake3_ctx);\n\n      /* Hash the header with a zero BLAKE3 */\n      _mesa_blake3_update(&blake3_ctx, &header, sizeof(header));\n\n      /* Hash the serialized data */\n      _mesa_blake3_update(&blake3_ctx, blob->data + sizeof(header),\n                        blob->size - sizeof(header));\n\n      _mesa_blake3_final(&blake3_ctx, header.blake3);\n\n      blob_overwrite_bytes(blob, header_offset, &header, sizeof(header));\n   }\n\n   return VK_SUCCESS;\n}\n\nstatic VkResult\nvk_shader_deserialize(struct vk_device *device,\n                      size_t data_size, const void *data,\n                      const VkAllocationCallbacks* pAllocator,\n                      struct vk_shader **shader_out)\n{\n   const struct vk_device_shader_ops *ops = device->shader_ops;\n\n   struct blob_reader blob;\n   blob_reader_init(&blob, data, data_size);\n\n   struct vk_shader_bin_header header, ref_header;\n   blob_copy_bytes(&blob, &header, sizeof(header));\n   if (blob.overrun)\n      return vk_error(device, VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT);\n\n   vk_shader_bin_header_init(&ref_header, device->physical);\n\n   if (memcmp(header.mesavkshaderbin, ref_header.mesavkshaderbin,\n              sizeof(header.mesavkshaderbin)))\n      return vk_error(device, VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT);\n\n   if (header.driver_id != ref_header.driver_id)\n      return vk_error(device, VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT);\n\n   if (memcmp(header.uuid, ref_header.uuid, sizeof(header.uuid)))\n      return vk_error(device, VK_ERROR_INCOMPATIBLE_SHADER_BINARY_EXT);\n\n   /* From the Vulkan 1.3.276 spec:\n    *\n"
+        }
+      ]
+    }
+  ]
+}

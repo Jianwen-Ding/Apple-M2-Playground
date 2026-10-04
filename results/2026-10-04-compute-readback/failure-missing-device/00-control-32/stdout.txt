@@ -1,0 +1,5 @@
+case mode=control count=32 groups=1 local_size=32 words=48 byte_order=native
+egl stage=initialize ok=1 error=0x3000
+egl_version=1.5 egl_vendor=Mesa Project
+egl stage=display-device ok=1 error=0x3000
+egl_render_node=/dev/dri/renderD128 egl_card=/dev/dri/card1

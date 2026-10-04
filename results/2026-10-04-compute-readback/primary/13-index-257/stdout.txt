@@ -1,0 +1,39 @@
+case mode=index count=257 groups=9 local_size=32 words=304 byte_order=native
+egl stage=initialize ok=1 error=0x3000
+egl_version=1.5 egl_vendor=Mesa Project
+egl stage=display-device ok=1 error=0x3000
+egl_render_node=/dev/dri/renderD128 egl_card=/dev/dri/card1
+drm_driver=asahi drm_description=Apple AGX Graphics drm_version=0.0.0
+egl stage=bind-ES ok=1 error=0x3000
+egl stage=choose-config ok=1 error=0x3000
+egl stage=create-ES32 ok=1 error=0x3000
+egl stage=make-current ok=1 error=0x3000
+gl_renderer=Apple M2 Max (G14C B1)
+gl_vendor=Mesa
+gl_version=OpenGL ES 3.2 Mesa 25.1.9
+glsl_version=OpenGL ES GLSL ES 3.20
+limits gl=3.2 invocations=1024 size_x=1024 count_x=65535
+gl stage=identity-limits error=0x0
+compile_status=1
+gl stage=compile error=0x0
+link_status=1
+gl stage=link error=0x0
+gl stage=buffers-program-uniform error=0x0
+dispatch_count=1
+gl stage=dispatch-barrier error=0x0
+gl stage=fence-create error=0x0
+fence_wait=1 status=0x911c elapsed_s=0.000488
+gl stage=fence-wait error=0x0
+gl stage=readback-bind error=0x0
+gl stage=map error=0x0
+unmap valid=1
+gl stage=unmap error=0x0
+gl stage=readback-bind error=0x0
+gl stage=map error=0x0
+unmap valid=1
+gl stage=unmap error=0x0
+gl stage=GL-cleanup error=0x0
+egl stage=release-current ok=1 error=0x3000
+egl stage=destroy-context ok=1 error=0x3000
+egl stage=terminate ok=1 error=0x3000
+READBACK_COMPLETE (host oracle is performed by run_compute.py)

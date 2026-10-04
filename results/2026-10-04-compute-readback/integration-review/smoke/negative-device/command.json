@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/gles_compute",
+    "control",
+    "32",
+    "/dev/dri/intentionally-wrong-node"
+  ],
+  "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/negative-device",
+  "elapsed_seconds": 0.016456265000215353,
+  "returncode": 1,
+  "timed_out": false,
+  "timeout_seconds": 15
+}

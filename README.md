@@ -7,8 +7,9 @@ chip `0x6021`, with 38 enabled cores derived from its masks. Local Mesa naming
 logic interprets this as M2 Max; the 64 GB capacity has not been measured.
 
 The goal is reproducible hardware observations that can guide PTX translation
-and an AGX compiler backend. Read-only parameter and driver-time probes establish the baseline;
-no new instruction behavior has been demonstrated yet.
+and an AGX compiler backend. Device parameters, driver time, and Mesa-compiled
+GLES compute with exact readback now establish the baseline. No raw AGX
+instruction execution, native encoding semantics, or shader counter is established.
 
 ## Layout
 
@@ -38,17 +39,26 @@ make check   # Python/C syntax checks; no GPU device access
 make smoke   # Build and run the DRM driver-access test
 make params  # Three read-only Asahi identity/topology queries
 make time    # 264 bounded driver timestamp queries; no shader execution
+make compute # Two GLES dispatches, guards/control readback and negative checks
 ```
 
-Run records and binaries go to `/scratch/apple-m2-playground/runs/`.
+Run records and binaries go to scratch. Baseline/DRM runs use
+`/scratch/apple-m2-playground/runs/`; shared compute creates a unique directory
+under `SCRATCH_ROOT`.
 Override with `make smoke DEVICE=/dev/dri/renderD128 SCRATCH_ROOT=/scratch/other`.
-Python-only equivalents are documented in [scripts/README.md](scripts/README.md).
+`PROBE_INCLUDE` selects the EGL/GLES/Vulkan header root (default
+`/save/workspace/AGX_Probe/mesa/include`); `CC` selects the compiler. Vendor
+headers are read without modifying vendor sources. Python-only equivalents
+are documented in [scripts/README.md](scripts/README.md).
 
 - [Probe plan](docs/probe-plan.md)
 - [Asahi Linux environment](environments/asahi-linux/README.md)
 - [Offline environment](environments/offline/README.md)
 - [DRM probe tests](tests/README.md)
 - [Device parameters and evidence](experiments/baseline/device-params.md)
+- [Compute/readback and evidence](experiments/baseline/compute-readback.md)
+- [Linux backend reconnaissance](experiments/baseline/linux-compute-backend.md)
+- [Shader-counter evidence gap](experiments/timing/shader-counter-candidates.md)
 - [Driver time and evidence](experiments/timing/driver-time.md)
 - [Reviewed progress and next tasks](notes/2026-10-04-probe-progress.md)
 - [Known limitations and failed approaches](notes/failed-approaches.md)

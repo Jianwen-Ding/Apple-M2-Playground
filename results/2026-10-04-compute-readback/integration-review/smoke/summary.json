@@ -1,0 +1,232 @@
+{
+  "binary_sha256": "9774fb07bc898799d437705d81dc3a3f6b5e421e2f05f52e4ec70ebcd2e33ec2",
+  "build": {
+    "argv": [
+      "cc",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-O2",
+      "-MD",
+      "-MF",
+      "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/build/dependencies.d",
+      "-I/save/workspace/AGX_Probe/mesa/include",
+      "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/sources/gles_compute.c",
+      "-ldl",
+      "-o",
+      "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/gles_compute"
+    ],
+    "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/build",
+    "elapsed_seconds": 0.10330806199999643,
+    "returncode": 0,
+    "timed_out": false,
+    "timeout_seconds": 30
+  },
+  "cases": [
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/gles_compute",
+          "control",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/00-control-32",
+        "elapsed_seconds": 0.01918639899986374,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 32,
+      "directory": "00-control-32",
+      "mode": "control",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 32,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 8,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/gles_compute",
+          "constant",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/01-constant-32",
+        "elapsed_seconds": 0.01977198500026134,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 32,
+      "directory": "01-constant-32",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 32,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 8,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/gles_compute",
+          "index",
+          "33",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/02-index-33",
+        "elapsed_seconds": 0.020133276999786176,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 33,
+      "directory": "02-index-33",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 33,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 80,
+        "workgroups": 2
+      }
+    }
+  ],
+  "failure": null,
+  "final_control": {
+    "command": {
+      "argv": [
+        "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/gles_compute",
+        "control",
+        "32",
+        "/dev/dri/renderD128"
+      ],
+      "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/final-control",
+      "elapsed_seconds": 0.01875014799998098,
+      "returncode": 0,
+      "timed_out": false,
+      "timeout_seconds": 15
+    },
+    "verification": {
+      "checks": {
+        "control-input.bin": null,
+        "control-output.bin": null,
+        "input.bin": null,
+        "output.bin": null
+      },
+      "count": 32,
+      "endian": "little",
+      "local_size": 32,
+      "pass": true,
+      "prefix_guard_words": 8,
+      "suffix_guard_and_padding_words": 8,
+      "verified_control_words": 16,
+      "verified_output_words": 48,
+      "workgroups": 1
+    }
+  },
+  "negative_tests": {
+    "device_identity": {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/gles_compute",
+          "control",
+          "32",
+          "/dev/dri/intentionally-wrong-node"
+        ],
+        "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/negative-device",
+        "elapsed_seconds": 0.016456265000215353,
+        "returncode": 1,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "pass": true
+    },
+    "invalid_shader": {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/gles_compute",
+          "invalid",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/negative-invalid-shader",
+        "elapsed_seconds": 0.01763710200020796,
+        "returncode": 3,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "pass": true
+    },
+    "oracle_mismatch": {
+      "actual_from": "02-index-33/output.bin",
+      "pass": true,
+      "rejection": {
+        "first_mismatches": [
+          {
+            "actual": 305419896,
+            "expected": 305419897,
+            "word": 8
+          }
+        ],
+        "mismatch_count": 1
+      }
+    }
+  },
+  "package_inventory": {
+    "argv": [
+      "rpm",
+      "-q",
+      "mesa-dri-drivers",
+      "mesa-libEGL",
+      "libdrm",
+      "gcc",
+      "glibc"
+    ],
+    "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/inventory",
+    "elapsed_seconds": 0.005603352000434825,
+    "returncode": 0,
+    "timed_out": false,
+    "timeout_seconds": 10
+  },
+  "pass": true,
+  "suite": "smoke"
+}

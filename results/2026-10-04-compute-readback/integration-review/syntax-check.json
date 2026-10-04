@@ -1,0 +1,128 @@
+{
+  "command": "check",
+  "started_utc": "2026-10-04T20:30:28.069122+00:00",
+  "device": null,
+  "source_sha256": {
+    "tests/drm_params.c": "464bff1d31f0418966c8dd3b837ee9710864c10e3eda23efd4de22f250427c23",
+    "tests/drm_smoke.c": "3c9549ef5ce3e4e40fded9d669cd5cdd895727b830ab37cfc0971040ae98d291",
+    "tests/drm_time.c": "79127e8d1870ae11f497dcbc49eb97272f92e711acd7211a6c1807b28e0aa826",
+    "tests/gles_compute.c": "b96202306293ccb00f589a51413f10bc704c8a0d0a1d5df187237bfdd5a79bc3",
+    "tests/gles_time.c": "20b1b4b6d0a80663b42e1d9d1cfbc22bdba860666b65fd3d9cc53a52a042d7e3",
+    "tests/vulkan_caps.c": "47967ddd24bacbb688b96097d025995ffc71a71b9b5bd9e139a4294d2278c4b9",
+    "scripts/collect_environment.py": "120be2a7da615138e36c58658bec4eac9fb1cbb0be8c9ea0c257ecd506ad33d0",
+    "scripts/run.py": "2709307dcf4cb0a9de67937497803470e76dae6a56c8daadc6386ee9396d31f9",
+    "scripts/run_compute.py": "3e46d519b52daddf88be8fe646f44db97ec08263e91627241748a8fc580580b0",
+    "scripts/run_gles_time.py": "e0522d944c51f7cc2060098d0aa087a30c97136cb60d37212b94f307a02cefa9",
+    "scripts/run_params.py": "54c669a279852f859375ba0ef07c6863ee1226c844a450678ccee5fb5e2a4147",
+    "scripts/run_time.py": "77809d99785104516e6a57de4f96ca1d29b9e3e41fa3584dd7083214def78197",
+    "scripts/run_vulkan_caps.py": "cd697e5329cacbbeb69257fbaacef889ae064545ccb0a30f47698b1e7772484a"
+  },
+  "passed": true,
+  "commands": [
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_params.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.01157878999993045
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_smoke.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.01909023200005322
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_time.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.014357716000176879
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/gles_compute.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.017729935999795998
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/gles_time.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.01986623500033602
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I",
+        "/save/workspace/AGX_Probe/mesa/include",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/vulkan_caps.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.027810470000076748
+    }
+  ],
+  "sources_unchanged": true,
+  "completed_utc": "2026-10-04T20:30:28.205100+00:00",
+  "scope": "Python and C syntax checks only; no hardware execution."
+}

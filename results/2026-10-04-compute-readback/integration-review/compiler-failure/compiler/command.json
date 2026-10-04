@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "nonexistent-p2-review-compiler",
+    "--version"
+  ],
+  "cwd": "/scratch/p2-review-compiler-failure/20261004T203352.290442Z-5970/compiler",
+  "elapsed_seconds": 0.0003969589997723233,
+  "launch_error": "[Errno 2] No such file or directory: 'nonexistent-p2-review-compiler'",
+  "returncode": null,
+  "timed_out": false,
+  "timeout_seconds": 10
+}

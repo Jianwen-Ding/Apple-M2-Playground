@@ -1,0 +1,22 @@
+{
+  "scope": "Syntax only for newly appeared concurrent source; no execution/review/staging",
+  "argv": [
+    "cc",
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-O2",
+    "-I",
+    "/save/workspace/AGX_Probe/mesa/include",
+    "-fsyntax-only",
+    "tests/vulkan_compute.c"
+  ],
+  "returncode": 0,
+  "stdout": "",
+  "stderr": "",
+  "source_sha256_before": "41a1cf2e25306f058d864bb60aeedabb469bd6ef7eec64bce08e78650c9c51b1",
+  "source_sha256_after": "41a1cf2e25306f058d864bb60aeedabb469bd6ef7eec64bce08e78650c9c51b1",
+  "source_unchanged": true,
+  "elapsed_seconds": 0.02308459200003199
+}

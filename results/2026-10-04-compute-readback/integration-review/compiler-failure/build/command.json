@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "nonexistent-p2-review-compiler",
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-O2",
+    "-MD",
+    "-MF",
+    "/scratch/p2-review-compiler-failure/20261004T203352.290442Z-5970/build/dependencies.d",
+    "-I/save/workspace/AGX_Probe/mesa/include",
+    "/scratch/p2-review-compiler-failure/20261004T203352.290442Z-5970/sources/gles_compute.c",
+    "-ldl",
+    "-o",
+    "/scratch/p2-review-compiler-failure/20261004T203352.290442Z-5970/gles_compute"
+  ],
+  "cwd": "/scratch/p2-review-compiler-failure/20261004T203352.290442Z-5970/build",
+  "elapsed_seconds": 0.0002479169997968711,
+  "launch_error": "[Errno 2] No such file or directory: 'nonexistent-p2-review-compiler'",
+  "returncode": null,
+  "timed_out": false,
+  "timeout_seconds": 30
+}

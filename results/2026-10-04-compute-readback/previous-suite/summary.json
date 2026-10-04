@@ -1,0 +1,1001 @@
+{
+  "binary_sha256": "9774fb07bc898799d437705d81dc3a3f6b5e421e2f05f52e4ec70ebcd2e33ec2",
+  "build": {
+    "argv": [
+      "cc",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-O2",
+      "-MD",
+      "-MF",
+      "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/build/dependencies.d",
+      "-I/save/workspace/AGX_Probe/mesa/include",
+      "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/sources/gles_compute.c",
+      "-ldl",
+      "-o",
+      "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute"
+    ],
+    "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/build",
+    "elapsed_seconds": 0.1205434860000878,
+    "returncode": 0,
+    "timed_out": false,
+    "timeout_seconds": 30
+  },
+  "cases": [
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "control",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/00-control-32",
+        "elapsed_seconds": 0.019485224999925777,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 32,
+      "directory": "00-control-32",
+      "mode": "control",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 32,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 8,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/01-constant-32",
+        "elapsed_seconds": 0.020300060999943526,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 32,
+      "directory": "01-constant-32",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 32,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 8,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/02-constant-32",
+        "elapsed_seconds": 0.022071773999869038,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 32,
+      "directory": "02-constant-32",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 32,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 8,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "control",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/03-control-32",
+        "elapsed_seconds": 0.028253627000140114,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 32,
+      "directory": "03-control-32",
+      "mode": "control",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 32,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 8,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "1",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/04-constant-1",
+        "elapsed_seconds": 0.031779720000031375,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 1,
+      "directory": "04-constant-1",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 1,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/05-constant-32",
+        "elapsed_seconds": 0.020208101999969585,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 32,
+      "directory": "05-constant-32",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 32,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 8,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "33",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/06-constant-33",
+        "elapsed_seconds": 0.019433349999872007,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 33,
+      "directory": "06-constant-33",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 33,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 80,
+        "workgroups": 2
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "65",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/07-constant-65",
+        "elapsed_seconds": 0.03788340500000231,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 65,
+      "directory": "07-constant-65",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 65,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 112,
+        "workgroups": 3
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "257",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/08-constant-257",
+        "elapsed_seconds": 0.01979322600004707,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 257,
+      "directory": "08-constant-257",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 257,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 304,
+        "workgroups": 9
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "index",
+          "1",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/09-index-1",
+        "elapsed_seconds": 0.038354948000005606,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 1,
+      "directory": "09-index-1",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 1,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "index",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/10-index-32",
+        "elapsed_seconds": 0.02152952300002653,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 32,
+      "directory": "10-index-32",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 32,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 8,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "index",
+          "33",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/11-index-33",
+        "elapsed_seconds": 0.037917655000001105,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 33,
+      "directory": "11-index-33",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 33,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 80,
+        "workgroups": 2
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "index",
+          "65",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/12-index-65",
+        "elapsed_seconds": 0.020309060999807116,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 65,
+      "directory": "12-index-65",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 65,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 112,
+        "workgroups": 3
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "index",
+          "257",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/13-index-257",
+        "elapsed_seconds": 0.019780684000124893,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 257,
+      "directory": "13-index-257",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 257,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 304,
+        "workgroups": 9
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "1",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/14-constant-1",
+        "elapsed_seconds": 0.021448856000006344,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 1,
+      "directory": "14-constant-1",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 1,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/15-constant-32",
+        "elapsed_seconds": 0.02066868700012492,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 32,
+      "directory": "15-constant-32",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 32,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 8,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "33",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/16-constant-33",
+        "elapsed_seconds": 0.01995476799993412,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 33,
+      "directory": "16-constant-33",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 33,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 80,
+        "workgroups": 2
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "65",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/17-constant-65",
+        "elapsed_seconds": 0.020311769000045388,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 65,
+      "directory": "17-constant-65",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 65,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 112,
+        "workgroups": 3
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "constant",
+          "257",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/18-constant-257",
+        "elapsed_seconds": 0.021075813000152266,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 257,
+      "directory": "18-constant-257",
+      "mode": "constant",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 257,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 304,
+        "workgroups": 9
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "index",
+          "1",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/19-index-1",
+        "elapsed_seconds": 0.020061976999841136,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 1,
+      "directory": "19-index-1",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 1,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "index",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/20-index-32",
+        "elapsed_seconds": 0.021157604999871182,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 32,
+      "directory": "20-index-32",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 32,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 8,
+        "verified_control_words": 16,
+        "verified_output_words": 48,
+        "workgroups": 1
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "index",
+          "33",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/21-index-33",
+        "elapsed_seconds": 0.020011476000036055,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 33,
+      "directory": "21-index-33",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 33,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 80,
+        "workgroups": 2
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "index",
+          "65",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/22-index-65",
+        "elapsed_seconds": 0.020213603000001967,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 65,
+      "directory": "22-index-65",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 65,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 112,
+        "workgroups": 3
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "index",
+          "257",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/23-index-257",
+        "elapsed_seconds": 0.020392269000012675,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 257,
+      "directory": "23-index-257",
+      "mode": "index",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 257,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 304,
+        "workgroups": 9
+      }
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "control",
+          "257",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/24-control-257",
+        "elapsed_seconds": 0.018814890000157902,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "count": 257,
+      "directory": "24-control-257",
+      "mode": "control",
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null
+        },
+        "count": 257,
+        "endian": "little",
+        "local_size": 32,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_and_padding_words": 39,
+        "verified_control_words": 16,
+        "verified_output_words": 304,
+        "workgroups": 9
+      }
+    }
+  ],
+  "failure": null,
+  "final_control": {
+    "command": {
+      "argv": [
+        "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+        "control",
+        "32",
+        "/dev/dri/renderD128"
+      ],
+      "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/final-control",
+      "elapsed_seconds": 0.01861130600013894,
+      "returncode": 0,
+      "timed_out": false,
+      "timeout_seconds": 15
+    },
+    "verification": {
+      "checks": {
+        "control-input.bin": null,
+        "control-output.bin": null,
+        "input.bin": null,
+        "output.bin": null
+      },
+      "count": 32,
+      "endian": "little",
+      "local_size": 32,
+      "pass": true,
+      "prefix_guard_words": 8,
+      "suffix_guard_and_padding_words": 8,
+      "verified_control_words": 16,
+      "verified_output_words": 48,
+      "workgroups": 1
+    }
+  },
+  "negative_tests": {
+    "device_identity": {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "control",
+          "32",
+          "/dev/dri/intentionally-wrong-node"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/negative-device",
+        "elapsed_seconds": 0.0128882460001023,
+        "returncode": 1,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "pass": true
+    },
+    "invalid_shader": {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/gles_compute",
+          "invalid",
+          "32",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/negative-invalid-shader",
+        "elapsed_seconds": 0.017495261000021856,
+        "returncode": 3,
+        "timed_out": false,
+        "timeout_seconds": 15
+      },
+      "pass": true
+    },
+    "oracle_mismatch": {
+      "actual_from": "23-index-257/output.bin",
+      "pass": true,
+      "rejection": {
+        "first_mismatches": [
+          {
+            "actual": 305419896,
+            "expected": 305419897,
+            "word": 8
+          }
+        ],
+        "mismatch_count": 1
+      }
+    }
+  },
+  "package_inventory": {
+    "argv": [
+      "rpm",
+      "-q",
+      "mesa-dri-drivers",
+      "mesa-libEGL",
+      "libdrm",
+      "gcc",
+      "glibc"
+    ],
+    "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202238.369671Z-4036/inventory",
+    "elapsed_seconds": 0.00599943399993208,
+    "returncode": 0,
+    "timed_out": false,
+    "timeout_seconds": 10
+  },
+  "pass": true
+}

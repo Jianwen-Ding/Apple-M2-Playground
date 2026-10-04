@@ -1,0 +1,68 @@
+{
+  "utc": "2026-10-04T20:15:12.337923+00:00",
+  "files": {
+    "dependency-check.json": {
+      "sha256": "31504ed541a2b0a453da2d58018d6abdb03ad4358e29582a53ff61348763c169",
+      "size": 1622
+    },
+    "dependency-check.py": {
+      "sha256": "1246001c44c7c95f4c033a1fa66dcf33ca779b6f5e94fe73ac7720b631efaf2b",
+      "size": 1135
+    },
+    "egl-capabilities-device.json": {
+      "sha256": "84ff8788ce534fee5df3cbff787cb6d052b097df7f00adcba9f0b8ab84810a3c",
+      "size": 2855
+    },
+    "egl-capabilities.json": {
+      "sha256": "56ccdfffa950571f12f4062763a5d5597b230ff2285d6d4eb1895a5b6d4c8728",
+      "size": 2492
+    },
+    "egl-capabilities.py": {
+      "sha256": "da0f5657bfe07877b543995deb283b02aa7a121777d1bc0a63ff37827b60e109",
+      "size": 3398
+    },
+    "inventory.json": {
+      "sha256": "71af9eefc45ba8873075818e64092f23d39d658b97cd9601ba0a446c9de3237e",
+      "size": 65307
+    },
+    "inventory.py": {
+      "sha256": "ad2e798452adf50664769d155fe5c83f95c06aae8897101d9631b0f877533663",
+      "size": 2397
+    },
+    "run-capabilities.py": {
+      "sha256": "0a0b081498f7bc1de4f2b160511ff6180e01de2b340f7f336386fb3e79f897df",
+      "size": 1325
+    },
+    "source-references.json": {
+      "sha256": "071acbc9df06b186f4a7b3b2834726054f6c4eb7bed5dcee49fdd377d8f9768e",
+      "size": 3627
+    },
+    "vulkan-capabilities": {
+      "sha256": "24ec77db0df9e3e46ebb3a0298bb6c0eba791c492738a80c593014e4cf130d61",
+      "size": 71736
+    },
+    "vulkan-capabilities.c": {
+      "sha256": "e8346e7a89f702d4c71bcdf32d450bc0be281c78f6b4160e5046b34436e22fe5",
+      "size": 2781
+    },
+    "vulkan-capabilities.json": {
+      "sha256": "23fa31522fd81a75bf1462163207eb7c5137f440178c76e5f0010f737998c02f",
+      "size": 1196
+    },
+    "vulkan-loader-diagnostic.json": {
+      "sha256": "d4b44268cbeb0930afbc9e8c833ed0a04574f8e3d863b944e7ccb2fe2920eb06",
+      "size": 1515
+    }
+  },
+  "report": {
+    "path": "/save/workspace/apple-documentation-playground/experiments/baseline/linux-compute-backend.md",
+    "sha256": "c26d8201bde15258c10b447e834040a9e2c3c4f758f171c12b5c0406a5fe08cd"
+  },
+  "verification": {
+    "json_parse": "passed",
+    "python_syntax": "passed",
+    "mesa_report_paths_exist": 13,
+    "vulkan_compile": "passed -Wall -Wextra -Werror",
+    "kernel_dispatches": 0
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "00-control-32/command.json": "c3d5f2d62241918de5f9600d23b358d8eec35f617acb60ed93bd3671b0b7cf20",
+  "00-control-32/stderr.txt": "9930c8309aeab5d1e9f277d3628789b9926ab94207083a159585f2a5934a25cd",
+  "00-control-32/stdout.txt": "de6c92a9d93c62f83694f96bea4e33b9dcb6f42c941e609d2ddd5838041927c7",
+  "build-dependency-hashes.json": "60b5f38dae664496c3ea7d7e9c68ad9adceadccf95c043e6ce0bee1adc3082f8",
+  "build/command.json": "625f43d0baed7cd8b030ddf047e65b32fd39eb7d61420b96b5f0a7ada06609a9",
+  "build/dependencies.d": "04db9dbe326dd6398291006dc90c62fdf43dcd66dc4a015263766d6d274d8dd7",
+  "build/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "build/stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "compiler/command.json": "48522083a6c126f1059b2971a8e2c213a420bfe3a7c454acd365c3b94c14dbf6",
+  "compiler/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "compiler/stdout.txt": "ce5de0406d3697c0d2368841948f9f84e2ac927f1ef4e99f55e82877650bbfd3",
+  "environment.json": "6e893cdae85b1f022fbed23a46488950fcf7674527c1cdc4c8b6b08677c78046",
+  "inventory/command.json": "7d76cf4ae26618cbf65b529645bf1fb657954f0ee92900bba264672c1af3f014",
+  "inventory/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "inventory/stdout.txt": "20fb92503678acc205ada3f88e3f9221f52f6631409567135bcdabac3dd53830",
+  "runtime-hashes.json": "09fb3e6895049d155f91e6548bb580442fffd14984b6186ac68fad9408ba2773",
+  "source-hashes.json": "b9096ded19892ca645ffac7122a84b671175af4350a13c6ccd9ace59b76f3291",
+  "sources/gles_compute.c": "b96202306293ccb00f589a51413f10bc704c8a0d0a1d5df187237bfdd5a79bc3",
+  "sources/run_compute.py": "28e3cdc344b98151db01919be1e7df46f6066d466f7bdc2a5a86a9f654744ff0",
+  "summary.json": "fe3252ffb05532757c6d9dd67b435ea1bd92b48798a8d538b5b6189d20a6e1f2"
+}

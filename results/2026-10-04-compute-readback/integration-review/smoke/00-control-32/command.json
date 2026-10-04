@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/gles_compute",
+    "control",
+    "32",
+    "/dev/dri/renderD128"
+  ],
+  "cwd": "/scratch/apple-m2-playground/20261004T203119.490211Z-5350/00-control-32",
+  "elapsed_seconds": 0.01918639899986374,
+  "returncode": 0,
+  "timed_out": false,
+  "timeout_seconds": 15
+}

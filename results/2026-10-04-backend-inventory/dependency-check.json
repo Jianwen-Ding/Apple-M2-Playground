@@ -1,0 +1,28 @@
+{
+  "utc": "2026-10-04T20:10:47.441882+00:00",
+  "scope": "Dynamic loading and offline Python import only; no GPU API calls",
+  "libraries": {
+    "libvulkan.so.1": "load success",
+    "libvulkan_asahi.so": "libdisplay-info.so.2: cannot open shared object file: No such file or directory",
+    "libEGL.so.1": "load success",
+    "libEGL_mesa.so.0": "load success",
+    "libgallium-25.1.9.so": "load success",
+    "libGLESv2.so.2": "libGLESv2.so.2: cannot open shared object file: No such file or directory",
+    "libOpenCL.so.1": "libOpenCL.so.1: cannot open shared object file: No such file or directory",
+    "libdisplay-info.so.2": "libdisplay-info.so.2: cannot open shared object file: No such file or directory"
+  },
+  "imports": {
+    "fma": "import success",
+    "srgb": "import success",
+    "applegpu": "import success",
+    "disassemble": "import success",
+    "assemble": "import success"
+  },
+  "hashes": {
+    "/scratch/apple-m2-playground/backend-inventory/inventory.py": "ad2e798452adf50664769d155fe5c83f95c06aae8897101d9631b0f877533663",
+    "/scratch/apple-m2-playground/backend-inventory/run-capabilities.py": "0a0b081498f7bc1de4f2b160511ff6180e01de2b340f7f336386fb3e79f897df",
+    "/scratch/apple-m2-playground/backend-inventory/dependency-check.py": "1246001c44c7c95f4c033a1fa66dcf33ca779b6f5e94fe73ac7720b631efaf2b",
+    "/scratch/apple-m2-playground/backend-inventory/vulkan-capabilities.c": "e8346e7a89f702d4c71bcdf32d450bc0be281c78f6b4160e5046b34436e22fe5",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_core.h": "2f64fd6c7c3f342b0e44f039f1c359b7f0e6cfcb71a7dca1cc5156282faa3b51"
+  }
+}

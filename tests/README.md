@@ -1,4 +1,4 @@
-# Read-only DRM probes
+# DRM and compute probes
 
 `drm_smoke.c` opens a DRM render node and calls `DRM_IOCTL_VERSION` using
 the installed Linux UAPI headers. It requires a C compiler, but not libdrm.
@@ -52,3 +52,25 @@ Synthetic runner failure checks can be reproduced without opening DRM:
 ```sh
 python3 -B results/2026-10-04-driver-time/integration-review/verify_runner.py
 ```
+
+## Mesa GLES compute/readback
+
+`gles_compute.c` loads EGL/GL entry points dynamically, requires the requested
+EGL-associated Asahi render node and `Apple M2 Max (G14C B1)` renderer, and
+compiles GLSL ES 3.20 compute. It bounds fence waits and preserves whole-buffer
+bytes; the Python runner independently checks payload, guards, padding, and
+an untouched second buffer. Direct C status alone is not an oracle PASS.
+
+```sh
+make compute  # Two dispatches, two readback controls, three negative checks
+make check    # All tests/*.c and scripts/*.py; no device access
+```
+
+`PROBE_INCLUDE` selects the EGL/GLES/Vulkan header root, defaulting to
+`/save/workspace/AGX_Probe/mesa/include`; `CC` chooses the compiler. No vendor
+source modification is needed. [P2 report](../experiments/baseline/compute-readback.md)
+links raw bytes and independent verification. The full matrix is available
+through `python3 -B scripts/run_compute.py`.
+
+Concurrent Vulkan/timer probes may be present. The shared check only parses or
+syntax-checks them; execution and review belong to their respective owners.

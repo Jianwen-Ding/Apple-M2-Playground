@@ -1,0 +1,27 @@
+{
+  "concurrent_workloads": "Other agents may be active; no isolation or timing claim.",
+  "device": "/dev/dri/renderD128",
+  "device_stat": {
+    "mode": "0o20666",
+    "rdev_major": 226,
+    "rdev_minor": 128
+  },
+  "drm_driver_required": "asahi",
+  "environment_overrides": {
+    "LIBGL_ALWAYS_SOFTWARE": "false",
+    "MESA_SHADER_CACHE_DISABLE": "true"
+  },
+  "python": "3.13.13 (main, Apr  8 2026, 00:00:00) [GCC 15.2.1 20260123 (Red Hat 15.2.1-7)]",
+  "removed_environment_keys": [],
+  "renderer_required": "Apple M2 Max (G14C B1)",
+  "repo": "/save/workspace/apple-documentation-playground",
+  "uname": [
+    "Linux",
+    "d9724b51364b",
+    "6.19.14-400.asahi.fc42.aarch64+16k",
+    "#1 SMP PREEMPT_DYNAMIC Thu May  7 22:15:21 UTC 2026",
+    "aarch64",
+    ""
+  ],
+  "utc": "2026-10-04T20:23:52.122078+00:00"
+}

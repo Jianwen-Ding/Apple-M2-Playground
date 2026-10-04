@@ -35,5 +35,23 @@ permission failure paths were not induced in this review.
 During final integration, another owner added a GLES C probe. The expanded default
 `make check` failed on missing system `EGL/egl.h`. Supplying the unchanged Mesa
 header include root via `CC='cc -I/save/workspace/AGX_Probe/mesa/include'` let all
-four current C files pass syntax checking. The concurrent probe remains outside
-this commit; no shader execution was performed by this integration review.
+four current C files pass syntax checking. That probe was outside the first integration commit. The subsequent P2 review
+adds `PROBE_INCLUDE` to shared tooling so normal `make check` can use vendor
+EGL/GLES/Vulkan headers without embedding include flags in `CC`.
+
+## P2 and backend review
+
+[P2](../experiments/baseline/compute-readback.md) now demonstrates actual GLES
+compute/readback. Its stored wrong-oracle, invalid-GLSL, wrong-device, missing-
+header/device, and host-only timeout/launch failures are selected evidence.
+The original runner hardcoded `cc`; integration now honors `CC`. A missing
+compiler override failed before API children, with a retained summary.
+
+[Backend inventory](../results/2026-10-04-backend-inventory/README.md) records
+historical Vulkan ICD loading failure due to `libdisplay-info.so.2`; this review
+does not rerun or integrate the ongoing Vulkan owner's runtime work.
+[Counter research](../results/2026-10-04-shader-counter-research/README.md)
+found no justified shader timer selector. Inspected source writes both compute
+timestamp destinations to `comp_start` and returns constant-zero disjoint state.
+These predict timing hazards if present in the installed build; this review
+measured neither broken command timestamps nor instruction latency.

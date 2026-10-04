@@ -1,0 +1,73 @@
+[
+  {
+    "argv": [
+      "uname",
+      "-a"
+    ],
+    "status": 0,
+    "stdout": "Linux d9724b51364b 6.19.14-400.asahi.fc42.aarch64+16k #1 SMP PREEMPT_DYNAMIC Thu May  7 22:15:21 UTC 2026 aarch64 GNU/Linux\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "rpm",
+      "-q",
+      "--qf",
+      "%{NAME} %{VERSION}-%{RELEASE} source=%{SOURCERPM}\n",
+      "mesa-dri-drivers",
+      "mesa-libEGL",
+      "libglvnd-egl"
+    ],
+    "status": 0,
+    "stdout": "mesa-dri-drivers 25.1.9-1.fc42 source=mesa-25.1.9-1.fc42.src.rpm\nmesa-libEGL 25.1.9-1.fc42 source=mesa-25.1.9-1.fc42.src.rpm\nlibglvnd-egl 1.7.0-7.fc42 source=libglvnd-1.7.0-7.fc42.src.rpm\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/save/workspace/AGX_Probe/mesa",
+      "rev-parse",
+      "HEAD"
+    ],
+    "status": 0,
+    "stdout": "e5f0687867f5c5e88619175d9b0442f8560e8d53\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/save/workspace/AGX_Probe/applegpu",
+      "rev-parse",
+      "HEAD"
+    ],
+    "status": 0,
+    "stdout": "4c5bae61086b8067231120c98b4756d7696d399c\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/save/workspace/AGX_Probe/mesa",
+      "status",
+      "--porcelain"
+    ],
+    "status": 0,
+    "stdout": " T .github/copilot-instructions.md\n D .gitlab-ci/bin\n D .gitlab-ci/docs\n T CLAUDE.md\n T GEMINI.md\n T bin/ci/pipeline_message.py\n T include/android_stub/sync/sync.h\n T src/compiler/isaspec/README.rst\n T src/gallium/drivers/asahi/.clang-format\n T src/gallium/drivers/freedreno/.clang-format\n T src/gallium/drivers/panfrost/.clang-format\n T src/gallium/winsys/asahi/drm/.clang-format\n T src/gallium/winsys/panfrost/drm/.clang-format\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "git",
+      "-C",
+      "/save/workspace/AGX_Probe/applegpu",
+      "status",
+      "--porcelain"
+    ],
+    "status": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

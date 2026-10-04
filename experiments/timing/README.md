@@ -3,11 +3,17 @@
 Priority inherited from the request to investigate time behavior and a possible
 special register. No shader time register has been confirmed in this project.
 
+[Driver GET_TIME baseline](driver-time.md) has repeatable read-only samples.
+[Shader-counter reconnaissance](shader-counter-candidates.md) retains capability
+responses and source concerns but no justified shader timer selector. Selected
+source/capability evidence is versioned with those reports; loaded timing and
+raw command timestamp validation remain separately owned work.
+
 ## Planned sequence
 
-1. Read local Asahi time-query and parameter documentation; query supported
-   timestamps and frequencies and retain raw values.
-2. Establish a command-level baseline after compute submission works.
+1. Preserve the completed driver-time and P1 parameter controls.
+2. Validate command timestamp plumbing against the completed
+   [P2 compute/readback control](../baseline/compute-readback.md).
 3. Identify candidate special-register reads from primary source code and
    existing reverse-engineering tools; record the exact encoding.
 4. Test whether candidate values change monotonically, across lanes, and

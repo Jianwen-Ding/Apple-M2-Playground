@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/compute-runs/20261004T202352.203646Z-4218/gles_compute",
+    "control",
+    "32",
+    "/dev/dri/intentionally-missing-compute-node"
+  ],
+  "cwd": "/scratch/apple-m2-playground/compute-runs/20261004T202352.203646Z-4218/00-control-32",
+  "elapsed_seconds": 0.01305974799993237,
+  "returncode": 1,
+  "timed_out": false,
+  "timeout_seconds": 15
+}

@@ -1,0 +1,14 @@
+{
+  "all_negative_controls_pass": true,
+  "compared_main_and_control_words": 3328,
+  "current_source_snapshots_match": true,
+  "first_wait_status_counts": {
+    "0x911a": 4,
+    "0x911c": 22
+  },
+  "manifest_entries_checked": 817,
+  "method": "read-only retained-artifact verification using a separately expressed uint32 oracle; no GPU dispatch",
+  "pass": true,
+  "python_syntax_pass": true,
+  "readback_cases": 26
+}

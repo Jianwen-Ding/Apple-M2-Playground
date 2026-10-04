@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "control-input.bin": null,
+    "control-output.bin": null,
+    "input.bin": null,
+    "output.bin": null
+  },
+  "count": 257,
+  "endian": "little",
+  "local_size": 32,
+  "pass": true,
+  "prefix_guard_words": 8,
+  "suffix_guard_and_padding_words": 39,
+  "verified_control_words": 16,
+  "verified_output_words": 304,
+  "workgroups": 9
+}

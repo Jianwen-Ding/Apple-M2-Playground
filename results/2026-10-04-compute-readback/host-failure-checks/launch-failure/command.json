@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/scratch/intentionally-missing-compute-executable"
+  ],
+  "cwd": "/scratch/apple-m2-playground/compute-runner-failure-checks/launch-failure",
+  "elapsed_seconds": 0.0004359590000149183,
+  "launch_error": "[Errno 2] No such file or directory: '/scratch/intentionally-missing-compute-executable'",
+  "returncode": null,
+  "timed_out": false,
+  "timeout_seconds": 1
+}

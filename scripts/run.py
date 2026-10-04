@@ -45,16 +45,27 @@ def logged_command(argv, directory, label, timeout):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("env", "check", "drm-smoke", "params", "time"))
+    parser.add_argument("command", choices=("env", "check", "drm-smoke", "params", "time", "compute"))
     parser.add_argument("--scratch-root", type=Path,
                         default=Path("/scratch/apple-m2-playground"))
     parser.add_argument("--device", default="/dev/dri/renderD128")
+    parser.add_argument("--include-dir", type=Path,
+                        default=Path(os.environ.get("PROBE_INCLUDE", "/save/workspace/AGX_Probe/mesa/include")),
+                        help="EGL/GLES/Vulkan header root; set PROBE_INCLUDE or override here")
+    parser.add_argument("--smoke", action="store_true", help="compute: two dispatches plus controls")
     args = parser.parse_args()
+    if args.smoke and args.command != "compute":
+        parser.error("--smoke applies only to compute")
 
-    if args.command in ("params", "time"):
-        runner = REPO / "scripts" / ("run_params.py" if args.command == "params" else "run_time.py")
-        return subprocess.call([sys.executable, "-B", str(runner), "--scratch-root",
-                                str(args.scratch_root), "--device", args.device], cwd=REPO)
+    if args.command in ("params", "time", "compute"):
+        runner = REPO / "scripts" / f"run_{args.command}.py"
+        command = [sys.executable, "-B", str(runner), "--scratch-root",
+                   str(args.scratch_root), "--device", args.device]
+        if args.command == "compute":
+            command += ["--mesa-include", str(args.include_dir)]
+            if args.smoke:
+                command.append("--smoke")
+        return subprocess.call(command, cwd=REPO)
 
     started = datetime.now(timezone.utc)
     root = args.scratch_root.resolve() / "runs"
@@ -69,7 +80,7 @@ def main():
                                      (REPO / "scripts").glob("*.py"))]},
                "passed": False, "commands": []}
     compiler = shlex.split(os.environ.get("CC", "cc"))
-    flags = ["-std=c11", "-Wall", "-Wextra", "-Werror", "-O2"]
+    flags = ["-std=c11", "-Wall", "-Wextra", "-Werror", "-O2", "-I", str(args.include_dir.expanduser().resolve())]
 
     if args.command == "check":
         # Parse without writing .pyc files into the repository.
@@ -80,7 +91,11 @@ def main():
             result = logged_command(compiler + flags + ["-fsyntax-only", str(source)],
                                     directory, f"compile-{source.stem}", 60)
             summary["commands"].append(result)
-        summary["passed"] = bool(sources) and all(r["returncode"] == 0 for r in summary["commands"])
+        current_paths = [*sorted((REPO / "tests").glob("*.c")), *sorted((REPO / "scripts").glob("*.py"))]
+        current_hashes = {str(p.relative_to(REPO)): sha256(p) for p in current_paths}
+        summary["sources_unchanged"] = current_hashes == summary["source_sha256"]
+        summary["passed"] = (bool(sources) and summary["sources_unchanged"] and
+                             all(r["returncode"] == 0 for r in summary["commands"]))
     elif args.command == "drm-smoke":
         binary = directory / "drm_smoke"
         result = logged_command(compiler + flags + ["tests/drm_smoke.c", "-o", str(binary)],

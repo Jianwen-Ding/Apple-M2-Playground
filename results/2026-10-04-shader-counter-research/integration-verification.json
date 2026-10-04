@@ -1,0 +1,7 @@
+{
+  "scope": "Read-only original evidence/hash review; no API execution",
+  "passed": true,
+  "original_local_snapshot_hashes_checked": 22,
+  "original_remote_snapshot_hashes_checked": 9,
+  "bulk_snapshots_omitted": true
+}

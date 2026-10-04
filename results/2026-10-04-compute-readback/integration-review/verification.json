@@ -1,0 +1,27 @@
+{
+  "scope": "Read-only software review of stored hardware evidence; no dispatch",
+  "checks": [
+    {
+      "check": "retained manifest",
+      "files": 418,
+      "passed": true
+    },
+    {
+      "check": "primary manifest",
+      "files": 365,
+      "passed": true
+    },
+    {
+      "check": "independent complete-buffer oracle and API completion gates",
+      "readback_cases": 26,
+      "dispatches": 22,
+      "controls": 4,
+      "output_words": 3328,
+      "passed": true
+    },
+    {
+      "check": "wrong oracle, invalid shader and device rejection",
+      "passed": true
+    }
+  ]
+}

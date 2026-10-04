@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "-c",
+    "import time; print(\"before deliberate host sleep\", flush=True); time.sleep(10)"
+  ],
+  "cwd": "/scratch/apple-m2-playground/compute-runner-failure-checks/outer-timeout",
+  "elapsed_seconds": 0.15137636899999052,
+  "returncode": -9,
+  "timed_out": true,
+  "timeout_seconds": 0.15
+}

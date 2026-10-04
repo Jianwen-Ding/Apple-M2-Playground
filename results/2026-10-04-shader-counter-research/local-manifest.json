@@ -1,0 +1,134 @@
+[
+  {
+    "source": "/save/workspace/AGX_Probe/applegpu/applegpu.py",
+    "snapshot": "local/applegpu/applegpu.py",
+    "sha256": "986f6c6ec5547c5f61e357c7c0df614cb05b3382eed705d4ef7a79c4d3a2c46f",
+    "size": 163402
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/applegpu/hwtest.py",
+    "snapshot": "local/applegpu/hwtest.py",
+    "sha256": "a3b1da0407f1e28f5979d04bf18634c067e3f550ded7b7c4113a434560811896",
+    "size": 39778
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/applegpu/hwtestbed.py",
+    "snapshot": "local/applegpu/hwtestbed.py",
+    "sha256": "ebf24189f15985602637df0575a8e877e324b9a1648207e5ce69dd1ed72d2f8d",
+    "size": 11137
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/applegpu/README.md",
+    "snapshot": "local/applegpu/README.md",
+    "sha256": "82581bdf5a5163011628682c57b924738fafff58c423652663d36cffb6853345",
+    "size": 3674
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/compiler/agx_opcodes.py",
+    "snapshot": "local/mesa/src/asahi/compiler/agx_opcodes.py",
+    "sha256": "23d6d6312784a96e67aa9073deb55415c079b915899367c8b9a4075763f92446",
+    "size": 17626
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/compiler/agx_pack.c",
+    "snapshot": "local/mesa/src/asahi/compiler/agx_pack.c",
+    "sha256": "f594448db4ccfe5d4f98f849c3f1e08b662264702f5de40a4c97d34be180cf00",
+    "size": 42609
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/compiler/agx_compile.c",
+    "snapshot": "local/mesa/src/asahi/compiler/agx_compile.c",
+    "sha256": "1a5b056a18ffdd1fa6d3813129221e0ead2bf114c794844bbc14bdcd5ebc0c27",
+    "size": 122919
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/compiler/agx_performance.c",
+    "snapshot": "local/mesa/src/asahi/compiler/agx_performance.c",
+    "sha256": "eada12d5352c5cb3d29d84c33370f1bb681a99036731b82ac5d8d2c8286d478a",
+    "size": 4459
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/isa/AGX2.xml",
+    "snapshot": "local/mesa/src/asahi/isa/AGX2.xml",
+    "sha256": "4d90bdd84a7941f1c9be3013eb9bff4e12091028f0c29ef3333aea0456a0209b",
+    "size": 46631
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/lib/decode.c",
+    "snapshot": "local/mesa/src/asahi/lib/decode.c",
+    "sha256": "9dd8acb0b79e48cd936e06aadbb414ca177149b1863903f61df374dce87b6f9f",
+    "size": 37507
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/lib/wrap.c",
+    "snapshot": "local/mesa/src/asahi/lib/wrap.c",
+    "sha256": "d26c89383017ea62897b253c20bb74a5ed49949c5a7eb8fb0c0836729242065c",
+    "size": 14455
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/libagx/query.cl",
+    "snapshot": "local/mesa/src/asahi/libagx/query.cl",
+    "sha256": "5665be4a2e4df0c72d0ca9321dc5233127bfc44caa07cceaa847f118cf7ffcda",
+    "size": 4250
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/libagx/helper.cl",
+    "snapshot": "local/mesa/src/asahi/libagx/helper.cl",
+    "sha256": "ab6486d6e8460b03e81f65a20dadc8edf883fff8f6443a5a86bb6a3790e0c18d",
+    "size": 2533
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_physical_device.c",
+    "snapshot": "local/mesa/src/asahi/vulkan/hk_physical_device.c",
+    "sha256": "da726684350674540311ce2c943fec617d4c936afd751359a0449eb032c002ee",
+    "size": 58068
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/asahi/vulkan/hk_query_pool.c",
+    "snapshot": "local/mesa/src/asahi/vulkan/hk_query_pool.c",
+    "sha256": "40342a2e425870f22eacb17aa077183e4c503c62a3c7253bb15b24beb98174cd",
+    "size": 22283
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_pipe.c",
+    "snapshot": "local/mesa/src/gallium/drivers/asahi/agx_pipe.c",
+    "sha256": "7583eaed2ee995a6a3a92d253cf6fdeafb559c757faa10f35079b0621b4ba510",
+    "size": 84626
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_batch.c",
+    "snapshot": "local/mesa/src/gallium/drivers/asahi/agx_batch.c",
+    "sha256": "b99fac69d414e0f34420ef38243d31da644745f62d88a50835d734e627997778",
+    "size": 33397
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/gallium/drivers/asahi/agx_query.c",
+    "snapshot": "local/mesa/src/gallium/drivers/asahi/agx_query.c",
+    "sha256": "9964d81638edff5ae87685b949c2abab59d6f3c808e8e953b6d1aed5b861dccf",
+    "size": 17743
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/mesa/main/get.c",
+    "snapshot": "local/mesa/src/mesa/main/get.c",
+    "sha256": "e790af8cd7446d8de00a0c1464899e3eb30af9df07ed6b144ad0d49640cee95f",
+    "size": 107001
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/mesa/main/queryobj.c",
+    "snapshot": "local/mesa/src/mesa/main/queryobj.c",
+    "sha256": "e078eb8c88dcb6352160c7efc660d347ee6a27b0958a143c0cb4c6ccb6d4290f",
+    "size": 42067
+  },
+  {
+    "source": "/save/workspace/AGX_Probe/mesa/src/mesa/state_tracker/st_extensions.c",
+    "snapshot": "local/mesa/src/mesa/state_tracker/st_extensions.c",
+    "sha256": "ac64d297f499e675dcbd0a71c7672e60caec11f844abd2877728465573ebb1b8",
+    "size": 76838
+  },
+  {
+    "source": "/usr/include/drm/asahi_drm.h",
+    "snapshot": "asahi_drm.h",
+    "sha256": "69fe416b7294dfec4794217bd11379effd53caff4e86010bb803f1b34bdf5e89",
+    "size": 35836
+  }
+]

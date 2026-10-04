@@ -1,0 +1,5 @@
+mesa-dri-drivers-25.1.9-1.fc42.aarch64
+mesa-libEGL-25.1.9-1.fc42.aarch64
+libdrm-2.4.133-1.fc42.aarch64
+gcc-15.2.1-7.fc42.aarch64
+glibc-2.41-18.fc42.aarch64

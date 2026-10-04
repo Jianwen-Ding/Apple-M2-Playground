@@ -1,0 +1,17 @@
+{
+  "build/command.json": "24dc4715749ce665f041b9f93de29305133e4d79feca2ca0500252459bb00f1d",
+  "build/stderr.txt": "73e781b6de6c617a95be59cc83fe49b1b3a4adc32d2eb22b3d11c1567f7a6d6b",
+  "build/stdout.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "compiler/command.json": "12a778594030913945266cace539eb12ceef0249597a165bfccc6271ff3be144",
+  "compiler/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "compiler/stdout.txt": "ce5de0406d3697c0d2368841948f9f84e2ac927f1ef4e99f55e82877650bbfd3",
+  "environment.json": "a2d0e51a2338d7acd1f702fb62a4753c5931c30c9a2262061378f72e58ac2234",
+  "inventory/command.json": "a6c6d678c272f62cd835f1d070d69bc58bea9c1342c074ea6bd5550ad5c88c19",
+  "inventory/stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "inventory/stdout.txt": "20fb92503678acc205ada3f88e3f9221f52f6631409567135bcdabac3dd53830",
+  "runtime-hashes.json": "09fb3e6895049d155f91e6548bb580442fffd14984b6186ac68fad9408ba2773",
+  "source-hashes.json": "071498b446c8d86b602fe4cfc6195f7587552c83bb860edf427f4b09d1a04905",
+  "sources/gles_compute.c": "b96202306293ccb00f589a51413f10bc704c8a0d0a1d5df187237bfdd5a79bc3",
+  "sources/run_compute.py": "28e3cdc344b98151db01919be1e7df46f6066d466f7bdc2a5a86a9f654744ff0",
+  "summary.json": "0dfbc3194f5ddf6aff1410b46b7a29ca31b4b4077df8a6280fae8d0e983cd154"
+}
