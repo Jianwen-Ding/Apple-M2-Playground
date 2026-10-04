@@ -1,0 +1,1 @@
+DRM_IOCTL_VERSION: errno=25 (Inappropriate ioctl for device); device does not support this query or access failed

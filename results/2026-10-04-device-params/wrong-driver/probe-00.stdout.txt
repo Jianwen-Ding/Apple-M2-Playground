@@ -1,0 +1,5 @@
+device=/dev/dri/card2
+open_flags=O_RDONLY|O_CLOEXEC
+driver=apple
+driver_version=1.0.0
+description=Apple display controller DRM driver

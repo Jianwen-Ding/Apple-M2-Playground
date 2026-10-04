@@ -1,0 +1,83 @@
+{
+  "kernel": {
+    "system": "Linux",
+    "release": "6.19.14-400.asahi.fc42.aarch64+16k",
+    "version": "#1 SMP PREEMPT_DYNAMIC Thu May  7 22:15:21 UTC 2026",
+    "machine": "aarch64"
+  },
+  "os_release": "NAME=\"Fedora Linux\"\nVERSION=\"42 (Container Image)\"\nRELEASE_TYPE=stable\nID=fedora\nVERSION_ID=42\nVERSION_CODENAME=\"\"\nPLATFORM_ID=\"platform:f42\"\nPRETTY_NAME=\"Fedora Linux 42 (Container Image)\"\nANSI_COLOR=\"0;38;2;60;110;180\"\nLOGO=fedora-logo-icon\nCPE_NAME=\"cpe:/o:fedoraproject:fedora:42\"\nDEFAULT_HOSTNAME=\"fedora\"\nHOME_URL=\"https://fedoraproject.org/\"\nDOCUMENTATION_URL=\"https://docs.fedoraproject.org/en-US/fedora/f42/\"\nSUPPORT_URL=\"https://ask.fedoraproject.org/\"\nBUG_REPORT_URL=\"https://bugzilla.redhat.com/\"\nREDHAT_BUGZILLA_PRODUCT=\"Fedora\"\nREDHAT_BUGZILLA_PRODUCT_VERSION=42\nREDHAT_SUPPORT_PRODUCT=\"Fedora\"\nREDHAT_SUPPORT_PRODUCT_VERSION=42\nSUPPORT_END=2026-05-13\nVARIANT=\"Container Image\"\nVARIANT_ID=container",
+  "python": "3.13.13 (main, Apr  8 2026, 00:00:00) [GCC 15.2.1 20260123 (Red Hat 15.2.1-7)]",
+  "container_marker_present": true,
+  "device_tree_model": null,
+  "device_tree_compatible": null,
+  "drm_nodes": [
+    {
+      "path": "/dev/dri/card1",
+      "mode": "crw-rw----",
+      "major": 226,
+      "minor": 1,
+      "read_write_access": true,
+      "sysfs_path": "/sys/devices/platform/soc/406400000.gpu/drm/card1"
+    },
+    {
+      "path": "/dev/dri/card2",
+      "mode": "crw-rw----",
+      "major": 226,
+      "minor": 2,
+      "read_write_access": true,
+      "sysfs_path": "/sys/devices/platform/soc/soc:display-subsystem/drm/card2"
+    },
+    {
+      "path": "/dev/dri/renderD128",
+      "mode": "crw-rw-rw-",
+      "major": 226,
+      "minor": 128,
+      "read_write_access": true,
+      "sysfs_path": "/sys/devices/platform/soc/406400000.gpu/drm/renderD128"
+    }
+  ],
+  "headers": {
+    "/usr/include/drm/drm.h": "f9eadbfa0f9e1aeacc27f5c931ca3bd7b46974dbad817cd02fe601ccb5cdf08d",
+    "/usr/include/drm/asahi_drm.h": "69fe416b7294dfec4794217bd11379effd53caff4e86010bb803f1b34bdf5e89"
+  },
+  "tools": {
+    "cc": "/usr/bin/cc",
+    "make": "/usr/bin/make",
+    "pkg-config": "/usr/bin/pkg-config",
+    "vulkaninfo": null,
+    "clinfo": null,
+    "glslangValidator": null,
+    "spirv-as": null,
+    "xcrun": null
+  },
+  "git_head": {
+    "argv": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "returncode": 0,
+    "stdout": "178d7a17fca9ef3427cabca71fa25e888b279922",
+    "stderr": ""
+  },
+  "git_status": {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "returncode": 0,
+    "stdout": "M Makefile\n M README.md\n M docs/probe-plan.md\n M notes/failed-approaches.md\n M scripts/README.md\n M scripts/run.py\n M tests/README.md\n?? experiments/baseline/device-params.md\n?? experiments/baseline/linux-compute-backend.md\n?? experiments/timing/driver-time.md\n?? notes/2026-10-04-probe-progress.md\n?? results/2026-10-04-device-params/\n?? results/2026-10-04-driver-time/\n?? scripts/run_params.py\n?? scripts/run_time.py\n?? tests/drm_params.c\n?? tests/drm_time.c\n?? tests/gles_compute.c",
+    "stderr": ""
+  },
+  "libdrm_pkg_config": {
+    "argv": [
+      "pkg-config",
+      "--modversion",
+      "libdrm"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "Package libdrm was not found in the pkg-config search path.\nPerhaps you should add the directory containing `libdrm.pc'\nto the PKG_CONFIG_PATH environment variable\nPackage 'libdrm' not found"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "started_utc": "2026-10-04T20:10:49.904244+00:00",
+  "device": "/dev/dri/renderD128",
+  "repeats_requested": 1,
+  "passed": false,
+  "commands": [
+    {
+      "argv": [
+        "nonexistent-p1-compiler",
+        "--version"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": null,
+      "error": "[Errno 2] No such file or directory: 'nonexistent-p1-compiler'",
+      "timeout_seconds": 10,
+      "elapsed_host_seconds": 0.00027175100001386454
+    },
+    {
+      "argv": [
+        "nonexistent-p1-compiler",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-M",
+        "tests/drm_params.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": null,
+      "error": "[Errno 2] No such file or directory: 'nonexistent-p1-compiler'",
+      "timeout_seconds": 60,
+      "elapsed_host_seconds": 0.00018029199998181866
+    }
+  ],
+  "scope": "Read-only DRM version/global parameter queries; no GPU work.",
+  "source_sha256": {
+    "tests/drm_params.c": "464bff1d31f0418966c8dd3b837ee9710864c10e3eda23efd4de22f250427c23",
+    "scripts/run_params.py": "632eaf2d7f6baf1d6cf6ae1c349842a7ef2fbd224d2b22c288f8a79d8c26fb30",
+    "scripts/collect_environment.py": "120be2a7da615138e36c58658bec4eac9fb1cbb0be8c9ea0c257ecd506ad33d0"
+  },
+  "completed_utc": "2026-10-04T20:10:49.913094+00:00"
+}

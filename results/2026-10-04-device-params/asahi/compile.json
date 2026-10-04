@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "cc",
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-O2",
+    "tests/drm_params.c",
+    "-o",
+    "/scratch/apple-m2-playground/runs/20261004T201009Z-params-_smo1pm7/drm_params"
+  ],
+  "cwd": "/save/workspace/apple-documentation-playground",
+  "returncode": 0,
+  "timeout_seconds": 60,
+  "elapsed_host_seconds": 0.0490076380000346
+}

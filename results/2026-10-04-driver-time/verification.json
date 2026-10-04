@@ -1,0 +1,58 @@
+[
+  {
+    "argv": [
+      "/scratch/apple-m2-playground/runs/20261004T201000Z-driver-time-a1mx8tpp/drm_time",
+      "/dev/dri/renderD128",
+      "257",
+      "0"
+    ],
+    "returncode": 2,
+    "stdout": "",
+    "stderr": "Invalid bounded argument: 257\n"
+  },
+  {
+    "argv": [
+      "/scratch/apple-m2-playground/runs/20261004T201000Z-driver-time-a1mx8tpp/drm_time",
+      "/dev/dri/renderD128",
+      "2",
+      "21"
+    ],
+    "returncode": 2,
+    "stdout": "",
+    "stderr": "Invalid bounded argument: 21\n"
+  },
+  {
+    "argv": [
+      "/scratch/apple-m2-playground/runs/20261004T201000Z-driver-time-a1mx8tpp/drm_time",
+      "/dev/dri/renderD128",
+      "bad",
+      "0"
+    ],
+    "returncode": 2,
+    "stdout": "",
+    "stderr": "Invalid bounded argument: bad\n"
+  },
+  {
+    "argv": [
+      "cc",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-fsyntax-only",
+      "tests/drm_time.c"
+    ],
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "check": "analysis synthetic ratio and backward detection",
+    "passed": true
+  },
+  {
+    "check": "24 MHz floor-to-ns lattice compatibility (not frequency proof)",
+    "samples": 264,
+    "compatible": 264
+  }
+]

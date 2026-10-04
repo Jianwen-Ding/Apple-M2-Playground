@@ -1,0 +1,64 @@
+{
+  "command": "check",
+  "started_utc": "2026-10-04T20:15:25.009104+00:00",
+  "device": null,
+  "source_sha256": {
+    "tests/drm_params.c": "464bff1d31f0418966c8dd3b837ee9710864c10e3eda23efd4de22f250427c23",
+    "tests/drm_smoke.c": "3c9549ef5ce3e4e40fded9d669cd5cdd895727b830ab37cfc0971040ae98d291",
+    "tests/drm_time.c": "79127e8d1870ae11f497dcbc49eb97272f92e711acd7211a6c1807b28e0aa826",
+    "scripts/collect_environment.py": "120be2a7da615138e36c58658bec4eac9fb1cbb0be8c9ea0c257ecd506ad33d0",
+    "scripts/run.py": "4e92b338ff55636ec46cb27ebf7cc6d72b752abe715a0f59c0fa4a7837690c1f",
+    "scripts/run_params.py": "54c669a279852f859375ba0ef07c6863ee1226c844a450678ccee5fb5e2a4147",
+    "scripts/run_time.py": "adb249ccc9066a68458b55373f7108c574eaaea2f10a8a5052553af152e08086"
+  },
+  "passed": true,
+  "commands": [
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_params.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.01472489000002497
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_smoke.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.010992126000019198
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_time.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.011638002999916353
+    }
+  ],
+  "completed_utc": "2026-10-04T20:15:25.058503+00:00",
+  "scope": "Python and C syntax checks only; no hardware execution."
+}

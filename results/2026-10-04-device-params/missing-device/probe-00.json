@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/runs/20261004T201020Z-params-rljpu5cq/drm_params",
+    "/dev/dri/nonexistent-p1-probe"
+  ],
+  "cwd": "/save/workspace/apple-documentation-playground",
+  "returncode": 1,
+  "timeout_seconds": 10,
+  "elapsed_host_seconds": 0.0003332510000291222
+}

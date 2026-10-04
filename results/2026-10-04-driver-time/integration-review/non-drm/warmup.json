@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/runs/20261004T201538Z-driver-time-nmly8ta2/drm_time",
+    "/dev/null",
+    "8",
+    "0"
+  ],
+  "cwd": "/save/workspace/apple-documentation-playground",
+  "returncode": 1,
+  "elapsed_host_seconds": 0.0006138779999673716
+}

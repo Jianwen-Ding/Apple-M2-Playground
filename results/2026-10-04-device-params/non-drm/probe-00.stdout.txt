@@ -1,0 +1,2 @@
+device=/dev/null
+open_flags=O_RDONLY|O_CLOEXEC

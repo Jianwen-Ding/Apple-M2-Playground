@@ -1,0 +1,9 @@
+{"kind":"metadata","driver":"asahi","ioctl":3222299713,"struct_size":16,"samples":8,"interval_ms":0,"host_clock":"CLOCK_MONOTONIC_RAW","uapi_units":"nanoseconds"}
+{"kind":"sample","index":0,"host_before_ns":1433481032266,"host_after_ns":1433481033558,"flags":0,"gpu_timestamp_ns":1453916759375,"returncode":0,"errno":0}
+{"kind":"sample","index":1,"host_before_ns":1433481034641,"host_after_ns":1433481035308,"flags":0,"gpu_timestamp_ns":1453916761208,"returncode":0,"errno":0}
+{"kind":"sample","index":2,"host_before_ns":1433481035891,"host_after_ns":1433481036516,"flags":0,"gpu_timestamp_ns":1453916762416,"returncode":0,"errno":0}
+{"kind":"sample","index":3,"host_before_ns":1433481036975,"host_after_ns":1433481037558,"flags":0,"gpu_timestamp_ns":1453916763458,"returncode":0,"errno":0}
+{"kind":"sample","index":4,"host_before_ns":1433481037933,"host_after_ns":1433481038516,"flags":0,"gpu_timestamp_ns":1453916764416,"returncode":0,"errno":0}
+{"kind":"sample","index":5,"host_before_ns":1433481038891,"host_after_ns":1433481039475,"flags":0,"gpu_timestamp_ns":1453916765375,"returncode":0,"errno":0}
+{"kind":"sample","index":6,"host_before_ns":1433481039850,"host_after_ns":1433481040433,"flags":0,"gpu_timestamp_ns":1453916766333,"returncode":0,"errno":0}
+{"kind":"sample","index":7,"host_before_ns":1433481040808,"host_after_ns":1433481041350,"flags":0,"gpu_timestamp_ns":1453916767291,"returncode":0,"errno":0}

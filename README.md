@@ -2,11 +2,12 @@
 
 Task 1 workspace for probing Apple AGX on Asahi Linux. The project target is an
 M2 Max with 64 GB of unified memory, as supplied by the project owner. The
-current container has an accessible Asahi DRM render node; exact GPU identity
-and enabled core count still need a device-parameter query.
+current container exposes Asahi driver parameters for G14C revision `0x11`,
+chip `0x6021`, with 38 enabled cores derived from its masks. Local Mesa naming
+logic interprets this as M2 Max; the 64 GB capacity has not been measured.
 
 The goal is reproducible hardware observations that can guide PTX translation
-and an AGX compiler backend. Initial work establishes the test environment;
+and an AGX compiler backend. Read-only parameter and driver-time probes establish the baseline;
 no new instruction behavior has been demonstrated yet.
 
 ## Layout
@@ -35,6 +36,8 @@ From this repository:
 make env     # Record available tools, device nodes, kernel, and header hashes
 make check   # Python/C syntax checks; no GPU device access
 make smoke   # Build and run the DRM driver-access test
+make params  # Three read-only Asahi identity/topology queries
+make time    # 264 bounded driver timestamp queries; no shader execution
 ```
 
 Run records and binaries go to `/scratch/apple-m2-playground/runs/`.
@@ -44,7 +47,10 @@ Python-only equivalents are documented in [scripts/README.md](scripts/README.md)
 - [Probe plan](docs/probe-plan.md)
 - [Asahi Linux environment](environments/asahi-linux/README.md)
 - [Offline environment](environments/offline/README.md)
-- [DRM smoke test](tests/README.md)
+- [DRM probe tests](tests/README.md)
+- [Device parameters and evidence](experiments/baseline/device-params.md)
+- [Driver time and evidence](experiments/timing/driver-time.md)
+- [Reviewed progress and next tasks](notes/2026-10-04-probe-progress.md)
 - [Known limitations and failed approaches](notes/failed-approaches.md)
 - [Timing investigation](experiments/timing/README.md)
 

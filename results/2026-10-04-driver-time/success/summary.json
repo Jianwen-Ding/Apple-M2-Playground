@@ -1,0 +1,163 @@
+{
+  "device": "/dev/dri/renderD128",
+  "source_sha256": {
+    "tests/drm_time.c": "e8dfe3382e6fde1a0931d70d0186e893d9f0bae930a40ee1d6c5406b6d211303",
+    "scripts/run_time.py": "2979a764f484bb33b1bfd1e69930e426fea60b93db335e3295435c8e8f454475",
+    "scripts/run.py": "0b035bcbaf65c182cfd68c9c3ca94b082e0ef3b03b29eada00a19f5a449c5d82",
+    "scripts/collect_environment.py": "120be2a7da615138e36c58658bec4eac9fb1cbb0be8c9ea0c257ecd506ad33d0"
+  },
+  "commands": [
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "tests/drm_time.c",
+        "-o",
+        "/scratch/apple-m2-playground/runs/20261004T201000Z-driver-time-a1mx8tpp/drm_time"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.060773005000100966
+    },
+    {
+      "argv": [
+        "/scratch/apple-m2-playground/runs/20261004T201000Z-driver-time-a1mx8tpp/drm_time",
+        "/dev/dri/renderD128",
+        "8",
+        "0"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.0007436690000304225
+    },
+    {
+      "argv": [
+        "/scratch/apple-m2-playground/runs/20261004T201000Z-driver-time-a1mx8tpp/drm_time",
+        "/dev/dri/renderD128",
+        "128",
+        "0"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.0006097100000488354
+    },
+    {
+      "argv": [
+        "/scratch/apple-m2-playground/runs/20261004T201000Z-driver-time-a1mx8tpp/drm_time",
+        "/dev/dri/renderD128",
+        "64",
+        "10"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.635820716000012
+    },
+    {
+      "argv": [
+        "/scratch/apple-m2-playground/runs/20261004T201000Z-driver-time-a1mx8tpp/drm_time",
+        "/dev/dri/renderD128",
+        "64",
+        "10"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.6347985469999458
+    }
+  ],
+  "analyses": {
+    "warmup": {
+      "successful_samples": 8,
+      "backward_steps": 0,
+      "equal_steps": 0,
+      "min_delta_ns": 1042,
+      "max_delta_ns": 1959,
+      "gpu_elapsed_ns": 8667,
+      "host_elapsed_bounds_ns": [
+        8125,
+        10250
+      ],
+      "gpu_ns_per_host_ns": 0.9433469387755102,
+      "ratio_bracket": [
+        0.8455609756097561,
+        1.0667076923076924
+      ],
+      "host_ioctl_bracket_ns": {
+        "min": 500,
+        "max": 1625
+      },
+      "scope": "UAPI nanoseconds vs host raw clock; brackets do not measure ISA latency."
+    },
+    "burst": {
+      "successful_samples": 128,
+      "backward_steps": 0,
+      "equal_steps": 0,
+      "min_delta_ns": 541,
+      "max_delta_ns": 3625,
+      "gpu_elapsed_ns": 77333,
+      "host_elapsed_bounds_ns": [
+        76917,
+        78041
+      ],
+      "gpu_ns_per_host_ns": 0.9981156184256379,
+      "ratio_bracket": [
+        0.9909278456196102,
+        1.005408427265754
+      ],
+      "host_ioctl_bracket_ns": {
+        "min": 292,
+        "max": 791
+      },
+      "scope": "UAPI nanoseconds vs host raw clock; brackets do not measure ISA latency."
+    },
+    "paced": {
+      "successful_samples": 64,
+      "backward_steps": 0,
+      "equal_steps": 0,
+      "min_delta_ns": 10034458,
+      "max_delta_ns": 10562500,
+      "gpu_elapsed_ns": 635031917,
+      "host_elapsed_bounds_ns": [
+        635030292,
+        635033251
+      ],
+      "gpu_ns_per_host_ns": 1.0000002291223944,
+      "ratio_bracket": [
+        0.9999978993225979,
+        1.000002558933047
+      ],
+      "host_ioctl_bracket_ns": {
+        "min": 1167,
+        "max": 4458
+      },
+      "scope": "UAPI nanoseconds vs host raw clock; brackets do not measure ISA latency."
+    },
+    "paced_repeat": {
+      "successful_samples": 64,
+      "backward_steps": 0,
+      "equal_steps": 0,
+      "min_delta_ns": 10041500,
+      "max_delta_ns": 10079542,
+      "gpu_elapsed_ns": 633952708,
+      "host_elapsed_bounds_ns": [
+        633950834,
+        633954208
+      ],
+      "gpu_ns_per_host_ns": 1.0000002949747715,
+      "ratio_bracket": [
+        0.9999976338985039,
+        1.0000029560652017
+      ],
+      "host_ioctl_bracket_ns": {
+        "min": 333,
+        "max": 4208
+      },
+      "scope": "UAPI nanoseconds vs host raw clock; brackets do not measure ISA latency."
+    }
+  },
+  "passed": true,
+  "scope": "Read-only DRM VERSION and GET_TIME; no shaders or resets."
+}

@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/runs/20261004T201020Z-params-54hhqwf6/drm_params",
+    "/dev/dri/card2"
+  ],
+  "cwd": "/save/workspace/apple-documentation-playground",
+  "returncode": 3,
+  "timeout_seconds": 10,
+  "elapsed_host_seconds": 0.000512085000082152
+}

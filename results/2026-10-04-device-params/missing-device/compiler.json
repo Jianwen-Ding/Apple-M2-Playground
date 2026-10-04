@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "cc",
+    "--version"
+  ],
+  "cwd": "/save/workspace/apple-documentation-playground",
+  "returncode": 0,
+  "timeout_seconds": 10,
+  "elapsed_host_seconds": 0.0006111269999564684
+}

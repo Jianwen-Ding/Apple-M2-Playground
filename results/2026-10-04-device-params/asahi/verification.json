@@ -1,0 +1,16 @@
+{
+  "raw_decode": "PASS",
+  "raw_bytes": 592,
+  "enabled_cores_popcount": 38,
+  "python_syntax": "PASS",
+  "usage": {
+    "argv": [
+      "/scratch/apple-m2-playground/runs/20261004T201009Z-params-_smo1pm7/drm_params",
+      "a",
+      "b"
+    ],
+    "returncode": 2,
+    "stdout": "",
+    "stderr": "Usage: /scratch/apple-m2-playground/runs/20261004T201009Z-params-_smo1pm7/drm_params [DRM-device]\n"
+  }
+}

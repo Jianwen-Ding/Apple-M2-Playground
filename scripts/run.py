@@ -29,7 +29,8 @@ def logged_command(argv, directory, label, timeout):
         stdout, stderr = result.stdout, result.stderr
         record = {"argv": argv, "cwd": str(REPO), "returncode": result.returncode}
     except (OSError, subprocess.TimeoutExpired) as error:
-        stdout, stderr = "", str(error) + "\n"
+        stdout = (getattr(error, "stdout", None) or b"").decode(errors="replace")
+        stderr = (getattr(error, "stderr", None) or b"").decode(errors="replace") + str(error) + "\n"
         record = {"argv": argv, "cwd": str(REPO), "returncode": None, "error": str(error)}
     record["elapsed_host_seconds"] = time.monotonic() - start
     (directory / f"{label}.stdout.txt").write_text(stdout)
@@ -44,11 +45,16 @@ def logged_command(argv, directory, label, timeout):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("env", "check", "drm-smoke"))
+    parser.add_argument("command", choices=("env", "check", "drm-smoke", "params", "time"))
     parser.add_argument("--scratch-root", type=Path,
                         default=Path("/scratch/apple-m2-playground"))
     parser.add_argument("--device", default="/dev/dri/renderD128")
     args = parser.parse_args()
+
+    if args.command in ("params", "time"):
+        runner = REPO / "scripts" / ("run_params.py" if args.command == "params" else "run_time.py")
+        return subprocess.call([sys.executable, "-B", str(runner), "--scratch-root",
+                                str(args.scratch_root), "--device", args.device], cwd=REPO)
 
     started = datetime.now(timezone.utc)
     root = args.scratch_root.resolve() / "runs"
@@ -59,7 +65,7 @@ def main():
     summary = {"command": args.command, "started_utc": started.isoformat(),
                "device": args.device if args.command == "drm-smoke" else None,
                "source_sha256": {str(path.relative_to(REPO)): sha256(path)
-                                 for path in [REPO / "tests/drm_smoke.c", *sorted(
+                                 for path in [*sorted((REPO / "tests").glob("*.c")), *sorted(
                                      (REPO / "scripts").glob("*.py"))]},
                "passed": False, "commands": []}
     compiler = shlex.split(os.environ.get("CC", "cc"))
@@ -69,10 +75,12 @@ def main():
         # Parse without writing .pyc files into the repository.
         for source in sorted((REPO / "scripts").glob("*.py")):
             compile(source.read_text(), str(source), "exec")
-        result = logged_command(compiler + flags + ["-fsyntax-only", "tests/drm_smoke.c"],
-                                directory, "compile", 60)
-        summary["commands"].append(result)
-        summary["passed"] = result["returncode"] == 0
+        sources = sorted((REPO / "tests").glob("*.c"))
+        for source in sources:
+            result = logged_command(compiler + flags + ["-fsyntax-only", str(source)],
+                                    directory, f"compile-{source.stem}", 60)
+            summary["commands"].append(result)
+        summary["passed"] = bool(sources) and all(r["returncode"] == 0 for r in summary["commands"])
     elif args.command == "drm-smoke":
         binary = directory / "drm_smoke"
         result = logged_command(compiler + flags + ["tests/drm_smoke.c", "-o", str(binary)],

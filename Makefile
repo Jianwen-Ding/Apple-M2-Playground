@@ -2,12 +2,14 @@ PYTHON ?= python3
 SCRATCH_ROOT ?= /scratch/apple-m2-playground
 DEVICE ?= /dev/dri/renderD128
 
-.PHONY: help env check smoke
+.PHONY: help env check smoke params time
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
 	@echo 'make check  Check Python and C syntax without opening the GPU'
 	@echo 'make smoke  Compile and run the DRM access test'
+	@echo 'make params Query Asahi identity/topology (3 repeats)'
+	@echo 'make time   Query driver timestamps (264 samples; no shader)'
 	@echo 'Override SCRATCH_ROOT, DEVICE, PYTHON, or the CC environment variable as needed.'
 
 env:
@@ -18,3 +20,9 @@ check:
 
 smoke:
 	$(PYTHON) -B scripts/run.py drm-smoke --scratch-root "$(SCRATCH_ROOT)" --device "$(DEVICE)"
+
+params:
+	$(PYTHON) -B scripts/run.py params --scratch-root "$(SCRATCH_ROOT)" --device "$(DEVICE)"
+
+time:
+	$(PYTHON) -B scripts/run.py time --scratch-root "$(SCRATCH_ROOT)" --device "$(DEVICE)"

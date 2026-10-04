@@ -1,0 +1,30 @@
+{
+  "kind": "Local software naming interpretation; not independent hardware observation",
+  "path": "/save/workspace/AGX_Probe/mesa/src/asahi/lib/agx_device.c",
+  "sha256": "0f7304919dc4cd0a274817d4d02fa9e90941195cc07b2e8e17c27758c3ea7132",
+  "mesa_git_head": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+  "source_lines_544_564": [
+    "   assert(dev->params.gpu_generation >= 13);",
+    "   const char *variant = \" Unknown\";",
+    "   switch (dev->params.gpu_variant) {",
+    "   case 'G':",
+    "      variant = \"\";",
+    "      break;",
+    "   case 'S':",
+    "      variant = \" Pro\";",
+    "      break;",
+    "   case 'C':",
+    "      variant = \" Max\";",
+    "      break;",
+    "   case 'D':",
+    "      variant = \" Ultra\";",
+    "      break;",
+    "   }",
+    "   snprintf(dev->name, sizeof(dev->name), \"Apple M%d%s (G%d%c %02X)\",",
+    "            dev->params.gpu_generation - 12, variant,",
+    "            dev->params.gpu_generation, dev->params.gpu_variant,",
+    "            dev->params.gpu_revision + 0xA0);",
+    ""
+  ],
+  "interpretation": "generation 14 -> M2 (generation minus 12), variant C -> Max; UAPI revision 0x11 decodes to B1"
+}

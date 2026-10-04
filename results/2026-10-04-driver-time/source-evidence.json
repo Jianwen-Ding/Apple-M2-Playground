@@ -1,0 +1,69 @@
+{
+  "asahi_revision": "77cb8f24c2381a8abb7272d7bbdec548d6426a8a",
+  "retrieval": "GitHub API asahi branch resolved to immutable revision; raw files fetched with 20s timeout",
+  "running_kernel_source_match": "UNVERIFIED: installed UAPI matches exactly; kernel build revision is unavailable in container",
+  "sources": {
+    "drivers/gpu/drm/asahi/file.rs": {
+      "url": "https://github.com/AsahiLinux/linux/blob/77cb8f24c2381a8abb7272d7bbdec548d6426a8a/drivers/gpu/drm/asahi/file.rs",
+      "sha256": "e880e91345476d8aa7a1ac7eb8118579c99d7cf3bfeb2888da2c52bcfa87a92e",
+      "excerpts": [
+        {
+          "first_line": 1055,
+          "last_line": 1087,
+          "text": "    /// IOCTL: get_time: Get the current GPU timer value.\n    pub(crate) fn get_time(\n        device: &AsahiDevice,\n        data: &mut uapi::drm_asahi_get_time,\n        _file: &DrmFile,\n    ) -> Result<u32> {\n        if data.flags != 0 {\n            cls_pr_debug!(Errors, \"get_time: Unexpected flags\\n\");\n            return Err(EINVAL);\n        }\n\n        // TODO: Do this on device-init for perf.\n        let gpu = &device.gpu;\n        let frequency_hz = gpu.get_cfg().base_clock_hz as u64;\n        let ts_gcd = gcd(frequency_hz, NSEC_PER_SEC as u64);\n\n        let num = (NSEC_PER_SEC as u64) / ts_gcd;\n        let den = frequency_hz / ts_gcd;\n\n        let raw: u64;\n\n        // SAFETY: Assembly only loads the timer\n        unsafe {\n            core::arch::asm!(\n                \"mrs {x}, CNTPCT_EL0\",\n                x = out(reg) raw\n            );\n        }\n\n        data.gpu_timestamp = (raw * num) / den;\n\n        Ok(0)\n    }"
+        }
+      ]
+    },
+    "drivers/gpu/drm/asahi/driver.rs": {
+      "url": "https://github.com/AsahiLinux/linux/blob/77cb8f24c2381a8abb7272d7bbdec548d6426a8a/drivers/gpu/drm/asahi/driver.rs",
+      "sha256": "7a81fbdbd582edff0d30346576d98d842a18977489300ac395928aab8b589a36",
+      "excerpts": [
+        {
+          "first_line": 84,
+          "last_line": 88,
+          "text": "    kernel::declare_drm_ioctls! {\n        (ASAHI_GET_PARAMS,      drm_asahi_get_params,\n                          ioctl::RENDER_ALLOW, crate::file::File::get_params),\n        (ASAHI_GET_TIME,        drm_asahi_get_time,\n            ioctl::AUTH | ioctl::RENDER_ALLOW, crate::file::File::get_time),"
+        }
+      ]
+    },
+    "drivers/gpu/drm/asahi/hw/t602x.rs": {
+      "url": "https://github.com/AsahiLinux/linux/blob/77cb8f24c2381a8abb7272d7bbdec548d6426a8a/drivers/gpu/drm/asahi/hw/t602x.rs",
+      "sha256": "d540d56a0f9dcc6c71a96828715c5e52dc906b5469e1f5a4323e58990044af60",
+      "excerpts": [
+        {
+          "first_line": 47,
+          "last_line": 55,
+          "text": "\n// TODO: Tentative\npub(crate) const HWCONFIG_T6022: super::HwConfig = HwConfig {\n    chip_id: 0x6022,\n    gpu_gen: GpuGen::G14,\n    gpu_variant: GpuVariant::D,\n    gpu_core: GpuCore::G14D,\n\n    base_clock_hz: 24_000_000,"
+        }
+      ]
+    },
+    "drivers/gpu/drm/asahi/hw/mod.rs": {
+      "url": "https://github.com/AsahiLinux/linux/blob/77cb8f24c2381a8abb7272d7bbdec548d6426a8a/drivers/gpu/drm/asahi/hw/mod.rs",
+      "sha256": "a95fceff7e41563a7aa0b2365c6e39488e2d4f828c0a20bc2b888b0cb4b1185f",
+      "excerpts": [
+        {
+          "first_line": 209,
+          "last_line": 211,
+          "text": "\n    /// Base clock used used for timekeeping.\n    pub(crate) base_clock_hz: u32,"
+        }
+      ]
+    },
+    "include/uapi/drm/asahi_drm.h": {
+      "url": "https://github.com/AsahiLinux/linux/blob/77cb8f24c2381a8abb7272d7bbdec548d6426a8a/include/uapi/drm/asahi_drm.h",
+      "sha256": "69fe416b7294dfec4794217bd11379effd53caff4e86010bb803f1b34bdf5e89",
+      "excerpts": [
+        {
+          "first_line": 185,
+          "last_line": 193,
+          "text": "\t * @command_timestamp_frequency_hz: Timebase frequency for timestamps\n\t * written during command execution, specified via drm_asahi_timestamp\n\t * structures. As this rate is controlled by the firmware, it is a\n\t * queryable parameter.\n\t *\n\t * Userspace must divide by this frequency to convert timestamps to\n\t * seconds, rather than hardcoding a particular firmware's rate.\n\t */\n\t__u64 command_timestamp_frequency_hz;"
+        },
+        {
+          "first_line": 1150,
+          "last_line": 1159,
+          "text": " * struct drm_asahi_get_time - Arguments passed to DRM_IOCTL_ASAHI_GET_TIME\n */\nstruct drm_asahi_get_time {\n\t/** @flags: MBZ. */\n\t__u64 flags;\n\n\t/** @gpu_timestamp: On return, the GPU timestamp in nanoseconds. */\n\t__u64 gpu_timestamp;\n};\n"
+        }
+      ]
+    }
+  },
+  "installed_uapi_sha256": "69fe416b7294dfec4794217bd11379effd53caff4e86010bb803f1b34bdf5e89",
+  "vendor_mesa_revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53"
+}

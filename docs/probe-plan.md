@@ -5,11 +5,11 @@
 | Step | Deliverable | Current state |
 | --- | --- | --- |
 | P0 | Repeatable environment capture, build, and DRM access check | Implemented; see baseline evidence in `results/` |
-| P1 | Read-only Asahi parameter query and confirmed GPU identity | Planned |
+| P1 | Read-only Asahi parameter query and confirmed GPU identity | Complete for driver identity/topology; [G14C, 38 enabled mask bits](../experiments/baseline/device-params.md); product name is source interpretation |
 | P2 | Minimal GPU compute submission with deterministic memory readback | Planned; Linux execution backend needed |
 | P3 | Execute a known AGX instruction sequence and compare against a host oracle | Planned; depends on P2 |
 | P4 | Controlled instruction and operand variations with stored evidence | Planned; depends on P3 |
-| P5 | Timing probes with a validated time source and repeatable measurements | Planned; priority request |
+| P5 | Timing probes with a validated time source and repeatable measurements | Driver GET_TIME baseline complete ([evidence](../experiments/timing/driver-time.md)); shader counter and ISA timing remain unvalidated |
 
 ## Probe areas
 
@@ -29,8 +29,9 @@ register, and host ioctl latency is not instruction latency.
 
 ## First follow-up work
 
-1. Query Asahi device parameters with the installed UAPI; retain header hashes
-   and the raw output, including unsupported-ioctl errors.
+1. Preserve the completed [parameter](../experiments/baseline/device-params.md)
+   and [driver-time](../experiments/timing/driver-time.md) controls when building
+   subsequent probes. See [reviewed progress](../notes/2026-10-04-probe-progress.md).
 2. Choose a Linux execution path after checking installed Mesa and compute
    facilities. Define buffer allocation, submission, completion, and readback.
 3. Validate a constant-write kernel against an exact expected buffer before
@@ -43,3 +44,11 @@ The supplied applegpu toolset describes G13/M1. Treat its encodings and model
 as hypotheses to check on the project device. The resource guide also contains
 unverified claims and missing embedded formulas; trace claims to primary
 sources before using them as an oracle.
+
+P1 reports a command timestamp frequency of 1,000,000,000 Hz; command timestamp
+writes and readback have not been exercised. GET_TIME advances near the host
+raw-clock rate over two short paced runs, which establishes a driver query
+baseline. P2 still requires deterministic buffer readback before P3/P4 or shader
+counter experiments. The backend investigation is separately owned and pending
+integration; its source inspection alone cannot satisfy P2. No shader execution
+or novel AGX instruction behavior has been demonstrated by these probes.

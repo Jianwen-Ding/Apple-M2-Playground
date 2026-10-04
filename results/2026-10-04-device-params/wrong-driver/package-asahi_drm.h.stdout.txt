@@ -1,0 +1,1 @@
+kernel-headers-6.19.6-100.fc42.aarch64

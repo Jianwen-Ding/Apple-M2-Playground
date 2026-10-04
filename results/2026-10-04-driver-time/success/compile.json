@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "cc",
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-O2",
+    "tests/drm_time.c",
+    "-o",
+    "/scratch/apple-m2-playground/runs/20261004T201000Z-driver-time-a1mx8tpp/drm_time"
+  ],
+  "cwd": "/save/workspace/apple-documentation-playground",
+  "returncode": 0,
+  "elapsed_host_seconds": 0.060773005000100966
+}

@@ -1,0 +1,84 @@
+{
+  "command": "check",
+  "started_utc": "2026-10-04T20:20:36.628189+00:00",
+  "device": null,
+  "source_sha256": {
+    "tests/drm_params.c": "464bff1d31f0418966c8dd3b837ee9710864c10e3eda23efd4de22f250427c23",
+    "tests/drm_smoke.c": "3c9549ef5ce3e4e40fded9d669cd5cdd895727b830ab37cfc0971040ae98d291",
+    "tests/drm_time.c": "79127e8d1870ae11f497dcbc49eb97272f92e711acd7211a6c1807b28e0aa826",
+    "tests/gles_compute.c": "b96202306293ccb00f589a51413f10bc704c8a0d0a1d5df187237bfdd5a79bc3",
+    "scripts/collect_environment.py": "120be2a7da615138e36c58658bec4eac9fb1cbb0be8c9ea0c257ecd506ad33d0",
+    "scripts/run.py": "4e92b338ff55636ec46cb27ebf7cc6d72b752abe715a0f59c0fa4a7837690c1f",
+    "scripts/run_params.py": "54c669a279852f859375ba0ef07c6863ee1226c844a450678ccee5fb5e2a4147",
+    "scripts/run_time.py": "77809d99785104516e6a57de4f96ca1d29b9e3e41fa3584dd7083214def78197"
+  },
+  "passed": true,
+  "commands": [
+    {
+      "argv": [
+        "cc",
+        "-I/save/workspace/AGX_Probe/mesa/include",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_params.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.01137446000007003
+    },
+    {
+      "argv": [
+        "cc",
+        "-I/save/workspace/AGX_Probe/mesa/include",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_smoke.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.008172947000048225
+    },
+    {
+      "argv": [
+        "cc",
+        "-I/save/workspace/AGX_Probe/mesa/include",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/drm_time.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.011746920000177852
+    },
+    {
+      "argv": [
+        "cc",
+        "-I/save/workspace/AGX_Probe/mesa/include",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-fsyntax-only",
+        "/save/workspace/apple-documentation-playground/tests/gles_compute.c"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.016358269999955155
+    }
+  ],
+  "completed_utc": "2026-10-04T20:20:36.689465+00:00",
+  "scope": "Python and C syntax checks only; no hardware execution."
+}

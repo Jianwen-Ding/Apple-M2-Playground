@@ -1,0 +1,45 @@
+{
+  "device": "/dev/null",
+  "source_sha256": {
+    "tests/drm_time.c": "79127e8d1870ae11f497dcbc49eb97272f92e711acd7211a6c1807b28e0aa826",
+    "scripts/run_time.py": "adb249ccc9066a68458b55373f7108c574eaaea2f10a8a5052553af152e08086",
+    "scripts/run.py": "4e92b338ff55636ec46cb27ebf7cc6d72b752abe715a0f59c0fa4a7837690c1f",
+    "scripts/collect_environment.py": "120be2a7da615138e36c58658bec4eac9fb1cbb0be8c9ea0c257ecd506ad33d0"
+  },
+  "commands": [
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "tests/drm_time.c",
+        "-o",
+        "/scratch/apple-m2-playground/runs/20261004T201538Z-driver-time-nmly8ta2/drm_time"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 0,
+      "elapsed_host_seconds": 0.05941077200009204
+    },
+    {
+      "argv": [
+        "/scratch/apple-m2-playground/runs/20261004T201538Z-driver-time-nmly8ta2/drm_time",
+        "/dev/null",
+        "8",
+        "0"
+      ],
+      "cwd": "/save/workspace/apple-documentation-playground",
+      "returncode": 1,
+      "elapsed_host_seconds": 0.0006138779999673716
+    }
+  ],
+  "analyses": {
+    "warmup": {
+      "error": "probe command failed"
+    }
+  },
+  "passed": false,
+  "scope": "Read-only DRM VERSION and GET_TIME; no shaders or resets."
+}

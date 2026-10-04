@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "nonexistent-p1-compiler",
+    "--version"
+  ],
+  "cwd": "/save/workspace/apple-documentation-playground",
+  "returncode": null,
+  "error": "[Errno 2] No such file or directory: 'nonexistent-p1-compiler'",
+  "timeout_seconds": 10,
+  "elapsed_host_seconds": 0.00027175100001386454
+}
