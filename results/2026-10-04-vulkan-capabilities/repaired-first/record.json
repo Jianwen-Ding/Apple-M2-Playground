@@ -1,0 +1,909 @@
+{
+  "passed": true,
+  "utc": "20261004T202617167242Z",
+  "platform": "Linux-6.19.14-400.asahi.fc42.aarch64+16k-aarch64-with-glibc2.41",
+  "runtime_enabled": true,
+  "commands": [
+    {
+      "argv": [
+        "rpmkeys",
+        "--checksig",
+        "--verbose",
+        "/scratch/apple-m2-playground/vulkan-runtime/downloads/libdisplay-info-0.2.0-3.fc42.aarch64.signed.rpm"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "/scratch/apple-m2-playground/vulkan-runtime/downloads/libdisplay-info-0.2.0-3.fc42.aarch64.signed.rpm:\n    Header V4 RSA/SHA256 Signature, key ID 105ef944: OK\n    Header SHA256 digest: OK\n    Header SHA1 digest: OK\n    Payload SHA256 digest: OK\n    MD5 digest: OK\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "rpm",
+        "-qp",
+        "--qf",
+        "%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n",
+        "/scratch/apple-m2-playground/vulkan-runtime/downloads/libdisplay-info-0.2.0-3.fc42.aarch64.signed.rpm"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "libdisplay-info-0.2.0-3.fc42.aarch64\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "rpm",
+        "-qp",
+        "--requires",
+        "/scratch/apple-m2-playground/vulkan-runtime/downloads/libdisplay-info-0.2.0-3.fc42.aarch64.signed.rpm"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "ld-linux-aarch64.so.1()(64bit)\nld-linux-aarch64.so.1(GLIBC_2.17)(64bit)\nlibc.so.6()(64bit)\nlibc.so.6(GLIBC_2.17)(64bit)\nlibc.so.6(GLIBC_ABI_DT_RELR)(64bit)\nlibm.so.6()(64bit)\nlibm.so.6(GLIBC_2.17)(64bit)\nlibm.so.6(GLIBC_2.27)(64bit)\nrpmlib(CompressedFileNames) <= 3.0.4-1\nrpmlib(FileDigests) <= 4.6.0-1\nrpmlib(PayloadFilesHavePrefix) <= 4.0-1\nrpmlib(PayloadIsZstd) <= 5.4.18-1\nrtld(GNU_HASH)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "rpm",
+        "-qp",
+        "--provides",
+        "/scratch/apple-m2-playground/vulkan-runtime/downloads/libdisplay-info-0.2.0-3.fc42.aarch64.signed.rpm"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "libdisplay-info = 0.2.0-3.fc42\nlibdisplay-info(aarch-64) = 0.2.0-3.fc42\nlibdisplay-info.so.2()(64bit)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "rpm2cpio",
+        "/scratch/apple-m2-playground/vulkan-runtime/downloads/libdisplay-info-0.2.0-3.fc42.aarch64.signed.rpm"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "<binary payload>",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "rpm",
+        "-q",
+        "mesa-vulkan-drivers",
+        "vulkan-loader",
+        "glibc",
+        "libdrm"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "mesa-vulkan-drivers-25.1.9-1.fc42.aarch64\nvulkan-loader-1.4.313.0-1.fc42.aarch64\nglibc-2.41-18.fc42.aarch64\nlibdrm-2.4.133-1.fc42.aarch64\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ldd",
+        "/usr/lib64/libvulkan_asahi.so"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x0000ffffb4a5c000)\n\tlibdrm.so.2 => /lib64/libdrm.so.2 (0x0000ffffb3dd0000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x0000ffffb3d90000)\n\tlibzstd.so.1 => /lib64/libzstd.so.1 (0x0000ffffb3cd0000)\n\tlibxcb.so.1 => /lib64/libxcb.so.1 (0x0000ffffb3c80000)\n\tlibX11-xcb.so.1 => /lib64/libX11-xcb.so.1 (0x0000ffffb3c50000)\n\tlibxcb-dri3.so.0 => /lib64/libxcb-dri3.so.0 (0x0000ffffb3c20000)\n\tlibxcb-present.so.0 => /lib64/libxcb-present.so.0 (0x0000ffffb3bf0000)\n\tlibxcb-xfixes.so.0 => /lib64/libxcb-xfixes.so.0 (0x0000ffffb3bc0000)\n\tlibxcb-sync.so.1 => /lib64/libxcb-sync.so.1 (0x0000ffffb3b90000)\n\tlibxcb-randr.so.0 => /lib64/libxcb-randr.so.0 (0x0000ffffb3b50000)\n\tlibxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x0000ffffb3b20000)\n\tlibxshmfence.so.1 => /lib64/libxshmfence.so.1 (0x0000ffffb3af0000)\n\tlibwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x0000ffffb3ac0000)\n\tlibdisplay-info.so.2 => not found\n\tlibudev.so.1 => /lib64/libudev.so.1 (0x0000ffffb3a60000)\n\tlibSPIRV-Tools.so => /lib64/libSPIRV-Tools.so (0x0000ffffb38c0000)\n\tlibexpat.so.1 => /lib64/libexpat.so.1 (0x0000ffffb3870000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x0000ffffb35f0000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x0000ffffb3530000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x0000ffffb34f0000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x0000ffffb3320000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffb4a60000)\n\tlibXau.so.6 => /lib64/libXau.so.6 (0x0000ffffb32f0000)\n\tlibffi.so.8 => /lib64/libffi.so.8 (0x0000ffffb32b0000)\n\tlibcap.so.2 => /lib64/libcap.so.2 (0x0000ffffb3280000)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ldd",
+        "/scratch/apple-m2-playground/vulkan-runtime/usr/lib64/libdisplay-info.so.2"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x0000ffff62d0c000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x0000ffff62be0000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x0000ffff62a10000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff62d10000)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ldd",
+        "/usr/lib64/libvulkan_asahi.so"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x0000fffef21ec000)\n\tlibdrm.so.2 => /lib64/libdrm.so.2 (0x0000fffef1560000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x0000fffef1520000)\n\tlibzstd.so.1 => /lib64/libzstd.so.1 (0x0000fffef1460000)\n\tlibxcb.so.1 => /lib64/libxcb.so.1 (0x0000fffef1410000)\n\tlibX11-xcb.so.1 => /lib64/libX11-xcb.so.1 (0x0000fffef13e0000)\n\tlibxcb-dri3.so.0 => /lib64/libxcb-dri3.so.0 (0x0000fffef13b0000)\n\tlibxcb-present.so.0 => /lib64/libxcb-present.so.0 (0x0000fffef1380000)\n\tlibxcb-xfixes.so.0 => /lib64/libxcb-xfixes.so.0 (0x0000fffef1350000)\n\tlibxcb-sync.so.1 => /lib64/libxcb-sync.so.1 (0x0000fffef1320000)\n\tlibxcb-randr.so.0 => /lib64/libxcb-randr.so.0 (0x0000fffef12e0000)\n\tlibxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x0000fffef12b0000)\n\tlibxshmfence.so.1 => /lib64/libxshmfence.so.1 (0x0000fffef1280000)\n\tlibwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x0000fffef1250000)\n\tlibdisplay-info.so.2 => /scratch/apple-m2-playground/vulkan-runtime/usr/lib64/libdisplay-info.so.2 (0x0000fffef11f0000)\n\tlibudev.so.1 => /lib64/libudev.so.1 (0x0000fffef1190000)\n\tlibSPIRV-Tools.so => /lib64/libSPIRV-Tools.so (0x0000fffef0ff0000)\n\tlibexpat.so.1 => /lib64/libexpat.so.1 (0x0000fffef0fa0000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x0000fffef0d20000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x0000fffef0c60000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x0000fffef0c20000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x0000fffef0a50000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000fffef21f0000)\n\tlibXau.so.6 => /lib64/libXau.so.6 (0x0000fffef0a20000)\n\tlibffi.so.8 => /lib64/libffi.so.8 (0x0000fffef09e0000)\n\tlibcap.so.2 => /lib64/libcap.so.2 (0x0000fffef09b0000)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "cc",
+        "--version"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "cc (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I/save/workspace/AGX_Probe/mesa/include",
+        "/save/workspace/apple-documentation-playground/tests/vulkan_caps.c",
+        "-ldl",
+        "-o",
+        "/scratch/apple-m2-playground/vulkan-runtime/runs/repaired-first/vulkan_caps"
+      ],
+      "timeout_seconds": 30,
+      "returncode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/scratch/apple-m2-playground/vulkan-runtime/runs/repaired-first/vulkan_caps"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "stdout": "{\"vkCreateInstance\":0,\"loader_api\":\"1.4.313\",\"requested_instance_api\":\"1.1.0\",\"physical_device_count\":1,\"accepted_asahi\":true,\"device\":{\"name\":\"Apple M2 Max (G14C B1)\",\"api\":\"1.4.328\",\"vendor_id\":65541,\"device_id\":0,\"device_type\":1,\"driver_version_raw\":104869894,\"driver_id\":26,\"driver_name\":\"Honeykrisp\",\"driver_info\":\"Mesa 25.3.6\",\"drm_extension\":true,\"has_render\":true,\"render_major\":226,\"render_minor\":128,\"shader_object_extension\":true,\"shader_object_feature\":true,\"shader_binary_uuid\":\"2313bd7c3909b8ad0f31883eab5c412e\",\"shader_binary_version\":0,\"features\":{\"shaderInt64\":1,\"shaderInt16\":1,\"shaderFloat64\":0},\"compute_limits\":{\"max_invocations\":1024,\"max_workgroup_size\":[1024,1024,64],\"max_workgroup_count\":[2147483647,65535,65535],\"shared_memory_bytes\":32768},\"queues\":[{\"index\":0,\"flags\":15,\"count\":1,\"timestamp_valid_bits\":64}],\"memory_heaps\":[{\"index\":0,\"size_bytes\":33619443712,\"flags\":1}],\"memory_types\":[{\"index\":0,\"flags\":15,\"heap\":0},{\"index\":1,\"flags\":7,\"heap\":0}],\"extensions\":[{\"name\":\"VK_KHR_8bit_storage\",\"spec_version\":1},{\"name\":\"VK_KHR_16bit_storage\",\"spec_version\":1},{\"name\":\"VK_KHR_bind_memory2\",\"spec_version\":1},{\"name\":\"VK_KHR_buffer_device_address\",\"spec_version\":1},{\"name\":\"VK_KHR_calibrated_timestamps\",\"spec_version\":1},{\"name\":\"VK_KHR_copy_commands2\",\"spec_version\":1},{\"name\":\"VK_KHR_create_renderpass2\",\"spec_version\":1},{\"name\":\"VK_KHR_dedicated_allocation\",\"spec_version\":3},{\"name\":\"VK_KHR_depth_stencil_resolve\",\"spec_version\":1},{\"name\":\"VK_KHR_descriptor_update_template\",\"spec_version\":1},{\"name\":\"VK_KHR_device_group\",\"spec_version\":4},{\"name\":\"VK_KHR_draw_indirect_count\",\"spec_version\":1},{\"name\":\"VK_KHR_driver_properties\",\"spec_version\":1},{\"name\":\"VK_KHR_dynamic_rendering\",\"spec_version\":1},{\"name\":\"VK_KHR_dynamic_rendering_local_read\",\"spec_version\":1},{\"name\":\"VK_KHR_external_fence\",\"spec_version\":1},{\"name\":\"VK_KHR_external_fence_fd\",\"spec_version\":1},{\"name\":\"VK_KHR_external_memory\",\"spec_version\":1},{\"name\":\"VK_KHR_external_memory_fd\",\"spec_version\":1},{\"name\":\"VK_KHR_external_semaphore\",\"spec_version\":1},{\"name\":\"VK_KHR_external_semaphore_fd\",\"spec_version\":1},{\"name\":\"VK_KHR_format_feature_flags2\",\"spec_version\":2},{\"name\":\"VK_KHR_get_memory_requirements2\",\"spec_version\":1},{\"name\":\"VK_KHR_global_priority\",\"spec_version\":1},{\"name\":\"VK_KHR_image_format_list\",\"spec_version\":1},{\"name\":\"VK_KHR_imageless_framebuffer\",\"spec_version\":1},{\"name\":\"VK_KHR_incremental_present\",\"spec_version\":2},{\"name\":\"VK_KHR_index_type_uint8\",\"spec_version\":1},{\"name\":\"VK_KHR_line_rasterization\",\"spec_version\":1},{\"name\":\"VK_KHR_load_store_op_none\",\"spec_version\":1},{\"name\":\"VK_KHR_maintenance1\",\"spec_version\":2},{\"name\":\"VK_KHR_maintenance2\",\"spec_version\":1},{\"name\":\"VK_KHR_maintenance3\",\"spec_version\":1},{\"name\":\"VK_KHR_maintenance4\",\"spec_version\":2},{\"name\":\"VK_KHR_maintenance5\",\"spec_version\":1},{\"name\":\"VK_KHR_maintenance6\",\"spec_version\":1},{\"name\":\"VK_KHR_maintenance7\",\"spec_version\":1},{\"name\":\"VK_KHR_maintenance8\",\"spec_version\":1},{\"name\":\"VK_KHR_maintenance9\",\"spec_version\":1},{\"name\":\"VK_KHR_map_memory2\",\"spec_version\":1},{\"name\":\"VK_KHR_multiview\",\"spec_version\":1},{\"name\":\"VK_KHR_pipeline_executable_properties\",\"spec_version\":1},{\"name\":\"VK_KHR_pipeline_library\",\"spec_version\":1},{\"name\":\"VK_KHR_push_descriptor\",\"spec_version\":2},{\"name\":\"VK_KHR_relaxed_block_layout\",\"spec_version\":1},{\"name\":\"VK_KHR_sampler_mirror_clamp_to_edge\",\"spec_version\":3},{\"name\":\"VK_KHR_sampler_ycbcr_conversion\",\"spec_version\":14},{\"name\":\"VK_KHR_separate_depth_stencil_layouts\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_draw_parameters\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_expect_assume\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_float16_int8\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_float_controls\",\"spec_version\":4},{\"name\":\"VK_KHR_shader_float_controls2\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_integer_dot_product\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_maximal_reconvergence\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_non_semantic_info\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_quad_control\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_relaxed_extended_instruction\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_subgroup_extended_types\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_subgroup_rotate\",\"spec_version\":2},{\"name\":\"VK_KHR_shader_subgroup_uniform_control_flow\",\"spec_version\":1},{\"name\":\"VK_KHR_shader_terminate_invocation\",\"spec_version\":1},{\"name\":\"VK_KHR_spirv_1_4\",\"spec_version\":1},{\"name\":\"VK_KHR_storage_buffer_storage_class\",\"spec_version\":1},{\"name\":\"VK_KHR_swapchain\",\"spec_version\":70},{\"name\":\"VK_KHR_swapchain_mutable_format\",\"spec_version\":1},{\"name\":\"VK_KHR_synchronization2\",\"spec_version\":1},{\"name\":\"VK_KHR_timeline_semaphore\",\"spec_version\":2},{\"name\":\"VK_KHR_uniform_buffer_standard_layout\",\"spec_version\":1},{\"name\":\"VK_KHR_variable_pointers\",\"spec_version\":1},{\"name\":\"VK_KHR_vertex_attribute_divisor\",\"spec_version\":1},{\"name\":\"VK_KHR_vulkan_memory_model\",\"spec_version\":3},{\"name\":\"VK_KHR_workgroup_memory_explicit_layout\",\"spec_version\":1},{\"name\":\"VK_KHR_zero_initialize_workgroup_memory\",\"spec_version\":1},{\"name\":\"VK_EXT_4444_formats\",\"spec_version\":1},{\"name\":\"VK_EXT_attachment_feedback_loop_layout\",\"spec_version\":2},{\"name\":\"VK_EXT_border_color_swizzle\",\"spec_version\":1},{\"name\":\"VK_EXT_buffer_device_address\",\"spec_version\":2},{\"name\":\"VK_EXT_calibrated_timestamps\",\"spec_version\":2},{\"name\":\"VK_EXT_color_write_enable\",\"spec_version\":1},{\"name\":\"VK_EXT_custom_border_color\",\"spec_version\":12},{\"name\":\"VK_EXT_depth_bias_control\",\"spec_version\":1},{\"name\":\"VK_EXT_depth_clip_enable\",\"spec_version\":1},{\"name\":\"VK_EXT_descriptor_indexing\",\"spec_version\":2},{\"name\":\"VK_EXT_dynamic_rendering_unused_attachments\",\"spec_version\":1},{\"name\":\"VK_EXT_extended_dynamic_state\",\"spec_version\":1},{\"name\":\"VK_EXT_extended_dynamic_state2\",\"spec_version\":1},{\"name\":\"VK_EXT_extended_dynamic_state3\",\"spec_version\":2},{\"name\":\"VK_EXT_external_memory_dma_buf\",\"spec_version\":1},{\"name\":\"VK_EXT_global_priority\",\"spec_version\":2},{\"name\":\"VK_EXT_global_priority_query\",\"spec_version\":1},{\"name\":\"VK_EXT_graphics_pipeline_library\",\"spec_version\":1},{\"name\":\"VK_EXT_hdr_metadata\",\"spec_version\":3},{\"name\":\"VK_EXT_host_image_copy\",\"spec_version\":1},{\"name\":\"VK_EXT_host_query_reset\",\"spec_version\":1},{\"name\":\"VK_EXT_image_2d_view_of_3d\",\"spec_version\":1},{\"name\":\"VK_EXT_image_drm_format_modifier\",\"spec_version\":2},{\"name\":\"VK_EXT_image_robustness\",\"spec_version\":1},{\"name\":\"VK_EXT_index_type_uint8\",\"spec_version\":1},{\"name\":\"VK_EXT_inline_uniform_block\",\"spec_version\":1},{\"name\":\"VK_EXT_line_rasterization\",\"spec_version\":1},{\"name\":\"VK_EXT_load_store_op_none\",\"spec_version\":1},{\"name\":\"VK_EXT_map_memory_placed\",\"spec_version\":1},{\"name\":\"VK_EXT_multi_draw\",\"spec_version\":1},{\"name\":\"VK_EXT_mutable_descriptor_type\",\"spec_version\":1},{\"name\":\"VK_EXT_non_seamless_cube_map\",\"spec_version\":1},{\"name\":\"VK_EXT_physical_device_drm\",\"spec_version\":1},{\"name\":\"VK_EXT_pipeline_creation_cache_control\",\"spec_version\":3},{\"name\":\"VK_EXT_pipeline_creation_feedback\",\"spec_version\":1},{\"name\":\"VK_EXT_pipeline_protected_access\",\"spec_version\":1},{\"name\":\"VK_EXT_pipeline_robustness\",\"spec_version\":1},{\"name\":\"VK_EXT_primitive_topology_list_restart\",\"spec_version\":1},{\"name\":\"VK_EXT_private_data\",\"spec_version\":1},{\"name\":\"VK_EXT_provoking_vertex\",\"spec_version\":1},{\"name\":\"VK_EXT_queue_family_foreign\",\"spec_version\":1},{\"name\":\"VK_EXT_robustness2\",\"spec_version\":1},{\"name\":\"VK_EXT_sample_locations\",\"spec_version\":1},{\"name\":\"VK_EXT_scalar_block_layout\",\"spec_version\":1},{\"name\":\"VK_EXT_separate_stencil_usage\",\"spec_version\":1},{\"name\":\"VK_EXT_shader_demote_to_helper_invocation\",\"spec_version\":1},{\"name\":\"VK_EXT_shader_module_identifier\",\"spec_version\":1},{\"name\":\"VK_EXT_shader_object\",\"spec_version\":1},{\"name\":\"VK_EXT_shader_replicated_composites\",\"spec_version\":1},{\"name\":\"VK_EXT_shader_stencil_export\",\"spec_version\":1},{\"name\":\"VK_EXT_shader_subgroup_ballot\",\"spec_version\":1},{\"name\":\"VK_EXT_shader_subgroup_vote\",\"spec_version\":1},{\"name\":\"VK_EXT_shader_viewport_index_layer\",\"spec_version\":1},{\"name\":\"VK_EXT_subgroup_size_control\",\"spec_version\":2},{\"name\":\"VK_EXT_swapchain_maintenance1\",\"spec_version\":1},{\"name\":\"VK_EXT_texel_buffer_alignment\",\"spec_version\":1},{\"name\":\"VK_EXT_tooling_info\",\"spec_version\":1},{\"name\":\"VK_EXT_transform_feedback\",\"spec_version\":1},{\"name\":\"VK_EXT_vertex_attribute_divisor\",\"spec_version\":3},{\"name\":\"VK_EXT_vertex_input_dynamic_state\",\"spec_version\":2},{\"name\":\"VK_GOOGLE_decorate_string\",\"spec_version\":1},{\"name\":\"VK_GOOGLE_hlsl_functionality1\",\"spec_version\":1},{\"name\":\"VK_GOOGLE_user_type\",\"spec_version\":1},{\"name\":\"VK_VALVE_mutable_descriptor_type\",\"spec_version\":1}]}}\n",
+      "stderr": "[Vulkan Loader] WARNING | LAYER: Implicit layer \"VK_LAYER_MESA_device_select\" forced disabled because name matches filter of env var 'VK_LOADER_LAYERS_DISABLE'.\n[Vulkan Loader] WARNING | LAYER: Layer \"VK_LAYER_MESA_device_select\" forced disabled because name matches filter of env var 'VK_LOADER_LAYERS_DISABLE'.\n[Vulkan Loader] DRIVER:         Searching for driver manifest files\n[Vulkan Loader] DRIVER:            In following locations:\n[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/asahi_icd.aarch64.json\n[Vulkan Loader] DRIVER:            Found the following files:\n[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/asahi_icd.aarch64.json\n[Vulkan Loader] DRIVER:         Found ICD manifest file /usr/share/vulkan/icd.d/asahi_icd.aarch64.json, version 1.0.1\n[Vulkan Loader] DEBUG | DRIVER: Searching for ICD drivers named /usr/lib64/libvulkan_asahi.so\n[Vulkan Loader] INFO | DRIVER:  linux_read_sorted_physical_devices:\n[Vulkan Loader] INFO | DRIVER:       Original order:\n[Vulkan Loader] INFO | DRIVER:             [0] Apple M2 Max (G14C B1)\n[Vulkan Loader] INFO | DRIVER:       Sorted order:\n[Vulkan Loader] INFO | DRIVER:             [0] Apple M2 Max (G14C B1)  \n[Vulkan Loader] INFO | DRIVER:  linux_read_sorted_physical_devices:\n[Vulkan Loader] INFO | DRIVER:       Original order:\n[Vulkan Loader] INFO | DRIVER:             [0] Apple M2 Max (G14C B1)\n[Vulkan Loader] INFO | DRIVER:       Sorted order:\n[Vulkan Loader] INFO | DRIVER:             [0] Apple M2 Max (G14C B1)  \n[Vulkan Loader] DEBUG | DRIVER: Copying old device 0 into new device 0\n"
+    }
+  ],
+  "package": {
+    "url": "https://archives.fedoraproject.org/pub/archive/fedora/linux/releases/42/Everything/aarch64/os/Packages/l/libdisplay-info-0.2.0-3.fc42.aarch64.rpm",
+    "sha256": "86fa707a83121deb20435b225615b76ff96a39b9b6fe9163f07218596e589ce3",
+    "identity": "libdisplay-info-0.2.0-3.fc42.aarch64\n",
+    "requires": "ld-linux-aarch64.so.1()(64bit)\nld-linux-aarch64.so.1(GLIBC_2.17)(64bit)\nlibc.so.6()(64bit)\nlibc.so.6(GLIBC_2.17)(64bit)\nlibc.so.6(GLIBC_ABI_DT_RELR)(64bit)\nlibm.so.6()(64bit)\nlibm.so.6(GLIBC_2.17)(64bit)\nlibm.so.6(GLIBC_2.27)(64bit)\nrpmlib(CompressedFileNames) <= 3.0.4-1\nrpmlib(FileDigests) <= 4.6.0-1\nrpmlib(PayloadFilesHavePrefix) <= 4.0-1\nrpmlib(PayloadIsZstd) <= 5.4.18-1\nrtld(GNU_HASH)\n",
+    "provides": "libdisplay-info = 0.2.0-3.fc42\nlibdisplay-info(aarch-64) = 0.2.0-3.fc42\nlibdisplay-info.so.2()(64bit)\n",
+    "signature": "/scratch/apple-m2-playground/vulkan-runtime/downloads/libdisplay-info-0.2.0-3.fc42.aarch64.signed.rpm:\n    Header V4 RSA/SHA256 Signature, key ID 105ef944: OK\n    Header SHA256 digest: OK\n    Header SHA1 digest: OK\n    Payload SHA256 digest: OK\n    MD5 digest: OK\n",
+    "extracted_members": [
+      {
+        "path": "usr/lib/.build-id",
+        "mode": "0o40755",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "usr/lib/.build-id/7c",
+        "mode": "0o40755",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "usr/lib/.build-id/7c/37dd71f8be93922701b682dd77749b020066b4",
+        "mode": "0o120777",
+        "size": 46,
+        "sha256": "f8f66e204cc5a929ab227f0f181a0322297cc8e8e6e1ee848ee0cd7b1e2c4eb2"
+      },
+      {
+        "path": "usr/lib64/libdisplay-info.so.0.2.0",
+        "mode": "0o100755",
+        "size": 265856,
+        "sha256": "e65991680fa5770c58867a2d5b53108c4ae2f24ec37680b388afd35bf10b305e"
+      },
+      {
+        "path": "usr/lib64/libdisplay-info.so.2",
+        "mode": "0o120777",
+        "size": 24,
+        "sha256": "2a91fd5193c5fd82bc416a7124121497fd58e3fadb24c0c2f21cbb78056db9fd"
+      },
+      {
+        "path": "usr/share/doc/libdisplay-info",
+        "mode": "0o40755",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "usr/share/doc/libdisplay-info/README.md",
+        "mode": "0o100644",
+        "size": 3178,
+        "sha256": "b089d7162260bd78f30fdc62e32b46de87dfacdacbaaf2516b7d440b5730fca1"
+      },
+      {
+        "path": "usr/share/licenses/libdisplay-info",
+        "mode": "0o40755",
+        "size": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "usr/share/licenses/libdisplay-info/LICENSE",
+        "mode": "0o100644",
+        "size": 1089,
+        "sha256": "15b396244e58830c5614b9394f4deccfe684970cd507f299383ab57ad339eedd"
+      }
+    ]
+  },
+  "packages": "mesa-vulkan-drivers-25.1.9-1.fc42.aarch64\nvulkan-loader-1.4.313.0-1.fc42.aarch64\nglibc-2.41-18.fc42.aarch64\nlibdrm-2.4.133-1.fc42.aarch64\n",
+  "system_dependency_control": "\tlinux-vdso.so.1 (0x0000ffffb4a5c000)\n\tlibdrm.so.2 => /lib64/libdrm.so.2 (0x0000ffffb3dd0000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x0000ffffb3d90000)\n\tlibzstd.so.1 => /lib64/libzstd.so.1 (0x0000ffffb3cd0000)\n\tlibxcb.so.1 => /lib64/libxcb.so.1 (0x0000ffffb3c80000)\n\tlibX11-xcb.so.1 => /lib64/libX11-xcb.so.1 (0x0000ffffb3c50000)\n\tlibxcb-dri3.so.0 => /lib64/libxcb-dri3.so.0 (0x0000ffffb3c20000)\n\tlibxcb-present.so.0 => /lib64/libxcb-present.so.0 (0x0000ffffb3bf0000)\n\tlibxcb-xfixes.so.0 => /lib64/libxcb-xfixes.so.0 (0x0000ffffb3bc0000)\n\tlibxcb-sync.so.1 => /lib64/libxcb-sync.so.1 (0x0000ffffb3b90000)\n\tlibxcb-randr.so.0 => /lib64/libxcb-randr.so.0 (0x0000ffffb3b50000)\n\tlibxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x0000ffffb3b20000)\n\tlibxshmfence.so.1 => /lib64/libxshmfence.so.1 (0x0000ffffb3af0000)\n\tlibwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x0000ffffb3ac0000)\n\tlibdisplay-info.so.2 => not found\n\tlibudev.so.1 => /lib64/libudev.so.1 (0x0000ffffb3a60000)\n\tlibSPIRV-Tools.so => /lib64/libSPIRV-Tools.so (0x0000ffffb38c0000)\n\tlibexpat.so.1 => /lib64/libexpat.so.1 (0x0000ffffb3870000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x0000ffffb35f0000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x0000ffffb3530000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x0000ffffb34f0000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x0000ffffb3320000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffffb4a60000)\n\tlibXau.so.6 => /lib64/libXau.so.6 (0x0000ffffb32f0000)\n\tlibffi.so.8 => /lib64/libffi.so.8 (0x0000ffffb32b0000)\n\tlibcap.so.2 => /lib64/libcap.so.2 (0x0000ffffb3280000)\n",
+  "child_environment_overrides": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json",
+    "VK_ICD_FILENAMES": "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json",
+    "VK_LOADER_LAYERS_DISABLE": "~implicit~",
+    "VK_LOADER_DEBUG": "error,warn,driver",
+    "LD_LIBRARY_PATH": "/scratch/apple-m2-playground/vulkan-runtime/usr/lib64"
+  },
+  "icd_manifest": {
+    "ICD": {
+      "api_version": "1.4.328",
+      "library_arch": "64",
+      "library_path": "/usr/lib64/libvulkan_asahi.so"
+    },
+    "file_format_version": "1.0.1"
+  },
+  "runtime_dependency_check": "\tlinux-vdso.so.1 (0x0000ffff62d0c000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x0000ffff62be0000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x0000ffff62a10000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff62d10000)\n",
+  "repaired_icd_dependency_check": "\tlinux-vdso.so.1 (0x0000fffef21ec000)\n\tlibdrm.so.2 => /lib64/libdrm.so.2 (0x0000fffef1560000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x0000fffef1520000)\n\tlibzstd.so.1 => /lib64/libzstd.so.1 (0x0000fffef1460000)\n\tlibxcb.so.1 => /lib64/libxcb.so.1 (0x0000fffef1410000)\n\tlibX11-xcb.so.1 => /lib64/libX11-xcb.so.1 (0x0000fffef13e0000)\n\tlibxcb-dri3.so.0 => /lib64/libxcb-dri3.so.0 (0x0000fffef13b0000)\n\tlibxcb-present.so.0 => /lib64/libxcb-present.so.0 (0x0000fffef1380000)\n\tlibxcb-xfixes.so.0 => /lib64/libxcb-xfixes.so.0 (0x0000fffef1350000)\n\tlibxcb-sync.so.1 => /lib64/libxcb-sync.so.1 (0x0000fffef1320000)\n\tlibxcb-randr.so.0 => /lib64/libxcb-randr.so.0 (0x0000fffef12e0000)\n\tlibxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x0000fffef12b0000)\n\tlibxshmfence.so.1 => /lib64/libxshmfence.so.1 (0x0000fffef1280000)\n\tlibwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x0000fffef1250000)\n\tlibdisplay-info.so.2 => /scratch/apple-m2-playground/vulkan-runtime/usr/lib64/libdisplay-info.so.2 (0x0000fffef11f0000)\n\tlibudev.so.1 => /lib64/libudev.so.1 (0x0000fffef1190000)\n\tlibSPIRV-Tools.so => /lib64/libSPIRV-Tools.so (0x0000fffef0ff0000)\n\tlibexpat.so.1 => /lib64/libexpat.so.1 (0x0000fffef0fa0000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x0000fffef0d20000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x0000fffef0c60000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x0000fffef0c20000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x0000fffef0a50000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000fffef21f0000)\n\tlibXau.so.6 => /lib64/libXau.so.6 (0x0000fffef0a20000)\n\tlibffi.so.8 => /lib64/libffi.so.8 (0x0000fffef09e0000)\n\tlibcap.so.2 => /lib64/libcap.so.2 (0x0000fffef09b0000)\n",
+  "sha256": {
+    "/save/workspace/apple-documentation-playground/tests/vulkan_caps.c": "47967ddd24bacbb688b96097d025995ffc71a71b9b5bd9e139a4294d2278c4b9",
+    "/save/workspace/apple-documentation-playground/scripts/run_vulkan_caps.py": "adf75ba9cb842a92f79289f5337e39af58d39143f9a6e9cf602dd15e34541997",
+    "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json": "0f1c1d709b03dc399db52ad8d3ac07e4361e0b247b86d5fd636f4e06d0abbf19",
+    "/usr/lib64/libvulkan_asahi.so": "26abaa59964177c0acf1860ba19cfd4b97c25435a8c4d81f9052973bc6bf1c65",
+    "/usr/lib64/libvulkan.so.1": "779a58a2dd93644b81e7975d80e0a30e3a7beafc472f0937fde93a8840a90407",
+    "/etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-42-primary": "3d89e80b959de7741cd01526e1c8fa31a2471658c0570340f7a3c295ef9af239",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vk_android_native_buffer.h": "cf47964326ac4f0685cceadbbc97aff185138255b07facdf7e26bc0ce3147224",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vk_icd.h": "ba22828f76de7231e7dfbb5d8564e7a58dd9f5dbeac8c1f0ff6c056c92db744a",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vk_layer.h": "a9fb1343e7e1fa3456189bf146f2186b8df46c1b1a01f88f8b9ae4cd25b1623c",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vk_platform.h": "a2cd9085c66776845d2524c3b0e73ccf4827ba046aa6f676c4b8ddbed47d6552",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan.h": "096f50152d0b298d8df84a561a37d8190c8a60af34dff0e2cc8328b24491a640",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_android.h": "9dcce545a790b5b1ce00e103ade95c8efa4c8a0bf2ff39865d76a7d2f987aef2",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_beta.h": "bb43577a445c357c3f0c03572b3dd3ebd9fca39914c0092f7d77e942af05d3fc",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_core.h": "2f64fd6c7c3f342b0e44f039f1c359b7f0e6cfcb71a7dca1cc5156282faa3b51",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_directfb.h": "efecf5a15380f61c16ef257ed55a998f2cc651789bec22056ccc81d2518daefc",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_fuchsia.h": "17aedccaae68825bfa2954faec1bc9e953b106f1161e1b2ab26ab4cdccf21a06",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_ggp.h": "b68cbbf19b9397ee63dd6ba94526059bd2ff000c66083243758e3a04e215bd2c",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_ios.h": "ebaeffc3f4ec0484dcf34753678f1642caf73f6db4e17f11f1b82302151b918c",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_macos.h": "3ae5522081741e9021be86727e11949ad8c695e66f75e1c422e577afd7657f59",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_metal.h": "d5fe0caf881cc9c72ea2ba31ca86c684e97cdec6741d6e6298ecbd8f58dc8c5e",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_ohos.h": "3cc40f845b5fd75cda0d8a3b1f2782522a3591657f67c656a211b4639eb23b16",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_screen.h": "b9e7e7921b4be199c8ecfe518bd71bd8e533adbbab193714c542157b87b10e86",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_ubm.h": "ac106317c017d1975f26184d3979dba0352f10aa1cfc7ef5373be92fef6bd137",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_vi.h": "a53e35bb1b3113e6ef4932cb9358a27861a198d7865227ecd93555fecc73dd68",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_wayland.h": "6c4146149d45bcbb5a22c7540feaa396ee9a49f077737c7a343c62de5199fbc7",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_win32.h": "72f0b6de71287d3b04d12235e4f2fef8f343126f85be4963c516d31d5bb4c099",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_xcb.h": "3d49f5eb52090e72e1cf7cde545088225ac524a2ff1d1f35737e7d944474c1b7",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_xlib.h": "3c44e97d3f380eb912e01a79e9667457fdf5e18164f0b09b3c61431f421bc551",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_xlib_xrandr.h": "188233d112d812cca1777cfa6c1585073f1f2b033fa08b2f11c8d0757fcc232e",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_av1std.h": "c75c1d324b97d247aef0008024bc7f3adb98c741ab7f66c882ec38fdacc7ee33",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_av1std_decode.h": "7e3a1ce177c12546d410f3179ce1b81f2da7a8eba4f525b29cd563ab4099c0e5",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_av1std_encode.h": "8d166b4543260a38347860443b1a59c7a5e86cdb0d0facaf4c704f667de030e3",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h264std.h": "fded484cef9f90fbbd089e0647268f36e5f4292179fbc5428a2c9e8d7709bbe9",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h264std_decode.h": "37b970c3d80536ad1ac074cfe19b58ee03c3075378e02179e1dc5e4351266821",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h264std_encode.h": "227e092b53c4e7ca1a948ed021704511c1ed16040cd6188ff6703e5ae66db64d",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h265std.h": "0b81f8986ada015ef2e127449eff9d9634899bb59a0a9277a4054e9ec4416c12",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h265std_decode.h": "879a0dd370a1b1ad184638906c52bdfe7d80d639fbc5a5baa8b02d7c5b60b147",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h265std_encode.h": "abb3e72af22e4e0a3dbe5dff7be1b275949388809fb3987830341e8f495ea1c7",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_vp9std.h": "0a47125865376a3fe7014b69ff6db9d04e30ebf8c4d15664f1d894649ad5c09d",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_vp9std_decode.h": "1ceb1a8d0e3370e508cf688a6e57dc314cd82186b60f3cef420ea4b1b483865d",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codecs_common.h": "d2e7caa396c521d03d491a269572b1d31b925b5127d22fda14199951ebae89f8",
+    "/scratch/apple-m2-playground/vulkan-runtime/usr/lib64/libdisplay-info.so.0.2.0": "e65991680fa5770c58867a2d5b53108c4ae2f24ec37680b388afd35bf10b305e"
+  },
+  "compiler": "cc (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+  "binary_sha256": "c08151fb8084a197ba27322f6f60a2480a1033d31eecc9e970af39aea8e4ac67",
+  "capabilities": {
+    "vkCreateInstance": 0,
+    "loader_api": "1.4.313",
+    "requested_instance_api": "1.1.0",
+    "physical_device_count": 1,
+    "accepted_asahi": true,
+    "device": {
+      "name": "Apple M2 Max (G14C B1)",
+      "api": "1.4.328",
+      "vendor_id": 65541,
+      "device_id": 0,
+      "device_type": 1,
+      "driver_version_raw": 104869894,
+      "driver_id": 26,
+      "driver_name": "Honeykrisp",
+      "driver_info": "Mesa 25.3.6",
+      "drm_extension": true,
+      "has_render": true,
+      "render_major": 226,
+      "render_minor": 128,
+      "shader_object_extension": true,
+      "shader_object_feature": true,
+      "shader_binary_uuid": "2313bd7c3909b8ad0f31883eab5c412e",
+      "shader_binary_version": 0,
+      "features": {
+        "shaderInt64": 1,
+        "shaderInt16": 1,
+        "shaderFloat64": 0
+      },
+      "compute_limits": {
+        "max_invocations": 1024,
+        "max_workgroup_size": [
+          1024,
+          1024,
+          64
+        ],
+        "max_workgroup_count": [
+          2147483647,
+          65535,
+          65535
+        ],
+        "shared_memory_bytes": 32768
+      },
+      "queues": [
+        {
+          "index": 0,
+          "flags": 15,
+          "count": 1,
+          "timestamp_valid_bits": 64
+        }
+      ],
+      "memory_heaps": [
+        {
+          "index": 0,
+          "size_bytes": 33619443712,
+          "flags": 1
+        }
+      ],
+      "memory_types": [
+        {
+          "index": 0,
+          "flags": 15,
+          "heap": 0
+        },
+        {
+          "index": 1,
+          "flags": 7,
+          "heap": 0
+        }
+      ],
+      "extensions": [
+        {
+          "name": "VK_KHR_8bit_storage",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_16bit_storage",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_bind_memory2",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_buffer_device_address",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_calibrated_timestamps",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_copy_commands2",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_create_renderpass2",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_dedicated_allocation",
+          "spec_version": 3
+        },
+        {
+          "name": "VK_KHR_depth_stencil_resolve",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_descriptor_update_template",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_device_group",
+          "spec_version": 4
+        },
+        {
+          "name": "VK_KHR_draw_indirect_count",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_driver_properties",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_dynamic_rendering",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_dynamic_rendering_local_read",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_external_fence",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_external_fence_fd",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_external_memory",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_external_memory_fd",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_external_semaphore",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_external_semaphore_fd",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_format_feature_flags2",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_KHR_get_memory_requirements2",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_global_priority",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_image_format_list",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_imageless_framebuffer",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_incremental_present",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_KHR_index_type_uint8",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_line_rasterization",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_load_store_op_none",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_maintenance1",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_KHR_maintenance2",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_maintenance3",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_maintenance4",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_KHR_maintenance5",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_maintenance6",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_maintenance7",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_maintenance8",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_maintenance9",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_map_memory2",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_multiview",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_pipeline_executable_properties",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_pipeline_library",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_push_descriptor",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_KHR_relaxed_block_layout",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_sampler_mirror_clamp_to_edge",
+          "spec_version": 3
+        },
+        {
+          "name": "VK_KHR_sampler_ycbcr_conversion",
+          "spec_version": 14
+        },
+        {
+          "name": "VK_KHR_separate_depth_stencil_layouts",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_draw_parameters",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_expect_assume",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_float16_int8",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_float_controls",
+          "spec_version": 4
+        },
+        {
+          "name": "VK_KHR_shader_float_controls2",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_integer_dot_product",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_maximal_reconvergence",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_non_semantic_info",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_quad_control",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_relaxed_extended_instruction",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_subgroup_extended_types",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_subgroup_rotate",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_KHR_shader_subgroup_uniform_control_flow",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_shader_terminate_invocation",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_spirv_1_4",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_storage_buffer_storage_class",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_swapchain",
+          "spec_version": 70
+        },
+        {
+          "name": "VK_KHR_swapchain_mutable_format",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_synchronization2",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_timeline_semaphore",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_KHR_uniform_buffer_standard_layout",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_variable_pointers",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_vertex_attribute_divisor",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_vulkan_memory_model",
+          "spec_version": 3
+        },
+        {
+          "name": "VK_KHR_workgroup_memory_explicit_layout",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_KHR_zero_initialize_workgroup_memory",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_4444_formats",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_attachment_feedback_loop_layout",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_EXT_border_color_swizzle",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_buffer_device_address",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_EXT_calibrated_timestamps",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_EXT_color_write_enable",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_custom_border_color",
+          "spec_version": 12
+        },
+        {
+          "name": "VK_EXT_depth_bias_control",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_depth_clip_enable",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_descriptor_indexing",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_EXT_dynamic_rendering_unused_attachments",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_extended_dynamic_state",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_extended_dynamic_state2",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_extended_dynamic_state3",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_EXT_external_memory_dma_buf",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_global_priority",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_EXT_global_priority_query",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_graphics_pipeline_library",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_hdr_metadata",
+          "spec_version": 3
+        },
+        {
+          "name": "VK_EXT_host_image_copy",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_host_query_reset",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_image_2d_view_of_3d",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_image_drm_format_modifier",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_EXT_image_robustness",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_index_type_uint8",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_inline_uniform_block",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_line_rasterization",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_load_store_op_none",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_map_memory_placed",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_multi_draw",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_mutable_descriptor_type",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_non_seamless_cube_map",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_physical_device_drm",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_pipeline_creation_cache_control",
+          "spec_version": 3
+        },
+        {
+          "name": "VK_EXT_pipeline_creation_feedback",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_pipeline_protected_access",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_pipeline_robustness",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_primitive_topology_list_restart",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_private_data",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_provoking_vertex",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_queue_family_foreign",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_robustness2",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_sample_locations",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_scalar_block_layout",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_separate_stencil_usage",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_shader_demote_to_helper_invocation",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_shader_module_identifier",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_shader_object",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_shader_replicated_composites",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_shader_stencil_export",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_shader_subgroup_ballot",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_shader_subgroup_vote",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_shader_viewport_index_layer",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_subgroup_size_control",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_EXT_swapchain_maintenance1",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_texel_buffer_alignment",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_tooling_info",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_transform_feedback",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_EXT_vertex_attribute_divisor",
+          "spec_version": 3
+        },
+        {
+          "name": "VK_EXT_vertex_input_dynamic_state",
+          "spec_version": 2
+        },
+        {
+          "name": "VK_GOOGLE_decorate_string",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_GOOGLE_hlsl_functionality1",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_GOOGLE_user_type",
+          "spec_version": 1
+        },
+        {
+          "name": "VK_VALVE_mutable_descriptor_type",
+          "spec_version": 1
+        }
+      ]
+    }
+  },
+  "expected_render_node": {
+    "path": "/dev/dri/renderD128",
+    "major": 226,
+    "minor": 128
+  }
+}

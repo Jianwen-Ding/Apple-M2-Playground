@@ -1,0 +1,72 @@
+{
+  "binary_sha256": "1a5804057a4e43a68046b4ba5cdb81bc7f76dae32cc85f783062cbcbfff3c306",
+  "build": {
+    "argv": [
+      "cc",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-O2",
+      "-MD",
+      "-MF",
+      "/scratch/apple-m2-playground/gles-timing/20261004T202845.121621Z-5098/build/dependencies.d",
+      "-I/save/workspace/AGX_Probe/mesa/include",
+      "/scratch/apple-m2-playground/gles-timing/20261004T202845.121621Z-5098/sources/gles_time.c",
+      "-ldl",
+      "-o",
+      "/scratch/apple-m2-playground/gles-timing/20261004T202845.121621Z-5098/gles_time"
+    ],
+    "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202845.121621Z-5098/build",
+    "elapsed_seconds": 0.1478547560000152,
+    "returncode": 0,
+    "timed_out": false,
+    "timeout_seconds": 30
+  },
+  "calibration_failure": null,
+  "cases": [
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202845.121621Z-5098/gles_time",
+          "control",
+          "0",
+          "64",
+          "/dev/dri/intentionally-wrong-node"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202845.121621Z-5098/00-initial-control",
+        "elapsed_seconds": 0.013214628000014272,
+        "returncode": 1,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "00-initial-control",
+      "mode": "control",
+      "repeats": 0
+    },
+    {
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202845.121621Z-5098/gles_time",
+          "control",
+          "0",
+          "64",
+          "/dev/dri/intentionally-wrong-node"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202845.121621Z-5098/final-control",
+        "elapsed_seconds": 0.012487000999954034,
+        "returncode": 1,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "final-control",
+      "mode": "control",
+      "repeats": 0
+    }
+  ],
+  "execution_verified": false,
+  "failure": "00-initial-control: API/process failure; stopped scaling",
+  "final_control_failure": "final-control: API/process failure; stopped scaling",
+  "interpretation": "API calibration only; no ISA latency or physical cycles.",
+  "timers_usable": false
+}

@@ -1,0 +1,490 @@
+{
+  "status": "OFFLINE_CANDIDATES_ONLY",
+  "target_to_validate": "G14C B1",
+  "hardware_execution_performed": false,
+  "cross_check": "applegpu assembler vs independent transcription of Mesa source bitfields; not two built encoders",
+  "oracle": "uint32 modulo 2^32 host arithmetic; no software emulator execution",
+  "registers": {
+    "dst_r32": 0,
+    "src_r32": 1,
+    "source_zero_extended": true
+  },
+  "placement_constraints": [
+    "Template bytes are not offsets into an opaque shader container.",
+    "Locate one decoded matching baseline ALU instruction inside executable code; require full-byte match and compiler disassembly confirmation.",
+    "Prove destination is a live 32-bit arithmetic result feeding only the checked output data, never an address, bounds, loop count, lane mask or resource descriptor.",
+    "Prove source register is live initialized uint32 input; preserve physical registers, allocation metadata and all surrounding instructions.",
+    "Use only the immediate XOR; preserve opcode, length, shift, sign extension, saturation, cache/discard, helper-kill and control bits.",
+    "Same-size edits preserve subsequent offsets; leave branches, waits, stop/epilogue, memory operations and container metadata untouched.",
+    "Re-read decoder fields after editing; execute unchanged baseline and guarded readback control before/after each single variation.",
+    "Binary import/roundtrip and G14C validity must be established by the execution harness; local applegpu describes G13."
+  ],
+  "sources": {
+    "applegpu": {
+      "root": "/save/workspace/AGX_Probe/applegpu",
+      "git_head": "4c5bae61086b8067231120c98b4756d7696d399c",
+      "sha256": {
+        "applegpu.py": "986f6c6ec5547c5f61e357c7c0df614cb05b3382eed705d4ef7a79c4d3a2c46f",
+        "assemble.py": "6954f39ea05462ba67b1bba93b101470210268e96b3c6de748909db38d940425"
+      }
+    },
+    "mesa": {
+      "root": "/save/workspace/AGX_Probe/mesa",
+      "git_head": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "sha256": {
+        "src/asahi/compiler/agx_pack.c": "f594448db4ccfe5d4f98f849c3f1e08b662264702f5de40a4c97d34be180cf00",
+        "src/asahi/compiler/agx_opcodes.py": "23d6d6312784a96e67aa9073deb55415c079b915899367c8b9a4075763f92446"
+      }
+    }
+  },
+  "candidates": [
+    {
+      "id": "mov-small",
+      "baseline": {
+        "assembly": "mov_imm r0, 1, 0",
+        "bytes_le_hex": "620101000000",
+        "decoder_text": "mov_imm          r0, 1, 0b0",
+        "decoder_fields": {
+          "Dt": 2,
+          "D": 0,
+          "imm32": 1,
+          "kill": 0
+        }
+      },
+      "modified": {
+        "assembly": "mov_imm r0, 2, 0",
+        "bytes_le_hex": "620102000000",
+        "decoder_text": "mov_imm          r0, 2, 0b0",
+        "decoder_fields": {
+          "Dt": 2,
+          "D": 0,
+          "imm32": 2,
+          "kill": 0
+        }
+      },
+      "size_bytes": 6,
+      "xor_le_hex": "000003000000",
+      "changed_bits_lsb0": [
+        16,
+        17
+      ],
+      "fixtures": [
+        {
+          "input_u32": 0,
+          "baseline_u32": 1,
+          "modified_u32": 2
+        },
+        {
+          "input_u32": 1,
+          "baseline_u32": 1,
+          "modified_u32": 2
+        },
+        {
+          "input_u32": 2147483647,
+          "baseline_u32": 1,
+          "modified_u32": 2
+        },
+        {
+          "input_u32": 2147483648,
+          "baseline_u32": 1,
+          "modified_u32": 2
+        },
+        {
+          "input_u32": 4294967295,
+          "baseline_u32": 1,
+          "modified_u32": 2
+        },
+        {
+          "input_u32": 305419896,
+          "baseline_u32": 1,
+          "modified_u32": 2
+        }
+      ]
+    },
+    {
+      "id": "mov-bit0",
+      "baseline": {
+        "assembly": "mov_imm r0, 305419896, 0",
+        "bytes_le_hex": "620178563412",
+        "decoder_text": "mov_imm          r0, 305419896, 0b0",
+        "decoder_fields": {
+          "Dt": 2,
+          "D": 0,
+          "imm32": 305419896,
+          "kill": 0
+        }
+      },
+      "modified": {
+        "assembly": "mov_imm r0, 305419897, 0",
+        "bytes_le_hex": "620179563412",
+        "decoder_text": "mov_imm          r0, 305419897, 0b0",
+        "decoder_fields": {
+          "Dt": 2,
+          "D": 0,
+          "imm32": 305419897,
+          "kill": 0
+        }
+      },
+      "size_bytes": 6,
+      "xor_le_hex": "000001000000",
+      "changed_bits_lsb0": [
+        16
+      ],
+      "fixtures": [
+        {
+          "input_u32": 0,
+          "baseline_u32": 305419896,
+          "modified_u32": 305419897
+        },
+        {
+          "input_u32": 1,
+          "baseline_u32": 305419896,
+          "modified_u32": 305419897
+        },
+        {
+          "input_u32": 2147483647,
+          "baseline_u32": 305419896,
+          "modified_u32": 305419897
+        },
+        {
+          "input_u32": 2147483648,
+          "baseline_u32": 305419896,
+          "modified_u32": 305419897
+        },
+        {
+          "input_u32": 4294967295,
+          "baseline_u32": 305419896,
+          "modified_u32": 305419897
+        },
+        {
+          "input_u32": 305419896,
+          "baseline_u32": 305419896,
+          "modified_u32": 305419897
+        }
+      ]
+    },
+    {
+      "id": "add-small",
+      "baseline": {
+        "assembly": "iadd r0, r1, 1",
+        "bytes_le_hex": "0e01421200000000",
+        "decoder_text": "iadd             r0, r1, 1",
+        "decoder_fields": {
+          "S": 0,
+          "N": 0,
+          "Dt": 2,
+          "D": 0,
+          "At": 9,
+          "As": 0,
+          "A": 2,
+          "Bt": 0,
+          "Bs": 0,
+          "B": 1,
+          "s": 0
+        }
+      },
+      "modified": {
+        "assembly": "iadd r0, r1, 2",
+        "bytes_le_hex": "0e01422200000000",
+        "decoder_text": "iadd             r0, r1, 2",
+        "decoder_fields": {
+          "S": 0,
+          "N": 0,
+          "Dt": 2,
+          "D": 0,
+          "At": 9,
+          "As": 0,
+          "A": 2,
+          "Bt": 0,
+          "Bs": 0,
+          "B": 2,
+          "s": 0
+        }
+      },
+      "size_bytes": 8,
+      "xor_le_hex": "0000003000000000",
+      "changed_bits_lsb0": [
+        28,
+        29
+      ],
+      "fixtures": [
+        {
+          "input_u32": 0,
+          "baseline_u32": 1,
+          "modified_u32": 2
+        },
+        {
+          "input_u32": 1,
+          "baseline_u32": 2,
+          "modified_u32": 3
+        },
+        {
+          "input_u32": 2147483647,
+          "baseline_u32": 2147483648,
+          "modified_u32": 2147483649
+        },
+        {
+          "input_u32": 2147483648,
+          "baseline_u32": 2147483649,
+          "modified_u32": 2147483650
+        },
+        {
+          "input_u32": 4294967295,
+          "baseline_u32": 0,
+          "modified_u32": 1
+        },
+        {
+          "input_u32": 305419896,
+          "baseline_u32": 305419897,
+          "modified_u32": 305419898
+        }
+      ]
+    },
+    {
+      "id": "add-split-immediate",
+      "baseline": {
+        "assembly": "iadd r0, r1, 63",
+        "bytes_le_hex": "0e0142f203000000",
+        "decoder_text": "iadd             r0, r1, 63",
+        "decoder_fields": {
+          "S": 0,
+          "N": 0,
+          "Dt": 2,
+          "D": 0,
+          "At": 9,
+          "As": 0,
+          "A": 2,
+          "Bt": 0,
+          "Bs": 0,
+          "B": 63,
+          "s": 0
+        }
+      },
+      "modified": {
+        "assembly": "iadd r0, r1, 64",
+        "bytes_le_hex": "0e01420200010000",
+        "decoder_text": "iadd             r0, r1, 64",
+        "decoder_fields": {
+          "S": 0,
+          "N": 0,
+          "Dt": 2,
+          "D": 0,
+          "At": 9,
+          "As": 0,
+          "A": 2,
+          "Bt": 0,
+          "Bs": 0,
+          "B": 64,
+          "s": 0
+        }
+      },
+      "size_bytes": 8,
+      "xor_le_hex": "000000f003010000",
+      "changed_bits_lsb0": [
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        40
+      ],
+      "fixtures": [
+        {
+          "input_u32": 0,
+          "baseline_u32": 63,
+          "modified_u32": 64
+        },
+        {
+          "input_u32": 1,
+          "baseline_u32": 64,
+          "modified_u32": 65
+        },
+        {
+          "input_u32": 2147483647,
+          "baseline_u32": 2147483710,
+          "modified_u32": 2147483711
+        },
+        {
+          "input_u32": 2147483648,
+          "baseline_u32": 2147483711,
+          "modified_u32": 2147483712
+        },
+        {
+          "input_u32": 4294967295,
+          "baseline_u32": 62,
+          "modified_u32": 63
+        },
+        {
+          "input_u32": 305419896,
+          "baseline_u32": 305419959,
+          "modified_u32": 305419960
+        }
+      ]
+    },
+    {
+      "id": "mul-low-coefficient",
+      "baseline": {
+        "assembly": "imadd r0, r1, 2, 0",
+        "bytes_le_hex": "1e01422200000000",
+        "decoder_text": "imadd            r0, r1, 2, 0",
+        "decoder_fields": {
+          "S": 0,
+          "N": 0,
+          "Dt": 2,
+          "D": 0,
+          "At": 9,
+          "As": 0,
+          "A": 2,
+          "Bt": 0,
+          "Bs": 0,
+          "B": 2,
+          "Ct": 0,
+          "Cs": 0,
+          "C": 0,
+          "s": 0
+        }
+      },
+      "modified": {
+        "assembly": "imadd r0, r1, 3, 0",
+        "bytes_le_hex": "1e01423200000000",
+        "decoder_text": "imadd            r0, r1, 3, 0",
+        "decoder_fields": {
+          "S": 0,
+          "N": 0,
+          "Dt": 2,
+          "D": 0,
+          "At": 9,
+          "As": 0,
+          "A": 2,
+          "Bt": 0,
+          "Bs": 0,
+          "B": 3,
+          "Ct": 0,
+          "Cs": 0,
+          "C": 0,
+          "s": 0
+        }
+      },
+      "size_bytes": 8,
+      "xor_le_hex": "0000001000000000",
+      "changed_bits_lsb0": [
+        28
+      ],
+      "fixtures": [
+        {
+          "input_u32": 0,
+          "baseline_u32": 0,
+          "modified_u32": 0
+        },
+        {
+          "input_u32": 1,
+          "baseline_u32": 2,
+          "modified_u32": 3
+        },
+        {
+          "input_u32": 2147483647,
+          "baseline_u32": 4294967294,
+          "modified_u32": 2147483645
+        },
+        {
+          "input_u32": 2147483648,
+          "baseline_u32": 0,
+          "modified_u32": 2147483648
+        },
+        {
+          "input_u32": 4294967295,
+          "baseline_u32": 4294967294,
+          "modified_u32": 4294967293
+        },
+        {
+          "input_u32": 305419896,
+          "baseline_u32": 610839792,
+          "modified_u32": 916259688
+        }
+      ]
+    },
+    {
+      "id": "mad-addend",
+      "baseline": {
+        "assembly": "imadd r0, r1, 2, 0",
+        "bytes_le_hex": "1e01422200000000",
+        "decoder_text": "imadd            r0, r1, 2, 0",
+        "decoder_fields": {
+          "S": 0,
+          "N": 0,
+          "Dt": 2,
+          "D": 0,
+          "At": 9,
+          "As": 0,
+          "A": 2,
+          "Bt": 0,
+          "Bs": 0,
+          "B": 2,
+          "Ct": 0,
+          "Cs": 0,
+          "C": 0,
+          "s": 0
+        }
+      },
+      "modified": {
+        "assembly": "imadd r0, r1, 2, 1",
+        "bytes_le_hex": "1e01422200010000",
+        "decoder_text": "imadd            r0, r1, 2, 1",
+        "decoder_fields": {
+          "S": 0,
+          "N": 0,
+          "Dt": 2,
+          "D": 0,
+          "At": 9,
+          "As": 0,
+          "A": 2,
+          "Bt": 0,
+          "Bs": 0,
+          "B": 2,
+          "Ct": 0,
+          "Cs": 0,
+          "C": 1,
+          "s": 0
+        }
+      },
+      "size_bytes": 8,
+      "xor_le_hex": "0000000000010000",
+      "changed_bits_lsb0": [
+        40
+      ],
+      "fixtures": [
+        {
+          "input_u32": 0,
+          "baseline_u32": 0,
+          "modified_u32": 1
+        },
+        {
+          "input_u32": 1,
+          "baseline_u32": 2,
+          "modified_u32": 3
+        },
+        {
+          "input_u32": 2147483647,
+          "baseline_u32": 4294967294,
+          "modified_u32": 4294967295
+        },
+        {
+          "input_u32": 2147483648,
+          "baseline_u32": 0,
+          "modified_u32": 1
+        },
+        {
+          "input_u32": 4294967295,
+          "baseline_u32": 4294967294,
+          "modified_u32": 4294967295
+        },
+        {
+          "input_u32": 305419896,
+          "baseline_u32": 610839792,
+          "modified_u32": 610839793
+        }
+      ]
+    }
+  ]
+}

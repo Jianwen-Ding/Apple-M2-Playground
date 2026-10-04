@@ -1,0 +1,185 @@
+{
+  "passed": false,
+  "utc": "20261004T202701436624Z",
+  "platform": "Linux-6.19.14-400.asahi.fc42.aarch64+16k-aarch64-with-glibc2.41",
+  "runtime_enabled": false,
+  "commands": [
+    {
+      "argv": [
+        "rpm",
+        "-q",
+        "mesa-vulkan-drivers",
+        "vulkan-loader",
+        "glibc",
+        "libdrm"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "elapsed_seconds": 0.018012106000014683,
+      "stdout": "mesa-vulkan-drivers-25.1.9-1.fc42.aarch64\nvulkan-loader-1.4.313.0-1.fc42.aarch64\nglibc-2.41-18.fc42.aarch64\nlibdrm-2.4.133-1.fc42.aarch64\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "rpm",
+        "-V",
+        "mesa-vulkan-drivers"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 1,
+      "elapsed_seconds": 0.06858686600003239,
+      "stdout": "S.5....T.    /usr/lib64/libvulkan_asahi.so\nS.5....T.    /usr/share/vulkan/icd.d/asahi_icd.aarch64.json\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "readelf",
+        "-n",
+        "/usr/lib64/libvulkan_asahi.so"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "elapsed_seconds": 0.0058382290001190995,
+      "stdout": "\nDisplaying notes found in: .note.gnu.property\n  Owner                Data size \tDescription\n  GNU                  0x00000010\tNT_GNU_PROPERTY_TYPE_0\n      Properties: AArch64 feature: BTI, PAC, GCS\n\nDisplaying notes found in: .note.gnu.build-id\n  Owner                Data size \tDescription\n  GNU                  0x00000014\tNT_GNU_BUILD_ID (unique build ID bitstring)\n    Build ID: 4145f84ae7bdcc482d00efc7cb7e84ea2663e631\n\nDisplaying notes found in: .note.package\n  Owner                Data size \tDescription\n  FDO                  0x0000007c\tFDO_PACKAGING_METADATA\n    Packaging Metadata: {\"type\":\"rpm\",\"name\":\"mesa\",\"version\":\"25.3.6-0.3.fc42\",\"architecture\":\"aarch64\",\"osCpe\":\"cpe:/o:fedoraproject:fedora:42\"}\n\nDisplaying notes found in: .gnu.build.attributes\n  Owner                Data size \tDescription\n  GA$<version>3a1      0x00000010\tOPEN\n    Applies to region from 0x9700 to 0x35f39c\n  GA$<version>3a1      0x00000010\tOPEN\n    Applies to region from 0x35f2d0 to 0x35f3dc\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "-C",
+        "/save/workspace/AGX_Probe/mesa",
+        "rev-parse",
+        "HEAD"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "elapsed_seconds": 0.0010555459998613514,
+      "stdout": "e5f0687867f5c5e88619175d9b0442f8560e8d53\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "ldd",
+        "/usr/lib64/libvulkan_asahi.so"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "elapsed_seconds": 0.004575974000090355,
+      "stdout": "\tlinux-vdso.so.1 (0x0000ffff222cc000)\n\tlibdrm.so.2 => /lib64/libdrm.so.2 (0x0000ffff21640000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x0000ffff21600000)\n\tlibzstd.so.1 => /lib64/libzstd.so.1 (0x0000ffff21540000)\n\tlibxcb.so.1 => /lib64/libxcb.so.1 (0x0000ffff214f0000)\n\tlibX11-xcb.so.1 => /lib64/libX11-xcb.so.1 (0x0000ffff214c0000)\n\tlibxcb-dri3.so.0 => /lib64/libxcb-dri3.so.0 (0x0000ffff21490000)\n\tlibxcb-present.so.0 => /lib64/libxcb-present.so.0 (0x0000ffff21460000)\n\tlibxcb-xfixes.so.0 => /lib64/libxcb-xfixes.so.0 (0x0000ffff21430000)\n\tlibxcb-sync.so.1 => /lib64/libxcb-sync.so.1 (0x0000ffff21400000)\n\tlibxcb-randr.so.0 => /lib64/libxcb-randr.so.0 (0x0000ffff213c0000)\n\tlibxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x0000ffff21390000)\n\tlibxshmfence.so.1 => /lib64/libxshmfence.so.1 (0x0000ffff21360000)\n\tlibwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x0000ffff21330000)\n\tlibdisplay-info.so.2 => not found\n\tlibudev.so.1 => /lib64/libudev.so.1 (0x0000ffff212d0000)\n\tlibSPIRV-Tools.so => /lib64/libSPIRV-Tools.so (0x0000ffff21130000)\n\tlibexpat.so.1 => /lib64/libexpat.so.1 (0x0000ffff210e0000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x0000ffff20e60000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x0000ffff20da0000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x0000ffff20d60000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x0000ffff20b90000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff222d0000)\n\tlibXau.so.6 => /lib64/libXau.so.6 (0x0000ffff20b60000)\n\tlibffi.so.8 => /lib64/libffi.so.8 (0x0000ffff20b20000)\n\tlibcap.so.2 => /lib64/libcap.so.2 (0x0000ffff20af0000)\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "cc",
+        "--version"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 0,
+      "elapsed_seconds": 0.0013088380001136102,
+      "stdout": "cc (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "cc",
+        "-std=c11",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-O2",
+        "-I/save/workspace/AGX_Probe/mesa/include",
+        "/save/workspace/apple-documentation-playground/tests/vulkan_caps.c",
+        "-ldl",
+        "-o",
+        "/scratch/apple-m2-playground/vulkan-runtime/runs/final-missing/vulkan_caps"
+      ],
+      "timeout_seconds": 30,
+      "returncode": 0,
+      "elapsed_seconds": 0.09207449099994847,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/scratch/apple-m2-playground/vulkan-runtime/runs/final-missing/vulkan_caps"
+      ],
+      "timeout_seconds": 15,
+      "returncode": 3,
+      "elapsed_seconds": 0.0012022119999528513,
+      "stdout": "{\"vkCreateInstance\":-9}\n",
+      "stderr": "[Vulkan Loader] WARNING | LAYER: Implicit layer \"VK_LAYER_MESA_device_select\" forced disabled because name matches filter of env var 'VK_LOADER_LAYERS_DISABLE'.\n[Vulkan Loader] WARNING | LAYER: Layer \"VK_LAYER_MESA_device_select\" forced disabled because name matches filter of env var 'VK_LOADER_LAYERS_DISABLE'.\n[Vulkan Loader] DRIVER:         Searching for driver manifest files\n[Vulkan Loader] DRIVER:            In following locations:\n[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/asahi_icd.aarch64.json\n[Vulkan Loader] DRIVER:            Found the following files:\n[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/asahi_icd.aarch64.json\n[Vulkan Loader] DRIVER:         Found ICD manifest file /usr/share/vulkan/icd.d/asahi_icd.aarch64.json, version 1.0.1\n[Vulkan Loader] DEBUG | DRIVER: Searching for ICD drivers named /usr/lib64/libvulkan_asahi.so\n[Vulkan Loader] ERROR:          libdisplay-info.so.2: cannot open shared object file: No such file or directory\n[Vulkan Loader] ERROR | DRIVER: loader_icd_scan: Failed loading library associated with ICD JSON /usr/lib64/libvulkan_asahi.so. Ignoring this JSON\n[Vulkan Loader] ERROR | DRIVER: vkCreateInstance: Found no drivers!\n"
+    }
+  ],
+  "packages": "mesa-vulkan-drivers-25.1.9-1.fc42.aarch64\nvulkan-loader-1.4.313.0-1.fc42.aarch64\nglibc-2.41-18.fc42.aarch64\nlibdrm-2.4.133-1.fc42.aarch64\n",
+  "rpm_verification": "S.5....T.    /usr/lib64/libvulkan_asahi.so\nS.5....T.    /usr/share/vulkan/icd.d/asahi_icd.aarch64.json\n",
+  "icd_elf_notes": "\nDisplaying notes found in: .note.gnu.property\n  Owner                Data size \tDescription\n  GNU                  0x00000010\tNT_GNU_PROPERTY_TYPE_0\n      Properties: AArch64 feature: BTI, PAC, GCS\n\nDisplaying notes found in: .note.gnu.build-id\n  Owner                Data size \tDescription\n  GNU                  0x00000014\tNT_GNU_BUILD_ID (unique build ID bitstring)\n    Build ID: 4145f84ae7bdcc482d00efc7cb7e84ea2663e631\n\nDisplaying notes found in: .note.package\n  Owner                Data size \tDescription\n  FDO                  0x0000007c\tFDO_PACKAGING_METADATA\n    Packaging Metadata: {\"type\":\"rpm\",\"name\":\"mesa\",\"version\":\"25.3.6-0.3.fc42\",\"architecture\":\"aarch64\",\"osCpe\":\"cpe:/o:fedoraproject:fedora:42\"}\n\nDisplaying notes found in: .gnu.build.attributes\n  Owner                Data size \tDescription\n  GA$<version>3a1      0x00000010\tOPEN\n    Applies to region from 0x9700 to 0x35f39c\n  GA$<version>3a1      0x00000010\tOPEN\n    Applies to region from 0x35f2d0 to 0x35f3dc\n",
+  "mesa_header_source_revision": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+  "system_dependency_control": "\tlinux-vdso.so.1 (0x0000ffff222cc000)\n\tlibdrm.so.2 => /lib64/libdrm.so.2 (0x0000ffff21640000)\n\tlibz.so.1 => /lib64/libz.so.1 (0x0000ffff21600000)\n\tlibzstd.so.1 => /lib64/libzstd.so.1 (0x0000ffff21540000)\n\tlibxcb.so.1 => /lib64/libxcb.so.1 (0x0000ffff214f0000)\n\tlibX11-xcb.so.1 => /lib64/libX11-xcb.so.1 (0x0000ffff214c0000)\n\tlibxcb-dri3.so.0 => /lib64/libxcb-dri3.so.0 (0x0000ffff21490000)\n\tlibxcb-present.so.0 => /lib64/libxcb-present.so.0 (0x0000ffff21460000)\n\tlibxcb-xfixes.so.0 => /lib64/libxcb-xfixes.so.0 (0x0000ffff21430000)\n\tlibxcb-sync.so.1 => /lib64/libxcb-sync.so.1 (0x0000ffff21400000)\n\tlibxcb-randr.so.0 => /lib64/libxcb-randr.so.0 (0x0000ffff213c0000)\n\tlibxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x0000ffff21390000)\n\tlibxshmfence.so.1 => /lib64/libxshmfence.so.1 (0x0000ffff21360000)\n\tlibwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x0000ffff21330000)\n\tlibdisplay-info.so.2 => not found\n\tlibudev.so.1 => /lib64/libudev.so.1 (0x0000ffff212d0000)\n\tlibSPIRV-Tools.so => /lib64/libSPIRV-Tools.so (0x0000ffff21130000)\n\tlibexpat.so.1 => /lib64/libexpat.so.1 (0x0000ffff210e0000)\n\tlibstdc++.so.6 => /lib64/libstdc++.so.6 (0x0000ffff20e60000)\n\tlibm.so.6 => /lib64/libm.so.6 (0x0000ffff20da0000)\n\tlibgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x0000ffff20d60000)\n\tlibc.so.6 => /lib64/libc.so.6 (0x0000ffff20b90000)\n\t/lib/ld-linux-aarch64.so.1 (0x0000ffff222d0000)\n\tlibXau.so.6 => /lib64/libXau.so.6 (0x0000ffff20b60000)\n\tlibffi.so.8 => /lib64/libffi.so.8 (0x0000ffff20b20000)\n\tlibcap.so.2 => /lib64/libcap.so.2 (0x0000ffff20af0000)\n",
+  "child_environment_overrides": {
+    "VK_DRIVER_FILES": "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json",
+    "VK_ICD_FILENAMES": "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json",
+    "VK_LOADER_LAYERS_DISABLE": "~implicit~",
+    "VK_LOADER_DEBUG": "error,warn,driver"
+  },
+  "icd_manifest": {
+    "ICD": {
+      "api_version": "1.4.328",
+      "library_arch": "64",
+      "library_path": "/usr/lib64/libvulkan_asahi.so"
+    },
+    "file_format_version": "1.0.1"
+  },
+  "sha256": {
+    "/save/workspace/apple-documentation-playground/tests/vulkan_caps.c": "47967ddd24bacbb688b96097d025995ffc71a71b9b5bd9e139a4294d2278c4b9",
+    "/save/workspace/apple-documentation-playground/scripts/run_vulkan_caps.py": "cd697e5329cacbbeb69257fbaacef889ae064545ccb0a30f47698b1e7772484a",
+    "/usr/share/vulkan/icd.d/asahi_icd.aarch64.json": "0f1c1d709b03dc399db52ad8d3ac07e4361e0b247b86d5fd636f4e06d0abbf19",
+    "/usr/lib64/libvulkan_asahi.so": "26abaa59964177c0acf1860ba19cfd4b97c25435a8c4d81f9052973bc6bf1c65",
+    "/usr/lib64/libvulkan.so.1": "779a58a2dd93644b81e7975d80e0a30e3a7beafc472f0937fde93a8840a90407",
+    "/etc/pki/rpm-gpg/RPM-GPG-KEY-fedora-42-primary": "3d89e80b959de7741cd01526e1c8fa31a2471658c0570340f7a3c295ef9af239",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vk_android_native_buffer.h": "cf47964326ac4f0685cceadbbc97aff185138255b07facdf7e26bc0ce3147224",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vk_icd.h": "ba22828f76de7231e7dfbb5d8564e7a58dd9f5dbeac8c1f0ff6c056c92db744a",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vk_layer.h": "a9fb1343e7e1fa3456189bf146f2186b8df46c1b1a01f88f8b9ae4cd25b1623c",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vk_platform.h": "a2cd9085c66776845d2524c3b0e73ccf4827ba046aa6f676c4b8ddbed47d6552",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan.h": "096f50152d0b298d8df84a561a37d8190c8a60af34dff0e2cc8328b24491a640",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_android.h": "9dcce545a790b5b1ce00e103ade95c8efa4c8a0bf2ff39865d76a7d2f987aef2",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_beta.h": "bb43577a445c357c3f0c03572b3dd3ebd9fca39914c0092f7d77e942af05d3fc",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_core.h": "2f64fd6c7c3f342b0e44f039f1c359b7f0e6cfcb71a7dca1cc5156282faa3b51",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_directfb.h": "efecf5a15380f61c16ef257ed55a998f2cc651789bec22056ccc81d2518daefc",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_fuchsia.h": "17aedccaae68825bfa2954faec1bc9e953b106f1161e1b2ab26ab4cdccf21a06",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_ggp.h": "b68cbbf19b9397ee63dd6ba94526059bd2ff000c66083243758e3a04e215bd2c",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_ios.h": "ebaeffc3f4ec0484dcf34753678f1642caf73f6db4e17f11f1b82302151b918c",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_macos.h": "3ae5522081741e9021be86727e11949ad8c695e66f75e1c422e577afd7657f59",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_metal.h": "d5fe0caf881cc9c72ea2ba31ca86c684e97cdec6741d6e6298ecbd8f58dc8c5e",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_ohos.h": "3cc40f845b5fd75cda0d8a3b1f2782522a3591657f67c656a211b4639eb23b16",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_screen.h": "b9e7e7921b4be199c8ecfe518bd71bd8e533adbbab193714c542157b87b10e86",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_ubm.h": "ac106317c017d1975f26184d3979dba0352f10aa1cfc7ef5373be92fef6bd137",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_vi.h": "a53e35bb1b3113e6ef4932cb9358a27861a198d7865227ecd93555fecc73dd68",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_wayland.h": "6c4146149d45bcbb5a22c7540feaa396ee9a49f077737c7a343c62de5199fbc7",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_win32.h": "72f0b6de71287d3b04d12235e4f2fef8f343126f85be4963c516d31d5bb4c099",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_xcb.h": "3d49f5eb52090e72e1cf7cde545088225ac524a2ff1d1f35737e7d944474c1b7",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_xlib.h": "3c44e97d3f380eb912e01a79e9667457fdf5e18164f0b09b3c61431f421bc551",
+    "/save/workspace/AGX_Probe/mesa/include/vulkan/vulkan_xlib_xrandr.h": "188233d112d812cca1777cfa6c1585073f1f2b033fa08b2f11c8d0757fcc232e",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_av1std.h": "c75c1d324b97d247aef0008024bc7f3adb98c741ab7f66c882ec38fdacc7ee33",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_av1std_decode.h": "7e3a1ce177c12546d410f3179ce1b81f2da7a8eba4f525b29cd563ab4099c0e5",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_av1std_encode.h": "8d166b4543260a38347860443b1a59c7a5e86cdb0d0facaf4c704f667de030e3",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h264std.h": "fded484cef9f90fbbd089e0647268f36e5f4292179fbc5428a2c9e8d7709bbe9",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h264std_decode.h": "37b970c3d80536ad1ac074cfe19b58ee03c3075378e02179e1dc5e4351266821",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h264std_encode.h": "227e092b53c4e7ca1a948ed021704511c1ed16040cd6188ff6703e5ae66db64d",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h265std.h": "0b81f8986ada015ef2e127449eff9d9634899bb59a0a9277a4054e9ec4416c12",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h265std_decode.h": "879a0dd370a1b1ad184638906c52bdfe7d80d639fbc5a5baa8b02d7c5b60b147",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_h265std_encode.h": "abb3e72af22e4e0a3dbe5dff7be1b275949388809fb3987830341e8f495ea1c7",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_vp9std.h": "0a47125865376a3fe7014b69ff6db9d04e30ebf8c4d15664f1d894649ad5c09d",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codec_vp9std_decode.h": "1ceb1a8d0e3370e508cf688a6e57dc314cd82186b60f3cef420ea4b1b483865d",
+    "/save/workspace/AGX_Probe/mesa/include/vk_video/vulkan_video_codecs_common.h": "d2e7caa396c521d03d491a269572b1d31b925b5127d22fda14199951ebae89f8"
+  },
+  "compiler": "cc (GCC) 15.2.1 20260123 (Red Hat 15.2.1-7)\nCopyright (C) 2025 Free Software Foundation, Inc.\nThis is free software; see the source for copying conditions.  There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n",
+  "binary_sha256": "c08151fb8084a197ba27322f6f60a2480a1033d31eecc9e970af39aea8e4ac67",
+  "capabilities": {
+    "vkCreateInstance": -9
+  },
+  "expected_render_node": {
+    "path": "/dev/dri/renderD128",
+    "major": 226,
+    "minor": 128
+  }
+}

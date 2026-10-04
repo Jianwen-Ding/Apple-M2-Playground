@@ -76,3 +76,20 @@ Builds have a 30-second limit; API children have a 15-second timeout with proces
 group termination. Fence waits have a five-second deadline. Both modes stop
 on unexpected failure; they claim compute/readback, not raw ISA or GPU timing.
 See [P2 report](../experiments/baseline/compute-readback.md).
+
+`make instruction-candidates` is offline only. It exports six ALU immediate edits,
+changed bits and uint32 mathematical fixtures to
+`SCRATCH_ROOT/agx-instruction-candidates.json`. `APPLEGPU_ROOT` and `MESA_ROOT`
+select reference checkouts, independently of SDK headers/`PROBE_INCLUDE`.
+The script also accepts those roots explicitly and supports distinct r0..r31
+registers. It checks assembler/decoder agreement with a restricted source-bitfield
+transcription; it does not patch, import or execute a shader.
+[Candidate evidence](../results/2026-10-04-agx-instruction-candidates/README.md)
+records the tested scope.
+
+Completed standalone `run_vulkan_caps.py` and `run_gles_time.py` retain their
+[capability](../experiments/baseline/vulkan-runtime.md) and
+[failed calibration](../experiments/timing/gles-timer-calibration.md) evidence.
+Their syntax/evidence was reviewed here; no capability or timer GPU rerun occurred.
+Execution/patching runners still owned by the instruction agent are outside this
+integration.

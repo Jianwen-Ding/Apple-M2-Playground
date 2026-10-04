@@ -1,0 +1,28 @@
+{
+  "bounds": {
+    "availability_seconds": 2,
+    "child_seconds": 12,
+    "fence_seconds": 2,
+    "max_lanes": 64,
+    "max_recurrence_iterations": 256,
+    "suite_seconds": 60
+  },
+  "clock_temperature": "Not measured; host CLOCK_MONOTONIC and API ns only.",
+  "concurrency": "Other agents may be active; no isolated performance claims.",
+  "device": "/dev/dri/renderD128",
+  "overrides": {
+    "LIBGL_ALWAYS_SOFTWARE": "false",
+    "MESA_SHADER_CACHE_DISABLE": "true"
+  },
+  "removed_environment_keys": [],
+  "repo": "/save/workspace/apple-documentation-playground",
+  "uname": [
+    "Linux",
+    "d9724b51364b",
+    "6.19.14-400.asahi.fc42.aarch64+16k",
+    "#1 SMP PREEMPT_DYNAMIC Thu May  7 22:15:21 UTC 2026",
+    "aarch64",
+    ""
+  ],
+  "utc": "2026-10-04T20:28:21.910399+00:00"
+}

@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "-c",
+    "import time; print(\"before-timeout\", flush=True); time.sleep(5)"
+  ],
+  "cwd": "/scratch/apple-m2-playground/gles-timing/runner-verification",
+  "elapsed_seconds": 0.050921924000022045,
+  "returncode": -9,
+  "timed_out": true,
+  "timeout_seconds": 0.05
+}

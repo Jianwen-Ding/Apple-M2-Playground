@@ -1,0 +1,217 @@
+{
+  "pass": true,
+  "manifests": {
+    "results/2026-10-04-gles-timing/selected-manifest.json": {
+      "checked": 399,
+      "omitted": []
+    },
+    "results/2026-10-04-gles-timing/final-run/manifest.json": {
+      "checked": 373,
+      "omitted": []
+    },
+    "results/2026-10-04-gles-timing/negative-node/manifest.json": {
+      "checked": 19,
+      "omitted": []
+    },
+    "results/2026-10-04-vulkan-capabilities/manifest.json": {
+      "checked": 23,
+      "omitted": []
+    }
+  },
+  "cases": [
+    {
+      "case": "00-initial-control",
+      "mode": "control",
+      "repeats": 0,
+      "api_delta_ns": 0,
+      "host_to_result_ns": "16875.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "01-empty-elapsed",
+      "mode": "empty",
+      "repeats": 0,
+      "api_delta_ns": 1,
+      "host_to_result_ns": "60583.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "02-empty-pair",
+      "mode": "empty-pair",
+      "repeats": 0,
+      "api_delta_ns": 15375,
+      "host_to_result_ns": "48584.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "03-warmup-elapsed",
+      "mode": "elapsed",
+      "repeats": 0,
+      "api_delta_ns": 18446742086696203491,
+      "host_to_result_ns": "1692339.000000000",
+      "exceeds_bracket_plus_1ms": true
+    },
+    {
+      "case": "04-warmup-pair",
+      "mode": "pair",
+      "repeats": 0,
+      "api_delta_ns": 604709,
+      "host_to_result_ns": "1089837.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "05-elapsed-r0-s0",
+      "mode": "elapsed",
+      "repeats": 0,
+      "api_delta_ns": 18446742086639928075,
+      "host_to_result_ns": "1557672.000000000",
+      "exceeds_bracket_plus_1ms": true
+    },
+    {
+      "case": "06-pair-r0-s0",
+      "mode": "pair",
+      "repeats": 0,
+      "api_delta_ns": 753167,
+      "host_to_result_ns": "1192796.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "07-elapsed-r0-s1",
+      "mode": "elapsed",
+      "repeats": 0,
+      "api_delta_ns": 18446742086577248325,
+      "host_to_result_ns": "1643464.000000000",
+      "exceeds_bracket_plus_1ms": true
+    },
+    {
+      "case": "08-pair-r0-s1",
+      "mode": "pair",
+      "repeats": 0,
+      "api_delta_ns": 768125,
+      "host_to_result_ns": "889420.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "09-elapsed-r0-s2",
+      "mode": "elapsed",
+      "repeats": 0,
+      "api_delta_ns": 18446742086515525450,
+      "host_to_result_ns": "1288129.000000000",
+      "exceeds_bracket_plus_1ms": true
+    },
+    {
+      "case": "10-pair-r0-s2",
+      "mode": "pair",
+      "repeats": 0,
+      "api_delta_ns": 797333,
+      "host_to_result_ns": "1341880.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "11-elapsed-r64-s0",
+      "mode": "elapsed",
+      "repeats": 64,
+      "api_delta_ns": 18446742086453025408,
+      "host_to_result_ns": "1675589.000000000",
+      "exceeds_bracket_plus_1ms": true
+    },
+    {
+      "case": "12-pair-r64-s0",
+      "mode": "pair",
+      "repeats": 64,
+      "api_delta_ns": 774125,
+      "host_to_result_ns": "1244213.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "13-elapsed-r64-s1",
+      "mode": "elapsed",
+      "repeats": 64,
+      "api_delta_ns": 18446742086390804741,
+      "host_to_result_ns": "1604338.000000000",
+      "exceeds_bracket_plus_1ms": true
+    },
+    {
+      "case": "14-pair-r64-s1",
+      "mode": "pair",
+      "repeats": 64,
+      "api_delta_ns": 1063916,
+      "host_to_result_ns": "1567131.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "15-elapsed-r64-s2",
+      "mode": "elapsed",
+      "repeats": 64,
+      "api_delta_ns": 18446742086325076116,
+      "host_to_result_ns": "1256171.000000000",
+      "exceeds_bracket_plus_1ms": true
+    },
+    {
+      "case": "16-pair-r64-s2",
+      "mode": "pair",
+      "repeats": 64,
+      "api_delta_ns": 784167,
+      "host_to_result_ns": "1272963.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "17-elapsed-r256-s0",
+      "mode": "elapsed",
+      "repeats": 256,
+      "api_delta_ns": 18446742086279051658,
+      "host_to_result_ns": "1269255.000000000",
+      "exceeds_bracket_plus_1ms": true
+    },
+    {
+      "case": "18-pair-r256-s0",
+      "mode": "pair",
+      "repeats": 256,
+      "api_delta_ns": 780959,
+      "host_to_result_ns": "1289671.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "19-elapsed-r256-s1",
+      "mode": "elapsed",
+      "repeats": 256,
+      "api_delta_ns": 18446742086233808575,
+      "host_to_result_ns": "1298255.000000000",
+      "exceeds_bracket_plus_1ms": true
+    },
+    {
+      "case": "20-pair-r256-s1",
+      "mode": "pair",
+      "repeats": 256,
+      "api_delta_ns": 786167,
+      "host_to_result_ns": "1280005.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "21-elapsed-r256-s2",
+      "mode": "elapsed",
+      "repeats": 256,
+      "api_delta_ns": 18446742086183143741,
+      "host_to_result_ns": "1295963.000000000",
+      "exceeds_bracket_plus_1ms": true
+    },
+    {
+      "case": "22-pair-r256-s2",
+      "mode": "pair",
+      "repeats": 256,
+      "api_delta_ns": 740292,
+      "host_to_result_ns": "1248338.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "final-control",
+      "mode": "control",
+      "repeats": 0,
+      "api_delta_ns": 0,
+      "host_to_result_ns": "14958.000000000",
+      "exceeds_bracket_plus_1ms": false
+    }
+  ],
+  "loaded_elapsed_invalid": 10,
+  "vulkan_repeat_capabilities_and_hashes_equal": true
+}

@@ -148,3 +148,48 @@ is restricted to completed P2/backend/counter files and shared integration work;
 ongoing Vulkan/timer work is excluded. Code/doc whitespace checks pass; original
 raw logs may retain trailing blank lines to preserve evidence. Commit and remote
 verification are reported in the handoff.
+
+## Instruction-priority integration
+
+Reviewed six offline mov/add/mul-low/mad-low candidates. Exact baseline/modified
+bytes, XOR and changed bits agree with the report; all 36 uint32 fixtures were
+independently recomputed. r31/r30 and configured relative roots passed. Added
+`make instruction-candidates`; roots are configurable, module origins checked,
+and output is clearly offline. Candidate JSON/source provenance is
+[versioned](../results/2026-10-04-agx-instruction-candidates/README.md).
+This is assembler/source-bitfield consistency, not emulator or G14 execution.
+
+Integrated the completed [Vulkan capability corrections](../results/2026-10-04-vulkan-capabilities/review.md)
+and [GLES calibration corrections](../results/2026-10-04-gles-timing/review.md),
+including the scoped [invalid elapsed finding](../novel-results/2026-10-04-gles-elapsed/README.md).
+Retained selected hashes, final Vulkan repeats/current-source snapshots, and
+original/revised GLES buffer oracles were checked read-only. Ten original loaded
+elapsed results and the revised one-dispatch confirmation remain incompatible
+with their host brackets; timer calibration remains FAIL. No capability queries,
+GPU timer runs, compute dispatches or instruction patches were executed in this
+integration. One `make check` passed for its source snapshot; concurrent
+execution files were syntax-checked only and were not edited or staged.
+
+Next priority is an unchanged opaque shader binary roundtrip followed by one
+controlled native arithmetic edit with guarded exact host readback. Agent6151's
+Vulkan compute, binary patcher and execution report/result files remain separately
+owned and in progress, outside this commit.
+
+Concrete patcher review concerns for the coordinator:
+
+- The loaded Vulkan ICD reports Mesa **25.3.6** while reference packing source
+  is **26.3-devel** and applegpu describes G13. Retain exact ICD hash, shader
+  binary UUID/version and exported bytes; source structure similarity alone
+  cannot justify opaque payload offsets or integrity fields.
+- Require a demonstrated unchanged export/import/readback control before edits.
+  Parse and validate container/code bounds and integrity using the matched format;
+  never globally replace a hex substring or infer code boundaries from a hit.
+- These templates require low physical r32 registers and specific unsigned,
+  uncached, unsaturated/unshifted modifiers. Prove one complete decoded baseline
+  site and live initialized source; destination must feed checked output data,
+  never addresses, bounds, loops, descriptors or masks. Preserve non-immediate
+  fields, metadata, surrounding instructions and instruction length, then re-decode.
+- Test one edit at a time with unchanged controls, full guards/padding/control
+  buffers and independent modulo-2^32 expected output. Preserve imported/exported
+  hashes and a minimal byte diff; stop on import, completion or oracle failure.
+  Successful import or changed output alone does not establish intended semantics.

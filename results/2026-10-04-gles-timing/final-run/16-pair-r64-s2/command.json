@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+    "pair",
+    "64",
+    "64",
+    "/dev/dri/renderD128"
+  ],
+  "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/16-pair-r64-s2",
+  "elapsed_seconds": 0.02086219600005279,
+  "returncode": 0,
+  "timed_out": false,
+  "timeout_seconds": 12
+}

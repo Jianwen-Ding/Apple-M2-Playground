@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/review-3769-4247/gles_time",
+    "control",
+    "0",
+    "64",
+    "/dev/dri/renderD128"
+  ],
+  "cwd": "/scratch/apple-m2-playground/review-3769-4247/gles-revised/initial-control",
+  "elapsed_seconds": 0.0187374029997045,
+  "returncode": 0,
+  "timed_out": false,
+  "timeout_seconds": 12
+}

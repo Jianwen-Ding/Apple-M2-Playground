@@ -1,0 +1,18 @@
+{
+  "scope": "Offline candidate bytes/bits and mathematical fixture review; no GPU, emulator or compiled Mesa encoder",
+  "candidates": 6,
+  "fixtures_per_candidate": 6,
+  "default_bytes_and_changed_bits_verified": true,
+  "host_fixtures_independently_rederived": true,
+  "r31_r30_supported": true,
+  "configured_relative_roots_match": true,
+  "source_sha256": "690b7004459b875124fdca52a9c2021e2d08eb85e92aadb043242c9b1a5a6b18",
+  "completed_evidence_review": {
+    "selected_vulkan_hashes_checked": 30,
+    "selected_gles_hashes_checked": 485,
+    "vulkan_review_capabilities_match_final_repeat": true,
+    "gles_original_and_revised_buffers_verified": true,
+    "original_loaded_elapsed_invalid_count": 10,
+    "capability_queries_or_gpu_reruns": false
+  }
+}

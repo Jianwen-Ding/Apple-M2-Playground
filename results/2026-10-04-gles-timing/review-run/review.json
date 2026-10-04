@@ -1,0 +1,82 @@
+{
+  "pass": true,
+  "calibration_status": "FAIL_INVALID_TIMER",
+  "execution_verified": true,
+  "timers_usable": false,
+  "cases": [
+    {
+      "case": "empty-elapsed",
+      "mode": "empty",
+      "repeats": 0,
+      "api_delta_ns": 1,
+      "host_to_result_ns": "68333.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "final-control",
+      "mode": "control",
+      "repeats": 0,
+      "api_delta_ns": 0,
+      "host_to_result_ns": "29210.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "initial-control",
+      "mode": "control",
+      "repeats": 0,
+      "api_delta_ns": 0,
+      "host_to_result_ns": "17833.000000000",
+      "exceeds_bracket_plus_1ms": false
+    },
+    {
+      "case": "loaded-elapsed",
+      "mode": "elapsed",
+      "repeats": 256,
+      "api_delta_ns": 18446737753804343408,
+      "host_to_result_ns": "1362717.000000000",
+      "exceeds_bracket_plus_1ms": true
+    }
+  ],
+  "source_sha256": {
+    "gles_time.c": "995252bfa3dbd4fbf5c6bb9f4c5fc9d9e65e5200418a5773f996387625fdda1c",
+    "run_gles_time.py": "2687ff1883a50d4875f0e6095b4fddee35e688e8616f4dfdf25b230fc43afdc7"
+  },
+  "binary_sha256": "316ad05046d484291a3f5ff0932165bbdbff7596babaad9f6f49b732ae94c0ff",
+  "runtime-hashes": {
+    "/usr/lib64/libEGL.so.1": {
+      "resolved": "/usr/lib64/libEGL.so.1.1.0",
+      "sha256": "f1b51e049addf6c460471a486a5eefb206d09bc85b74267800789807d454d963"
+    },
+    "/usr/lib64/libEGL_mesa.so.0": {
+      "resolved": "/usr/lib64/libEGL_mesa.so.0.0.0",
+      "sha256": "66ed39775b54ee16f87fb81c19d4b06fc4e9d26932111cc9df021c029e049cac"
+    },
+    "/usr/lib64/libgallium-25.1.9.so": {
+      "resolved": "/usr/lib64/libgallium-25.1.9.so",
+      "sha256": "5f50c815d06e3111c5a9f7d9d92320d617b1e4e60002f524bfa6338ad9416944"
+    }
+  },
+  "uname": [
+    "Linux",
+    "d9724b51364b",
+    "6.19.14-400.asahi.fc42.aarch64+16k",
+    "#1 SMP PREEMPT_DYNAMIC Thu May  7 22:15:21 UTC 2026",
+    "aarch64",
+    ""
+  ],
+  "concurrency": "Other agents active; no isolated performance claims",
+  "build_argv": [
+    "cc",
+    "-pipe",
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-O2",
+    "-I/save/workspace/AGX_Probe/mesa/include",
+    "tests/gles_time.c",
+    "-ldl",
+    "-o",
+    "/scratch/apple-m2-playground/review-3769-4247/gles_time"
+  ]
+}

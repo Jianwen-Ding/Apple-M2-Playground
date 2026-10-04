@@ -1,0 +1,12 @@
+[Vulkan Loader] WARNING | LAYER: Implicit layer "VK_LAYER_MESA_device_select" forced disabled because name matches filter of env var 'VK_LOADER_LAYERS_DISABLE'.
+[Vulkan Loader] WARNING | LAYER: Layer "VK_LAYER_MESA_device_select" forced disabled because name matches filter of env var 'VK_LOADER_LAYERS_DISABLE'.
+[Vulkan Loader] DRIVER:         Searching for driver manifest files
+[Vulkan Loader] DRIVER:            In following locations:
+[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/asahi_icd.aarch64.json
+[Vulkan Loader] DRIVER:            Found the following files:
+[Vulkan Loader] DRIVER:               /usr/share/vulkan/icd.d/asahi_icd.aarch64.json
+[Vulkan Loader] DRIVER:         Found ICD manifest file /usr/share/vulkan/icd.d/asahi_icd.aarch64.json, version 1.0.1
+[Vulkan Loader] DEBUG | DRIVER: Searching for ICD drivers named /usr/lib64/libvulkan_asahi.so
+[Vulkan Loader] ERROR:          libdisplay-info.so.2: cannot open shared object file: No such file or directory
+[Vulkan Loader] ERROR | DRIVER: loader_icd_scan: Failed loading library associated with ICD JSON /usr/lib64/libvulkan_asahi.so. Ignoring this JSON
+[Vulkan Loader] ERROR | DRIVER: vkCreateInstance: Found no drivers!

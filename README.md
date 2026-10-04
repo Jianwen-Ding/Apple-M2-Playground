@@ -40,6 +40,7 @@ make smoke   # Build and run the DRM driver-access test
 make params  # Three read-only Asahi identity/topology queries
 make time    # 264 bounded driver timestamp queries; no shader execution
 make compute # Two GLES dispatches, guards/control readback and negative checks
+make instruction-candidates # Export offline ALU byte changes and uint32 oracles
 ```
 
 Run records and binaries go to scratch. Baseline/DRM runs use
@@ -56,6 +57,9 @@ are documented in [scripts/README.md](scripts/README.md).
 - [Offline environment](environments/offline/README.md)
 - [DRM probe tests](tests/README.md)
 - [Device parameters and evidence](experiments/baseline/device-params.md)
+- [Offline AGX integer candidates](experiments/arithmetic/agx-instruction-candidates.md)
+- [Vulkan runtime/capability evidence](experiments/baseline/vulkan-runtime.md)
+- [Failed GLES elapsed calibration](experiments/timing/gles-timer-calibration.md)
 - [Compute/readback and evidence](experiments/baseline/compute-readback.md)
 - [Linux backend reconnaissance](experiments/baseline/linux-compute-backend.md)
 - [Shader-counter evidence gap](experiments/timing/shader-counter-candidates.md)
@@ -69,3 +73,10 @@ an observed hardware result, and a confirmed finding. A successful DRM version
 query proves device access; it does not prove shader execution.
 
 The initial `test.txt` is the repository push smoke-test artifact.
+
+Current priority is **actual AGX instruction execution**: validate an unchanged
+shader-object binary roundtrip, identify a decoded live arithmetic instruction,
+then compare one immediate-only variation with exact guarded host readback.
+[Six offline candidates](results/2026-10-04-agx-instruction-candidates/README.md)
+supply bytes and mathematical oracles; their G14 validity remains untested.
+The separately owned instruction patcher/roundtrip work is still in progress.

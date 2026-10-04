@@ -2,9 +2,11 @@ PYTHON ?= python3
 SCRATCH_ROOT ?= /scratch/apple-m2-playground
 DEVICE ?= /dev/dri/renderD128
 PROBE_INCLUDE ?= /save/workspace/AGX_Probe/mesa/include
+APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
+MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute
+.PHONY: help env check smoke params time compute instruction-candidates
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -13,6 +15,8 @@ help:
 	@echo 'make params Query Asahi identity/topology (3 repeats)'
 	@echo 'make time   Query driver timestamps (264 samples; no shader)'
 	@echo 'make compute Build and verify a bounded GLES compute smoke test'
+	@echo 'make instruction-candidates Export offline AGX ALU bytes/oracles; no GPU access'
+	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
 	@echo 'Override SCRATCH_ROOT, DEVICE, PYTHON, CC, or PROBE_INCLUDE as needed.'
 
 env:
@@ -32,3 +36,6 @@ time:
 
 compute:
 	$(PYTHON) -B scripts/run.py compute --smoke --scratch-root "$(SCRATCH_ROOT)" --device "$(DEVICE)"
+
+instruction-candidates:
+	$(PYTHON) -B scripts/agx_instruction_candidates.py --applegpu-root "$(APPLEGPU_ROOT)" --mesa-root "$(MESA_ROOT)" --output "$(SCRATCH_ROOT)/agx-instruction-candidates.json"

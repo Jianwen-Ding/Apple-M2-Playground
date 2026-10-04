@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "rpm",
+    "-q",
+    "mesa-dri-drivers",
+    "mesa-libEGL",
+    "libdrm",
+    "gcc",
+    "glibc"
+  ],
+  "cwd": "/scratch/apple-m2-playground/review-3769-4247/negative-node/20261004T214000.288143Z-6077/inventory",
+  "elapsed_seconds": 0.011593569000069692,
+  "returncode": 0,
+  "timed_out": false,
+  "timeout_seconds": 10
+}

@@ -1,0 +1,56 @@
+{
+  "scope": "Read-only reference sources; Mesa transcription is not the loaded Vulkan encoder; applegpu targets G13",
+  "sources": [
+    {
+      "reference": "applegpu",
+      "git_head": "4c5bae61086b8067231120c98b4756d7696d399c",
+      "path": "applegpu.py",
+      "sha256": "986f6c6ec5547c5f61e357c7c0df614cb05b3382eed705d4ef7a79c4d3a2c46f"
+    },
+    {
+      "reference": "applegpu",
+      "git_head": "4c5bae61086b8067231120c98b4756d7696d399c",
+      "path": "assemble.py",
+      "sha256": "6954f39ea05462ba67b1bba93b101470210268e96b3c6de748909db38d940425"
+    },
+    {
+      "reference": "mesa",
+      "git_head": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "path": "src/asahi/compiler/agx_pack.c",
+      "sha256": "f594448db4ccfe5d4f98f849c3f1e08b662264702f5de40a4c97d34be180cf00",
+      "excerpts": [
+        {
+          "first_line": 290,
+          "last_line": 356,
+          "text": "   unsigned reg = dest.value;\n   enum agx_size size = dest.size;\n   pack_assert(I, reg < 0x100);\n\n   return (dest.cache ? (1 << 0) : 0) | ((size >= AGX_SIZE_32) ? (1 << 1) : 0) |\n          ((size == AGX_SIZE_64) ? (1 << 2) : 0) | ((reg << 2));\n}\n\nstatic unsigned\nagx_pack_alu_src(const agx_instr *I, agx_index src)\n{\n   unsigned value = src.value;\n   enum agx_size size = src.size;\n\n   if (src.type == AGX_INDEX_IMMEDIATE) {\n      /* Flags 0 for an 8-bit immediate */\n      pack_assert(I, value < 0x100);\n\n      return (value & BITFIELD_MASK(6)) | ((value >> 6) << 10);\n   } else if (src.type == AGX_INDEX_UNIFORM) {\n      pack_assert(I, size == AGX_SIZE_16 || size == AGX_SIZE_32);\n      pack_assert(I, value < AGX_NUM_UNIFORMS);\n\n      return (value & BITFIELD_MASK(6)) |\n             ((value & BITFIELD_BIT(8)) ? (1 << 6) : 0) |\n             ((size == AGX_SIZE_32) ? (1 << 7) : 0) | (0x1 << 8) |\n             (((value >> 6) & BITFIELD_MASK(2)) << 10);\n   } else {\n      assert_register_is_aligned(I, src);\n      pack_assert(I, !(src.cache && src.discard));\n\n      unsigned hint = src.discard ? 0x3 : src.cache ? 0x2 : 0x1;\n      unsigned size_flag = (size == AGX_SIZE_64)   ? 0x3\n                           : (size == AGX_SIZE_32) ? 0x2\n                           : (size == AGX_SIZE_16) ? 0x0\n                                                   : 0x0;\n\n      return (value & BITFIELD_MASK(6)) | (hint << 6) | (size_flag << 8) |\n             (((value >> 6) & BITFIELD_MASK(2)) << 10);\n   }\n}\n\nstatic unsigned\nagx_pack_cmpsel_src(const agx_instr *I, agx_index src, enum agx_size dest_size)\n{\n   unsigned value = src.value;\n   ASSERTED enum agx_size size = src.size;\n\n   if (src.type == AGX_INDEX_IMMEDIATE) {\n      /* Flags 0x4 for an 8-bit immediate */\n      pack_assert(I, value < 0x100);\n\n      return (value & BITFIELD_MASK(6)) | (0x4 << 6) | ((value >> 6) << 10);\n   } else if (src.type == AGX_INDEX_UNIFORM) {\n      pack_assert(I, size == AGX_SIZE_16 || size == AGX_SIZE_32);\n      pack_assert(I, size == dest_size);\n      pack_assert(I, value < 0x200);\n\n      return (value & BITFIELD_MASK(6)) | ((value >> 8) << 6) | (0x3 << 7) |\n             (((value >> 6) & BITFIELD_MASK(2)) << 10);\n   } else {\n      pack_assert(I, src.type == AGX_INDEX_REGISTER);\n      pack_assert(I, !(src.cache && src.discard));\n      pack_assert(I, size == AGX_SIZE_16 || size == AGX_SIZE_32);\n      pack_assert(I, size == dest_size);\n      assert_register_is_aligned(I, src);\n\n"
+        },
+        {
+          "first_line": 418,
+          "last_line": 431,
+          "text": "   uint64_t raw = encoding.exact;\n   uint16_t extend = 0;\n\n   // TODO: assert saturable\n   if (I->saturate)\n      raw |= (1 << 6);\n\n   if (info.nr_dests) {\n      pack_assert(I, info.nr_dests == 1);\n      unsigned D = agx_pack_alu_dst(I, I->dest[0]);\n      unsigned extend_offset = (sizeof(extend) * 8) - 4;\n\n      raw |= (D & BITFIELD_MASK(8)) << 7;\n      extend |= ((D >> 8) << extend_offset);\n"
+        },
+        {
+          "first_line": 454,
+          "last_line": 480,
+          "text": "      if (is_f16 && !is_cmpsel)\n         pack_assert(I, (src_short & (1 << 9)) == 0);\n\n      if (info.is_float || (I->op == AGX_OPCODE_FCMPSEL && !is_cmpsel)) {\n         unsigned fmod = agx_pack_float_mod(I->src[s]);\n         unsigned fmod_offset = is_f16 ? 9 : 10;\n         src_short |= (fmod << fmod_offset);\n      } else if (I->op == AGX_OPCODE_IMAD || I->op == AGX_OPCODE_IADD) {\n         /* Force unsigned for immediates so uadd_sat works properly */\n         bool zext = I->src[s].abs || I->src[s].type == AGX_INDEX_IMMEDIATE;\n         bool extends = I->src[s].size < AGX_SIZE_64;\n\n         unsigned sxt = (extends && !zext) ? (1 << 10) : 0;\n\n         unsigned negate_src = (I->op == AGX_OPCODE_IMAD) ? 2 : 1;\n         pack_assert(I, !I->src[s].neg || s == negate_src);\n         src_short |= sxt;\n      }\n\n      /* Sources come at predictable offsets */\n      unsigned offset = 16 + (12 * s);\n      raw |= (((uint64_t)src_short) << offset);\n\n      /* Destination and each source get extended in reverse order */\n      unsigned extend_offset = (sizeof(extend) * 8) - ((s + 3) * 2);\n      extend |= (src_extend << extend_offset);\n   }\n"
+        },
+        {
+          "first_line": 505,
+          "last_line": 508,
+          "text": "      raw |= (uint64_t)(I->imm) << 8;\n   else if (info.immediates & AGX_IMMEDIATE_IMM)\n      raw |= (uint64_t)(I->imm) << 16;\n   else if (info.immediates & AGX_IMMEDIATE_ROUND)\n"
+        },
+        {
+          "first_line": 531,
+          "last_line": 548,
+          "text": "      switch (I->op) {\n      case AGX_OPCODE_IADD:\n      case AGX_OPCODE_ICMP_BALLOT:\n      case AGX_OPCODE_ICMP_QUAD_BALLOT:\n      case AGX_OPCODE_FCMP_BALLOT:\n      case AGX_OPCODE_FCMP_QUAD_BALLOT:\n         extend_offset -= 16;\n         break;\n      default:\n         break;\n      }\n\n      raw |= (uint64_t)extend << extend_offset;\n      memcpy(util_dynarray_grow_bytes(emission, 1, length), &raw, length);\n   } else {\n      /* So far, >8 byte ALU is only to store the extend bits */\n      unsigned extend_offset = (((length - sizeof(extend)) * 8) - 64);\n      unsigned hi = ((uint64_t)extend) << extend_offset;\n"
+        }
+      ]
+    },
+    {
+      "reference": "mesa",
+      "git_head": "e5f0687867f5c5e88619175d9b0442f8560e8d53",
+      "path": "src/asahi/compiler/agx_opcodes.py",
+      "sha256": "23d6d6312784a96e67aa9073deb55415c079b915899367c8b9a4075763f92446"
+    }
+  ]
+}

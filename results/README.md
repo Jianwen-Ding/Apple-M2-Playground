@@ -20,3 +20,10 @@ No novel ISA finding is implied by a successful environment or DRM access test.
   runtime/capability responses and selected source excerpts; no dispatch.
 - [2026-10-04 shader-counter research](2026-10-04-shader-counter-research/README.md):
   source maps, timestamp concerns and synchronous GL state reads; no shader counter.
+
+- [2026-10-04 offline AGX instruction candidates](2026-10-04-agx-instruction-candidates/README.md):
+  exact bytes, changed bits, mathematical fixtures and source provenance; no execution.
+- [2026-10-04 Vulkan capabilities](2026-10-04-vulkan-capabilities/README.md):
+  isolated runtime repair, physical-device and shader-object reports; no binary import.
+- [2026-10-04 GLES calibration](2026-10-04-gles-timing/README.md):
+  checked compute readback with invalid loaded elapsed results; pairs uncalibrated.

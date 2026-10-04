@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "cc",
+    "-pipe",
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-O2",
+    "-MD",
+    "-MF",
+    "/scratch/apple-m2-playground/review-3769-4247/negative-node/20261004T214000.288143Z-6077/build/dependencies.d",
+    "-I/save/workspace/AGX_Probe/mesa/include",
+    "/scratch/apple-m2-playground/review-3769-4247/negative-node/20261004T214000.288143Z-6077/sources/gles_time.c",
+    "-ldl",
+    "-o",
+    "/scratch/apple-m2-playground/review-3769-4247/negative-node/20261004T214000.288143Z-6077/gles_time"
+  ],
+  "cwd": "/scratch/apple-m2-playground/review-3769-4247/negative-node/20261004T214000.288143Z-6077/build",
+  "elapsed_seconds": 0.15373149900005956,
+  "returncode": 0,
+  "timed_out": false,
+  "timeout_seconds": 30
+}

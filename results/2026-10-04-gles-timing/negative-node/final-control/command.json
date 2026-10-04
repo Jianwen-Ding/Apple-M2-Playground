@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "/scratch/apple-m2-playground/gles-timing/20261004T202845.121621Z-5098/gles_time",
+    "control",
+    "0",
+    "64",
+    "/dev/dri/intentionally-wrong-node"
+  ],
+  "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202845.121621Z-5098/final-control",
+  "elapsed_seconds": 0.012487000999954034,
+  "returncode": 1,
+  "timed_out": false,
+  "timeout_seconds": 12
+}

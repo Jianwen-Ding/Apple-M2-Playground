@@ -1,0 +1,1783 @@
+{
+  "binary_sha256": "1a5804057a4e43a68046b4ba5cdb81bc7f76dae32cc85f783062cbcbfff3c306",
+  "build": {
+    "argv": [
+      "cc",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-O2",
+      "-MD",
+      "-MF",
+      "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/build/dependencies.d",
+      "-I/save/workspace/AGX_Probe/mesa/include",
+      "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/sources/gles_time.c",
+      "-ldl",
+      "-o",
+      "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time"
+    ],
+    "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/build",
+    "elapsed_seconds": 0.13757509600009143,
+    "returncode": 0,
+    "timed_out": false,
+    "timeout_seconds": 30
+  },
+  "calibration_failure": "Loaded elapsed results fail the host bracket; timestamp pairs remain uncalibrated.",
+  "cases": [
+    {
+      "assessment": {
+        "host_fence_ns": 15791.999885550467,
+        "host_readback_ns": 70584.00001369591,
+        "issues": []
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "control",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/00-initial-control",
+        "elapsed_seconds": 0.01967773399996986,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "00-initial-control",
+      "mode": "control",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          0,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.493132217,
+          1966.493148009,
+          1966.493149092,
+          1966.493202801
+        ],
+        "mode": "control",
+        "polls": 0,
+        "raw_u64": [
+          0,
+          0
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1986921480000,
+          1986921498291
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 1,
+        "host_fence_ns": 53458.000138562056,
+        "host_readback_ns": 151458.00011850952,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "empty",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/01-empty-elapsed",
+        "elapsed_seconds": 0.03559116299993548,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "01-empty-elapsed",
+      "mode": "empty",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.525730704,
+          1966.525784162,
+          1966.525791287,
+          1966.525882162
+        ],
+        "mode": "empty",
+        "polls": 1,
+        "raw_u64": [
+          1,
+          0
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1986954076916,
+          1986954140166
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 15375,
+        "host_fence_ns": 42417.000031491625,
+        "host_readback_ns": 104708.99997017113,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "empty-pair",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/02-empty-pair",
+        "elapsed_seconds": 0.01872756400007347,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "02-empty-pair",
+      "mode": "empty-pair",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.550236537,
+          1966.550278954,
+          1966.550285121,
+          1966.550341246
+        ],
+        "mode": "empty-pair",
+        "polls": 2,
+        "raw_u64": [
+          1986978600041,
+          1986978615416
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1986978584291,
+          1986978634083
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 18446742086696203491,
+        "host_fence_ns": 1672297.999903094,
+        "host_readback_ns": 1818922.999973438,
+        "issues": [
+          "result exceeds enclosing host bracket by >1 ms"
+        ],
+        "numerically_plausible": false
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "elapsed",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/03-warmup-elapsed",
+        "elapsed_seconds": 0.03750637799998913,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "03-warmup-elapsed",
+      "mode": "elapsed",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.583386859,
+          1966.585059157,
+          1966.585079198,
+          1966.585205782
+        ],
+        "mode": "elapsed",
+        "polls": 1,
+        "raw_u64": [
+          18446742086696203491,
+          0
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1987011731541,
+          1987013427791
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 604709,
+        "host_fence_ns": 1084962.0000499273,
+        "host_readback_ns": 1144004.0000252337,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "pair",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/04-warmup-pair",
+        "elapsed_seconds": 0.019158315999902698,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "04-warmup-pair",
+      "mode": "pair",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.608181652,
+          1966.609266614,
+          1966.609271489,
+          1966.609325656
+        ],
+        "mode": "pair",
+        "polls": 2,
+        "raw_u64": [
+          1987036541541,
+          1987037146250
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1987036529583,
+          1987037620416
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 18446742086639928075,
+        "host_fence_ns": 1538171.9999822963,
+        "host_readback_ns": 1662921.9999231282,
+        "issues": [
+          "result exceeds enclosing host bracket by >1 ms"
+        ],
+        "numerically_plausible": false
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "elapsed",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/05-elapsed-r0-s0",
+        "elapsed_seconds": 0.03490670299993326,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "05-elapsed-r0-s0",
+      "mode": "elapsed",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.639789844,
+          1966.641328016,
+          1966.641347516,
+          1966.641452766
+        ],
+        "mode": "elapsed",
+        "polls": 1,
+        "raw_u64": [
+          18446742086639928075,
+          0
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1987068134041,
+          1987069695958
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 753167,
+        "host_fence_ns": 1186671.0001413594,
+        "host_readback_ns": 1254130.000006626,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "pair",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/06-pair-r0-s0",
+        "elapsed_seconds": 0.020792196999991575,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "06-pair-r0-s0",
+      "mode": "pair",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.666650727,
+          1966.667837398,
+          1966.667843523,
+          1966.667904857
+        ],
+        "mode": "pair",
+        "polls": 2,
+        "raw_u64": [
+          1987095013416,
+          1987095766583
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1987094997583,
+          1987096192125
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 18446742086577248325,
+        "host_fence_ns": 1624630.999913279,
+        "host_readback_ns": 1746589.0000494255,
+        "issues": [
+          "result exceeds enclosing host bracket by >1 ms"
+        ],
+        "numerically_plausible": false
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "elapsed",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/07-elapsed-r0-s1",
+        "elapsed_seconds": 0.038415673000145034,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "07-elapsed-r0-s1",
+      "mode": "elapsed",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.702390683,
+          1966.704015314,
+          1966.704034147,
+          1966.704137272
+        ],
+        "mode": "elapsed",
+        "polls": 1,
+        "raw_u64": [
+          18446742086577248325,
+          0
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1987130736208,
+          1987132382375
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 768125,
+        "host_fence_ns": 882711.9997931732,
+        "host_readback_ns": 948211.9999120187,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "pair",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/08-pair-r0-s1",
+        "elapsed_seconds": 0.02050986200015359,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "08-pair-r0-s1",
+      "mode": "pair",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.729448317,
+          1966.730331029,
+          1966.730337737,
+          1966.730396529
+        ],
+        "mode": "pair",
+        "polls": 2,
+        "raw_u64": [
+          1987157812875,
+          1987158581000
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1987157795208,
+          1987158685625
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 18446742086515525450,
+        "host_fence_ns": 1267546.000008224,
+        "host_readback_ns": 1395587.9999230092,
+        "issues": [
+          "result exceeds enclosing host bracket by >1 ms"
+        ],
+        "numerically_plausible": false
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "elapsed",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/09-elapsed-r0-s2",
+        "elapsed_seconds": 0.0379952130001584,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "09-elapsed-r0-s2",
+      "mode": "elapsed",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.764481146,
+          1966.765748692,
+          1966.765769275,
+          1966.765876734
+        ],
+        "mode": "elapsed",
+        "polls": 1,
+        "raw_u64": [
+          18446742086515525450,
+          0
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1987192826875,
+          1987194117291
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 797333,
+        "host_fence_ns": 1335254.9999581242,
+        "host_readback_ns": 1399880.0000081246,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "pair",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/10-pair-r0-s2",
+        "elapsed_seconds": 0.02149544799999603,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "10-pair-r0-s2",
+      "mode": "pair",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.791309862,
+          1966.792645117,
+          1966.792651742,
+          1966.792709742
+        ],
+        "mode": "pair",
+        "polls": 2,
+        "raw_u64": [
+          1987219673333,
+          1987220470666
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1987219656125,
+          1987220999250
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 18446742086453025408,
+        "host_fence_ns": 1656338.999964646,
+        "host_readback_ns": 1781297.999968956,
+        "issues": [
+          "result exceeds enclosing host bracket by >1 ms"
+        ],
+        "numerically_plausible": false
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "elapsed",
+          "64",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/11-elapsed-r64-s0",
+        "elapsed_seconds": 0.03761875399982273,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "11-elapsed-r64-s0",
+      "mode": "elapsed",
+      "repeats": 64,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.826583483,
+          1966.828239822,
+          1966.828259072,
+          1966.828364781
+        ],
+        "mode": "elapsed",
+        "polls": 1,
+        "raw_u64": [
+          18446742086453025408,
+          0
+        ],
+        "repeats": 64,
+        "state_timestamp_i64": [
+          1987254928125,
+          1987256606916
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 774125,
+        "host_fence_ns": 1238212.9998513847,
+        "host_readback_ns": 1302962.999943702,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "pair",
+          "64",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/12-pair-r64-s0",
+        "elapsed_seconds": 0.020792363000055047,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "12-pair-r64-s0",
+      "mode": "pair",
+      "repeats": 64,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.853347616,
+          1966.854585829,
+          1966.854591829,
+          1966.854650579
+        ],
+        "mode": "pair",
+        "polls": 2,
+        "raw_u64": [
+          1987281709958,
+          1987282484083
+        ],
+        "repeats": 64,
+        "state_timestamp_i64": [
+          1987281694291,
+          1987282939791
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 18446742086390804741,
+        "host_fence_ns": 1585879.999993267,
+        "host_readback_ns": 1708088.9999760985,
+        "issues": [
+          "result exceeds enclosing host bracket by >1 ms"
+        ],
+        "numerically_plausible": false
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "elapsed",
+          "64",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/13-elapsed-r64-s1",
+        "elapsed_seconds": 0.03755492100003721,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "13-elapsed-r64-s1",
+      "mode": "elapsed",
+      "repeats": 64,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.888891405,
+          1966.890477285,
+          1966.890495743,
+          1966.890599494
+        ],
+        "mode": "elapsed",
+        "polls": 1,
+        "raw_u64": [
+          18446742086390804741,
+          0
+        ],
+        "repeats": 64,
+        "state_timestamp_i64": [
+          1987317236791,
+          1987318843333
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 1063916,
+        "host_fence_ns": 1557380.999884117,
+        "host_readback_ns": 1702588.9999331413,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "pair",
+          "64",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/14-pair-r64-s1",
+        "elapsed_seconds": 0.03610254000000168,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "14-pair-r64-s1",
+      "mode": "pair",
+      "repeats": 64,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.928740624,
+          1966.930298005,
+          1966.930307755,
+          1966.930443213
+        ],
+        "mode": "pair",
+        "polls": 2,
+        "raw_u64": [
+          1987357111000,
+          1987358174916
+        ],
+        "repeats": 64,
+        "state_timestamp_i64": [
+          1987357084375,
+          1987358655125
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 18446742086325076116,
+        "host_fence_ns": 1245254.9999579787,
+        "host_readback_ns": 1316921.0001251486,
+        "issues": [
+          "result exceeds enclosing host bracket by >1 ms"
+        ],
+        "numerically_plausible": false
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "elapsed",
+          "64",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/15-elapsed-r64-s2",
+        "elapsed_seconds": 0.020791987999928097,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "15-elapsed-r64-s2",
+      "mode": "elapsed",
+      "repeats": 64,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.954939797,
+          1966.956185052,
+          1966.956195968,
+          1966.956256718
+        ],
+        "mode": "elapsed",
+        "polls": 1,
+        "raw_u64": [
+          18446742086325076116,
+          0
+        ],
+        "repeats": 64,
+        "state_timestamp_i64": [
+          1987383285750,
+          1987384543541
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 784167,
+        "host_fence_ns": 1265671.0000555904,
+        "host_readback_ns": 1330088.0000315374,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "pair",
+          "64",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/16-pair-r64-s2",
+        "elapsed_seconds": 0.02086219600005279,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "16-pair-r64-s2",
+      "mode": "pair",
+      "repeats": 64,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1966.977519458,
+          1966.978785129,
+          1966.978792421,
+          1966.978849546
+        ],
+        "mode": "pair",
+        "polls": 2,
+        "raw_u64": [
+          1987405882958,
+          1987406667125
+        ],
+        "repeats": 64,
+        "state_timestamp_i64": [
+          1987405865416,
+          1987407139875
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 18446742086279051658,
+        "host_fence_ns": 1254255.0000489429,
+        "host_readback_ns": 1324797.0000520581,
+        "issues": [
+          "result exceeds enclosing host bracket by >1 ms"
+        ],
+        "numerically_plausible": false
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "elapsed",
+          "256",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/17-elapsed-r256-s0",
+        "elapsed_seconds": 0.020844237999881443,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "17-elapsed-r256-s0",
+      "mode": "elapsed",
+      "repeats": 256,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1967.000961996,
+          1967.002216251,
+          1967.002231251,
+          1967.002286793
+        ],
+        "mode": "elapsed",
+        "polls": 1,
+        "raw_u64": [
+          18446742086279051658,
+          0
+        ],
+        "repeats": 256,
+        "state_timestamp_i64": [
+          1987429307875,
+          1987430578666
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 780959,
+        "host_fence_ns": 1281796.0000575113,
+        "host_readback_ns": 1343463.0000119796,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "pair",
+          "256",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/18-pair-r256-s0",
+        "elapsed_seconds": 0.02018236000003526,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "18-pair-r256-s0",
+      "mode": "pair",
+      "repeats": 256,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1967.023806616,
+          1967.025088412,
+          1967.025096287,
+          1967.025150079
+        ],
+        "mode": "pair",
+        "polls": 2,
+        "raw_u64": [
+          1987452168541,
+          1987452949500
+        ],
+        "repeats": 256,
+        "state_timestamp_i64": [
+          1987452152458,
+          1987453443500
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 18446742086233808575,
+        "host_fence_ns": 1287504.9999365727,
+        "host_readback_ns": 1354297.0000344212,
+        "issues": [
+          "result exceeds enclosing host bracket by >1 ms"
+        ],
+        "numerically_plausible": false
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "elapsed",
+          "256",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/19-elapsed-r256-s1",
+        "elapsed_seconds": 0.020417902999952275,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "19-elapsed-r256-s1",
+      "mode": "elapsed",
+      "repeats": 256,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1967.046177984,
+          1967.047465489,
+          1967.047476239,
+          1967.047532281
+        ],
+        "mode": "elapsed",
+        "polls": 1,
+        "raw_u64": [
+          18446742086233808575,
+          0
+        ],
+        "repeats": 256,
+        "state_timestamp_i64": [
+          1987474523333,
+          1987475823541
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 786167,
+        "host_fence_ns": 1272629.9999030745,
+        "host_readback_ns": 1362796.9999561175,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "pair",
+          "256",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/20-pair-r256-s1",
+        "elapsed_seconds": 0.021127155999920433,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "20-pair-r256-s1",
+      "mode": "pair",
+      "repeats": 256,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1967.068677811,
+          1967.069950441,
+          1967.069957816,
+          1967.070040608
+        ],
+        "mode": "pair",
+        "polls": 2,
+        "raw_u64": [
+          1987497039458,
+          1987497825625
+        ],
+        "repeats": 256,
+        "state_timestamp_i64": [
+          1987497023166,
+          1987498304291
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 18446742086183143741,
+        "host_fence_ns": 1282838.000179254,
+        "host_readback_ns": 1355296.0001561586,
+        "issues": [
+          "result exceeds enclosing host bracket by >1 ms"
+        ],
+        "numerically_plausible": false
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "elapsed",
+          "256",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/21-elapsed-r256-s2",
+        "elapsed_seconds": 0.02125057300008848,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "21-elapsed-r256-s2",
+      "mode": "elapsed",
+      "repeats": 256,
+      "timing": {
+        "available": [
+          1,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1967.096842991,
+          1967.098125829,
+          1967.098138954,
+          1967.098198287
+        ],
+        "mode": "elapsed",
+        "polls": 1,
+        "raw_u64": [
+          18446742086183143741,
+          0
+        ],
+        "repeats": 256,
+        "state_timestamp_i64": [
+          1987525188500,
+          1987526486041
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "api_delta_ns": 740292,
+        "host_fence_ns": 1242296.0001003956,
+        "host_readback_ns": 1302213.0001445476,
+        "issues": [],
+        "numerically_plausible": true
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "pair",
+          "256",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/22-pair-r256-s2",
+        "elapsed_seconds": 0.02049552800008314,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "22-pair-r256-s2",
+      "mode": "pair",
+      "repeats": 256,
+      "timing": {
+        "available": [
+          1,
+          1
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1967.120798948,
+          1967.122041244,
+          1967.122047286,
+          1967.122101161
+        ],
+        "mode": "pair",
+        "polls": 2,
+        "raw_u64": [
+          1987549160291,
+          1987549900583
+        ],
+        "repeats": 256,
+        "state_timestamp_i64": [
+          1987549144791,
+          1987550394166
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    },
+    {
+      "assessment": {
+        "host_fence_ns": 13832.999911755905,
+        "host_readback_ns": 67707.99996047572,
+        "issues": []
+      },
+      "command": {
+        "argv": [
+          "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+          "control",
+          "0",
+          "64",
+          "/dev/dri/renderD128"
+        ],
+        "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/final-control",
+        "elapsed_seconds": 0.01908714899991537,
+        "returncode": 0,
+        "timed_out": false,
+        "timeout_seconds": 12
+      },
+      "directory": "final-control",
+      "mode": "control",
+      "repeats": 0,
+      "timing": {
+        "available": [
+          0,
+          0
+        ],
+        "disjoint_after": 0,
+        "disjoint_before": 0,
+        "elapsed_bits": 64,
+        "host_monotonic_s": [
+          1967.143398359,
+          1967.143412192,
+          1967.143413317,
+          1967.143466067
+        ],
+        "mode": "control",
+        "polls": 0,
+        "raw_u64": [
+          0,
+          0
+        ],
+        "repeats": 0,
+        "state_timestamp_i64": [
+          1987571743833,
+          1987571760291
+        ],
+        "timestamp_bits": 64
+      },
+      "verification": {
+        "checks": {
+          "control-input.bin": null,
+          "control-output.bin": null,
+          "input.bin": null,
+          "output.bin": null,
+          "seeds-output.bin": null,
+          "seeds.bin": null
+        },
+        "output_words": 64,
+        "pass": true,
+        "prefix_guard_words": 8,
+        "suffix_guard_words": 8,
+        "unchanged_seed_words": 64,
+        "untouched_control_words": 16
+      }
+    }
+  ],
+  "execution_verified": true,
+  "failure": null,
+  "final_control": {
+    "assessment": {
+      "host_fence_ns": 13832.999911755905,
+      "host_readback_ns": 67707.99996047572,
+      "issues": []
+    },
+    "command": {
+      "argv": [
+        "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/gles_time",
+        "control",
+        "0",
+        "64",
+        "/dev/dri/renderD128"
+      ],
+      "cwd": "/scratch/apple-m2-playground/gles-timing/20261004T202821.910289Z-4881/final-control",
+      "elapsed_seconds": 0.01908714899991537,
+      "returncode": 0,
+      "timed_out": false,
+      "timeout_seconds": 12
+    },
+    "directory": "final-control",
+    "mode": "control",
+    "repeats": 0,
+    "timing": {
+      "available": [
+        0,
+        0
+      ],
+      "disjoint_after": 0,
+      "disjoint_before": 0,
+      "elapsed_bits": 64,
+      "host_monotonic_s": [
+        1967.143398359,
+        1967.143412192,
+        1967.143413317,
+        1967.143466067
+      ],
+      "mode": "control",
+      "polls": 0,
+      "raw_u64": [
+        0,
+        0
+      ],
+      "repeats": 0,
+      "state_timestamp_i64": [
+        1987571743833,
+        1987571760291
+      ],
+      "timestamp_bits": 64
+    },
+    "verification": {
+      "checks": {
+        "control-input.bin": null,
+        "control-output.bin": null,
+        "input.bin": null,
+        "output.bin": null,
+        "seeds-output.bin": null,
+        "seeds.bin": null
+      },
+      "output_words": 64,
+      "pass": true,
+      "prefix_guard_words": 8,
+      "suffix_guard_words": 8,
+      "unchanged_seed_words": 64,
+      "untouched_control_words": 16
+    }
+  },
+  "interpretation": "API calibration only; no ISA latency or physical cycles.",
+  "loaded_results_plausible": false,
+  "negative_oracle": {
+    "first_mismatches": [
+      {
+        "actual": 2579684216,
+        "expected": 2579684217,
+        "word": 8
+      }
+    ],
+    "mismatch_count": 1
+  },
+  "timers_usable": false
+}

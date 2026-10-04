@@ -7,9 +7,9 @@
 | P0 | Repeatable environment capture, build, and DRM access check | Implemented; see baseline evidence in `results/` |
 | P1 | Read-only Asahi parameter query and confirmed GPU identity | Complete for driver identity/topology; [G14C, 38 enabled mask bits](../experiments/baseline/device-params.md); product name is source interpretation |
 | P2 | Minimal GPU compute submission with deterministic memory readback | Complete through Mesa GLES: [22 dispatches, 26 whole-buffer readbacks](../experiments/baseline/compute-readback.md); reviewed smoke command `make compute` |
-| P3 | Execute a known AGX instruction sequence and compare against a host oracle | Planned; depends on P2 |
+| P3 | Execute a known AGX instruction sequence and compare against a host oracle | Current priority; [six offline candidates](../experiments/arithmetic/agx-instruction-candidates.md) reviewed; binary roundtrip/execution separately owned and in progress |
 | P4 | Controlled instruction and operand variations with stored evidence | Planned; depends on P3 |
-| P5 | Timing probes with a validated time source and repeatable measurements | Driver GET_TIME baseline complete ([evidence](../experiments/timing/driver-time.md)); shader counter and ISA timing remain unvalidated |
+| P5 | Timing probes with a validated time source and repeatable measurements | Driver GET_TIME baseline complete ([evidence](../experiments/timing/driver-time.md)); [GLES elapsed calibration failed](../experiments/timing/gles-timer-calibration.md); pairs, shader counter and ISA timing remain unvalidated |
 
 ## Probe areas
 
@@ -22,9 +22,9 @@
 | Arithmetic | What are the integer, float, conversion, and exceptional-value semantics? | `experiments/arithmetic/` |
 | Control flow | How do masks, divergence, branches, barriers, and lane operations behave? | `experiments/control-flow/` |
 
-Timing is the explicit request in the supplied `AGX_Probe/REQUESTS.md`. Start
-by inventorying documented driver timestamp support, then develop a hypothesis
-about shader-readable time. A driver time query is not proof of an ISA clock
+The current user priority is actual AGX instruction execution. Timing was an
+earlier request; its completed calibration evidence is retained, without further
+capability queries or timer sweeps in this integration. A driver time query is not proof of an ISA clock
 register, and host ioctl latency is not instruction latency.
 
 ## First follow-up work
@@ -35,9 +35,11 @@ register, and host ioctl latency is not instruction latency.
 2. Preserve the completed [GLES compute/readback control](../experiments/baseline/compute-readback.md)
    and [backend inventory](../experiments/baseline/linux-compute-backend.md).
 3. Obtain emitted native-code provenance and validate an unchanged binary round
-   trip before controlled raw AGX changes; the installed Vulkan path is separately
-   owned and still outside this review.
-4. Establish an unchanged control shader and a host oracle for each experiment.
+   trip before controlled raw AGX changes. [Completed Vulkan queries](../experiments/baseline/vulkan-runtime.md)
+   report shader-object support; they do not prove binary import. The separately
+   owned execution/patcher work remains outside this integration.
+4. Select one decoded live output-data ALU site, apply a single reviewed
+   immediate change, and require guarded exact readback with unchanged controls.
 5. Add bounded instruction variations, then promote reproducible findings to
    `novel-results/` with regression tests.
 

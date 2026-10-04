@@ -1,0 +1,52 @@
+{
+  "python_syntax": "pass (ast.parse)",
+  "c_compile": "pass (-std=c11 -Wall -Wextra -Werror -O2)",
+  "final_capabilities_identical": true,
+  "final_sources_headers_icd_and_runtime_hashes_identical": true,
+  "negative_control_failed_as_expected": true,
+  "global_dependency_still_missing": true,
+  "all_recorded_commands_bounded": true,
+  "runs": {
+    "missing-runtime": {
+      "passed": false,
+      "error": null
+    },
+    "repaired-first": {
+      "passed": true,
+      "error": null
+    },
+    "repaired-repeat": {
+      "passed": true,
+      "error": null
+    },
+    "missing-runtime-repeat": {
+      "passed": false,
+      "error": null
+    },
+    "final-setup": {
+      "passed": true,
+      "error": null
+    },
+    "final-repeat": {
+      "passed": true,
+      "error": null
+    },
+    "final-missing": {
+      "passed": false,
+      "error": null
+    }
+  },
+  "rpm_payload_file_digest_check": {
+    "argv": [
+      "rpm",
+      "-qp",
+      "--dump",
+      "/scratch/apple-m2-playground/vulkan-runtime/downloads/libdisplay-info-0.2.0-3.fc42.aarch64.signed.rpm"
+    ],
+    "returncode": 0,
+    "stdout": "/usr/lib/.build-id 0 1737072000 0000000000000000000000000000000000000000000000000000000000000000 040755 root root 0 0 0 X\n/usr/lib/.build-id/7c 0 1737072000 0000000000000000000000000000000000000000000000000000000000000000 040755 root root 0 0 0 X\n/usr/lib/.build-id/7c/37dd71f8be93922701b682dd77749b020066b4 46 1737072000 0000000000000000000000000000000000000000000000000000000000000000 0120777 root root 0 0 0 ../../../../usr/lib64/libdisplay-info.so.0.2.0\n/usr/lib64/libdisplay-info.so.0.2.0 265856 1737072000 e65991680fa5770c58867a2d5b53108c4ae2f24ec37680b388afd35bf10b305e 0100755 root root 0 0 0 X\n/usr/lib64/libdisplay-info.so.2 24 1737072000 0000000000000000000000000000000000000000000000000000000000000000 0120777 root root 0 0 0 libdisplay-info.so.0.2.0\n/usr/share/doc/libdisplay-info 0 1737072000 0000000000000000000000000000000000000000000000000000000000000000 040755 root root 0 0 0 X\n/usr/share/doc/libdisplay-info/README.md 3178 1718901377 b089d7162260bd78f30fdc62e32b46de87dfacdacbaaf2516b7d440b5730fca1 0100644 root root 0 1 0 X\n/usr/share/licenses/libdisplay-info 0 1737072000 0000000000000000000000000000000000000000000000000000000000000000 040755 root root 0 0 0 X\n/usr/share/licenses/libdisplay-info/LICENSE 1089 1718901377 15b396244e58830c5614b9394f4deccfe684970cd507f299383ab57ad339eedd 0100644 root root 0 0 0 X\n",
+    "stderr": ""
+  },
+  "extracted_library_matches_signed_rpm_file_digest": true,
+  "final_evidence_matches_current_sources_and_libraries": true
+}

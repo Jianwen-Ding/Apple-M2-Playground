@@ -1,0 +1,14 @@
+{
+  "/usr/lib64/libEGL.so.1": {
+    "resolved": "/usr/lib64/libEGL.so.1.1.0",
+    "sha256": "f1b51e049addf6c460471a486a5eefb206d09bc85b74267800789807d454d963"
+  },
+  "/usr/lib64/libEGL_mesa.so.0": {
+    "resolved": "/usr/lib64/libEGL_mesa.so.0.0.0",
+    "sha256": "66ed39775b54ee16f87fb81c19d4b06fc4e9d26932111cc9df021c029e049cac"
+  },
+  "/usr/lib64/libgallium-25.1.9.so": {
+    "resolved": "/usr/lib64/libgallium-25.1.9.so",
+    "sha256": "5f50c815d06e3111c5a9f7d9d92320d617b1e4e60002f524bfa6338ad9416944"
+  }
+}
