@@ -225,3 +225,29 @@ Next: separately test the independently decoded index imadd addend 0→1, preser
 its cached/sign-extended operands and exact modulo-2^32/XOR oracle. That site is
 an offline proposal in the independent report; subsequent concurrent ALU work is
 outside this integration. Broader register/operand coverage remains pending.
+
+## Multiply-add addend integration
+
+The index shader's previously proposed immediate addend 0-to-1 edit now has
+[hardware evidence](../experiments/arithmetic/imadd-addend.md). Kimi K3 through
+acm-dev produced the pinned patcher/runner, offline rejection tests, and a passing
+bounded run. Patched counts 33/257 match the modulo uint32 product-plus-one/XOR
+oracle; unchanged imports before/after match baseline, with guards/padding/tail
+intact. Independent coordinator recomputation matched 800 words across six
+readbacks and exact instruction bit40/blob byte0x957. Stale SHA1 returned
+1000482000 before any submission. No arbitrary instructions or SRs were scanned.
+
+GLM 5.3 through acm-dev supplied a decoder-independent stored verifier; it passed
+227 scratch checks before provider funding failure. Kimi likewise stopped on a
+provider access error after execution. The coordinator packaged original evidence
+as hex, adapted the verifier to committed artifacts, strengthened missing-case/log
+checks and exception paths, and added module-origin validation to the patcher.
+Original run source snapshots remain unchanged. No final agent review report is
+claimed. New offline checks include software-only addend 63/64/255 fixtures, not
+additional hardware observations. Shared Make/README entry points are integrated.
+
+Known coverage gap: no fixed product `0xffffffff` tests addend carry into zero,
+and only this one destination/operand combination was executed. Timing and shader
+counter identification remain open; the failed GLES elapsed calibration remains
+unresolved. Next: a separately pinned fixed-input carry test, then wider register
+and immediate coverage, retaining unchanged controls and whole-buffer oracles.

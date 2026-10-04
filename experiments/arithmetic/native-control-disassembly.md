@@ -1,5 +1,9 @@
 # Native control instruction review — 2026-10-04
 
+Subsequent execution: the formerly proposed index addend edit now has a separate
+[passing hardware report](imadd-addend.md). The original review below remains
+an offline record of the pre-execution hypothesis.
+
 **Independent offline placement review; this review did not execute modified
 instructions.** The separate [move experiment](first-agx-instruction.md) now
 has hardware evidence; the index imadd proposal below remains unexecuted. No GPU work,

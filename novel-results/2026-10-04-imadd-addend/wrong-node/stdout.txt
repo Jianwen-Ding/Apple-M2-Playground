@@ -1,0 +1,6 @@
+{"api":"vkCreateInstance","result":0}
+{"api":"vkEnumeratePhysicalDevices","result":0}
+{"api":"vkEnumeratePhysicalDevices","result":0}
+{"api":"vkEnumerateDeviceExtensionProperties","result":0}
+{"api":"vkEnumerateDeviceExtensionProperties","result":0}
+{"identity":{"name":"Apple M2 Max (G14C B1)","driver":"Honeykrisp","info":"Mesa 25.3.6","render_major":226,"render_minor":128,"uuid":"2313bd7c3909b8ad0f31883eab5c412e","binary_version":0}}

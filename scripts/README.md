@@ -108,3 +108,11 @@ instruction boundary, changes immediate bit 16, and refreshes the actual Mesa
 without GPU access. Hardware reproduction requires `--probe-mov`; import failure,
 completion failure or any whole-buffer mismatch stops the suite. See
 [execution scope](../experiments/arithmetic/first-agx-instruction.md).
+
+`make agx-imadd` runs a separate index-shader suite using `run_agx_imadd.py`
+and `patch_agx_imadd.py`: five dispatches, one no-dispatch readback, unchanged
+before/after controls, patched counts 33/257, stale-digest and wrong-node rejection.
+It pins the index blob and changes only immediate addend bit 40. Paths and bounds
+match the existing Vulkan suite. `make verify-imadd` runs offline rejection tests
+and independent checks on the committed hex evidence; it performs no GPU calls.
+See [multiply-add scope](../experiments/arithmetic/imadd-addend.md).

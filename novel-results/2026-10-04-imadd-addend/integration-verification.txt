@@ -1,0 +1,321 @@
+python3 -B tests/test_agx_imadd.py
+test_accepts_correct_vectors (__main__.OracleTest.test_accepts_correct_vectors) ... ok
+test_control_rejects_dispatched_buffer (__main__.OracleTest.test_control_rejects_dispatched_buffer) ... ok
+test_distinguishes_addend (__main__.OracleTest.test_distinguishes_addend) ... ok
+test_rejects_corrupt_guard_tail_payload (__main__.OracleTest.test_rejects_corrupt_guard_tail_payload) ... ok
+test_rejects_malformed_lengths (__main__.OracleTest.test_rejects_malformed_lengths) ... ok
+test_rejects_wrong_count (__main__.OracleTest.test_rejects_wrong_count) ... ok
+test_control_blob_layout (__main__.PatcherAcceptanceTest.test_control_blob_layout) ... ok
+test_decode_fields_preserved_except_addend (__main__.PatcherAcceptanceTest.test_decode_fields_preserved_except_addend) ... ok
+test_model_pins_match_vendor_tree (__main__.PatcherAcceptanceTest.test_model_pins_match_vendor_tree) ... ok
+test_patch_invariants (__main__.PatcherAcceptanceTest.test_patch_invariants) ... ok
+test_empty (__main__.PatcherRejectionTest.test_empty) ... ok
+test_existing_output_dir_refused (__main__.PatcherRejectionTest.test_existing_output_dir_refused) ... ok
+test_extended (__main__.PatcherRejectionTest.test_extended) ... ok
+test_foreign_constant_shader_rejected (__main__.PatcherRejectionTest.test_foreign_constant_shader_rejected) ... ok
+test_metadata_byte_flip (__main__.PatcherRejectionTest.test_metadata_byte_flip) ... ok
+test_no_double_patch (__main__.PatcherRejectionTest.test_no_double_patch) ... ok
+test_non_bytes_input (__main__.PatcherRejectionTest.test_non_bytes_input) ... ok
+test_random_bytes (__main__.PatcherRejectionTest.test_random_bytes) ... ok
+test_stale_blob_rejected_as_input (__main__.PatcherRejectionTest.test_stale_blob_rejected_as_input) ... ok
+test_truncated (__main__.PatcherRejectionTest.test_truncated) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.035s
+
+OK
+python3 -B scripts/verify_imadd_evidence.py novel-results/2026-10-04-imadd-addend --self-test --baseline-run "/scratch/apple-m2-playground/absent-baseline"
+ok   R.sha256  d0b99dace1de6eb2467c64ce872e8f5c02458d1edae0a3f74b9ed2c17cff0ba3
+ok   R.size  2572 bytes
+ok   R.magic  4d657361566b53686164657242696e00
+ok   R.driver_id  26
+ok   R.uuid  2313bd7c3909b8ad0f31883eab5c412e
+ok   R.version  0
+ok   R.size_field  2572
+ok   R.sha1  stored 63b9e3adb3efa0a5226bff79bb75493d7a72a24a
+ok   R.stage  5
+ok   R.lengths  (336, 0)
+ok   R.agx_info  (5, 336)
+ok   R.main_size  78
+ok   R.has_preamble  1
+ok   R.entries  (256, 128)
+ok   R.rodata  (0, 16, 4)
+ok   R.instruction  9e09820659000000
+ok   R.opcode  0x1e
+ok   R.const15  0
+ok   R.remainder  0x0
+ok   R.uncovered_zero  (51, 62, 63)
+ok   R.fields  {"A": 2, "As": 1, "At": 10, "B": 16, "Bs": 1, "Bt": 6, "C": 0, "Cs": 0, "Ct": 0, "D": 4, "Dt": 3, "N": 0, "S": 0, "s": 0}
+ok   run.directory  /save/workspace/apple-documentation-playground/novel-results/2026-10-04-imadd-addend
+ok   run.layout  final
+ok   R.sha256  d0b99dace1de6eb2467c64ce872e8f5c02458d1edae0a3f74b9ed2c17cff0ba3
+ok   R.size  2572 bytes
+ok   R.magic  4d657361566b53686164657242696e00
+ok   R.driver_id  26
+ok   R.uuid  2313bd7c3909b8ad0f31883eab5c412e
+ok   R.version  0
+ok   R.size_field  2572
+ok   R.sha1  stored 63b9e3adb3efa0a5226bff79bb75493d7a72a24a
+ok   R.stage  5
+ok   R.lengths  (336, 0)
+ok   R.agx_info  (5, 336)
+ok   R.main_size  78
+ok   R.has_preamble  1
+ok   R.entries  (256, 128)
+ok   R.rodata  (0, 16, 4)
+ok   R.instruction  9e09820659000000
+ok   R.opcode  0x1e
+ok   R.const15  0
+ok   R.remainder  0x0
+ok   R.uncovered_zero  (51, 62, 63)
+ok   R.fields  {"A": 2, "As": 1, "At": 10, "B": 16, "Bs": 1, "Bt": 6, "C": 0, "Cs": 0, "Ct": 0, "D": 4, "Dt": 3, "N": 0, "S": 0, "s": 0}
+ok   P.size  2572 bytes
+ok   P.magic  4d657361566b53686164657242696e00
+ok   P.driver_id  26
+ok   P.uuid  2313bd7c3909b8ad0f31883eab5c412e
+ok   P.version  0
+ok   P.size_field  2572
+ok   P.sha1  stored 28176ec6dd927e7e8bdbfd59823820da9e269b4b
+ok   P.instruction  9e09820659010000 expected 9e09820659010000
+ok   P.diff_offsets  ['0x957']
+ok   P.outside_preserved  []
+ok   P.bits  changed bits [40]
+ok   P.opcode  0x1e
+ok   P.const15  0
+ok   P.remainder  0x0
+ok   P.fields  {"A": 2, "As": 1, "At": 10, "B": 16, "Bs": 1, "Bt": 6, "C": 1, "Cs": 0, "Ct": 0, "D": 4, "Dt": 3, "N": 0, "S": 0, "s": 0}
+ok   P.non_addend_fields  instruction bits outside C
+ok   S.only_instruction  ['0x957']
+ok   S.sha1_stale  63b9e3adb3efa0a5226bff79bb75493d7a72a24a
+ok   S.sha1_invalid  digest not refreshed
+ok   J.input_hex  4d657361566b536861646572...
+ok   J.patched_hex  4d657361566b536861646572...
+ok   J.stale_hex  4d657361566b536861646572...
+ok   J.reference_sha256  d0b99dace1de6eb2467c64ce872e8f5c02458d1edae0a3f74b9ed2c17cff0ba3
+ok   J.patched_sha256  b84264e4e41404eae35fc9f50c05c271e292bb6998c8e37a88e07aec53f07362
+ok   J.old_instruction  9e09820659000000
+ok   J.new_instruction  9e09820659010000
+ok   J.changed_offsets  [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 2391]
+ok   J.before_fields  {"A": 2, "As": 1, "At": 10, "B": 16, "Bs": 1, "Bt": 6, "C": 0, "Cs": 0, "Ct": 0, "D": 4, "Dt": 3, "N": 0, "S": 0, "s": 0}
+ok   J.after_fields  {"A": 2, "As": 1, "At": 10, "B": 16, "Bs": 1, "Bt": 6, "C": 1, "Cs": 0, "Ct": 0, "D": 4, "Dt": 3, "N": 0, "S": 0, "s": 0}
+ok   J.wrapper_sha1_before  63b9e3adb3efa0a5226bff79bb75493d7a72a24a
+ok   J.wrapper_sha1_after  28176ec6dd927e7e8bdbfd59823820da9e269b4b
+ok   J.target_offsets  2386
+ok   J.stale_sha256  533c0387abb797e05f40f9d0a387acef66008179a4632df0acd7be55ac645d9b
+ok   run.required_cases  ['no-dispatch', 'index-source-33', 'imadd-before-33', 'imadd-patched-33', 'imadd-patched-257', 'imadd-after-33']
+ok   run.required_stale-integrity
+ok   run.required_wrong-node
+ok   no-dispatch.length  96 words
+ok   no-dispatch.full_buffer  96 words
+ok   no-dispatch.leading_guards  cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd
+ok   no-dispatch.active  words 8..40
+ok   no-dispatch.inactive_padding  words 41..71
+ok   no-dispatch.trailing_guards  words 72..79
+ok   no-dispatch.control_tail  last word a5a5000f
+ok   no-dispatch.readback_sha256  1bbecebd1c663b6e8d9ec2c16ac2ba30edf3146f43844e750854aef51619910a
+ok   no-dispatch.oracle_passed  True
+ok   no-dispatch.oracle_expected  stored expected vector
+ok   no-dispatch.oracle_actual  stored actual vector
+ok   no-dispatch.stdout_present
+ok   no-dispatch.api_results  []
+ok   no-dispatch.single_create_submit_fence  {'vkCreateShadersEXT': 1, 'vkQueueSubmit': 1, 'vkWaitForFences': 1}
+ok   no-dispatch.identity  {"binary_version": 0, "driver": "Honeykrisp", "info": "Mesa 25.3.6", "name": "Apple M2 Max (G14C B1)", "render_major": 226, "render_minor": 128, "uuid": "2313bd7c3909b8ad0f31883eab5c412e"}
+ok   no-dispatch.render_node  226:128
+ok   no-dispatch.memory_words  96
+ok   no-dispatch.completion  {"completed": true, "count": 33, "dispatch": false, "words": 96}
+ok   no-dispatch.recorded_events
+ok   no-dispatch.command_success
+ok   index-source-33.length  96 words
+ok   index-source-33.full_buffer  96 words
+ok   index-source-33.leading_guards  cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd
+ok   index-source-33.active  words 8..40
+ok   index-source-33.inactive_padding  words 41..71
+ok   index-source-33.trailing_guards  words 72..79
+ok   index-source-33.control_tail  last word a5a5000f
+ok   index-source-33.readback_sha256  ac28bb344417d7efd5bad65118332e22ecad5b6b711878f0143437dfb00b4fcc
+ok   index-source-33.oracle_passed  True
+ok   index-source-33.oracle_expected  stored expected vector
+ok   index-source-33.oracle_actual  stored actual vector
+ok   index-source-33.stdout_present
+ok   index-source-33.api_results  []
+ok   index-source-33.single_create_submit_fence  {'vkCreateShadersEXT': 1, 'vkQueueSubmit': 1, 'vkWaitForFences': 1}
+ok   index-source-33.identity  {"binary_version": 0, "driver": "Honeykrisp", "info": "Mesa 25.3.6", "name": "Apple M2 Max (G14C B1)", "render_major": 226, "render_minor": 128, "uuid": "2313bd7c3909b8ad0f31883eab5c412e"}
+ok   index-source-33.render_node  226:128
+ok   index-source-33.memory_words  96
+ok   index-source-33.completion  {"completed": true, "count": 33, "dispatch": true, "words": 96}
+ok   index-source-33.recorded_events
+ok   index-source-33.command_success
+ok   imadd-before-33.length  96 words
+ok   imadd-before-33.full_buffer  96 words
+ok   imadd-before-33.leading_guards  cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd
+ok   imadd-before-33.active  words 8..40
+ok   imadd-before-33.inactive_padding  words 41..71
+ok   imadd-before-33.trailing_guards  words 72..79
+ok   imadd-before-33.control_tail  last word a5a5000f
+ok   imadd-before-33.readback_sha256  ac28bb344417d7efd5bad65118332e22ecad5b6b711878f0143437dfb00b4fcc
+ok   imadd-before-33.oracle_passed  True
+ok   imadd-before-33.oracle_expected  stored expected vector
+ok   imadd-before-33.oracle_actual  stored actual vector
+ok   imadd-before-33.stdout_present
+ok   imadd-before-33.api_results  []
+ok   imadd-before-33.single_create_submit_fence  {'vkCreateShadersEXT': 1, 'vkQueueSubmit': 1, 'vkWaitForFences': 1}
+ok   imadd-before-33.identity  {"binary_version": 0, "driver": "Honeykrisp", "info": "Mesa 25.3.6", "name": "Apple M2 Max (G14C B1)", "render_major": 226, "render_minor": 128, "uuid": "2313bd7c3909b8ad0f31883eab5c412e"}
+ok   imadd-before-33.render_node  226:128
+ok   imadd-before-33.memory_words  96
+ok   imadd-before-33.completion  {"completed": true, "count": 33, "dispatch": true, "words": 96}
+ok   imadd-before-33.recorded_events
+ok   imadd-before-33.command_success
+ok   imadd-before-33.input_sha256  d0b99dace1de6eb2467c64ce872e8f5c02458d1edae0a3f74b9ed2c17cff0ba3
+ok   imadd-patched-33.length  96 words
+ok   imadd-patched-33.full_buffer  96 words
+ok   imadd-patched-33.leading_guards  cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd
+ok   imadd-patched-33.active  words 8..40
+ok   imadd-patched-33.inactive_padding  words 41..71
+ok   imadd-patched-33.trailing_guards  words 72..79
+ok   imadd-patched-33.control_tail  last word a5a5000f
+ok   imadd-patched-33.readback_sha256  1d3abf784a6e240f3a84be8107775cb315df6f94b1f6a4c269d3c253b1876452
+ok   imadd-patched-33.oracle_passed  True
+ok   imadd-patched-33.oracle_expected  stored expected vector
+ok   imadd-patched-33.oracle_actual  stored actual vector
+ok   imadd-patched-33.stdout_present
+ok   imadd-patched-33.api_results  []
+ok   imadd-patched-33.single_create_submit_fence  {'vkCreateShadersEXT': 1, 'vkQueueSubmit': 1, 'vkWaitForFences': 1}
+ok   imadd-patched-33.identity  {"binary_version": 0, "driver": "Honeykrisp", "info": "Mesa 25.3.6", "name": "Apple M2 Max (G14C B1)", "render_major": 226, "render_minor": 128, "uuid": "2313bd7c3909b8ad0f31883eab5c412e"}
+ok   imadd-patched-33.render_node  226:128
+ok   imadd-patched-33.memory_words  96
+ok   imadd-patched-33.completion  {"completed": true, "count": 33, "dispatch": true, "words": 96}
+ok   imadd-patched-33.recorded_events
+ok   imadd-patched-33.command_success
+ok   imadd-patched-33.input_sha256  b84264e4e41404eae35fc9f50c05c271e292bb6998c8e37a88e07aec53f07362
+ok   imadd-patched-257.length  320 words
+ok   imadd-patched-257.full_buffer  320 words
+ok   imadd-patched-257.leading_guards  cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd
+ok   imadd-patched-257.active  words 8..264
+ok   imadd-patched-257.inactive_padding  words 265..295
+ok   imadd-patched-257.trailing_guards  words 296..303
+ok   imadd-patched-257.control_tail  last word a5a5000f
+ok   imadd-patched-257.readback_sha256  ca0b1fe86a27dbc47c01b0a681447ba024eb5daab4d78f49ac870c065fd25c24
+ok   imadd-patched-257.oracle_passed  True
+ok   imadd-patched-257.oracle_expected  stored expected vector
+ok   imadd-patched-257.oracle_actual  stored actual vector
+ok   imadd-patched-257.stdout_present
+ok   imadd-patched-257.api_results  []
+ok   imadd-patched-257.single_create_submit_fence  {'vkCreateShadersEXT': 1, 'vkQueueSubmit': 1, 'vkWaitForFences': 1}
+ok   imadd-patched-257.identity  {"binary_version": 0, "driver": "Honeykrisp", "info": "Mesa 25.3.6", "name": "Apple M2 Max (G14C B1)", "render_major": 226, "render_minor": 128, "uuid": "2313bd7c3909b8ad0f31883eab5c412e"}
+ok   imadd-patched-257.render_node  226:128
+ok   imadd-patched-257.memory_words  320
+ok   imadd-patched-257.completion  {"completed": true, "count": 257, "dispatch": true, "words": 320}
+ok   imadd-patched-257.recorded_events
+ok   imadd-patched-257.command_success
+ok   imadd-patched-257.input_sha256  b84264e4e41404eae35fc9f50c05c271e292bb6998c8e37a88e07aec53f07362
+ok   imadd-after-33.length  96 words
+ok   imadd-after-33.full_buffer  96 words
+ok   imadd-after-33.leading_guards  cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd cdcdcdcd
+ok   imadd-after-33.active  words 8..40
+ok   imadd-after-33.inactive_padding  words 41..71
+ok   imadd-after-33.trailing_guards  words 72..79
+ok   imadd-after-33.control_tail  last word a5a5000f
+ok   imadd-after-33.readback_sha256  ac28bb344417d7efd5bad65118332e22ecad5b6b711878f0143437dfb00b4fcc
+ok   imadd-after-33.oracle_passed  True
+ok   imadd-after-33.oracle_expected  stored expected vector
+ok   imadd-after-33.oracle_actual  stored actual vector
+ok   imadd-after-33.stdout_present
+ok   imadd-after-33.api_results  []
+ok   imadd-after-33.single_create_submit_fence  {'vkCreateShadersEXT': 1, 'vkQueueSubmit': 1, 'vkWaitForFences': 1}
+ok   imadd-after-33.identity  {"binary_version": 0, "driver": "Honeykrisp", "info": "Mesa 25.3.6", "name": "Apple M2 Max (G14C B1)", "render_major": 226, "render_minor": 128, "uuid": "2313bd7c3909b8ad0f31883eab5c412e"}
+ok   imadd-after-33.render_node  226:128
+ok   imadd-after-33.memory_words  96
+ok   imadd-after-33.completion  {"completed": true, "count": 33, "dispatch": true, "words": 96}
+ok   imadd-after-33.recorded_events
+ok   imadd-after-33.command_success
+ok   imadd-after-33.input_sha256  d0b99dace1de6eb2467c64ce872e8f5c02458d1edae0a3f74b9ed2c17cff0ba3
+ok   stale.returncode  1
+ok   stale.rejected  [{'api': 'vkCreateShadersEXT', 'result': 1000482000}]
+ok   stale.no_submit
+ok   stale.no_readback
+ok   wrong_node.returncode  1
+ok   wrong_node.before_device
+ok   wrong_node.no_readback
+ok   run.passed  True
+ok   run.index_binary_pin  {'bytes': 2572, 'sha256': 'd0b99dace1de6eb2467c64ce872e8f5c02458d1edae0a3f74b9ed2c17cff0ba3'}
+ok   run.index_validation
+ok   run.wrong_node_control
+ok   run.no_dispatch_rejected
+ok   run.stale_control
+ok   T1.size  2572 bytes
+ok   T1.magic  4d657361566b53686164657242696e00
+ok   T1.driver_id  26
+ok   T1.uuid  2313bd7c3909b8ad0f31883eab5c412e
+ok   T1.version  0
+ok   T1.size_field  2572
+ok   T1.sha1  stored 28176ec6dd927e7e8bdbfd59823820da9e269b4b
+ok   T1.instruction  9e09820659010000 expected 9e09820659010000
+ok   T1.diff_offsets  ['0x957']
+ok   T1.outside_preserved  []
+ok   T1.bits  changed bits [40]
+ok   T1.opcode  0x1e
+ok   T1.const15  0
+ok   T1.remainder  0x0
+ok   T1.fields  {"A": 2, "As": 1, "At": 10, "B": 16, "Bs": 1, "Bt": 6, "C": 1, "Cs": 0, "Ct": 0, "D": 4, "Dt": 3, "N": 0, "S": 0, "s": 0}
+ok   T1.non_addend_fields  instruction bits outside C
+ok   T63.size  2572 bytes
+ok   T63.magic  4d657361566b53686164657242696e00
+ok   T63.driver_id  26
+ok   T63.uuid  2313bd7c3909b8ad0f31883eab5c412e
+ok   T63.version  0
+ok   T63.size_field  2572
+ok   T63.sha1  stored a9fe32f33a901d2e8e22b4a182eec2135774f6ab
+ok   T63.instruction  9e098206593f0000 expected 9e098206593f0000
+ok   T63.diff_offsets  ['0x957']
+ok   T63.outside_preserved  []
+ok   T63.bits  changed bits [40, 41, 42, 43, 44, 45]
+ok   T63.opcode  0x1e
+ok   T63.const15  0
+ok   T63.remainder  0x0
+ok   T63.fields  {"A": 2, "As": 1, "At": 10, "B": 16, "Bs": 1, "Bt": 6, "C": 63, "Cs": 0, "Ct": 0, "D": 4, "Dt": 3, "N": 0, "S": 0, "s": 0}
+ok   T63.non_addend_fields  instruction bits outside C
+ok   T64.size  2572 bytes
+ok   T64.magic  4d657361566b53686164657242696e00
+ok   T64.driver_id  26
+ok   T64.uuid  2313bd7c3909b8ad0f31883eab5c412e
+ok   T64.version  0
+ok   T64.size_field  2572
+ok   T64.sha1  stored 49431e054e2b4578678354fb6729eb63f9d67955
+ok   T64.instruction  9e09820659004000 expected 9e09820659004000
+ok   T64.diff_offsets  ['0x958']
+ok   T64.outside_preserved  []
+ok   T64.bits  changed bits [54]
+ok   T64.opcode  0x1e
+ok   T64.const15  0
+ok   T64.remainder  0x0
+ok   T64.fields  {"A": 2, "As": 1, "At": 10, "B": 16, "Bs": 1, "Bt": 6, "C": 64, "Cs": 0, "Ct": 0, "D": 4, "Dt": 3, "N": 0, "S": 0, "s": 0}
+ok   T64.non_addend_fields  instruction bits outside C
+ok   T255.size  2572 bytes
+ok   T255.magic  4d657361566b53686164657242696e00
+ok   T255.driver_id  26
+ok   T255.uuid  2313bd7c3909b8ad0f31883eab5c412e
+ok   T255.version  0
+ok   T255.size_field  2572
+ok   T255.sha1  stored a495fb45d8dd93054e0dee8170f8d85f4df84f7c
+ok   T255.instruction  9e098206593fc000 expected 9e098206593fc000
+ok   T255.diff_offsets  ['0x957', '0x958']
+ok   T255.outside_preserved  []
+ok   T255.bits  changed bits [40, 41, 42, 43, 44, 45, 54, 55]
+ok   T255.opcode  0x1e
+ok   T255.const15  0
+ok   T255.remainder  0x0
+ok   T255.fields  {"A": 2, "As": 1, "At": 10, "B": 16, "Bs": 1, "Bt": 6, "C": 255, "Cs": 0, "Ct": 0, "D": 4, "Dt": 3, "N": 0, "S": 0, "s": 0}
+ok   T255.non_addend_fields  instruction bits outside C
+ok   selftest.extra_bit_rejected  addend-1 plus bit 54 must fail
+ok   selftest.non_addend_bit_rejected  B-field bit must fail
+ok   selftest.metadata_rejected  metadata byte must fail
+ok   selftest.stale_sha1_rejected  unrefreshed SHA1 must fail
+ok   selftest.reference_tamper_rejected  mutated control must be refused
+ok   selftest.guard_tamper_rejected  T.leading_guards
+ok   selftest.active_tamper_rejected  T.active
+ok   selftest.padding_tamper_rejected  T.inactive_padding
+ok   selftest.trailing_tamper_rejected  T.trailing_guards
+ok   selftest.tail_tamper_rejected  T.control_tail
+ok   selftest.truncated_rejected  T.length
+ok   selftest.clean_readback_accepted
+{"passed": true, "checks": 293, "failures": []}

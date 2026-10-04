@@ -87,3 +87,12 @@ rounded inactive lanes and a patterned tail in the same allocation.
 [stored verifier](../results/2026-10-04-vulkan-binary-roundtrip/verify_stored.py)
 retain the narrow validated field, unchanged controls and stale-digest rejection.
 No new GPU run occurred during integration review.
+
+## Pinned multiply-add addend
+
+`make agx-imadd` reuses the same Vulkan child to execute one immediate-addend
+bit edit in the pinned index shader. `make verify-imadd` performs 20 offline
+patcher/oracle rejection tests plus decoder-independent verification of committed
+shader/readback hex, digests, full-buffer oracles and API logs. It requires no GPU
+access; the patcher tests require the pinned applegpu reference tree. See the
+[hardware scope and limits](../experiments/arithmetic/imadd-addend.md).

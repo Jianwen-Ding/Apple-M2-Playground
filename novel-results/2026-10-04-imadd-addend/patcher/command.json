@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "/usr/bin/python3",
+    "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py",
+    "/scratch/apple-m2-playground/agx-imadd-addend-runs/20261004T225032918936Z/index.bin",
+    "--output",
+    "/scratch/apple-m2-playground/agx-imadd-addend-runs/20261004T225032918936Z/imadd-patch"
+  ],
+  "timeout_seconds": 15,
+  "returncode": 0
+}

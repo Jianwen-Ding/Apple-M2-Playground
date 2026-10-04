@@ -55,3 +55,18 @@ found no justified shader timer selector. Inspected source writes both compute
 timestamp destinations to `comp_start` and returns constant-zero disjoint state.
 These predict timing hazards if present in the installed build; this review
 measured neither broken command timestamps nor instruction latency.
+
+## Multiply-add probe and delegation limitations
+
+The pinned [imadd addend test](../experiments/arithmetic/imadd-addend.md) passed;
+there was no observed GPU/import/oracle failure for the refreshed native patch.
+The intentionally stale digest was rejected before dispatch. This supports the
+pinned wrapper integrity behavior only. General addend carry, register coverage
+and instruction timing remain untested.
+
+This session's acm-dev native Claude/Grok CLI launches failed, and native Gemini
+workers required authentication. OpenCode-backed Kimi K3 and GLM 5.3 performed
+implementation/hardware and offline review respectively, but stopped during final
+packaging on provider access/funding errors. Their code and passing raw evidence
+were recovered; coordinator integration completed the reproducible artifacts.
+Do not interpret a running process or provider failure as a completed review.

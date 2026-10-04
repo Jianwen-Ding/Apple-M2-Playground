@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "cc",
+    "--version"
+  ],
+  "timeout_seconds": 15,
+  "returncode": 0
+}

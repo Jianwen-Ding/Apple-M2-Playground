@@ -1,0 +1,1 @@
+{"passed": true, "output": "/scratch/apple-m2-playground/agx-imadd-addend-runs/20261004T225032918936Z/imadd-patch", "patched_sha256": "b84264e4e41404eae35fc9f50c05c271e292bb6998c8e37a88e07aec53f07362"}
