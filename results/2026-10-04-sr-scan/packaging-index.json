@@ -1,0 +1,298 @@
+{
+  "known-controls": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-scan-runs/20261004T233234800941Z",
+    "original_record_sha256": "69319ea3fa2c6e32a1259912b89aee211ab292af1fa6bd88a0540c7a7f847f37",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/3d2d4a4c29d1-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/6d4175df66b3-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "full-single": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-scan-runs/20261004T233344915565Z",
+    "original_record_sha256": "87b831f69b1b1d8b8face01debb3a4a7868edc2d3ccf5b6bb902400a5839942c",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/3d2d4a4c29d1-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/6d4175df66b3-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "pair-controls": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-scan-runs/20261004T233914338759Z",
+    "original_record_sha256": "f14144156f70e11b8253471a4fc055209d5e99c9f437ecc95b0976cc71f7a5b7",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "full-paired": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-scan-runs/20261004T233933832022Z",
+    "original_record_sha256": "9076850cb0cd8ea7f7c0cb44d232df49f6c1f3149f221283f7024de60de8e8be",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "sparse-even": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-scan-runs/20261004T234808793409Z",
+    "original_record_sha256": "4a9185cda590ab4aa0194f59519a68cc27ec859e31a22e023a25369619a0ff97",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/014317698a8b-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/ce8840000425-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "context-257": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-context-runs/20261004T234523094206Z",
+    "original_record_sha256": "bd3ef47f7c55f27a327d98f452bd2a6263aa48762e7ed76b5a56f38b6f3d8808",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/tests/vulkan_sr_repeated.c": "sources/f181a358a130-vulkan_sr_repeated.c",
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_context.py": "sources/8dcc319ed2fd-run_agx_sr_context.py"
+    }
+  },
+  "context-1": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-context-runs/20261004T235235628491Z",
+    "original_record_sha256": "d04337a9566193f9818434b1ad2af5b8961a32c83b1abbfbc83a0584606b0993",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/tests/vulkan_sr_repeated.c": "sources/f181a358a130-vulkan_sr_repeated.c",
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_context.py": "sources/e9fcd77d93a3-run_agx_sr_context.py"
+    }
+  },
+  "context-33": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-context-runs/20261004T235236563522Z",
+    "original_record_sha256": "e7751dc3866575680120d778eb0256853799b5b06eb23d262e7d3e23b9a84847",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/tests/vulkan_sr_repeated.c": "sources/f181a358a130-vulkan_sr_repeated.c",
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_context.py": "sources/e9fcd77d93a3-run_agx_sr_context.py"
+    }
+  },
+  "context-65": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-context-runs/20261004T235237491074Z",
+    "original_record_sha256": "c4550874df2df70d19e369767d5f3fe1e981ebd1fa9805734bfb98c4beccd6e9",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/tests/vulkan_sr_repeated.c": "sources/f181a358a130-vulkan_sr_repeated.c",
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_context.py": "sources/e9fcd77d93a3-run_agx_sr_context.py"
+    }
+  },
+  "failed-pair-metadata": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-scan-runs/20261004T233827378814Z",
+    "original_record_sha256": "715830c1516e7664fcfaa3536a9253a87a46890d4fdbed803dd09e0061afc150",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/410912795ed1-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "failed-even-decode": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-scan-runs/20261004T234745478485Z",
+    "original_record_sha256": "fe10264b1aa59f591c227a25ff491cd7a2c2a7575e9bc22f07a1cff23d97bac3",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/014317698a8b-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/35da0c70989b-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-1": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-1",
+    "original_record_sha256": "ca92ba8be952dedc4c52c6a093c81b12694341ac1dc19d6178a3142275f80ca9",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-16": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-16",
+    "original_record_sha256": "21a9d14c3a953f26632da35d401f83cfc6725c579fb8a2057acc7d715073760c",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-17": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-17",
+    "original_record_sha256": "c6d32f0e88dab8b0517519b184ae76c09c1d7a272868731b89c423268b74b880",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-2": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-2",
+    "original_record_sha256": "2ae7b6580f981fc347d5bcb77f1764d5dc357324c04cf6e75210fd550003fb9c",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-257": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-257",
+    "original_record_sha256": "f0c458489addf32f7196ab3923e46dba1760ae31b95b0a83027030f730183e10",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-3": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-3",
+    "original_record_sha256": "a5c2a56429bb776256e65fbf9581f80444e23ee2bb1636630b44120d21a5d1fa",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-31": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-31",
+    "original_record_sha256": "6529d2aa7ce30c3864419c211bda0981b3d56bc01639733aa3bb17df8ccf2d8d",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-32": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-32",
+    "original_record_sha256": "2a2e3c898fa82f32d86656a00795ec1264e841ff1e26e88184e0c2cc746f041b",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-33": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-33",
+    "original_record_sha256": "e908dbdc16378846072ff5645acc0ec159efc0657cb3270ee52f23a29180ef51",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-4": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-4",
+    "original_record_sha256": "c9da4b85cd8e82f7fed5edb50c99df1c581ee36d8e72aafaceef9432f67312f7",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-5": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-5",
+    "original_record_sha256": "002f60ab274fa711fa7bf022e92bfe3f4ff30d3bec6353a5f583fe3540f1d6b3",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-63": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-63",
+    "original_record_sha256": "5d5d96241a94f82ac18eeca3f202a2d292dd456da12b312febde9445071fe03d",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-64": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-64",
+    "original_record_sha256": "675401c4859dfa06061d1f1711bebbe6a3482f8e954469d00bd276a2a18f4c87",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-65": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-65",
+    "original_record_sha256": "f96720378da0ac301ebb334e41fefcfca1a539fa77df38e1b3c4c0cd76de9c11",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  },
+  "count-7": {
+    "original_scratch": "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-7",
+    "original_record_sha256": "44b3982d6fc3c2e10b4bf1ff5cf9208d0a27e39d6f4417bdf79eb4d57af46ca5",
+    "source_snapshots": {
+      "/save/workspace/apple-documentation-playground/scripts/run_agx_sr_scan.py": "sources/20b2aaaf3493-run_agx_sr_scan.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_sr.py": "sources/cd217c2a2b30-patch_agx_sr.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_imadd.py": "sources/abc10feeb20a-patch_agx_imadd.py",
+      "/save/workspace/apple-documentation-playground/scripts/patch_agx_shader.py": "sources/98b60ab9724c-patch_agx_shader.py",
+      "/save/workspace/apple-documentation-playground/scripts/run_vulkan_compute.py": "sources/1fb90a504281-run_vulkan_compute.py",
+      "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c": "sources/41a1cf2e2530-vulkan_compute.c"
+    }
+  }
+}

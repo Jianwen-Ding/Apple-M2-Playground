@@ -251,3 +251,13 @@ and only this one destination/operand combination was executed. Timing and shade
 counter identification remain open; the failed GLES elapsed calibration remains
 unresolved. Next: a separately pinned fixed-input carry test, then wider register
 and immediate coverage, retaining unchanged controls and whole-buffer oracles.
+
+## Special-register hardware follow-up
+
+The user-authorized exhaustive SR scan completed all 256 selectors with three
+single samples and three paired samples separated by 128 native adds. No ticking
+selector was identified. Prefix/sparse masks establish scoped SR16 lane-position,
+SR57 four-lane population, and SR59 32-lane population behavior. Copilot reviewed
+evidence through ACM and wrote an independent verifier; the coordinator ran all
+serialized hardware probes and integration checks. See the
+[complete report](../experiments/registers/special-register-scan.md).

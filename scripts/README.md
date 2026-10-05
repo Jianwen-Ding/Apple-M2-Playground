@@ -116,3 +116,12 @@ It pins the index blob and changes only immediate addend bit 40. Paths and bound
 match the existing Vulkan suite. `make verify-imadd` runs offline rejection tests
 and independent checks on the committed hex evidence; it performs no GPU calls.
 See [multiply-add scope](../experiments/arithmetic/imadd-addend.md).
+
+Special-register probes use `patch_agx_sr.py` to reconstruct pinned single-read,
+paired-read, and sparse-mask native shaders. `run_agx_sr_scan.py` serializes bounded
+hardware cases and guard checks; `characterize_agx_sr.py` varies prefix counts.
+`run_agx_sr_context.py` uses twelve dispatches in one logical device. Use each
+runner's `--help` for selector/count options. `verify_sr_evidence.py` independently
+reconstructs shader bytes and buffers with the Python standard library;
+`verify_sr_findings.py` checks the retained lane/context observations. Run
+`make verify-sr` without GPU access.

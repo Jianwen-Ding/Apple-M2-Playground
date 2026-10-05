@@ -1,5 +1,10 @@
 # Shader counter reconnaissance: G14C B1 — 2026-10-04
 
+Subsequent user-authorized [hardware scanning](../registers/special-register-scan.md)
+superseded this report's earlier restriction on unnamed SR probes. All 256
+selectors completed single and paired sweeps; no ticking register was found.
+The source reconnaissance below remains historical evidence.
+
 **Result: no justified shader-readable timing register, counter index, or timer
 instruction bytes were found in the inspected primary evidence.** The special
 register read encoding is source-supported, but its identified register map

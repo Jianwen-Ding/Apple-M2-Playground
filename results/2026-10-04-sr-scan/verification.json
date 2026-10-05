@@ -1,0 +1,58 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/verify_sr_findings.py"
+      ],
+      "exit_code": 0,
+      "result": {
+        "passed": true,
+        "verified_readbacks": 2522,
+        "verified_uint32_words": 435904,
+        "paired_read_ticking_selectors": [],
+        "sr32_command_step_hex": "0x24000"
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/verify_sr_evidence.py",
+        "--selftest",
+        "results/2026-10-04-sr-scan/full-single.json"
+      ],
+      "exit_code": 0,
+      "result": {
+        "passed": true,
+        "selftest": true
+      }
+    },
+    {
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/verify_sr_evidence.py",
+        "--selftest",
+        "results/2026-10-04-sr-scan/full-paired.json"
+      ],
+      "exit_code": 0,
+      "result": {
+        "passed": true,
+        "selftest": true
+      }
+    }
+  ],
+  "syntax_check_record": "/scratch/apple-m2-playground/runs/20261005T001014Z-check-sno16avu/record.json",
+  "integration_source_sha256": {
+    "scripts/verify_sr_findings.py": "b1a04ad33c6931a1264a81a5b30585f881f20ad6978b1e46e14dbe9805a52180",
+    "scripts/verify_sr_evidence.py": "dcdb2d3fea77536ec19663d261e49dd11a3458a1aed4312ba0f72ab404ab375a",
+    "scripts/patch_agx_sr.py": "ce88400004254e1f5bd38a5b2ba4b3e395e520222d1e26917562e6e9cbeeacc1",
+    "scripts/run_agx_sr_scan.py": "014317698a8b9606820eca6e7d8b4bb09add90f6fc2229dcc22e8876ba4322ed",
+    "scripts/run_agx_sr_context.py": "e9fcd77d93a37243e80c0b6f12e2e039d73b5e8c0be4f3bc126c6ce2bebd96a2",
+    "scripts/characterize_agx_sr.py": "22983d06616df4cc11f61761e6d28a64024a4f3b5b97ccd6395fc90ea0e2e96a",
+    "tests/vulkan_sr_repeated.c": "f181a358a13079a442cca9b0b993beaf834d3bdefc9b2b3674fb2386d77c7216"
+  }
+}

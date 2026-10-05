@@ -70,3 +70,19 @@ implementation/hardware and offline review respectively, but stopped during fina
 packaging on provider access/funding errors. Their code and passing raw evidence
 were recovered; coordinator integration completed the reproducible artifacts.
 Do not interpret a running process or provider failure as a completed review.
+
+### Special-register scan, 2026-10-04
+
+The full 0..255 sweep and separated paired reads found no progressing shader
+clock through the tested 32-bit `get_sr` path. SR32 changes between fresh command
+buffers, with the same 0x24000 step at counts 1, 33, 65, and 257; this is not a
+workgroup-count or elapsed-time oracle. Its underlying cause remains unidentified.
+Two local patch validations failed before a mutated shader submission: the main
+metadata includes 16 padding bytes (70 total, rather than 54 executable bytes),
+and a textual conditional-disassembly comparison was too brittle. Both failures
+are retained with the successful original controls. Known `wait 0` padding was
+used because the reference decoder supplied no established nop encoding.
+Paid ACM workers failed on provider funding; explicit Copilot model names were
+unavailable. The configured default Copilot worker completed three review turns
+and contributed the independent verifier. See the
+[hardware report](../experiments/registers/special-register-scan.md).

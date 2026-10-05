@@ -96,3 +96,10 @@ patcher/oracle rejection tests plus decoder-independent verification of committe
 shader/readback hex, digests, full-buffer oracles and API logs. It requires no GPU
 access; the patcher tests require the pinned applegpu reference tree. See the
 [hardware scope and limits](../experiments/arithmetic/imadd-addend.md).
+
+`vulkan_sr_repeated.c` repeats imported-shader dispatches in one logical device,
+with fresh command buffers/fences and requested 10 ms spacing. Every iteration
+resets sentinels and retains the full readback. Fresh command-buffer allocation
+is a confounder when interpreting changing special-register values. The SR
+runners check guards, padding, and untouched tails; `make verify-sr` independently
+checks the retained evidence and deliberate corruption rejection.

@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "cc",
+    "-std=c11",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-O2",
+    "-I/save/workspace/AGX_Probe/mesa/include",
+    "/save/workspace/apple-documentation-playground/tests/vulkan_compute.c",
+    "-ldl",
+    "-o",
+    "/scratch/apple-m2-playground/sr-characterization/20261004T234212358996Z/count-3/vulkan_compute"
+  ],
+  "timeout_seconds": 30,
+  "host_before_ns": 8633913292424,
+  "returncode": 0,
+  "host_after_ns": 8634062117196
+}

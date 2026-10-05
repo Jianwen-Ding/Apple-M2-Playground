@@ -93,3 +93,10 @@ site has now also passed a separate 0-to-1 hardware test at counts 33 and 257,
 with unchanged before/after controls and all 800 words across six buffers checked.
 See the [scoped result](experiments/arithmetic/imadd-addend.md); general arithmetic
 and instruction timing remain uncharacterized.
+
+The [special-register hardware scan](experiments/registers/special-register-scan.md)
+covered all 256 selectors with single and paired reads. No progressing timing
+register was found through the tested 32-bit read path. Prefix and sparse masks
+identified SR16 lane position, SR57 four-lane active population, and SR59
+32-lane active population. `make verify-sr` checks retained evidence offline;
+`make sr-scan` and `make sr-pairs` reproduce the full hardware sweeps.
