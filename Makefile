@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -27,6 +27,10 @@ help:
 	@echo 'make verify-sr-shape Verify retained shape/core/bit-15 evidence offline'
 	@echo 'make sr-shared / sr-meta / sr-width SR18/SR19 resource and get_sr width probes'
 	@echo 'make verify-sr-resources Verify retained resource/width evidence offline'
+	@echo 'make timestamps         Hardware regression: Vulkan timestamp placement (~10 ms shader time)'
+	@echo 'make verify-timestamps  Verify retained timestamp/fetch/direct-DRM evidence offline'
+	@echo 'make drm-compute        Direct DRM (no Mesa) control + fadd4/iadd8 chain dispatches'
+	@echo 'make gpu-faults LOG=... Summarize Asahi GPU timeouts/faults in a kernel log'
 	@echo 'make opcode-scan        GPU-FAULTING: undecoded opcode effects (needs CONFIRM_GPU_FAULTS=1)'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
 	@echo 'Override SCRATCH_ROOT, DEVICE, PYTHON, CC, or PROBE_INCLUDE as needed.'
@@ -125,3 +129,19 @@ opcode-scan:
 	$(OPSCAN) --set 6e-fuzz --output "$(OPDIR)-6e-fuzz"
 	$(OPSCAN) --set 6e-init --repeats 3 --output "$(OPDIR)-6e-init"
 
+
+timestamps:
+	$(PYTHON) -B tests/test_command_timestamps.py --runtime "$(SCRATCH_ROOT)/vulkan-runtime/usr/lib64" --output "$(SCRATCH_ROOT)/timestamp-runs/test-$$(date -u +%Y%m%dT%H%M%SZ)"
+
+verify-timestamps:
+	$(PYTHON) -B scripts/verify_command_timestamps.py
+
+DRMDIR = $(SCRATCH_ROOT)/drm-compute/runs/$$(date -u +%Y%m%dT%H%M%SZ)
+drm-compute:
+	$(PYTHON) -B scripts/run_drm_compute.py --kind control --count 257 --device "$(DEVICE)" --output "$(DRMDIR)-control"
+	$(PYTHON) -B scripts/run_drm_compute.py --kind fadd4 --lengths 0,4096,16384,65536 --count 32 --repeats 8 --device "$(DEVICE)" --output "$(DRMDIR)-fadd4"
+	$(PYTHON) -B scripts/run_drm_compute.py --kind iadd8 --lengths 0,16384,32768 --count 32 --repeats 6 --device "$(DEVICE)" --output "$(DRMDIR)-iadd8"
+
+LOG ?= results/2026-10-10-opcode-scan-kernel-log/gpu-lines.log.gz
+gpu-faults:
+	$(PYTHON) -B scripts/summarize_gpu_faults.py "$(LOG)"

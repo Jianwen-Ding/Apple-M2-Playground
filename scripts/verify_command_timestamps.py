@@ -12,7 +12,10 @@ Claims checked against results/2026-10-10-command-timestamps/*.json:
   5. host submit+wait exceeds t3-t0 by a roughly constant overhead;
   6. dependent and 4-way independent chains cost the same;
   7. slow-state time does not depend on active lanes (32..19456);
-  8. samples fall in two discrete performance states ~1.5-1.8x apart.
+  8. samples fall in two discrete performance states ~1.5-1.8x apart;
+  9. the direct DRM path (results/2026-10-10-direct-drm, no Mesa/Vulkan)
+     passes whole-buffer oracles, its firmware start/end timestamps are on
+     the same 24 MHz grid, and its chain slopes match the Vulkan path.
 """
 import argparse
 import json
@@ -34,6 +37,7 @@ def fit(xs, ys):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--evidence', type=Path, default=REPO/'results/2026-10-10-command-timestamps')
+    p.add_argument('--drm-evidence', type=Path, default=REPO/'results/2026-10-10-direct-drm')
     a = p.parse_args()
     runs = {f.stem: json.loads(f.read_text()) for f in sorted(a.evidence.glob('*.json')) if f.stem != 'verification'}
     checks = []
@@ -99,6 +103,20 @@ def main():
     per_byte = (slow_iadd-slow_fadd)/4
     check('fetch-model-slow-state', 1.5 < per_byte < 2.3, ns_per_byte=round(per_byte, 3),
           fixed_ns_per_instr=round(slow_fadd-4*per_byte, 3))
+
+    # 9: direct DRM path agrees with the Vulkan path.
+    drm = {f.stem: json.loads(f.read_text()) for f in sorted(a.drm_evidence.glob('*.json')) if f.stem != 'verification'}
+    check('drm-oracles', all(r['passed'] and r['path'] == 'direct-drm' for r in drm.values()) and
+          all(v['buffer_ok'] for r in drm.values() for v in r['variants']), runs=sorted(drm))
+    fw = [t for r in drm.values() for v in r['variants'] for s in v['samples'] for t in s['fw_ts']+s['drm_time']]
+    check('drm-24mhz-grid', all((t*3+124)//125*125//3 == t for t in fw) and all(
+          s['fw_ts'][0] < s['fw_ts'][1] for r in drm.values() for v in r['variants'] for s in v['samples']), timestamps=len(fw))
+    for kind, vk, top in (('iadd8', slow_iadd, 32768), ('fadd4', slow_fadd, 16384)):
+        pts = [(v['n'], st.median(s['fw_ts'][1]-s['fw_ts'][0] for s in v['samples'][1:])) for v in drm[kind]['variants'] if v['n'] <= top]
+        b = fit(*zip(*pts))[1]
+        check(f'drm-slope-matches-vulkan-{kind}', abs(b-vk) < 0.05*vk, drm_ns_per_instr=round(b, 3), vulkan_ns_per_instr=round(vk, 3))
+    empty = [s['fw_ts'][1]-s['fw_ts'][0] for r in drm.values() for v in r['variants'] if v['n'] in (None, 0) for s in v['samples'][1:]]
+    check('drm-empty-command', st.median(empty) < 10000, median_fw_ns=round(st.median(empty)), samples=len(empty))
 
     passed = all(c['passed'] for c in checks)
     out = {'passed': passed, 'checks': checks}

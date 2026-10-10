@@ -137,6 +137,38 @@
    "passed": true,
    "ns_per_byte": 1.837,
    "fixed_ns_per_instr": 3.086
+  },
+  {
+   "check": "drm-oracles",
+   "passed": true,
+   "runs": [
+    "control",
+    "fadd4",
+    "iadd8"
+   ]
+  },
+  {
+   "check": "drm-24mhz-grid",
+   "passed": true,
+   "timestamps": 216
+  },
+  {
+   "check": "drm-slope-matches-vulkan-iadd8",
+   "passed": true,
+   "drm_ns_per_instr": 17.658,
+   "vulkan_ns_per_instr": 17.782
+  },
+  {
+   "check": "drm-slope-matches-vulkan-fadd4",
+   "passed": true,
+   "drm_ns_per_instr": 10.464,
+   "vulkan_ns_per_instr": 10.434
+  },
+  {
+   "check": "drm-empty-command",
+   "passed": true,
+   "median_fw_ns": 5750,
+   "samples": 15
   }
  ]
 }

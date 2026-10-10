@@ -130,3 +130,25 @@ VkResult error" as "no fault".
   active lanes unless jumped over. 0x18-like opcodes are no-ops. Some 0x6e operand
   forms return stale, bit-noisy on-chip data. That resembles the LeftoverLocals
   class (CVE-2023-4969) and was deliberately not pursued.
+
+### Command timestamps and direct DRM, 2026-10-10
+
+* **`Write; Dispatch; Write` timestamps measure nothing on Honeykrisp.** Both land
+  on stream ends, and the first one marks the end of the dispatch. This was first
+  read as "compute timestamps are broken". Record top-of-pipe plus a second stamp
+  before the dispatch, or use direct DRM's start/end pair.
+* **Clock state looked like code-size dependence.** iadd chains at 65536 seemed
+  cheaper per instruction than at 32768. That was a mid-run clock-state switch, not
+  layout. Always print per-sample times. A 1.5–1.7× jump between consecutive
+  identical dispatches is a state change.
+* **Unrolled code cannot measure ALU latency.** Dependent and independent chains
+  cost the same because instruction fetch dominates (~1.84 ns/byte). Use small
+  loops.
+* **A quick oracle with hard-coded word offsets mis-reported a failure** (tail at
+  word 72 instead of 80). Compute the whole expected buffer from count and layout,
+  as `run_drm_compute.py` does.
+* **Host time is not a timing source.** Identical empty DRM dispatches took 115 or
+  577 µs host-side. Firmware timestamps stayed at 5.7–7 µs.
+* The opcode-scan kernel log was captured after the fact, and that session's scan
+  outputs were lost. Its 286 timeouts / 73 Unmapped read faults cannot be matched
+  to opcodes. See [kernel log evidence](../results/2026-10-10-opcode-scan-kernel-log/README.md).

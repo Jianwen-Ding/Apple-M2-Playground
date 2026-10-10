@@ -51,6 +51,10 @@ make sr-core     # 2048-workgroup SR20 core-id / constant check
 make verify-sr-shape # Check retained shape/core/bit-15 evidence offline
 make sr-meta     # SR18/SR19 vs single driver-metadata field edits
 make verify-sr-resources # Check retained resource/width evidence offline
+make timestamps  # Vulkan timestamp-placement hardware regression
+make verify-timestamps # Check timestamp, fetch-cost and direct-DRM evidence offline
+make drm-compute # Direct DRM dispatches: no Mesa or Vulkan in the path
+make gpu-faults  # Summarize GPU timeouts/faults in a kernel log (LOG=...)
 ```
 
 Run records and binaries go to scratch. Baseline/DRM runs use
@@ -81,6 +85,9 @@ are documented in [scripts/README.md](scripts/README.md).
 - [Reviewed progress and next tasks](notes/2026-10-04-probe-progress.md)
 - [SR geometry, core id, bit-15 form](experiments/registers/sr-geometry-core-alt.md)
 - [SR18/SR19 resources and get_sr widths](experiments/registers/sr-resources-width.md)
+- [Command timestamps and fetch-bound code](experiments/timing/command-timestamps.md)
+- [Direct DRM compute (no Mesa)](experiments/baseline/direct-drm-compute.md)
+- [Opcode-scan kernel log](results/2026-10-10-opcode-scan-kernel-log/README.md)
 - [Known limitations and failed approaches](notes/failed-approaches.md)
 - [Timing investigation](experiments/timing/README.md)
 
@@ -118,3 +125,18 @@ A [resource follow-up](experiments/registers/sr-resources-width.md) identified S
 threadgroup-memory bytes and SR19 as register allocation, by editing single driver
 metadata fields on unchanged code. It also showed `get_sr` is 32-bit only
 (`make verify-sr-resources`).
+
+**Direct DRM path (2026-10-10).** `tests/drm_compute.c` now submits compute work
+with raw Asahi ioctls: its own VM, BOs, USC pipeline words and CDM control stream,
+with no Mesa or Vulkan. It reproduces the Vulkan results exactly (oracles, and
+chain slopes within 1%), and it exposes firmware start/end timestamps per command:
+an empty command is ~5.7 µs. New probes should prefer this path. See the
+[report](experiments/baseline/direct-drm-compute.md).
+
+**Timing (2026-10-10).** [Command timestamps](experiments/timing/command-timestamps.md)
+are 24 MHz ticks. Honeykrisp attaches a compute timestamp to the end of the
+current stream, so `Write; Dispatch; Write` measures nothing; record two before.
+Unrolled code is fetch bound at ~1.84 ns/byte per instruction, independent of
+dependencies and lane count. The GPU runs in two clock states ~1.65× apart, so
+warm up before benchmarking. No shader-readable clock is known; dispatch-level
+timing works.

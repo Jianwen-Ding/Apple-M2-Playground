@@ -1,0 +1,71 @@
+{
+ "source": "results/2026-10-10-opcode-scan-kernel-log/gpu-lines.log.gz",
+ "timeouts": 286,
+ "timeouts_with_fault": 73,
+ "fault_records": 73,
+ "first": "Sat Oct 10 18:04:52 2026",
+ "last": "Sat Oct 10 18:11:31 2026",
+ "timeout_counter_range": [
+  45,
+  330
+ ],
+ "recovery_events": {
+  "Halted: 1": 287,
+  "Attempting recovery...": 287
+ },
+ "fault_fields": {
+  "reason": {
+   "Unmapped": 73
+  },
+  "read": {
+   "true": 73
+  },
+  "level": {
+   "0x1": 73
+  },
+  "sideband": {
+   "0x51": 73
+  },
+  "unit_code": {
+   "0x1": 70,
+   "0x21": 2,
+   "0x11": 1
+  },
+  "address": {
+   "0x1100000900": 25,
+   "0x113ecba380": 7,
+   "0x117ecba400": 4,
+   "0x117edba2c0": 3,
+   "0x1100000100": 3,
+   "0x117fcba400": 2,
+   "0x11fbf1dc80": 2,
+   "0x115ecba380": 2,
+   "0x111f8ba2c0": 1,
+   "0x117fdba2c0": 1,
+   "0x113edbe300": 1,
+   "0x115fc3a2c0": 1,
+   "0x117f8be400": 1,
+   "0x113eeba2c0": 1,
+   "0x115ecbe380": 1,
+   "0x115e8ba380": 1,
+   "0x115fcba300": 1,
+   "0x111fcba400": 1,
+   "0x115eeba2c0": 1,
+   "0x117efba380": 1,
+   "0x111ecba400": 1,
+   "0x111e8ba400": 1,
+   "0x117e9ba2c0": 1,
+   "0x117536ff80": 1,
+   "0x117e8ba7c0": 1,
+   "0x117a8ba300": 1,
+   "0x115ec3a2c0": 1,
+   "0x115edbe500": 1,
+   "0x113e9ba300": 1,
+   "0x111ed3a300": 1,
+   "0x117fc3e300": 1,
+   "0x113f8ba380": 1,
+   "0x117eeba300": 1
+  }
+ },
+ "distinct_vm_slots": 45
+}

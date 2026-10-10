@@ -9,6 +9,10 @@ responses and source concerns but no justified shader timer selector. Selected
 source/capability evidence is versioned with those reports; loaded timing and
 raw command timestamp validation remain separately owned work.
 
+[Command timestamps](command-timestamps.md) (2026-10-10) validates step 2:
+dispatch timing works on both Vulkan and the direct DRM path at 24 MHz resolution.
+It also characterizes fetch-bound straight-line cost and the two clock states.
+
 ## Planned sequence
 
 1. Preserve the completed driver-time and P1 parameter controls.
