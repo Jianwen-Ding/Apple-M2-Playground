@@ -17,3 +17,6 @@ The tested path yielded no clock; SR16/57/59 have reproducible lane/mask behavio
 [Geometry, core id, and bit-15 form](sr-geometry-core-alt.md): nine 1-D to 3-D
 shapes confirm workgroup/local/global SRs; SR7 = SIMD groups per threadgroup;
 SR20 = (cluster<<4)|core matching driver core masks; bit-15 `get_sr` writes nothing observable.
+
+[Resource registers and widths](sr-resources-width.md): SR18 = threadgroup memory
+bytes, SR19 = register allocation; `get_sr` is 32-bit only (16-bit form = low half).

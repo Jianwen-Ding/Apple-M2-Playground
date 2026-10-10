@@ -132,11 +132,13 @@ def patch_pair(blob, selector, gap, constant=False, root=Path('/save/workspace/A
                            'metadata_mutations':[40,48,0x41d,0x83d,0x845,CODE_START-8]}
 
 
-def patch_body(blob, body, root=Path('/save/workspace/AGX_Probe/applegpu')):
+def patch_body(blob, body, root=Path('/save/workspace/AGX_Probe/applegpu'), gprs=None):
     """Replace only the original mov_imm r2 with an arbitrary body leaving data in r2.
 
     The body must not touch r0l/r1 or uniforms; the original index/bounds
     prefix and address/store/pop_exec/stop suffix are byte-identical.
+    gprs overrides the 16-bit register allocation (metadata 0x861, nr_gprs=6
+    in the control); the driver packs it as USC Registers in groups of 8.
     """
     patch(blob, 80, root)  # Enforce original binary and decoder pins.
     if (struct.unpack_from('<II',blob,0x419)!=(5,336) or
@@ -146,7 +148,12 @@ def patch_body(blob, body, root=Path('/save/workspace/AGX_Probe/applegpu')):
     gpu,_=load_model(root)
     main=blob[CODE_START+0x80:SITE]+bytes(body)+blob[CODE_START+0x9c:CODE_START+0xb6]
     changed,code,preamble_offset,decoded=_relocate(blob,main,gpu)
-    return bytes(changed), {'body_hex':bytes(body).hex(),'main_hex':main.hex(),
+    if gprs is not None:
+        if struct.unpack_from('<HH',changed,0x861)!=(6,8) or not 8<=gprs<=256:
+            raise ValueError('nr_gprs layout mismatch or out of range')
+        struct.pack_into('<H',changed,0x861,gprs)
+        changed[48:68]=integrity(changed)
+    return bytes(changed), {'gprs':gprs,'body_hex':bytes(body).hex(),'main_hex':main.hex(),
                            'main_disassembly':decoded,'main_size':len(main)+16,
                            'code_size':len(code),'preamble_offset':preamble_offset,
                            'input_sha256':hashlib.sha256(blob).hexdigest(),

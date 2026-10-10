@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -25,6 +25,8 @@ help:
 	@echo 'make verify-sr Verify retained special-register evidence offline'
 	@echo 'make sr-shape / sr-core / sr-alt Workgroup-shape, core-id, bit-15 form probes'
 	@echo 'make verify-sr-shape Verify retained shape/core/bit-15 evidence offline'
+	@echo 'make sr-shared / sr-meta / sr-width SR18/SR19 resource and get_sr width probes'
+	@echo 'make verify-sr-resources Verify retained resource/width evidence offline'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
 	@echo 'Override SCRATCH_ROOT, DEVICE, PYTHON, CC, or PROBE_INCLUDE as needed.'
 
@@ -96,3 +98,17 @@ sr-std-preload:
 
 verify-sr-shape:
 	$(PYTHON) -B scripts/verify_sr_shape_core.py --selftest
+
+sr-shared:
+	$(PYTHON) -B scripts/run_agx_sr_shape.py --shapes 0 --shared-words 0,32,64,128,256,512,1024,2048,4096,8192 --selectors all --output "$(SCRATCH_ROOT)/sr-shape-runs/shared-$$(date -u +%Y%m%dT%H%M%SZ)"
+	$(PYTHON) -B scripts/run_agx_sr_shape.py --shapes 0 --shared-words 33,63,65,100,129,1000,4097,8000 --selectors 18,19,80 --output "$(SCRATCH_ROOT)/sr-shape-runs/shared-gran-$$(date -u +%Y%m%dT%H%M%SZ)"
+
+sr-meta:
+	$(PYTHON) -B scripts/run_agx_sr_meta.py --output "$(SCRATCH_ROOT)/sr-meta-runs/$$(date -u +%Y%m%dT%H%M%SZ)"
+
+sr-width:
+	$(PYTHON) -B scripts/run_agx_sr_scan.py --preload 0x5a5a1234 --width 64 --selectors all --repeats 2 --count 65 --output "$(SCRATCH_ROOT)/sr-scan-runs/w64-$$(date -u +%Y%m%dT%H%M%SZ)"
+	$(PYTHON) -B scripts/run_agx_sr_scan.py --preload 0x5a5a1234 --width 16 --selectors all --repeats 2 --count 65 --output "$(SCRATCH_ROOT)/sr-scan-runs/w16-$$(date -u +%Y%m%dT%H%M%SZ)"
+
+verify-sr-resources:
+	$(PYTHON) -B scripts/verify_sr_resources.py --selftest

@@ -102,3 +102,10 @@ and contributed the independent verifier. See the
   across several shapes before naming a register.
 * No GLSL/SPIR-V compiler is installed (no glslang/glslc/spirv-as). SPIR-V is
   hand-encoded from the Mesa grammar and validated with libSPIRV-Tools.
+* A shader that routes data through threadgroup memory reads back 0 when its
+  shared allocation is edited to 0. Threadgroup stores/loads then silently do
+  nothing, with no fault. This was briefly mis-read as "SR19 = 0".
+* Editing exported `main_offset` (0x849) makes the shader write nothing. It is not
+  a tunable field.
+* 64-bit / 16-bit `get_sr` destinations expose no hidden clock half. `get_sr` is
+  32-bit only, and SR113 is intermittent (0/8) and must not be attributed to an edit.

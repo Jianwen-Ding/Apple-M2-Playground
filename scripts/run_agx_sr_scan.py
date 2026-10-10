@@ -17,6 +17,7 @@ import patch_agx_sr as patcher
 import run_vulkan_compute as baseline
 
 REPO = Path(__file__).resolve().parents[1]
+COPY_R3 = bytes.fromhex('0e09460200000000')  # iadd r2, r3, 0
 KNOWN = {80: lambda i: i, 0: lambda i: i//32, 4: lambda i: 32,
          5: lambda i: 1, 6: lambda i: 1, 48: lambda i: i%32,
          51: lambda i: i%32, 52: lambda i: i%32, 53: lambda i: 0}
@@ -59,6 +60,7 @@ def main():
     p.add_argument('--preload', type=lambda v:int(v,0), help='mov_imm r2, VALUE before the read (detects reads that do not write r2)')
     p.add_argument('--after', default='3800', help='hex bytes after the read in --preload mode (default wait 0)')
     p.add_argument('--reread', action='store_true', help='in --preload mode, append a standard get_sr of the same selector and wait 0')
+    p.add_argument('--width', type=int, choices=(16,32,64), default=32, help='--preload mode destination: r2l, r2, or r2:r3 (r3 preloaded with ~preload, then copied to r2)')
     p.add_argument('--alt', action='store_true', help='set bit 15 (applegpu TODO.sr_thing form)')
     p.add_argument('--output', type=Path)
     p.add_argument('--runtime', type=Path, default=Path('/scratch/apple-m2-playground/vulkan-runtime/usr/lib64'))
@@ -83,7 +85,7 @@ def main():
     state = {'passed': False, 'complete': False, 'utc': stamp, 'requested': selectors,
              'count': a.count, 'repeats': a.repeats, 'spacing_ms': a.spacing_ms,
              'pair_gap': a.pair_gap,
-             'even_mask': a.even_mask, 'alt_bit15': a.alt, 'preload': a.preload, 'after_hex': a.after, 'reread': a.reread,
+             'even_mask': a.even_mask, 'alt_bit15': a.alt, 'preload': a.preload, 'after_hex': a.after, 'reread': a.reread, 'width': a.width,
              'commands': [], 'observations': [], 'controls': [], 'failures': []}
     def save():
         (out/'record.json').write_text(json.dumps(state, indent=2)+'\n')
@@ -164,20 +166,33 @@ def main():
             body_control,evidence=patcher.patch_body(blob,mov+bytes.fromhex('3800'))
             path=out/'preload-control.bin';path.write_bytes(body_control);state['preload_control_patch']=evidence
             state['controls'].append(case('preload-control',path,lambda i:a.preload));save()
+            if a.width==64:
+                high=bytes.fromhex('620d')+(a.preload^0xffffffff).to_bytes(4,'little')
+                body_control,evidence=patcher.patch_body(blob,high+mov+bytes.fromhex('3800')+COPY_R3,gprs=16)
+                path=out/'high-control.bin';path.write_bytes(body_control);state['high_control_patch']=evidence
+                state['controls'].append(case('high-control',path,lambda i:a.preload^0xffffffff));save()
         for ordinal,selector in enumerate(selectors):
             patched,evidence=patcher.patch(blob,selector,alt=a.alt) if a.pair_gap is None else patcher.patch_pair(blob,selector,a.pair_gap,alt=a.alt)
             if a.even_mask:patched,evidence=patcher.patch_even(blob,selector,alt=a.alt)
             if a.preload is not None:
                 read=patcher.patch(blob,selector,alt=a.alt)[0][patcher.SITE:patcher.SITE+4]
+                raw=int.from_bytes(read,'little')
+                if a.width==16: raw&=~(3<<7)                    # Dt=0: 16-bit r2l
+                if a.width==64: raw|=1<<9                       # D=5: 64-bit r2:r3
+                read=raw.to_bytes(4,'little')
                 tail=patcher.patch(blob,selector)[0][patcher.SITE:patcher.SITE+6] if a.reread else b''
-                patched,evidence=patcher.patch_body(blob,mov+read+bytes.fromhex(a.after)+tail)
+                if a.width==64:
+                    high=bytes.fromhex('620d')+(a.preload^0xffffffff).to_bytes(4,'little')  # mov_imm r3
+                    patched,evidence=patcher.patch_body(blob,high+mov+read+bytes.fromhex(a.after)+COPY_R3,gprs=16)
+                else:
+                    patched,evidence=patcher.patch_body(blob,mov+read+bytes.fromhex(a.after)+tail)
                 evidence['selector']=selector;evidence['alt_bit15']=a.alt
             code=out/(f'sr{selector:03d}.bin');code.write_bytes(patched)
             observation={'selector':selector,'patch':evidence,'samples':[],'completed':False}
             state['observations'].append(observation)
             try:
                 for repeat in range(a.repeats):
-                    sample=case(f'sr{selector:03d}-r{repeat}',code,None if a.alt else KNOWN.get(selector))
+                    sample=case(f'sr{selector:03d}-r{repeat}',code,None if a.alt or a.width!=32 else KNOWN.get(selector))
                     observation['samples'].append(sample);save()
                     if repeat+1<a.repeats: time.sleep(a.spacing_ms/1000)
                 observation['completed']=True

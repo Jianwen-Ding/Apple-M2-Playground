@@ -147,8 +147,8 @@ a negative result for one compute context only.
 * SR8–10 vs SR4–6 remain indistinguishable. Mesa labels them
   `dispatch_threads_per_threadgroup`, which may differ for non-uniform or indirect
   dispatch (not tested).
-* Meanings of SR15=16, SR19=8, SR24=SR25=2, SR97=2048, SR114=136 are unresolved.
-  Shape and workgroup count do not affect them. The next variable is shader
-  resources (threadgroup memory, register count).
+* SR19 was later identified as register allocation (8 = `nr_gprs` 6 rounded up), and SR18
+  as threadgroup memory; see [resources report](sr-resources-width.md). SR15=16,
+  SR24=SR25=2, SR97=2048 and SR114=136 did not respond to any shader-resource field either.
 * SR20's 4-bit core field is inferred from the stride; per-core scheduling counts
   are incidental, not a scheduler model.

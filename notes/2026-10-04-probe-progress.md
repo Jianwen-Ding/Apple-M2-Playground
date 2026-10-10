@@ -272,3 +272,13 @@ A replicated `make sr-shape` matched the retained values exactly. Next: vary
 threadgroup memory and register pressure to explain SR15/19/24/25/97/114, test
 fragment-stage SRs (60/62/124), and try non-32-bit `get_sr` destination widths
 in the clock search.
+
+## 2026-10-10 SR resources and widths
+
+[Report](../experiments/registers/sr-resources-width.md). SR18 = threadgroup memory
+bytes (256 granule) and SR19 = register allocation (8-register granule), both
+established by single-field metadata edits on unchanged code. No SR follows
+uniform, texture/sampler, scratch or preamble-register counts. `get_sr` is 32-bit
+only. The shader-visible clock remains unfound through `get_sr`. Next candidates are
+non-`get_sr` routes (e.g. instructions applegpu leaves undecoded, or memory-mapped
+counters via the driver) and fragment-stage SRs.

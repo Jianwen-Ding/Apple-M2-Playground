@@ -40,14 +40,18 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def spirv(local, path, grammar):
-    """Hand-encoded SPIR-V 1.3 by instruction schema (no compiler installed)."""
+def spirv(local, path, grammar, shared=0):
+    """Hand-encoded SPIR-V 1.3 by instruction schema (no compiler installed).
+
+    shared>0 routes the value through a uint[shared] Workgroup array:
+    s[lii] = value; barrier; data[...] = s[lii].
+    """
     schema = json.loads(grammar.read_text())
     ops = {i['opname']: i['opcode'] for i in schema['instructions']}
     enums = {k['kind']: {e['enumerant']: int(e['value'], 0) if isinstance(e['value'], str) else e['value']
                          for e in k.get('enumerants', [])} for k in schema['operand_kinds']}
     e = lambda kind, name: enums[kind][name]
-    words = [0x07230203, 0x00010300, 0, 47, 0]
+    words = [0x07230203, 0x00010300, 0, 57 if shared else 47, 0]
     def emit(name, *args):
         words.extend([((len(args)+1) << 16) | ops[name], *args])
     sc, bi, dec = 'StorageClass', 'BuiltIn', 'Decoration'
@@ -74,6 +78,11 @@ def spirv(local, path, grammar):
     emit('OpVariable', 17, 18, e(sc, 'PushConstant')); emit('OpTypePointer', 19, e(sc, 'PushConstant'), 2)
     for ident, value in [(20, 0), (21, 8), (22, CONSTANT), (23, local[0]*local[1]*local[2])]:
         emit('OpConstant', 2, ident, value)
+    if shared:
+        if shared < local[0]*local[1]*local[2]: raise ValueError('shared array smaller than workgroup')
+        emit('OpConstant', 2, 47, shared); emit('OpConstant', 2, 52, 2); emit('OpConstant', 2, 53, 0x108)
+        emit('OpTypeArray', 48, 2, 47); emit('OpTypePointer', 49, e(sc, 'Workgroup'), 48)
+        emit('OpVariable', 49, 50, e(sc, 'Workgroup')); emit('OpTypePointer', 51, e(sc, 'Workgroup'), 2)
     emit('OpFunction', 1, 24, 0, 5); emit('OpLabel', 25)
     emit('OpLoad', 4, 26, 7); emit('OpLoad', 4, 27, 8); emit('OpLoad', 2, 28, 10)
     emit('OpCompositeExtract', 2, 29, 26, 0); emit('OpCompositeExtract', 2, 30, 26, 1)
@@ -81,11 +90,15 @@ def spirv(local, path, grammar):
     emit('OpCompositeExtract', 2, 33, 27, 1)
     emit('OpIMul', 2, 34, 33, 31); emit('OpIAdd', 2, 35, 30, 34); emit('OpIMul', 2, 36, 32, 35)
     emit('OpIAdd', 2, 37, 29, 36); emit('OpIMul', 2, 38, 23, 37); emit('OpIAdd', 2, 39, 28, 38)
+    value = 22
+    if shared:
+        emit('OpAccessChain', 51, 54, 50, 28); emit('OpStore', 54, 22)
+        emit('OpControlBarrier', 52, 52, 53); emit('OpLoad', 2, 55, 54); value = 55
     emit('OpAccessChain', 19, 40, 18, 20); emit('OpLoad', 2, 41, 40)
     emit('OpULessThan', 3, 42, 39, 41); emit('OpSelectionMerge', 44, 0)
     emit('OpBranchConditional', 42, 43, 44); emit('OpLabel', 43)
     emit('OpIAdd', 2, 45, 39, 21); emit('OpAccessChain', 15, 46, 14, 20, 45)
-    emit('OpStore', 46, 22); emit('OpBranch', 44); emit('OpLabel', 44)
+    emit('OpStore', 46, value); emit('OpBranch', 44); emit('OpLabel', 44)
     emit('OpReturn'); emit('OpFunctionEnd')
     path.write_bytes(struct.pack('<'+'I'*len(words), *words))
     return path
@@ -132,12 +145,14 @@ def main():
     p.add_argument('--selectors', default='0,1,2,4,5,6,7,8,9,10,15,19,24,25,48,49,50,51,52,53,56,57,58,59,80,81,82,97,114')
     p.add_argument('--shapes', default='all', help='all or comma-separated SHAPES indices')
     p.add_argument('--repeats', type=int, default=2)
+    p.add_argument('--shared-words', default='0', help='comma list of Workgroup uint array sizes (0 = none)')
     p.add_argument('--output', type=Path)
     p.add_argument('--runtime', type=Path, default=Path('/scratch/apple-m2-playground/vulkan-runtime/usr/lib64'))
     p.add_argument('--grammar', type=Path, default=Path('/save/workspace/AGX_Probe/mesa/src/compiler/spirv/spirv.core.grammar.json'))
     p.add_argument('--cc', default=os.environ.get('CC', 'cc'))
     a = p.parse_args()
-    selectors = [int(s) for s in a.selectors.split(',')]
+    selectors = list(range(256)) if a.selectors == 'all' else [int(s) for s in a.selectors.split(',')]
+    shared_sizes = [int(v) for v in a.shared_words.split(',')]
     shapes = SHAPES if a.shapes == 'all' else [SHAPES[int(i)] for i in a.shapes.split(',')]
     if not (1 <= a.repeats <= 5 and all(0 <= s <= 255 for s in selectors)):
         p.error('bounded repeats and selectors 0..255 required')
@@ -181,12 +196,12 @@ def main():
         binary = out/'vulkan_compute'
         run(shlex.split(a.cc)+['-std=c11', '-Wall', '-Wextra', '-Werror', '-O2', '-I/save/workspace/AGX_Probe/mesa/include',
                                REPO/'tests/vulkan_compute.c', '-ldl', '-o', binary], 30, env)
-        for k, (local, groups) in enumerate(shapes):
-            tag = 'l%dx%dx%d-g%dx%dx%d' % (*local, *groups)
+        for k, (local, groups, shared) in enumerate((l, g, n) for l, g in shapes for n in shared_sizes):
+            tag = 'l%dx%dx%d-g%dx%dx%d' % (*local, *groups) + (f'-s{shared}' if shared else '')
             count = local[0]*local[1]*local[2]*groups[0]*groups[1]*groups[2]
-            shape = {'tag': tag, 'local': local, 'groups': groups, 'count': count, 'observations': {}}
+            shape = {'tag': tag, 'local': local, 'groups': groups, 'shared_words': shared, 'count': count, 'observations': {}}
             state['shapes'].append(shape)
-            spv = spirv(local, out/(tag+'.spv'), a.grammar)
+            spv = spirv(local, out/(tag+'.spv'), a.grammar, shared)
             v = json.loads(run([sys.executable, REPO/'scripts/run_vulkan_compute.py', '--validate', spv], 30, env))
             if v['result'] != 0: raise ValueError('SPIR-V validation failed: '+tag)
             exported = out/(tag+'.bin')
