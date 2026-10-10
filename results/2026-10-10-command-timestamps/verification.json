@@ -1,0 +1,142 @@
+{
+ "passed": true,
+ "checks": [
+  {
+   "check": "runs-passed",
+   "passed": true,
+   "runs": 16
+  },
+  {
+   "check": "oracles-and-guards",
+   "passed": true
+  },
+  {
+   "check": "limits",
+   "passed": true
+  },
+  {
+   "check": "ordered",
+   "passed": true,
+   "samples": 587
+  },
+  {
+   "check": "24mhz-grid",
+   "passed": true,
+   "timestamps": 2348,
+   "chance_rate": 0.024
+  },
+  {
+   "check": "linear-t1-t0-iadd8",
+   "passed": true,
+   "slope_ns_per_instr": 17.782,
+   "intercept_ns": 25393,
+   "r2": 0.999987
+  },
+  {
+   "check": "flat-t2-t1-iadd8",
+   "passed": true,
+   "t2_t1_medians_ns": [
+    14959,
+    28333,
+    13000,
+    24500,
+    25500,
+    26875,
+    27750,
+    27584,
+    27041,
+    26792,
+    28500,
+    27917,
+    27250
+   ],
+   "t1_t0_at_65536_ns": 1188916
+  },
+  {
+   "check": "linear-t1-t0-fadd4",
+   "passed": true,
+   "slope_ns_per_instr": 10.434,
+   "intercept_ns": 28992,
+   "r2": 0.99937
+  },
+  {
+   "check": "flat-t2-t1-fadd4",
+   "passed": true,
+   "t2_t1_medians_ns": [
+    10916,
+    13458,
+    11958,
+    27417,
+    26917,
+    27125,
+    24542,
+    26458,
+    25958,
+    26542,
+    27250,
+    27000,
+    26459
+   ],
+   "t1_t0_at_65536_ns": 713167
+  },
+  {
+   "check": "host-overhead",
+   "passed": true,
+   "median_ns": 135795,
+   "p10_ns": 104884,
+   "p90_ns": 584394
+  },
+  {
+   "check": "dependency-independent-iadd8",
+   "passed": true,
+   "c1_ns": 616687,
+   "c4_ns": 608396
+  },
+  {
+   "check": "dependency-independent-fadd6",
+   "passed": true,
+   "c1_ns": 498625,
+   "c4_ns": 481146
+  },
+  {
+   "check": "dependency-independent-fadd4",
+   "passed": true,
+   "c1_ns": 378124,
+   "c4_ns": 373292
+  },
+  {
+   "check": "lane-count-independent",
+   "passed": true,
+   "counts": {
+    "count-1-c32": 32,
+    "count-2-c1216": 1216,
+    "count-3-c4864": 4864,
+    "count-4-c19456": 19456,
+    "count-5-c32": 32
+   },
+   "slow_medians_ns": {
+    "count-1-c32": 713750,
+    "count-2-c1216": 710250,
+    "count-3-c4864": 709625,
+    "count-4-c19456": 726334,
+    "count-5-c32": 715000
+   }
+  },
+  {
+   "check": "two-performance-states",
+   "passed": true,
+   "slow": 37,
+   "fast": 20,
+   "between": 3,
+   "slow_median_ns": 712083,
+   "fast_median_ns": 431917,
+   "ratio": 1.649
+  },
+  {
+   "check": "fetch-model-slow-state",
+   "passed": true,
+   "ns_per_byte": 1.837,
+   "fixed_ns_per_instr": 3.086
+  }
+ ]
+}

@@ -1,0 +1,231 @@
+{
+ "passed": true,
+ "utc": "20261010T225054823217Z",
+ "count": 32,
+ "repeats": 3,
+ "preload": 268435456,
+ "variants": [
+  {
+   "name": "unchanged",
+   "n": null,
+   "code_bytes": 2572,
+   "returncode": 0,
+   "limits": [
+    {
+     "timestamp_limits": {
+      "period_ns": 1,
+      "compute_and_graphics": 1
+     }
+    },
+    {
+     "queue": {
+      "family": 0,
+      "timestamp_valid_bits": 64
+     }
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "host_ns": 728753,
+     "ts": [
+      14092899025416,
+      14092899054833,
+      14092899064750,
+      14092899081833
+     ],
+     "avail": [
+      1,
+      1,
+      1,
+      1
+     ]
+    },
+    {
+     "rep": 1,
+     "host_ns": 226751,
+     "ts": [
+      14092899248958,
+      14092899280000,
+      14092899322875,
+      14092899340208
+     ],
+     "avail": [
+      1,
+      1,
+      1,
+      1
+     ]
+    },
+    {
+     "rep": 2,
+     "host_ns": 201626,
+     "ts": [
+      14092899481375,
+      14092899517416,
+      14092899532541,
+      14092899550583
+     ],
+     "avail": [
+      1,
+      1,
+      1,
+      1
+     ]
+    }
+   ],
+   "oracle": 305419896,
+   "values_ok": true,
+   "guards_ok": true,
+   "all_available": true
+  },
+  {
+   "name": "chain-0",
+   "n": 0,
+   "code_bytes": 2572,
+   "returncode": 0,
+   "limits": [
+    {
+     "timestamp_limits": {
+      "period_ns": 1,
+      "compute_and_graphics": 1
+     }
+    },
+    {
+     "queue": {
+      "family": 0,
+      "timestamp_valid_bits": 64
+     }
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "host_ns": 597752,
+     "ts": [
+      14092908057083,
+      14092908081541,
+      14092908090916,
+      14092908109208
+     ],
+     "avail": [
+      1,
+      1,
+      1,
+      1
+     ]
+    },
+    {
+     "rep": 1,
+     "host_ns": 227668,
+     "ts": [
+      14092908263375,
+      14092908295666,
+      14092908338166,
+      14092908357416
+     ],
+     "avail": [
+      1,
+      1,
+      1,
+      1
+     ]
+    },
+    {
+     "rep": 2,
+     "host_ns": 214168,
+     "ts": [
+      14092908496041,
+      14092908525208,
+      14092908565416,
+      14092908584666
+     ],
+     "avail": [
+      1,
+      1,
+      1,
+      1
+     ]
+    }
+   ],
+   "oracle": 268435456,
+   "values_ok": true,
+   "guards_ok": true,
+   "all_available": true
+  },
+  {
+   "name": "chain-256",
+   "n": 256,
+   "code_bytes": 4620,
+   "returncode": 0,
+   "limits": [
+    {
+     "timestamp_limits": {
+      "period_ns": 1,
+      "compute_and_graphics": 1
+     }
+    },
+    {
+     "queue": {
+      "family": 0,
+      "timestamp_valid_bits": 64
+     }
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "host_ns": 651919,
+     "ts": [
+      14092921023708,
+      14092921051208,
+      14092921067416,
+      14092921082250
+     ],
+     "avail": [
+      1,
+      1,
+      1,
+      1
+     ]
+    },
+    {
+     "rep": 1,
+     "host_ns": 243460,
+     "ts": [
+      14092921252916,
+      14092921307666,
+      14092921319833,
+      14092921336041
+     ],
+     "avail": [
+      1,
+      1,
+      1,
+      1
+     ]
+    },
+    {
+     "rep": 2,
+     "host_ns": 229042,
+     "ts": [
+      14092921501458,
+      14092921555958,
+      14092921567416,
+      14092921584541
+     ],
+     "avail": [
+      1,
+      1,
+      1,
+      1
+     ]
+    }
+   ],
+   "oracle": 268435712,
+   "values_ok": true,
+   "guards_ok": true,
+   "all_available": true
+  }
+ ]
+}
