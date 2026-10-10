@@ -52,7 +52,7 @@ def patch(blob, selector, root=Path('/save/workspace/AGX_Probe/applegpu'), alt=F
                      'wrapper_sha1': changed[48:68].hex()}
 
 
-def _relocate(blob, main, gpu):
+def _relocate(blob, main, gpu, strict=True):
     """Install a grown main, relocate the unchanged preamble, refresh sizes/SHA1."""
     # Original main_size includes 16 zero bytes following stop; retain this
     # instruction-fetch padding before aligning the relocated preamble.
@@ -72,11 +72,15 @@ def _relocate(blob, main, gpu):
     decoded=[];cursor=0
     while cursor<len(main):
         n=gpu.opcode_to_number(main[cursor:]);desc=gpu.get_instruction_descriptor(n)
-        if desc is None: raise ValueError('unknown main instruction')
+        if desc is None:
+            if strict: raise ValueError('unknown main instruction')
+            # Opcode scans: record the undecodable remainder instead of guessing its length.
+            decoded.append({'offset':0x80+cursor,'bytes':main[cursor:].hex(),'assembly':'<undecoded>'})
+            break
         size=desc.decode_size(n)
         decoded.append({'offset':0x80+cursor,'bytes':main[cursor:cursor+size].hex(),'assembly':str(desc.disassemble(n))})
         cursor+=size
-    if cursor!=len(main) or not decoded[-1]['assembly'].strip().startswith('stop'):
+    if strict and (cursor!=len(main) or not decoded[-1]['assembly'].strip().startswith('stop')):
         raise ValueError('main termination mismatch')
     return changed,code,preamble_offset,decoded
 
@@ -132,7 +136,7 @@ def patch_pair(blob, selector, gap, constant=False, root=Path('/save/workspace/A
                            'metadata_mutations':[40,48,0x41d,0x83d,0x845,CODE_START-8]}
 
 
-def patch_body(blob, body, root=Path('/save/workspace/AGX_Probe/applegpu'), gprs=None):
+def patch_body(blob, body, root=Path('/save/workspace/AGX_Probe/applegpu'), gprs=None, strict=True, trailer=b''):
     """Replace only the original mov_imm r2 with an arbitrary body leaving data in r2.
 
     The body must not touch r0l/r1 or uniforms; the original index/bounds
@@ -146,14 +150,15 @@ def patch_body(blob, body, root=Path('/save/workspace/AGX_Probe/applegpu'), gprs
             struct.unpack_from('<II',blob,0x845)!=(256,128)):
         raise ValueError('measured metadata mismatch')
     gpu,_=load_model(root)
-    main=blob[CODE_START+0x80:SITE]+bytes(body)+blob[CODE_START+0x9c:CODE_START+0xb6]
-    changed,code,preamble_offset,decoded=_relocate(blob,main,gpu)
+    # trailer: bytes placed after stop, i.e. never executed (fetch/decode-ahead probes).
+    main=blob[CODE_START+0x80:SITE]+bytes(body)+blob[CODE_START+0x9c:CODE_START+0xb6]+bytes(trailer)
+    changed,code,preamble_offset,decoded=_relocate(blob,main,gpu,strict and not trailer)
     if gprs is not None:
         if struct.unpack_from('<HH',changed,0x861)!=(6,8) or not 8<=gprs<=256:
             raise ValueError('nr_gprs layout mismatch or out of range')
         struct.pack_into('<H',changed,0x861,gprs)
         changed[48:68]=integrity(changed)
-    return bytes(changed), {'gprs':gprs,'body_hex':bytes(body).hex(),'main_hex':main.hex(),
+    return bytes(changed), {'gprs':gprs,'trailer_hex':bytes(trailer).hex(),'body_hex':bytes(body).hex(),'main_hex':main.hex(),
                            'main_disassembly':decoded,'main_size':len(main)+16,
                            'code_size':len(code),'preamble_offset':preamble_offset,
                            'input_sha256':hashlib.sha256(blob).hexdigest(),

@@ -109,3 +109,24 @@ and contributed the independent verifier. See the
   a tunable field.
 * 64-bit / 16-bit `get_sr` destinations expose no hidden clock half. `get_sr` is
   32-bit only, and SR113 is intermittent (0/8) and must not be attributed to an edit.
+
+### Undecoded-opcode execution, 2026-10-10 — SYSTEM-VISIBLE GPU FAULTS
+
+`scripts/run_agx_opcode_scan.py` executes the 59 low-7-bit opcode values the
+applegpu model cannot decode. Nine of them (0x06, 0x24, 0x34, 0x44, 0x46, 0x54,
+0x5c, 0x64, 0x74), executed by even one lane, discard every store of the whole
+dispatch. The submitting process sees **no error**: the fence signals and a second
+submission on the same VkDevice succeeds. **The project owner saw purple flashes
+and desktop stutter while these ran.** These are almost certainly whole-GPU fault
+recovery events that the shared display also experiences. Do not interpret "no
+VkResult error" as "no fault".
+
+* Run these only with the owner's agreement, on an idle machine. Keep counts
+  minimal and capture `dmesg` (needs root) around runs. `make opcode-scan` is
+  gated by `CONFIRM_GPU_FAULTS=1`.
+* Repeated firmware faults on Asahi can require a reboot. Note that risk before any rerun.
+* Results so far are in scratch only and are not yet a retained finding. Class A
+  (17 opcodes) end the executing SIMD group, and also act when the group has no
+  active lanes unless jumped over. 0x18-like opcodes are no-ops. Some 0x6e operand
+  forms return stale, bit-noisy on-chip data. That resembles the LeftoverLocals
+  class (CVE-2023-4969) and was deliberately not pursued.

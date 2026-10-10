@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -27,6 +27,7 @@ help:
 	@echo 'make verify-sr-shape Verify retained shape/core/bit-15 evidence offline'
 	@echo 'make sr-shared / sr-meta / sr-width SR18/SR19 resource and get_sr width probes'
 	@echo 'make verify-sr-resources Verify retained resource/width evidence offline'
+	@echo 'make opcode-scan        GPU-FAULTING: undecoded opcode effects (needs CONFIRM_GPU_FAULTS=1)'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
 	@echo 'Override SCRATCH_ROOT, DEVICE, PYTHON, CC, or PROBE_INCLUDE as needed.'
 
@@ -112,3 +113,15 @@ sr-width:
 
 verify-sr-resources:
 	$(PYTHON) -B scripts/verify_sr_resources.py --selftest
+
+OPSCAN = $(PYTHON) -B scripts/run_agx_opcode_scan.py
+OPDIR = $(SCRATCH_ROOT)/opcode-scan-runs/$$(date -u +%Y%m%dT%H%M%SZ)
+opcode-scan:
+	@test "$(CONFIRM_GPU_FAULTS)" = 1 || { echo 'opcode-scan executes instructions that fault the whole GPU (display stalls/purple flashes on the desktop). Re-run with CONFIRM_GPU_FAULTS=1 only on an otherwise idle machine.'; exit 1; }
+	$(OPSCAN) --follow --output "$(OPDIR)-plain"
+	$(OPSCAN) --bracket --output "$(OPDIR)-bracket"
+	$(OPSCAN) --bracket --after-stop --output "$(OPDIR)-after-stop"
+	$(OPSCAN) --set wg0-skip --count 257 --repeats 3 --follow --output "$(OPDIR)-wg0-skip"
+	$(OPSCAN) --set 6e-fuzz --output "$(OPDIR)-6e-fuzz"
+	$(OPSCAN) --set 6e-init --repeats 3 --output "$(OPDIR)-6e-init"
+

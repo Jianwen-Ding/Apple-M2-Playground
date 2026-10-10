@@ -33,7 +33,10 @@ static void writefile(const char *path, const void *p, size_t n) {
 int main(int argc, char **argv) {
     setvbuf(stdout, NULL, _IONBF, 0);
     require(argc == 7 || argc == 10, "usage: export|import|control input count node readback binary-output [groups-x groups-y groups-z]");
-    int importing = strcmp(argv[1], "import") == 0, control = strcmp(argv[1], "control") == 0;
+    /* follow: import argv[2] and submit, then import argv[6] and submit again on the
+       same device/queue; second readback goes to argv[5] with ".2" appended. */
+    int follow = strcmp(argv[1], "follow") == 0;
+    int importing = strcmp(argv[1], "import") == 0 || follow, control = strcmp(argv[1], "control") == 0;
     require(importing || control || strcmp(argv[1], "export") == 0, "mode");
     char *end; unsigned long parsed = strtoul(argv[3], &end, 10);
     require(*end == 0 && parsed >= 1 && parsed <= 65536, "count"); uint32_t count = (uint32_t)parsed;
@@ -130,7 +133,31 @@ int main(int argc, char **argv) {
     VkSubmitInfo submit={.sType=VK_STRUCTURE_TYPE_SUBMIT_INFO,.commandBufferCount=1,.pCommandBuffers=&cb}; CALL(vkQueueSubmit,queue,1,&submit,fence);
     CALL(vkWaitForFences,device,1,&fence,VK_TRUE,3000000000ull);
     writefile(argv[5],mapped,bytes);
-    if(!importing && !control) {
+    if(follow) {
+        /* Second submission: results are logged, not required, so a lost device is observable. */
+        for(uint32_t j=0;j<words;j++) mapped[j]=j<words-16 ? 0xcdcdcdcdu : 0xa5a50000u+j-(words-16);
+        size_t code2_size; void *code2=readfile(argv[6],&code2_size);
+        sci.codeSize=code2_size; sci.pCode=code2; VkShaderEXT shader2=VK_NULL_HANDLE;
+        VkResult r=vkCreateShadersEXT(device,1,&sci,NULL,&shader2); free(code2);
+        printf("{\"api\":\"follow:vkCreateShadersEXT\",\"result\":%d}\n",r); require(r==VK_SUCCESS,"follow-shader");
+        VkCommandBuffer cb2; CALL(vkAllocateCommandBuffers,device,&cbai,&cb2); CALL(vkBeginCommandBuffer,cb2,&cbi);
+        barrier.srcAccessMask=VK_ACCESS_HOST_WRITE_BIT; barrier.dstAccessMask=VK_ACCESS_SHADER_READ_BIT|VK_ACCESS_SHADER_WRITE_BIT;
+        vkCmdPipelineBarrier(cb2,VK_PIPELINE_STAGE_HOST_BIT,VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,0,1,&barrier,0,NULL,0,NULL);
+        vkCmdBindShadersEXT(cb2,1,&stage,&shader2);
+        vkCmdBindDescriptorSets(cb2,VK_PIPELINE_BIND_POINT_COMPUTE,pl,0,1,&ds,0,NULL); vkCmdPushConstants(cb2,pl,stage,0,4,&count);
+        vkCmdDispatch(cb2,groups[0],groups[1],groups[2]);
+        barrier.srcAccessMask=VK_ACCESS_SHADER_WRITE_BIT; barrier.dstAccessMask=VK_ACCESS_HOST_READ_BIT;
+        vkCmdPipelineBarrier(cb2,VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,VK_PIPELINE_STAGE_HOST_BIT,0,1,&barrier,0,NULL,0,NULL);
+        CALL(vkEndCommandBuffer,cb2);
+        VkFence fence2; CALL(vkCreateFence,device,&fci,NULL,&fence2);
+        VkSubmitInfo submit2={.sType=VK_STRUCTURE_TYPE_SUBMIT_INFO,.commandBufferCount=1,.pCommandBuffers=&cb2};
+        r=vkQueueSubmit(queue,1,&submit2,fence2); printf("{\"api\":\"follow:vkQueueSubmit\",\"result\":%d}\n",r);
+        if(r==VK_SUCCESS){ r=vkWaitForFences(device,1,&fence2,VK_TRUE,3000000000ull); printf("{\"api\":\"follow:vkWaitForFences\",\"result\":%d}\n",r); }
+        size_t n=strlen(argv[5]); char *second=malloc(n+3); require(second!=NULL,"follow-path");
+        memcpy(second,argv[5],n); memcpy(second+n,".2",3); writefile(second,mapped,bytes); free(second);
+        vkDestroyFence(device,fence2,NULL); vkDestroyShaderEXT(device,shader2,NULL);
+    }
+    if(!importing && !control && !follow) {
         size_t size=0; CALL(vkGetShaderBinaryDataEXT,device,shader,&size,NULL); require(size>0 && size<=1048576,"binary-size");
         size_t capacity=size; void *binary=aligned_alloc(16,(size+15)&~(size_t)15); require(binary!=NULL,"binary-allocate");
         CALL(vkGetShaderBinaryDataEXT,device,shader,&size,binary); require(size==capacity,"binary-size-stable"); writefile(argv[6],binary,size); free(binary);
