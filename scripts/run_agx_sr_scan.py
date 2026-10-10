@@ -56,15 +56,21 @@ def main():
     p.add_argument('--max-failures', type=int, default=8)
     p.add_argument('--pair-gap', type=int, help='two reads per lane with 0..256 intervening integer adds; count <=16')
     p.add_argument('--even-mask', action='store_true', help='nested mask reads/stores only even indices')
+    p.add_argument('--preload', type=lambda v:int(v,0), help='mov_imm r2, VALUE before the read (detects reads that do not write r2)')
+    p.add_argument('--after', default='3800', help='hex bytes after the read in --preload mode (default wait 0)')
+    p.add_argument('--reread', action='store_true', help='in --preload mode, append a standard get_sr of the same selector and wait 0')
+    p.add_argument('--alt', action='store_true', help='set bit 15 (applegpu TODO.sr_thing form)')
     p.add_argument('--output', type=Path)
     p.add_argument('--runtime', type=Path, default=Path('/scratch/apple-m2-playground/vulkan-runtime/usr/lib64'))
     p.add_argument('--cc', default=os.environ.get('CC', 'cc'))
     a = p.parse_args()
-    if not (1 <= a.count <= 257 and 2 <= a.repeats <= 5 and 0 <= a.spacing_ms <= 1000 and 1 <= a.max_failures <= 256):
+    if not (1 <= a.count <= 65536 and 2 <= a.repeats <= 5 and 0 <= a.spacing_ms <= 1000 and 1 <= a.max_failures <= 256):
         p.error('bounded count/repeats/spacing/failures required')
     if a.pair_gap is not None and not (0<=a.pair_gap<=256 and a.count<=16):
         p.error('pair-gap 0..256 requires count <=16')
     if a.even_mask and a.pair_gap is not None:p.error('even-mask and pair-gap are separate experiments')
+    if a.preload is not None and (a.even_mask or a.pair_gap is not None or not 0<=a.preload<2**32):
+        p.error('preload is a separate single-read experiment with a uint32 value')
     selectors = list(range(256)) if a.selectors == 'all' else [int(s) for s in a.selectors.split(',')]
     if len(set(selectors)) != len(selectors) or any(not 0 <= s <= 255 for s in selectors):
         p.error('unique selectors 0..255 required')
@@ -77,7 +83,7 @@ def main():
     state = {'passed': False, 'complete': False, 'utc': stamp, 'requested': selectors,
              'count': a.count, 'repeats': a.repeats, 'spacing_ms': a.spacing_ms,
              'pair_gap': a.pair_gap,
-             'even_mask': a.even_mask,
+             'even_mask': a.even_mask, 'alt_bit15': a.alt, 'preload': a.preload, 'after_hex': a.after, 'reread': a.reread,
              'commands': [], 'observations': [], 'controls': [], 'failures': []}
     def save():
         (out/'record.json').write_text(json.dumps(state, indent=2)+'\n')
@@ -153,15 +159,25 @@ def main():
             control=out/'sparse-control.bin';control.write_bytes(sparse_control)
             state['sparse_control_patch']=evidence;state['sparse_control_hex']=sparse_control.hex()
         state['controls'].append(case('unchanged-before',control,lambda i:0x12345678)); save()
+        if a.preload is not None:
+            mov=bytes.fromhex('6209')+a.preload.to_bytes(4,'little')
+            body_control,evidence=patcher.patch_body(blob,mov+bytes.fromhex('3800'))
+            path=out/'preload-control.bin';path.write_bytes(body_control);state['preload_control_patch']=evidence
+            state['controls'].append(case('preload-control',path,lambda i:a.preload));save()
         for ordinal,selector in enumerate(selectors):
-            patched,evidence=patcher.patch(blob,selector) if a.pair_gap is None else patcher.patch_pair(blob,selector,a.pair_gap)
-            if a.even_mask:patched,evidence=patcher.patch_even(blob,selector)
+            patched,evidence=patcher.patch(blob,selector,alt=a.alt) if a.pair_gap is None else patcher.patch_pair(blob,selector,a.pair_gap,alt=a.alt)
+            if a.even_mask:patched,evidence=patcher.patch_even(blob,selector,alt=a.alt)
+            if a.preload is not None:
+                read=patcher.patch(blob,selector,alt=a.alt)[0][patcher.SITE:patcher.SITE+4]
+                tail=patcher.patch(blob,selector)[0][patcher.SITE:patcher.SITE+6] if a.reread else b''
+                patched,evidence=patcher.patch_body(blob,mov+read+bytes.fromhex(a.after)+tail)
+                evidence['selector']=selector;evidence['alt_bit15']=a.alt
             code=out/(f'sr{selector:03d}.bin');code.write_bytes(patched)
             observation={'selector':selector,'patch':evidence,'samples':[],'completed':False}
             state['observations'].append(observation)
             try:
                 for repeat in range(a.repeats):
-                    sample=case(f'sr{selector:03d}-r{repeat}',code,KNOWN.get(selector))
+                    sample=case(f'sr{selector:03d}-r{repeat}',code,None if a.alt else KNOWN.get(selector))
                     observation['samples'].append(sample);save()
                     if repeat+1<a.repeats: time.sleep(a.spacing_ms/1000)
                 observation['completed']=True

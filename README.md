@@ -46,6 +46,9 @@ make instruction-candidates # Export offline ALU byte changes and uint32 oracles
 make agx-instruction # Reproduce the pinned G14C move-immediate hardware suite
 make agx-imadd # Reproduce the pinned G14C integer multiply-add addend suite
 make verify-imadd # Check retained multiply-add evidence offline
+make sr-shape    # SR reads across nine 1-D..3-D workgroup shapes
+make sr-core     # 2048-workgroup SR20 core-id / constant check
+make verify-sr-shape # Check retained shape/core/bit-15 evidence offline
 ```
 
 Run records and binaries go to scratch. Baseline/DRM runs use
@@ -74,6 +77,7 @@ are documented in [scripts/README.md](scripts/README.md).
 - [Shader-counter evidence gap](experiments/timing/shader-counter-candidates.md)
 - [Driver time and evidence](experiments/timing/driver-time.md)
 - [Reviewed progress and next tasks](notes/2026-10-04-probe-progress.md)
+- [SR geometry, core id, bit-15 form](experiments/registers/sr-geometry-core-alt.md)
 - [Known limitations and failed approaches](notes/failed-approaches.md)
 - [Timing investigation](experiments/timing/README.md)
 
@@ -100,3 +104,10 @@ register was found through the tested 32-bit read path. Prefix and sparse masks
 identified SR16 lane position, SR57 four-lane active population, and SR59
 32-lane active population. `make verify-sr` checks retained evidence offline;
 `make sr-scan` and `make sr-pairs` reproduce the full hardware sweeps.
+
+The [geometry/core-id follow-up](experiments/registers/sr-geometry-core-alt.md)
+ran nine local/group shapes (1-D to 3-D) and a 2048-workgroup dispatch. It
+confirmed the geometry SRs needed for CUDA `threadIdx`/`blockIdx`/`blockDim`/`%laneid`,
+found SR7 = SIMD groups per threadgroup, and showed SR20 = `(cluster<<4)|core`
+over exactly the 38 driver-enabled cores (a `%smid` source). The bit-15 `get_sr`
+form wrote nothing observable for all 256 selectors. `make verify-sr-shape` checks it offline.

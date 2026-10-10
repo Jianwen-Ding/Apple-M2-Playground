@@ -86,3 +86,19 @@ Paid ACM workers failed on provider funding; explicit Copilot model names were
 unavailable. The configured default Copilot worker completed three review turns
 and contributed the independent verifier. See the
 [hardware report](../experiments/registers/special-register-scan.md).
+
+### SR geometry / bit-15 follow-up, 2026-10-10
+
+* `/scratch/apple-m2-playground` was root-owned and not writable by the probe
+  user (uid 1000) this session. Default runner outputs failed with `PermissionError`
+  before any GPU work. Pass `--output` / `SCRATCH_ROOT=` to a writable directory.
+  `make check` also needs `SCRATCH_ROOT` overridden in that case.
+* The bit-15 `get_sr` form (applegpu `TODO.sr_thing`) is **not** an alternate
+  read or a move-to-SR in compute. Without a preload it stores stale
+  register-file contents, which can look like random data. Always preload the
+  destination when testing a possibly non-writing instruction.
+* SR15/19/24/25/97/114 do not depend on workgroup shape or count. Small
+  shapes produce coincidental matches (e.g. `gx = 2` for SR24), so fit formulas
+  across several shapes before naming a register.
+* No GLSL/SPIR-V compiler is installed (no glslang/glslc/spirv-as). SPIR-V is
+  hand-encoded from the Mesa grammar and validated with libSPIRV-Tools.

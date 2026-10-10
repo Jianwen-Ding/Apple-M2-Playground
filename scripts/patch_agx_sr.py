@@ -13,7 +13,8 @@ from patch_agx_shader import CONTROL_SHA256
 SITE = CODE_START + 0x96
 
 
-def patch(blob, selector, root=Path('/save/workspace/AGX_Probe/applegpu')):
+def patch(blob, selector, root=Path('/save/workspace/AGX_Probe/applegpu'), alt=False):
+    """alt=True sets bit 15: applegpu's undocumented TODO.sr_thing form."""
     if type(selector) is not int or not 0 <= selector <= 255:
         raise ValueError('selector must be an integer 0..255')
     if hashlib.sha256(blob).hexdigest() != CONTROL_SHA256:
@@ -25,9 +26,11 @@ def patch(blob, selector, root=Path('/save/workspace/AGX_Probe/applegpu')):
     gpu, _ = load_model(root)
     # Dt=2: 32-bit ordinary destination. D=4: physical half-register r2.
     raw = 0x72 | (2 << 7) | (4 << 9) | ((selector & 63) << 16) | ((selector >> 6) << 26)
+    raw |= (1 << 15) if alt else 0
     read = raw.to_bytes(4, 'little')
     desc = gpu.get_instruction_descriptor(raw)
-    if (type(desc).__name__ != 'MovFromSrInstructionDesc' or desc.decode_size(raw) != 4 or
+    expected = 'TodoSrThingInstructionDesc' if alt else 'MovFromSrInstructionDesc'
+    if (type(desc).__name__ != expected or desc.decode_size(raw) != 4 or
             dict(desc.decode_fields(raw)) != {'Dt': 2, 'D': 4, 'SR': selector}):
         raise ValueError('special register decode mismatch')
     wait = bytes.fromhex('3800')
@@ -41,7 +44,7 @@ def patch(blob, selector, root=Path('/save/workspace/AGX_Probe/applegpu')):
     offsets = [i for i,(a,b) in enumerate(zip(blob, changed)) if a != b]
     if any(not (48 <= i < 68 or SITE <= i < SITE + 6) for i in offsets):
         raise ValueError('unexpected mutation')
-    return changed, {'selector': selector, 'site': SITE, 'old': blob[SITE:SITE+6].hex(),
+    return changed, {'selector': selector, 'alt_bit15': alt, 'site': SITE, 'old': blob[SITE:SITE+6].hex(),
                      'new': (read+wait).hex(), 'decoded': str(desc.disassemble(raw)),
                      'fields': dict(desc.decode_fields(raw)), 'changed_offsets': offsets,
                      'input_sha256': hashlib.sha256(blob).hexdigest(),
@@ -49,7 +52,36 @@ def patch(blob, selector, root=Path('/save/workspace/AGX_Probe/applegpu')):
                      'wrapper_sha1': changed[48:68].hex()}
 
 
-def patch_pair(blob, selector, gap, constant=False, root=Path('/save/workspace/AGX_Probe/applegpu')):
+def _relocate(blob, main, gpu):
+    """Install a grown main, relocate the unchanged preamble, refresh sizes/SHA1."""
+    # Original main_size includes 16 zero bytes following stop; retain this
+    # instruction-fetch padding before aligning the relocated preamble.
+    preamble_offset=(0x80+len(main)+16+127)//128*128
+    preamble=blob[CODE_START+0x100:CODE_START+CODE_SIZE]
+    code=blob[CODE_START:CODE_START+0x80]+main
+    code+=bytes(preamble_offset-len(code))+preamble
+    changed=bytearray(blob[:CODE_START]+code)
+    struct.pack_into('<I',changed,0x41d,len(code))       # agx shader code size
+    struct.pack_into('<I',changed,0x83d,len(main)+16)    # main size including padding
+    struct.pack_into('<I',changed,0x845,preamble_offset)
+    struct.pack_into('<I',changed,CODE_START-8,len(code))
+    struct.pack_into('<Q',changed,40,len(changed))      # wrapper total size
+    changed[48:68]=integrity(changed)
+    # Retain a bounded instruction walk: prefix untouched, known store/base
+    # operands untouched, only data reads and explicit address stride doubled.
+    decoded=[];cursor=0
+    while cursor<len(main):
+        n=gpu.opcode_to_number(main[cursor:]);desc=gpu.get_instruction_descriptor(n)
+        if desc is None: raise ValueError('unknown main instruction')
+        size=desc.decode_size(n)
+        decoded.append({'offset':0x80+cursor,'bytes':main[cursor:cursor+size].hex(),'assembly':str(desc.disassemble(n))})
+        cursor+=size
+    if cursor!=len(main) or not decoded[-1]['assembly'].strip().startswith('stop'):
+        raise ValueError('main termination mismatch')
+    return changed,code,preamble_offset,decoded
+
+
+def patch_pair(blob, selector, gap, constant=False, root=Path('/save/workspace/AGX_Probe/applegpu'), alt=False):
     """Two data reads/stores per lane, separated by exactly gap integer adds.
 
     Rebuild the pinned main; preserve register allocation, rodata and preamble.
@@ -76,7 +108,7 @@ def patch_pair(blob, selector, gap, constant=False, root=Path('/save/workspace/A
         if desc is None or desc.decode_size(n)!=len(data) or desc.decode_remainder(n)!=0:
             raise ValueError('inconsistent assembly: '+text)
         return data
-    sr,_=patch(blob,selector,root)
+    sr,_=patch(blob,selector,root,alt)
     read=bytes.fromhex('620978563412') if constant else sr[SITE:SITE+4]
     prefix=blob[CODE_START+0x80:SITE]  # Original index and active-count check.
     double=encode('iadd r1, r1.sx, r1.sx')
@@ -90,31 +122,8 @@ def patch_pair(blob, selector, gap, constant=False, root=Path('/save/workspace/A
             delay.hex()!='0e09014064000000'):
         raise ValueError('address/delay encoding mismatch')
     main=prefix+read+double+address+store+wait+delay*gap+read+increment+store+wait+end
-    # Original main_size includes 16 zero bytes following stop; retain this
-    # instruction-fetch padding before aligning the relocated preamble.
-    preamble_offset=(0x80+len(main)+16+127)//128*128
-    preamble=blob[CODE_START+0x100:CODE_START+CODE_SIZE]
-    code=blob[CODE_START:CODE_START+0x80]+main
-    code+=bytes(preamble_offset-len(code))+preamble
-    changed=bytearray(blob[:CODE_START]+code)
-    struct.pack_into('<I',changed,0x41d,len(code))       # agx shader code size
-    struct.pack_into('<I',changed,0x83d,len(main)+16)    # main size including padding
-    struct.pack_into('<I',changed,0x845,preamble_offset)
-    struct.pack_into('<I',changed,CODE_START-8,len(code))
-    struct.pack_into('<Q',changed,40,len(changed))      # wrapper total size
-    changed[48:68]=integrity(changed)
-    # Retain a bounded instruction walk: prefix untouched, known store/base
-    # operands untouched, only data reads and explicit address stride doubled.
-    decoded=[];cursor=0
-    while cursor<len(main):
-        n=gpu.opcode_to_number(main[cursor:]);desc=gpu.get_instruction_descriptor(n)
-        if desc is None: raise ValueError('unknown main instruction')
-        size=desc.decode_size(n)
-        decoded.append({'offset':0x80+cursor,'bytes':main[cursor:cursor+size].hex(),'assembly':str(desc.disassemble(n))})
-        cursor+=size
-    if cursor!=len(main) or not decoded[-1]['assembly'].strip().startswith('stop'):
-        raise ValueError('main termination mismatch')
-    return bytes(changed), {'selector':selector,'pair_gap':gap,'constant_control':constant,
+    changed,code,preamble_offset,decoded=_relocate(blob,main,gpu)
+    return bytes(changed), {'selector':selector,'alt_bit15':alt,'pair_gap':gap,'constant_control':constant,
                            'main_size':len(main)+16,'code_size':len(code),'preamble_offset':preamble_offset,
                            'main_hex':main.hex(),'main_disassembly':decoded,
                            'input_sha256':hashlib.sha256(blob).hexdigest(),
@@ -123,9 +132,30 @@ def patch_pair(blob, selector, gap, constant=False, root=Path('/save/workspace/A
                            'metadata_mutations':[40,48,0x41d,0x83d,0x845,CODE_START-8]}
 
 
-def patch_even(blob, selector, constant=False, root=Path('/save/workspace/AGX_Probe/applegpu')):
+def patch_body(blob, body, root=Path('/save/workspace/AGX_Probe/applegpu')):
+    """Replace only the original mov_imm r2 with an arbitrary body leaving data in r2.
+
+    The body must not touch r0l/r1 or uniforms; the original index/bounds
+    prefix and address/store/pop_exec/stop suffix are byte-identical.
+    """
+    patch(blob, 80, root)  # Enforce original binary and decoder pins.
+    if (struct.unpack_from('<II',blob,0x419)!=(5,336) or
+            struct.unpack_from('<I',blob,0x83d)[0]!=70 or
+            struct.unpack_from('<II',blob,0x845)!=(256,128)):
+        raise ValueError('measured metadata mismatch')
+    gpu,_=load_model(root)
+    main=blob[CODE_START+0x80:SITE]+bytes(body)+blob[CODE_START+0x9c:CODE_START+0xb6]
+    changed,code,preamble_offset,decoded=_relocate(blob,main,gpu)
+    return bytes(changed), {'body_hex':bytes(body).hex(),'main_hex':main.hex(),
+                           'main_disassembly':decoded,'main_size':len(main)+16,
+                           'code_size':len(code),'preamble_offset':preamble_offset,
+                           'input_sha256':hashlib.sha256(blob).hexdigest(),
+                           'patched_sha256':hashlib.sha256(changed).hexdigest()}
+
+
+def patch_even(blob, selector, constant=False, root=Path('/save/workspace/AGX_Probe/applegpu'), alt=False):
     """Read/store only even global indices, under the original outer bounds mask."""
-    changed,evidence=patch(blob,selector,root)
+    changed,evidence=patch(blob,selector,root,alt)
     gpu,_=load_model(root)
     read=bytes.fromhex('620978563412') if constant else changed[SITE:SITE+6]
     # and r2,r1,1; nested if r0l, unsigned-equal,r2,0,1; paired pop_exec.
@@ -141,7 +171,7 @@ def patch_even(blob, selector, constant=False, root=Path('/save/workspace/AGX_Pr
     result[CODE_START+0x80:CODE_START+0x100]=main+bytes(128-len(main))
     struct.pack_into('<I',result,0x83d,len(main)+16)
     result[48:68]=integrity(result)
-    return bytes(result), {'selector':selector,'sparse_even':True,'constant_control':constant,
+    return bytes(result), {'selector':selector,'alt_bit15':alt,'sparse_even':True,'constant_control':constant,
                            'main_hex':main.hex(),'main_size':len(main)+16,
                            'input_sha256':hashlib.sha256(blob).hexdigest(),
                            'patched_sha256':hashlib.sha256(result).hexdigest()}

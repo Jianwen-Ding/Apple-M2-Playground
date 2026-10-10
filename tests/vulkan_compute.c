@@ -32,11 +32,11 @@ static void writefile(const char *path, const void *p, size_t n) {
 }
 int main(int argc, char **argv) {
     setvbuf(stdout, NULL, _IONBF, 0);
-    require(argc == 7, "usage: export|import|control input count node readback binary-output");
+    require(argc == 7 || argc == 10, "usage: export|import|control input count node readback binary-output [groups-x groups-y groups-z]");
     int importing = strcmp(argv[1], "import") == 0, control = strcmp(argv[1], "control") == 0;
     require(importing || control || strcmp(argv[1], "export") == 0, "mode");
     char *end; unsigned long parsed = strtoul(argv[3], &end, 10);
-    require(*end == 0 && parsed >= 1 && parsed <= 257, "count"); uint32_t count = (uint32_t)parsed;
+    require(*end == 0 && parsed >= 1 && parsed <= 65536, "count"); uint32_t count = (uint32_t)parsed;
     struct stat node; require(stat(argv[4], &node) == 0 && S_ISCHR(node.st_mode), "node-stat");
     void *lib = dlopen("libvulkan.so.1", RTLD_NOW | RTLD_LOCAL); require(lib != NULL, "loader");
     PFN_vkGetInstanceProcAddr get = (PFN_vkGetInstanceProcAddr)dlsym(lib, "vkGetInstanceProcAddr"); require(get != NULL, "get-proc");
@@ -119,7 +119,10 @@ int main(int argc, char **argv) {
     vkCmdPipelineBarrier(cb,VK_PIPELINE_STAGE_HOST_BIT,VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,0,1,&barrier,0,NULL,0,NULL);
     VkShaderStageFlagBits stage=VK_SHADER_STAGE_COMPUTE_BIT; vkCmdBindShadersEXT(cb,1,&stage,&shader);
     vkCmdBindDescriptorSets(cb,VK_PIPELINE_BIND_POINT_COMPUTE,pl,0,1,&ds,0,NULL); vkCmdPushConstants(cb,pl,stage,0,4,&count);
-    if(!control) vkCmdDispatch(cb,rounded/32,1,1);
+    uint32_t groups[3]={rounded/32,1,1};
+    if(argc==10) for(int j=0;j<3;j++){ unsigned long g=strtoul(argv[7+j],&end,10); require(*end==0 && g>=1 && g<=65536,"groups"); groups[j]=(uint32_t)g; }
+    require((uint64_t)groups[0]*groups[1]*groups[2]<=65536,"groups-total");
+    if(!control) vkCmdDispatch(cb,groups[0],groups[1],groups[2]);
     barrier.srcAccessMask=VK_ACCESS_SHADER_WRITE_BIT; barrier.dstAccessMask=VK_ACCESS_HOST_READ_BIT;
     vkCmdPipelineBarrier(cb,VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,VK_PIPELINE_STAGE_HOST_BIT,0,1,&barrier,0,NULL,0,NULL);
     CALL(vkEndCommandBuffer,cb);

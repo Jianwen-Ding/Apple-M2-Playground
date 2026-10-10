@@ -261,3 +261,14 @@ SR57 four-lane population, and SR59 32-lane population behavior. Copilot reviewe
 evidence through ACM and wrote an independent verifier; the coordinator ran all
 serialized hardware probes and integration checks. See the
 [complete report](../experiments/registers/special-register-scan.md).
+
+## 2026-10-10 SR geometry, core id and bit-15 form
+
+[Report](../experiments/registers/sr-geometry-core-alt.md). Nine shapes ×
+29 selectors confirm geometry SRs on hardware. SR7 = ceil(L/32) SIMD groups per
+threadgroup is new. SR20 = (cluster<<4)|core equals the GET_PARAMS core-mask set over
+2048 workgroups. The bit-15 form writes neither D nor any get_sr-visible state.
+A replicated `make sr-shape` matched the retained values exactly. Next: vary
+threadgroup memory and register pressure to explain SR15/19/24/25/97/114, test
+fragment-stage SRs (60/62/124), and try non-32-bit `get_sr` destination widths
+in the clock search.

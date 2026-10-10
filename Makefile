@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -23,6 +23,8 @@ help:
 	@echo 'make sr-characterize / sr-even Check lane-mask behavior'
 	@echo 'make sr-context Check repeated dispatches in one device'
 	@echo 'make verify-sr Verify retained special-register evidence offline'
+	@echo 'make sr-shape / sr-core / sr-alt Workgroup-shape, core-id, bit-15 form probes'
+	@echo 'make verify-sr-shape Verify retained shape/core/bit-15 evidence offline'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
 	@echo 'Override SCRATCH_ROOT, DEVICE, PYTHON, CC, or PROBE_INCLUDE as needed.'
 
@@ -76,3 +78,21 @@ verify-sr:
 	$(PYTHON) -B scripts/verify_sr_findings.py
 	$(PYTHON) -B scripts/verify_sr_evidence.py --selftest results/2026-10-04-sr-scan/full-single.json
 	$(PYTHON) -B scripts/verify_sr_evidence.py --selftest results/2026-10-04-sr-scan/full-paired.json
+
+sr-shape:
+	$(PYTHON) -B scripts/run_agx_sr_shape.py --output "$(SCRATCH_ROOT)/sr-shape-runs/$$(date -u +%Y%m%dT%H%M%SZ)"
+
+sr-core:
+	$(PYTHON) -B scripts/run_agx_sr_scan.py --selectors 80,0,20,21,7,15,19,24,25,32,97,113,114,8,9,10,60,63,1,2 --repeats 3 --count 65536 --output "$(SCRATCH_ROOT)/sr-scan-runs/core-$$(date -u +%Y%m%dT%H%M%SZ)"
+
+sr-alt:
+	$(PYTHON) -B scripts/run_agx_sr_scan.py --alt --preload 0xdeadbeef --selectors all --repeats 2 --count 65 --output "$(SCRATCH_ROOT)/sr-scan-runs/alt-$$(date -u +%Y%m%dT%H%M%SZ)"
+
+sr-alt-reread:
+	$(PYTHON) -B scripts/run_agx_sr_scan.py --alt --reread --preload 0x5a5a1234 --selectors all --repeats 2 --count 65 --output "$(SCRATCH_ROOT)/sr-scan-runs/alt-reread-$$(date -u +%Y%m%dT%H%M%SZ)"
+
+sr-std-preload:
+	$(PYTHON) -B scripts/run_agx_sr_scan.py --preload 0x5a5a1234 --selectors all --repeats 2 --count 65 --output "$(SCRATCH_ROOT)/sr-scan-runs/std-preload-$$(date -u +%Y%m%dT%H%M%SZ)"
+
+verify-sr-shape:
+	$(PYTHON) -B scripts/verify_sr_shape_core.py --selftest

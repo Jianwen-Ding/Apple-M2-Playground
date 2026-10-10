@@ -32,3 +32,5 @@ No novel ISA finding is implied by a successful environment or DRM access test.
   exact unchanged imports, guarded readbacks and one native move-immediate variation.
 - [First G14C move-immediate observation](../novel-results/2026-10-04-first-agx-instruction/README.md):
   one existing field supported by hardware; no novel architecture or broad ISA claim.
+- [2026-10-10 SR geometry/core-id/bit-15](2026-10-10-sr-shape-core/README.md):
+  per-lane values for nine shapes, 2048-workgroup SR20 sets, and 256-selector bit-15 sweeps.

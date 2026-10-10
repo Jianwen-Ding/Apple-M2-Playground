@@ -13,3 +13,7 @@ belong with `../timing/`.
 paired reads, prefix/sparse execution masks, and repeated same-device dispatches.
 The tested path yielded no clock; SR16/57/59 have reproducible lane/mask behavior.
 [Copilot review and independent verifier](sr-copilot-review.md).
+
+[Geometry, core id, and bit-15 form](sr-geometry-core-alt.md): nine 1-D to 3-D
+shapes confirm workgroup/local/global SRs; SR7 = SIMD groups per threadgroup;
+SR20 = (cluster<<4)|core matching driver core masks; bit-15 `get_sr` writes nothing observable.
