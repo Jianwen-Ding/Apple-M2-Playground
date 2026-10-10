@@ -1,4 +1,4 @@
-# Device-load latency by pointer chasing: G14C B1 — 2026-10-10
+# Device-load latency, overlap and bandwidth: G14C B1 — 2026-10-10
 
 Direct DRM path (no Mesa). Each hop is `device_load r2 = table[r2]` (i32,
 uniform base u8_u9, element-scaled register index) followed by `wait 0`. A loop
@@ -11,7 +11,7 @@ The emulator runs every chase against its real table before the GPU does.
 
 `make verify-memory` checks every figure here against
 [retained evidence](../../results/2026-10-10-agx-memory-latency/README.md):
-40 variants, 13.2 million dependent loads, all exact.
+69 variants, 21.7 million dependent loads and 19.3 GB streamed, all exact.
 
 ## Latency curve (64 B stride, warm = median of last 8 of 30 submits)
 
@@ -55,6 +55,42 @@ pages (256 MiB) adds about 32 ns at most. The 64-page anomaly (4 KiB of lines
 missing the first level) fits limited first-level associativity for addresses
 16 KiB apart. A first-level TLB limit near 64 entries is not excluded.
 
+## Overlapping loads (memory-level parallelism)
+
+C independent chains, each starting at a different point on the cycle. A round
+issues one load per chain, then a single `wait 0`. Warm medians:
+
+| footprint | 1 chain ns/round | 4 chains | 16 chains | ns per load at 16 chains |
+| --- | --- | --- | --- | --- |
+| 64 KiB | 121.9 | 109.2 | — | — |
+| 4 MiB | 354.0 | 385.3 | 318.5 | 19.9 |
+| 256 MiB | 369.1 | 418.4 | 384.7 | 24.0 |
+
+**One SIMD group keeps at least 16 loads in flight** with no measurable
+serialization: 16 loads cost one latency, round ratio 0.90–1.10. All lanes share
+one address per load here, so each is a single cache-line request.
+
+## Streaming read bandwidth
+
+Grid-stride kernel: lane i loads `T[i + j·S]` (S = lanes; 8 loads in flight per
+lane; one `wait`; sum into r2). `T[w] = w`, so every lane has a distinct
+closed-form oracle `n·i + S·n(n−1)/2`. ~256 MiB is read once per dispatch.
+
+| lanes | SIMD groups/core | GB/s (warm) |
+| --- | --- | --- |
+| 1,216 | 1 | 64.4 |
+| 4,864 | 4 | 226.2 |
+| 9,728 | 8 | 350.4 |
+| 19,456 | 16 | 354.3 |
+| 38,912 | 32 | 328.5 |
+| 65,536 | 54 | 349.2 |
+
+**Peak 356 GB/s, about 89% of the advertised 400 GB/s,** reached from 8 SIMD
+groups per core. The CPU writes the table immediately before each run, so part of
+it may still be in the system cache. These are read bandwidths, not certified
+DRAM-only numbers. Only i32 (4 B per lane) loads were used; vector loads and
+stores are untested.
+
 ## Implications
 
 * **First-level hits cost ~50 cycles; a dependent load chain is far slower than
@@ -63,20 +99,22 @@ missing the first level) fits limited first-level associativity for addresses
   so overlapping loads (wait groups) remain untested.
 * **Keep per-core working sets ≤ 8 KiB for the fastest level.** Threadgroup memory
   is a separate path and remains to be measured.
-* **Misses cost 350–390 ns**, ~500 cycles at the top clock. Achieving bandwidth
-  will require many loads in flight across many SIMD groups.
+* **Misses cost 350–390 ns, ~500 cycles at the top clock, but they overlap.** Batch
+  independent loads before one `wait` (≥ 16 per SIMD group are fine) and keep
+  ≥ 8 SIMD groups per core resident to approach the ~350 GB/s read bandwidth.
 
 ## Not yet established
 
-Bandwidth; latency with many SIMD groups and divergent addresses; threadgroup
-memory; stores; `wait` groups (the `g` field) for overlapping loads; and the
-cache level boundaries beyond the first.
+Divergent (uncoalesced) addresses; threadgroup memory; stores and write bandwidth;
+vector loads; `wait` groups (the `g` field); the maximum number of loads in flight
+beyond 16; and the cache level boundaries beyond the first.
 
 ## Reproduce
 
 ```sh
 make agx-loop-test   # includes two small hardware chases
 make verify-memory   # offline checks of every number above
+make agx-bandwidth   # overlap + streaming bandwidth re-measurement (~3 min)
 make agx-memory      # full re-measurement (~4 min)
 python3 -B scripts/run_drm_compute.py --kind chase --lengths 4096,1048576 --steps 16 --trips 1000
 ```

@@ -5,7 +5,7 @@ Offline (always): the emulator accepts the loop shapes, catches a corrupted
 self-branch with its step limit, bounds an inverted condition to one trip,
 and large trip counts differ from emulated copies only in the K immediate.
 
-Hardware (--hardware): three small loops and two small pointer chases through the direct DRM path with
+Hardware (--hardware): three small loops, three small pointer chases (incl. 16 chains) and a stream through the direct DRM path with
 whole-buffer oracles (<1 ms of shader time in total).
 
     python3 -B tests/test_agx_loop.py [--hardware]
@@ -73,6 +73,19 @@ class EmulatorGate(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             agx_loop.emulate(agx_loop.chase_body(2, 2), 32, table=table)
 
+    def test_multi_chain_chase(self):
+        table = agx_loop.chase_table(256, 16, seed=5)
+        for c in (2, 4, 16):
+            ok, _, _, r = agx_loop.check_chase(5, 3, table, 9, chains_n=c)
+            self.assertTrue(ok, c)
+            self.assertEqual(r['counts']['wait'], 15)  # one wait per round, not per load
+
+    def test_stream_per_lane(self):
+        for trips, steps, stride, active in [(1, 1, 32, 32), (3, 4, 64, 17), (2, 8, 1216, 32)]:
+            ok, _, want, r = agx_loop.check_stream(trips, steps, stride, active)
+            self.assertTrue(ok, (trips, steps, stride))
+            self.assertEqual(len(set(want[:active])), active)  # oracle distinguishes every lane
+
     def test_rejects_unbounded(self):
         with self.assertRaises(ValueError):
             agx_loop.loop_body(0, 1)
@@ -86,9 +99,11 @@ def hardware():
     for i, args in enumerate([['--loop-kind', 'iadd8', '--steps', '2', '--lengths', '1,3', '--count', '33'],
                               ['--loop-kind', 'fadd4', '--chains', '2', '--steps', '8', '--lengths', '100', '--count', '257'],
                               ['--loop-kind', 'iadd8', '--chains', '4', '--steps', '16', '--lengths', '50', '--count', '65'],
-                              ['--chase', '--lengths', '4096,65536', '--steps', '8', '--trips', '20', '--count', '33']]):
-        kind = 'chase' if '--chase' in args else 'loop'
-        args = [x for x in args if x != '--chase']
+                              ['--chase', '--lengths', '4096,65536', '--steps', '8', '--trips', '20', '--count', '33'],
+                              ['--chase', '--chains', '16', '--gprs', '48', '--lengths', '1048576', '--steps', '4', '--trips', '10', '--count', '32'],
+                              ['--stream', '--steps', '8', '--lengths', '4', '--count', '4864', '--gprs', '32']]):
+        kind = 'chase' if '--chase' in args else 'stream' if '--stream' in args else 'loop'
+        args = [x for x in args if x not in ('--chase', '--stream')]
         r = subprocess.run([sys.executable, '-B', str(REPO/'scripts/run_drm_compute.py'), '--kind', kind, '--repeats', '2',
                             '--timeout', '20', '--output', str(out/f'case{i}')]+args, capture_output=True, text=True, timeout=120)
         print(r.stdout.strip().splitlines()[-1])

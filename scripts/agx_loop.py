@@ -80,17 +80,76 @@ CHASE_LOAD = 'device_load 0, i32, x, r2, u8_u9, r2, unsigned'  # r2 = table[r2] 
 TABLE_VA = 0x1100100000  # data BO + 1 MiB in tests/drm_compute.c
 
 
-def chase_body(trips, steps, start=0):
-    """Return bytes for `trips` iterations of `steps` dependent loads r2 = table[r2] (each followed by wait 0)."""
-    if not (1 <= trips <= 0x7fffffff and 1 <= steps <= 256):
-        raise ValueError('bounded trips/steps required')
-    head = chains.mov_imm(3, 0)+chains.mov_imm(4, trips)+chains.mov_imm(2, start)
+CHASE_REGS = (2,)+tuple(range(5, 20))  # up to 16 chase chains; r3/r4 hold the loop counter
+
+
+def chase_starts(table, chains_n, start=0):
+    """Starting indices spread evenly along the table's single cycle."""
+    if chains_n == 1: return [start]
+    cycle = [start]; x = table[start]
+    while x != start:
+        cycle.append(x); x = table[x]
+    return [cycle[k*len(cycle)//chains_n] for k in range(chains_n)]
+
+
+def chase_body(trips, steps, start=0, starts=None):
+    """`trips` iterations of `steps` rounds; each round issues one dependent load per chain
+    (r2 = table[r2], r5 = table[r5], ...) and then a single wait 0. Chains fold into r2 by iadd."""
+    starts = list(starts) if starts is not None else [start]
+    if not (1 <= trips <= 0x7fffffff and 1 <= steps <= 256 and len(starts) in (1, 2, 4, 8, 16)):
+        raise ValueError('bounded trips/steps and 1/2/4/8/16 chains required')
+    regs = CHASE_REGS[:len(starts)]
+    head = chains.mov_imm(3, 0)+chains.mov_imm(4, trips)
+    head += b''.join(chains.mov_imm(r, v) for r, v in zip(regs, starts))
     head += encode('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
-    loop = (encode(CHASE_LOAD)+encode('wait 0'))*steps
+    rnd = b''.join(encode(f'device_load 0, i32, x, r{r}, u8_u9, r{r}, unsigned') for r in regs)+encode('wait 0')
+    loop = rnd*steps
+    loop += encode('iadd r3, 1, r3.sx')
+    loop += encode('while_icmp r0l, ult, r3, r4, 1')
+    jump = encode(f'jmp_exec_any pc-{len(loop)}', f'jmp_exec_any pc-{len(loop)}')
+    tail = encode('pop_exec r0l, 1')+b''.join(encode(f'iadd r2, r2, r{r}') for r in regs[1:])
+    return head+loop+jump+tail
+
+
+def stream_body(trips, steps, stride_words):
+    """Grid-stride streaming: lane i (global index in r1) loads T[i + j*S], j = 0..trips*steps-1.
+
+    Each round issues `steps` independent loads (r6..r13) with r5 advancing by S (r14),
+    one wait 0, then adds them into r2. r1 is only read (the control suffix uses it).
+    """
+    if not (1 <= trips <= 0x7fffffff and steps in (1, 2, 4, 8) and 1 <= stride_words < 1 << 31):
+        raise ValueError('bounded trips, 1/2/4/8 steps and stride required')
+    regs = range(6, 6+steps)
+    head = chains.mov_imm(3, 0)+chains.mov_imm(4, trips)+chains.mov_imm(14, stride_words)+chains.mov_imm(2, 0)
+    head += encode('iadd r5, r1, 0')
+    head += encode('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
+    loop = b''
+    for r in regs:
+        loop += encode(f'device_load 0, i32, x, r{r}, u8_u9, r5, unsigned')+encode('iadd r5, r5, r14')
+    loop += encode('wait 0')
+    loop += b''.join(encode(f'iadd r2, r2, r{r}') for r in regs)
     loop += encode('iadd r3, 1, r3.sx')
     loop += encode('while_icmp r0l, ult, r3, r4, 1')
     jump = encode(f'jmp_exec_any pc-{len(loop)}', f'jmp_exec_any pc-{len(loop)}')
     return head+loop+jump+encode('pop_exec r0l, 1')
+
+
+def stream_oracle(lane, trips, steps, stride_words):
+    """Sum of T[lane + j*S] for T[w] = w."""
+    n = trips*steps
+    return (n*lane+stride_words*n*(n-1)//2) & 0xffffffff
+
+
+def check_stream(trips, steps, stride_words, active=17):
+    import array
+    words = stride_words*trips*steps
+    table = array.array('I', range(words))
+    body = stream_body(trips, steps, stride_words)
+    r = emulate(body, active, table=table, lane_ids=True)
+    want = [stream_oracle(t, trips, steps, stride_words) for t in range(32)]
+    ok = (all(r['r2'][t] == want[t] for t in range(active)) and r['r0l'] == [0]*active+[1]*(32-active)
+          and r['counts'].get('jmp_exec_any') == trips and r['counts'].get('device_load') == trips*steps)
+    return ok, body, want, r
 
 
 def chase_table(entries, stride_words, seed=1):
@@ -134,17 +193,18 @@ class _Memory:
         return self.words[i]
 
 
-def emulate(body, active, max_steps=2_000_000, table=None):
+def emulate(body, active, max_steps=2_000_000, table=None, lane_ids=False):
     """Run body on one 32-lane SIMD group; lanes < active start at r0l=0, others 1."""
     _, g = _tools()
     class Uniforms(g.Uniforms):
         def get_reg64(self, regid, thread=None):  # applegpu's uniform-base path passes a thread
             return super().get_reg64(regid)
     unif = Uniforms(); unif.set_reg32(8, TABLE_VA & 0xffffffff); unif.set_reg32(9, TABLE_VA >> 32)
-    st = g.CoreState(num_registers=8, uniforms=unif, device_memory=_Memory(TABLE_VA, table or []))
+    st = g.CoreState(num_registers=24, uniforms=unif, device_memory=_Memory(TABLE_VA, table or []))
     for t in range(g.SIMD_WIDTH):
         st.set_reg16(0, t, 0 if t < active else 1)
         st.set_reg32(2, t, 0xdeadbeef)  # stale; the body must overwrite r2
+        if lane_ids: st.set_reg32(1, t, t)  # control prefix leaves the global thread index in r1
     st.exec = [t < active for t in range(g.SIMD_WIDTH)]
     pc = 0; executed = 0; trace = {}
     while pc < len(body):
@@ -167,13 +227,19 @@ def emulate(body, active, max_steps=2_000_000, table=None):
             'exec': list(st.exec), 'executed': executed, 'counts': trace}
 
 
-def check_chase(trips, steps, table, active=17, start=0):
+def chase_want(table, hops, starts):
+    return sum(chase_oracle(table, hops, s) for s in starts) & 0xffffffff
+
+
+def check_chase(trips, steps, table, active=17, start=0, chains_n=1):
     """Emulate a chase loop against `table`; active lanes must hold the host oracle."""
-    body = chase_body(trips, steps, start)
-    want = chase_oracle(table, trips*steps, start)
+    starts = chase_starts(table, chains_n, start)
+    body = chase_body(trips, steps, starts=starts)
+    want = chase_want(table, trips*steps, starts)
     r = emulate(body, active, table=table)
     ok = (all(r['r2'][t] == want for t in range(active)) and r['r0l'] == [0]*active+[1]*(32-active)
-          and r['counts'].get('jmp_exec_any') == trips and r['counts'].get('device_load') == trips*steps)
+          and r['counts'].get('jmp_exec_any') == trips and r['counts'].get('device_load') == trips*steps*chains_n
+          and r['counts'].get('wait') == trips*steps)
     return ok, body, want, r
 
 

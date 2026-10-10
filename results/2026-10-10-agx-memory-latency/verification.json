@@ -4,13 +4,14 @@
   {
    "check": "runs-passed",
    "passed": true,
-   "runs": 5
+   "runs": 20
   },
   {
    "check": "oracles",
    "passed": true,
-   "variants": 40,
-   "hops": 13248006
+   "variants": 69,
+   "dependent_loads": 21696006,
+   "streamed_bytes": 19314918912
   },
   {
    "check": "emulator-gated",
@@ -82,6 +83,33 @@
    "ns_64b_stride_64kib": 104.4,
    "ns_16384_pages_1mib_lines": 380.7,
    "ns_64b_stride_1mib": 348.6
+  },
+  {
+   "check": "loads-overlap",
+   "passed": true,
+   "round_ratio_4_vs_1": {
+    "65536": 0.896,
+    "4194304": 1.095,
+    "268435456": 1.036
+   },
+   "round_ratio_16_vs_1": {
+    "4194304": 0.9,
+    "268435456": 1.042
+   },
+   "ns_per_load_16_chains_256mib": 24.0
+  },
+  {
+   "check": "stream-bandwidth",
+   "passed": true,
+   "gb_per_s": {
+    "1216": 64.4,
+    "4864": 226.2,
+    "9728": 350.4,
+    "19456": 354.3,
+    "38912": 328.5,
+    "65536": 349.2
+   },
+   "best_gb_per_s": 356.4
   }
  ]
 }

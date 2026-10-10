@@ -1,0 +1,76 @@
+{
+ "passed": true,
+ "utc": "20261010T234254718250Z",
+ "path": "direct-drm",
+ "kind": "stream",
+ "chains": 1,
+ "loop_kind": null,
+ "steps": null,
+ "trips": null,
+ "stride": null,
+ "count": 33,
+ "repeats": 1,
+ "gprs": 32,
+ "preload": 268435456,
+ "variants": [
+  {
+   "name": "stream-s2-k3-lanes33",
+   "n": 3,
+   "code_bytes": 162,
+   "oracle": "per-lane",
+   "bytes_loaded": 1536,
+   "loads_per_lane": 6,
+   "stride_words": 64,
+   "returncode": 0,
+   "setup": [
+    {
+     "params": {
+      "gen": 14,
+      "variant": "C",
+      "rev": 17,
+      "clusters": 4,
+      "vm_start": 16384,
+      "vm_end": 549755781120,
+      "kernel_min": 536870912,
+      "ts_hz": 1000000000,
+      "max_khz": 1398000,
+      "features": 1,
+      "g14x": 1
+     }
+    },
+    {
+     "usc_words_hex": "1d08c000000000114d9000000d0c002000008d0400018800"
+    },
+    {
+     "cdm_hex": "02000000001000000000000000000040400000000100000001000000200000000100000001000000ffff0f600000004000000000"
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 562627,
+     "fw_ts": [
+      17212670485041,
+      17212670496250
+     ],
+     "drm_time": [
+      17212669987250,
+      17212670553041
+     ]
+    }
+   ],
+   "buffer_ok": true,
+   "mismatches": []
+  }
+ ],
+ "emulator": [
+  {
+   "name": "stream-s2-k3-lanes33",
+   "emulated_trips": 3,
+   "executed": 37,
+   "differs_only_in_trip_immediate": true
+  }
+ ]
+}

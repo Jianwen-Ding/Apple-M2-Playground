@@ -16,7 +16,12 @@ Claims checked:
      ladder (first/last ratio 2.5-3.2): this level is GPU-clocked too;
   5. 1-16 MiB is a flat ~349 ns plateau; >= 64 MiB rises to ~370-390 ns;
   6. one line per 16 KiB page: latency follows line footprint, not page
-     count; 16,384 pages add <= ~35 ns over 64 B stride at the same 1 MiB of lines.
+     count; 16,384 pages add <= ~35 ns over 64 B stride at the same 1 MiB of lines;
+  7. independent loads overlap: a round of 4 (or 16) dependent-chain loads
+     followed by one wait costs about one latency (<= 1.15x a 1-chain round);
+  8. grid-stride streaming (T[w] = w, per-lane sum oracles) reaches 328-354 GB/s
+     with >= 8 SIMD groups per core, ~64 GB/s with one group per core, and
+     never exceeds the 400 GB/s advertised memory bandwidth.
 """
 import argparse
 import json
@@ -38,11 +43,14 @@ def main():
     per = lambda v: [(s['fw_ts'][1]-s['fw_ts'][0])/v['hops'] for s in v['samples']]
     def curve(run):
         return {v['footprint']: per(v) for v in runs[run]['variants']}
+    # overlap runs record hops per chain; per() above is therefore ns per round.
     warm = lambda xs: st.median(xs[-8:])
 
-    check('runs-passed', all(r['passed'] and r['path'] == 'direct-drm' and r['kind'] == 'chase' for r in runs.values()), runs=len(runs))
+    check('runs-passed', all(r['passed'] and r['path'] == 'direct-drm' and r['kind'] in ('chase', 'stream') for r in runs.values()), runs=len(runs))
     check('oracles', all(v['buffer_ok'] for r in runs.values() for v in r['variants']),
-          variants=sum(len(r['variants']) for r in runs.values()), hops=sum(v['hops']*len(v['samples']) for r in runs.values() for v in r['variants']))
+          variants=sum(len(r['variants']) for r in runs.values()),
+          dependent_loads=sum(v.get('loads', v.get('hops', 0))*len(v['samples']) for r in runs.values() for v in r['variants'] if r['kind'] == 'chase'),
+          streamed_bytes=sum(v.get('bytes_loaded', 0)*len(v['samples']) for r in runs.values() for v in r['variants']))
     check('emulator-gated', all(len(r.get('emulator', [])) == len(r['variants']) for r in runs.values()))
 
     f = curve('curve-fine')
@@ -70,6 +78,25 @@ def main():
           ns_16_pages_1kib_lines=round(small_pages, 1), ns_1024_pages_64kib_lines=round(warm(pg[1024*16384]), 1),
           ns_64b_stride_64kib=round(warm(f[65536]), 1), ns_16384_pages_1mib_lines=round(many, 1),
           ns_64b_stride_1mib=round(plat[1 << 20], 1))
+
+    # 7: overlap of independent loads (round = one load per chain, then one wait).
+    rnd = lambda run, fp: warm(next(per(v) for v in runs[run]['variants'] if v['footprint'] == fp))
+    o4 = {fp: rnd('overlap4-c4', fp)/rnd('overlap4-c1', fp) for fp in (65536, 1 << 22, 1 << 28)}
+    o16 = {fp: rnd('overlap16-c16', fp)/rnd('overlap16-c1', fp) for fp in (1 << 22, 1 << 28)}
+    check('loads-overlap', all(x < 1.15 for x in list(o4.values())+list(o16.values())),
+          round_ratio_4_vs_1={k: round(v, 3) for k, v in o4.items()}, round_ratio_16_vs_1={k: round(v, 3) for k, v in o16.items()},
+          ns_per_load_16_chains_256mib=round(rnd('overlap16-c16', 1 << 28)/16, 1))
+
+    # 8: streaming bandwidth.
+    bw = {}
+    for n, r in runs.items():
+        if n.startswith('stream-lanes'):
+            v, = r['variants']; x = [s['fw_ts'][1]-s['fw_ts'][0] for s in v['samples']]
+            bw[r['count']] = v['bytes_loaded']/st.median(x[-6:])
+    best = max(v['bytes_loaded']/(s['fw_ts'][1]-s['fw_ts'][0]) for n, r in runs.items() if n.startswith('stream-lanes')
+               for v in r['variants'] for s in v['samples'])
+    check('stream-bandwidth', all(bw[c] >= 320 for c in bw if c >= 9728) and 55 < bw[1216] < 75 and best < 400,
+          gb_per_s={c: round(x, 1) for c, x in sorted(bw.items())}, best_gb_per_s=round(best, 1))
 
     passed = all(c['passed'] for c in checks)
     (a.evidence/'verification.json').write_text(json.dumps({'passed': passed, 'checks': checks}, indent=1)+'\n')

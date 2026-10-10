@@ -157,4 +157,6 @@ its non-FMA fp32 peak. The clock ladder spans 3.16×.
 with `device_load` + `wait` gives ~50 cycles for ≤ 8 KiB (first level ends between
 8 and 12 KiB), ~125–135 cycles for 12–64 KiB, and a flat ~349 ns for 1–32 MiB,
 rising to ~388 ns at 256 MiB. The TLB adds at most ~32 ns. Every one of 13.2 M hops
-matched its host oracle.
+matched its host oracle. A SIMD group keeps ≥ 16 loads in flight, and grid-stride
+streaming reaches ~350 GB/s (≈ 89% of the advertised 400 GB/s) from 8 SIMD groups
+per core.

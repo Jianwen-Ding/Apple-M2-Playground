@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -34,6 +34,7 @@ help:
 	@echo 'make verify-loops       Verify retained loop latency/throughput evidence offline'
 	@echo 'make agx-loops          Reproduce the loop latency/throughput matrix (~1 min GPU time)'
 	@echo 'make agx-memory         Pointer-chase load latency, 2 KiB..256 MiB (~4 min GPU time)'
+	@echo 'make agx-bandwidth      Load overlap (1..16 chains) and streaming read bandwidth (~3 min)'
 	@echo 'make verify-memory      Verify retained load-latency evidence offline'
 	@echo 'make gpu-faults LOG=... Summarize Asahi GPU timeouts/faults in a kernel log'
 	@echo 'make opcode-scan        GPU-FAULTING: undecoded opcode effects (needs CONFIRM_GPU_FAULTS=1)'
@@ -172,3 +173,8 @@ agx-memory:
 
 verify-memory:
 	$(PYTHON) -B scripts/verify_agx_memory.py
+
+agx-bandwidth:
+	@for c in 1 2 4 8 16; do $(PYTHON) -B scripts/run_drm_compute.py --kind chase --chains $$c --gprs 48 --lengths 4194304,268435456 --steps 8 --trips 500 --count 32 --repeats 16 --timeout 300 --device "$(DEVICE)" --output "$(MEMDIR)-overlap-c$$c" || exit 1; done
+	@for spec in "1216 6898" "4864 1724" "9728 862" "19456 431" "38912 215" "65536 128"; do set -- $$spec; \
+	  $(PYTHON) -B scripts/run_drm_compute.py --kind stream --steps 8 --lengths $$2 --count $$1 --gprs 32 --repeats 12 --timeout 120 --device "$(DEVICE)" --output "$(MEMDIR)-stream-$$1" || exit 1; done

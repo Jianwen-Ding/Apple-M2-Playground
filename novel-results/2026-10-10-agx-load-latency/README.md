@@ -1,4 +1,4 @@
-# Device-load latency hierarchy on G14C (pointer chase)
+# Device-load latency, overlap and read bandwidth on G14C
 
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM.
 
@@ -13,13 +13,17 @@ Dependent `device_load` (i32) + `wait 0` latency for one SIMD group:
 * The first-level boundary lies between 8 and 12 KiB. The page count adds at most
   ~32 ns up to 16,384 pages; capacity dominates.
 
-Not established: bandwidth, threadgroup memory, stores, multi-group behaviour,
+* A single SIMD group keeps ≥ 16 independent loads in flight; 16 cost one latency.
+* Grid-stride streaming reads 328–356 GB/s from 8 SIMD groups per core upward
+  (~89% of the advertised 400 GB/s), with per-lane exact oracles.
+
+Not established: threadgroup memory, stores, multi-group behaviour,
 exact cache sizes beyond the first level, and what serves the 1–32 MiB plateau.
 
 ## Reproducer and evidence
 
-`make agx-loop-test` (includes hardware chases), `make verify-memory` (9 offline
-checks over 13.2 M exact hops), `make agx-memory` (re-measurement).
+`make agx-loop-test` (includes hardware chases), `make verify-memory` (11 offline
+checks over 21.7 M exact dependent loads and 19.3 GB streamed), `make agx-bandwidth`, `make agx-memory` (re-measurement).
 [Report](../../experiments/memory/load-latency.md) ·
 [evidence](../../results/2026-10-10-agx-memory-latency/README.md).
 
