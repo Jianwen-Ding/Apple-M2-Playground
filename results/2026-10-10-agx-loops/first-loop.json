@@ -1,0 +1,125 @@
+{
+ "passed": true,
+ "utc": "20261010T232006541512Z",
+ "path": "direct-drm",
+ "kind": "loop",
+ "chains": 1,
+ "loop_kind": "iadd8",
+ "steps": 2,
+ "count": 33,
+ "repeats": 1,
+ "gprs": 16,
+ "preload": 268435456,
+ "variants": [
+  {
+   "name": "loop-iadd8-s2-k1",
+   "n": 1,
+   "code_bytes": 114,
+   "oracle": 268435458,
+   "returncode": 0,
+   "setup": [
+    {
+     "params": {
+      "gen": 14,
+      "variant": "C",
+      "rev": 17,
+      "clusters": 4,
+      "vm_start": 16384,
+      "vm_end": 549755781120,
+      "kernel_min": 536870912,
+      "ts_hz": 1000000000,
+      "max_khz": 1398000,
+      "features": 1,
+      "g14x": 1
+     }
+    },
+    {
+     "usc_words_hex": "1d088000000000114d9000000d0c002000008d0200018800"
+    },
+    {
+     "cdm_hex": "02000000001000000000000000000040400000000100000001000000200000000100000001000000ffff0f600000004000000000"
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 641836,
+     "fw_ts": [
+      15844506646541,
+      15844506654250
+     ],
+     "drm_time": [
+      15844506074625,
+      15844506722291
+     ]
+    }
+   ],
+   "buffer_ok": true,
+   "mismatches": []
+  },
+  {
+   "name": "loop-iadd8-s2-k3",
+   "n": 3,
+   "code_bytes": 114,
+   "oracle": 268435462,
+   "returncode": 0,
+   "setup": [
+    {
+     "params": {
+      "gen": 14,
+      "variant": "C",
+      "rev": 17,
+      "clusters": 4,
+      "vm_start": 16384,
+      "vm_end": 549755781120,
+      "kernel_min": 536870912,
+      "ts_hz": 1000000000,
+      "max_khz": 1398000,
+      "features": 1,
+      "g14x": 1
+     }
+    },
+    {
+     "usc_words_hex": "1d088000000000114d9000000d0c002000008d0200018800"
+    },
+    {
+     "cdm_hex": "02000000001000000000000000000040400000000100000001000000200000000100000001000000ffff0f600000004000000000"
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 621669,
+     "fw_ts": [
+      15844517578541,
+      15844517586208
+     ],
+     "drm_time": [
+      15844517023208,
+      15844517650000
+     ]
+    }
+   ],
+   "buffer_ok": true,
+   "mismatches": []
+  }
+ ],
+ "emulator": [
+  {
+   "name": "loop-iadd8-s2-k1",
+   "emulated_trips": 1,
+   "executed": 10,
+   "differs_only_in_trip_immediate": true
+  },
+  {
+   "name": "loop-iadd8-s2-k3",
+   "emulated_trips": 3,
+   "executed": 20,
+   "differs_only_in_trip_immediate": true
+  }
+ ]
+}

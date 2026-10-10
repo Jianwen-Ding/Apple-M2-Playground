@@ -54,6 +54,8 @@ make verify-sr-resources # Check retained resource/width evidence offline
 make timestamps  # Vulkan timestamp-placement hardware regression
 make verify-timestamps # Check timestamp, fetch-cost and direct-DRM evidence offline
 make drm-compute # Direct DRM dispatches: no Mesa or Vulkan in the path
+make agx-loop-test # Loop emulator gate + small hardware loops
+make verify-loops  # Check loop latency/throughput evidence offline
 make gpu-faults  # Summarize GPU timeouts/faults in a kernel log (LOG=...)
 ```
 
@@ -87,6 +89,7 @@ are documented in [scripts/README.md](scripts/README.md).
 - [SR18/SR19 resources and get_sr widths](experiments/registers/sr-resources-width.md)
 - [Command timestamps and fetch-bound code](experiments/timing/command-timestamps.md)
 - [Direct DRM compute (no Mesa)](experiments/baseline/direct-drm-compute.md)
+- [Counted loops and ALU timing](experiments/control-flow/loops-and-alu-timing.md)
 - [Opcode-scan kernel log](results/2026-10-10-opcode-scan-kernel-log/README.md)
 - [Known limitations and failed approaches](notes/failed-approaches.md)
 - [Timing investigation](experiments/timing/README.md)
@@ -140,3 +143,10 @@ Unrolled code is fetch bound at ~1.84 ns/byte per instruction, independent of
 dependencies and lane count. The GPU runs in two clock states ~1.65× apart, so
 warm up before benchmarking. No shader-readable clock is known; dispatch-level
 timing works.
+
+**Loops and ALU timing (2026-10-10).** [Counted loops](experiments/control-flow/loops-and-alu-timing.md)
+now run on hardware (`push_exec` / `while_icmp` / `jmp_exec_any` / `pop_exec`), gated
+by an emulator check. Per SIMD group, dependent `iadd`/`fadd32` cost 2 cycles and
+independent ones 1 cycle (at 1,398 MHz). A taken loop iteration costs ~38 cycles.
+A core saturates at ~3.6 SIMD groups' worth of issue, and the GPU sustained 83% of
+its non-FMA fp32 peak. The clock ladder spans 3.16×.

@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-10 Counted loops, ALU latency/issue rate, core throughput](2026-10-10-agx-loop-alu-timing/README.md)
 - [2026-10-10 Command timestamps, fetch-bound code, direct DRM compute](2026-10-10-command-timing-direct-drm/README.md)
 - [2026-10-10 SR18 threadgroup memory and SR19 register allocation](2026-10-10-sr-resource-registers/README.md)
 - [2026-10-10 SR7 SIMD-group count and SR20 cluster/core encoding](2026-10-10-sr-geometry-core-id/README.md)

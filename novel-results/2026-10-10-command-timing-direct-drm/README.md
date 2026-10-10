@@ -16,7 +16,7 @@ Status: confirmed on one device (driver-reported Apple M2 Max G14C B1, kernel
 3. **Unrolled straight-line code is fetch bound:** ~3.1 ns + 1.84 ns/byte per
    instruction in the slow clock state. It is independent of dependency chains
    and of active lanes from 32 to 19,456.
-4. **Two discrete clock states ~1.65× apart.** Switching to the fast state usually
+4. **Discrete clock states**; two ~1.65× apart were seen here. The [loop study](../2026-10-10-agx-loop-alu-timing/README.md) later found ≥4 levels spanning 3.16×. Switching to the fast state usually
    happens after a few ms of sustained work, but not always.
 5. **A compute dispatch can be submitted with raw ioctls and no Mesa.** The
    results agree with the Vulkan path (slopes within 1%). An empty command costs

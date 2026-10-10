@@ -1,0 +1,427 @@
+{
+ "passed": true,
+ "utc": "20261010T232013318073Z",
+ "path": "direct-drm",
+ "kind": "loop",
+ "chains": 1,
+ "loop_kind": "iadd8",
+ "steps": 1,
+ "count": 32,
+ "repeats": 3,
+ "gprs": 16,
+ "preload": 268435456,
+ "variants": [
+  {
+   "name": "loop-iadd8-s1-k10",
+   "n": 10,
+   "code_bytes": 106,
+   "oracle": 268435466,
+   "returncode": 0,
+   "setup": [
+    {
+     "params": {
+      "gen": 14,
+      "variant": "C",
+      "rev": 17,
+      "clusters": 4,
+      "vm_start": 16384,
+      "vm_end": 549755781120,
+      "kernel_min": 536870912,
+      "ts_hz": 1000000000,
+      "max_khz": 1398000,
+      "features": 1,
+      "g14x": 1
+     }
+    },
+    {
+     "usc_words_hex": "1d088000000000114d9000000d0c002000008d0200018800"
+    },
+    {
+     "cdm_hex": "02000000001000000000000000000040200000000100000001000000200000000100000001000000ffff0f600000004000000000"
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 234292,
+     "fw_ts": [
+      15851297614875,
+      15851297620291
+     ],
+     "drm_time": [
+      15851297438958,
+      15851297679958
+     ]
+    },
+    {
+     "rep": 1,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 111501,
+     "fw_ts": [
+      15851297755541,
+      15851297759416
+     ],
+     "drm_time": [
+      15851297688500,
+      15851297801041
+     ]
+    },
+    {
+     "rep": 2,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 103417,
+     "fw_ts": [
+      15851297867500,
+      15851297871458
+     ],
+     "drm_time": [
+      15851297807958,
+      15851297912291
+     ]
+    }
+   ],
+   "buffer_ok": true,
+   "mismatches": []
+  },
+  {
+   "name": "loop-iadd8-s1-k100",
+   "n": 100,
+   "code_bytes": 106,
+   "oracle": 268435556,
+   "returncode": 0,
+   "setup": [
+    {
+     "params": {
+      "gen": 14,
+      "variant": "C",
+      "rev": 17,
+      "clusters": 4,
+      "vm_start": 16384,
+      "vm_end": 549755781120,
+      "kernel_min": 536870912,
+      "ts_hz": 1000000000,
+      "max_khz": 1398000,
+      "features": 1,
+      "g14x": 1
+     }
+    },
+    {
+     "usc_words_hex": "1d088000000000114d9000000d0c002000008d0200018800"
+    },
+    {
+     "cdm_hex": "02000000001000000000000000000040200000000100000001000000200000000100000001000000ffff0f600000004000000000"
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 666003,
+     "fw_ts": [
+      15851355340541,
+      15851355350791
+     ],
+     "drm_time": [
+      15851354738041,
+      15851355410916
+     ]
+    },
+    {
+     "rep": 1,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 120417,
+     "fw_ts": [
+      15851355485833,
+      15851355494708
+     ],
+     "drm_time": [
+      15851355420041,
+      15851355541250
+     ]
+    },
+    {
+     "rep": 2,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 678378,
+     "fw_ts": [
+      15851356169541,
+      15851356179958
+     ],
+     "drm_time": [
+      15851355548333,
+      15851356227750
+     ]
+    }
+   ],
+   "buffer_ok": true,
+   "mismatches": []
+  },
+  {
+   "name": "loop-iadd8-s1-k1000",
+   "n": 1000,
+   "code_bytes": 106,
+   "oracle": 268436456,
+   "returncode": 0,
+   "setup": [
+    {
+     "params": {
+      "gen": 14,
+      "variant": "C",
+      "rev": 17,
+      "clusters": 4,
+      "vm_start": 16384,
+      "vm_end": 549755781120,
+      "kernel_min": 536870912,
+      "ts_hz": 1000000000,
+      "max_khz": 1398000,
+      "features": 1,
+      "g14x": 1
+     }
+    },
+    {
+     "usc_words_hex": "1d088000000000114d9000000d0c002000008d0200018800"
+    },
+    {
+     "cdm_hex": "02000000001000000000000000000040200000000100000001000000200000000100000001000000ffff0f600000004000000000"
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 842087,
+     "fw_ts": [
+      15851406528041,
+      15851406621208
+     ],
+     "drm_time": [
+      15851405854375,
+      15851406701958
+     ]
+    },
+    {
+     "rep": 1,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 224710,
+     "fw_ts": [
+      15851406781375,
+      15851406872791
+     ],
+     "drm_time": [
+      15851406709500,
+      15851406935250
+     ]
+    },
+    {
+     "rep": 2,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 211293,
+     "fw_ts": [
+      15851407004083,
+      15851407095708
+     ],
+     "drm_time": [
+      15851406942333,
+      15851407154625
+     ]
+    }
+   ],
+   "buffer_ok": true,
+   "mismatches": []
+  },
+  {
+   "name": "loop-iadd8-s1-k10000",
+   "n": 10000,
+   "code_bytes": 106,
+   "oracle": 268445456,
+   "returncode": 0,
+   "setup": [
+    {
+     "params": {
+      "gen": 14,
+      "variant": "C",
+      "rev": 17,
+      "clusters": 4,
+      "vm_start": 16384,
+      "vm_end": 549755781120,
+      "kernel_min": 536870912,
+      "ts_hz": 1000000000,
+      "max_khz": 1398000,
+      "features": 1,
+      "g14x": 1
+     }
+    },
+    {
+     "usc_words_hex": "1d088000000000114d9000000d0c002000008d0200018800"
+    },
+    {
+     "cdm_hex": "02000000001000000000000000000040200000000100000001000000200000000100000001000000ffff0f600000004000000000"
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 1483423,
+     "fw_ts": [
+      15851450186375,
+      15851451049375
+     ],
+     "drm_time": [
+      15851449630458,
+      15851451119583
+     ]
+    },
+    {
+     "rep": 1,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 1005171,
+     "fw_ts": [
+      15851451210041,
+      15851452071750
+     ],
+     "drm_time": [
+      15851451127041,
+      15851452133125
+     ]
+    },
+    {
+     "rep": 2,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 981504,
+     "fw_ts": [
+      15851452200333,
+      15851453062250
+     ],
+     "drm_time": [
+      15851452139750,
+      15851453122208
+     ]
+    }
+   ],
+   "buffer_ok": true,
+   "mismatches": []
+  },
+  {
+   "name": "loop-iadd8-s1-k100000",
+   "n": 100000,
+   "code_bytes": 106,
+   "oracle": 268535456,
+   "returncode": 0,
+   "setup": [
+    {
+     "params": {
+      "gen": 14,
+      "variant": "C",
+      "rev": 17,
+      "clusters": 4,
+      "vm_start": 16384,
+      "vm_end": 549755781120,
+      "kernel_min": 536870912,
+      "ts_hz": 1000000000,
+      "max_khz": 1398000,
+      "features": 1,
+      "g14x": 1
+     }
+    },
+    {
+     "usc_words_hex": "1d088000000000114d9000000d0c002000008d0200018800"
+    },
+    {
+     "cdm_hex": "02000000001000000000000000000040200000000100000001000000200000000100000001000000ffff0f600000004000000000"
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 5795609,
+     "fw_ts": [
+      15851493579958,
+      15851498810291
+     ],
+     "drm_time": [
+      15851493102750,
+      15851498903291
+     ]
+    },
+    {
+     "rep": 1,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 4065226,
+     "fw_ts": [
+      15851498984791,
+      15851502914041
+     ],
+     "drm_time": [
+      15851498911458,
+      15851502978291
+     ]
+    },
+    {
+     "rep": 2,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 3169431,
+     "fw_ts": [
+      15851503047833,
+      15851506073333
+     ],
+     "drm_time": [
+      15851502984708,
+      15851506155625
+     ]
+    }
+   ],
+   "buffer_ok": true,
+   "mismatches": []
+  }
+ ],
+ "emulator": [
+  {
+   "name": "loop-iadd8-s1-k10",
+   "emulated_trips": 10,
+   "executed": 45,
+   "differs_only_in_trip_immediate": true
+  },
+  {
+   "name": "loop-iadd8-s1-k100",
+   "emulated_trips": 64,
+   "executed": 261,
+   "differs_only_in_trip_immediate": true
+  },
+  {
+   "name": "loop-iadd8-s1-k1000",
+   "emulated_trips": 64,
+   "executed": 261,
+   "differs_only_in_trip_immediate": true
+  },
+  {
+   "name": "loop-iadd8-s1-k10000",
+   "emulated_trips": 64,
+   "executed": 261,
+   "differs_only_in_trip_immediate": true
+  },
+  {
+   "name": "loop-iadd8-s1-k100000",
+   "emulated_trips": 64,
+   "executed": 261,
+   "differs_only_in_trip_immediate": true
+  }
+ ]
+}

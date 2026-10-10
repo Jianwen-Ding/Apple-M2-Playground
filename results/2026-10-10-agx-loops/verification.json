@@ -1,0 +1,113 @@
+{
+ "passed": true,
+ "checks": [
+  {
+   "check": "runs-passed",
+   "passed": true,
+   "runs": 35
+  },
+  {
+   "check": "oracles",
+   "passed": true,
+   "variants": 40
+  },
+  {
+   "check": "emulator-gated",
+   "passed": true
+  },
+  {
+   "check": "timestamps-ordered",
+   "passed": true
+  },
+  {
+   "check": "loop-overhead",
+   "passed": true,
+   "ns_per_iteration": 86.38
+  },
+  {
+   "check": "dependent-iadd8",
+   "passed": true,
+   "ns": 4.475
+  },
+  {
+   "check": "two-chains-halve-iadd8",
+   "passed": true,
+   "ratio": 1.982
+  },
+  {
+   "check": "dependent-fadd4",
+   "passed": true,
+   "ns": 4.471
+  },
+  {
+   "check": "two-chains-halve-fadd4",
+   "passed": true,
+   "ratio": 1.984
+  },
+  {
+   "check": "iadd-4-chains-no-gain",
+   "passed": true,
+   "c2_ns": 2.258,
+   "c4_ns": 2.263
+  },
+  {
+   "check": "large-body-4-equals-2",
+   "passed": true,
+   "c2_us": 634.6,
+   "c4_us": 634.6,
+   "short_body_c4_ns": 0.312
+  },
+  {
+   "check": "large-body-dependent-2x",
+   "passed": true,
+   "ratio": 1.903
+  },
+  {
+   "check": "lowest-to-top-ratio",
+   "passed": true,
+   "ratio": 3.161,
+   "mhz_ratio": 3.149
+  },
+  {
+   "check": "cycles-at-top",
+   "passed": true,
+   "cycles": {
+    "fadd4-c1": 2.012,
+    "fadd4-c2": 1.013,
+    "iadd8-c1": 2.013,
+    "iadd8-c2": 1.017
+   },
+   "loop_overhead_cycles": 38.2
+  },
+  {
+   "check": "one-group-per-core-free",
+   "passed": true,
+   "us": {
+    "32": 796.9,
+    "1216": 797.1,
+    "4864": 1529.1,
+    "9728": 1805.8,
+    "19456": 3725.2,
+    "38912": 7033.6
+   }
+  },
+  {
+   "check": "core-saturation",
+   "passed": true,
+   "single_group_equivalents_per_core": {
+    "19456": 3.42,
+    "38912": 3.63,
+    "9728": 3.53
+   },
+   "fp32_adds_per_s": "5.665e+12",
+   "fraction_of_non_fma_peak": 0.833
+  },
+  {
+   "check": "linear-in-trips-small-body-hidden",
+   "passed": true,
+   "one_step_ns_per_iteration": 85.59,
+   "empty_loop_ns_per_iteration": 86.38,
+   "intercept_ns": 5932
+  }
+ ]
+}

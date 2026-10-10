@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -30,6 +30,9 @@ help:
 	@echo 'make timestamps         Hardware regression: Vulkan timestamp placement (~10 ms shader time)'
 	@echo 'make verify-timestamps  Verify retained timestamp/fetch/direct-DRM evidence offline'
 	@echo 'make drm-compute        Direct DRM (no Mesa) control + fadd4/iadd8 chain dispatches'
+	@echo 'make agx-loop-test      Loop emulator gate tests + 3 small hardware loops (direct DRM)'
+	@echo 'make verify-loops       Verify retained loop latency/throughput evidence offline'
+	@echo 'make agx-loops          Reproduce the loop latency/throughput matrix (~1 min GPU time)'
 	@echo 'make gpu-faults LOG=... Summarize Asahi GPU timeouts/faults in a kernel log'
 	@echo 'make opcode-scan        GPU-FAULTING: undecoded opcode effects (needs CONFIRM_GPU_FAULTS=1)'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
@@ -145,3 +148,17 @@ drm-compute:
 LOG ?= results/2026-10-10-opcode-scan-kernel-log/gpu-lines.log.gz
 gpu-faults:
 	$(PYTHON) -B scripts/summarize_gpu_faults.py "$(LOG)"
+
+agx-loop-test:
+	$(PYTHON) -B tests/test_agx_loop.py --hardware
+
+verify-loops:
+	$(PYTHON) -B scripts/verify_agx_loops.py
+
+LOOPDIR = $(SCRATCH_ROOT)/drm-compute/runs/loops-$$(date -u +%Y%m%dT%H%M%SZ)
+agx-loops:
+	@for k in iadd8 fadd4; do for c in 1 2 4; do for m in 0 64; do \
+	  $(PYTHON) -B scripts/run_drm_compute.py --kind loop --loop-kind $$k --chains $$c --steps $$m --lengths 2000 --count 32 --repeats 6 --device "$(DEVICE)" --output "$(LOOPDIR)-$$k-c$$c-m$$m" || exit 1; \
+	done; done; done
+	@for c in 1 2; do $(PYTHON) -B scripts/run_drm_compute.py --kind loop --loop-kind fadd4 --chains $$c --steps 512 --lengths 2000 --count 32 --repeats 40 --timeout 120 --device "$(DEVICE)" --output "$(LOOPDIR)-warm-fadd4-c$$c" || exit 1; done
+	@for n in 32 1216 4864 9728 19456 38912; do $(PYTHON) -B scripts/run_drm_compute.py --kind loop --loop-kind fadd4 --chains 2 --steps 512 --lengths 2000 --count $$n --repeats 30 --timeout 120 --device "$(DEVICE)" --output "$(LOOPDIR)-groups-$$n" || exit 1; done

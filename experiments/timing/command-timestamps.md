@@ -66,7 +66,9 @@ checked by `make verify-timestamps`.
    | fadd6 | ~14 | — |
    | fadd4 | 10.4 | ~6.2 |
 
-5. **There are two discrete clock states about 1.65× apart.** Each process starts in
+5. **There are discrete clock states.** *Update: the [loop study](../control-flow/loops-and-alu-timing.md)
+   found at least four levels spanning 3.16× (consistent with 444→1398 MHz). The
+   two levels seen here are part of that ladder.* In these runs they were about 1.65× apart. Each process starts in
    the slow state. It usually switches to the fast state after 6–9 back-to-back
    ~0.7 ms dispatches. Once, 64 back-to-back 0.6 ms dispatches never switched.
    Fast/slow medians were 432/712 µs (ratio 1.649, 3 of 60 samples in between).

@@ -17,6 +17,7 @@ import struct
 import subprocess
 import sys
 
+import agx_loop
 import patch_agx_sr as patcher
 import run_agx_timestamps as chains
 
@@ -39,7 +40,9 @@ def build_main(body):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--kind', choices=sorted(chains.KINDS)+['control'], default='control')
+    p.add_argument('--kind', choices=sorted(chains.KINDS)+['control', 'loop'], default='control')
+    p.add_argument('--loop-kind', choices=sorted(chains.KINDS), default='iadd8', help='chain instruction inside --kind loop')
+    p.add_argument('--steps', type=int, default=1, help='chain steps per loop iteration (--kind loop)')
     p.add_argument('--chains', type=int, choices=(1, 2, 4), default=1)
     p.add_argument('--lengths', default='0')
     p.add_argument('--count', type=int, default=33)
@@ -52,12 +55,14 @@ def main():
     p.add_argument('--cc', default=os.environ.get('CC', 'cc'))
     a = p.parse_args()
     lengths = [None] if a.kind == 'control' else [int(x) for x in a.lengths.split(',')]
-    if not (1 <= a.repeats <= 64 and 1 <= a.count <= 65536 and all(n is None or 0 <= n <= 100000 for n in lengths)):
+    limit = 10_000_000 if a.kind == 'loop' else 100000
+    if not (1 <= a.repeats <= 64 and 1 <= a.count <= 65536 and all(n is None or 0 <= n <= limit for n in lengths)):
         p.error('bounded repeats/count/lengths required')
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
     out = a.output or Path('/scratch/apple-m2-playground/drm-compute/runs')/stamp
     out.mkdir(parents=True, exist_ok=False)
     state = {'passed': False, 'utc': stamp, 'path': 'direct-drm', 'kind': a.kind, 'chains': a.chains,
+             'loop_kind': a.loop_kind if a.kind == 'loop' else None, 'steps': a.steps if a.kind == 'loop' else None,
              'count': a.count, 'repeats': a.repeats, 'gprs': a.gprs, 'preload': a.preload, 'variants': []}
     save = lambda: (out/'record.json').write_text(json.dumps(state, indent=1)+'\n')
     exe = out/'drm_compute'
@@ -68,7 +73,18 @@ def main():
         if r.returncode: raise RuntimeError('build failed: '+r.stderr.decode()[-400:])
         gpu, _ = patcher.load_model(chains.APPLEGPU)
         for n in lengths:
-            if n is None:
+            if a.kind == 'loop':
+                # n = trip count. Gate: emulate the identical structure (small K) before any GPU use.
+                body, want = agx_loop.loop_body(n, a.steps, a.loop_kind, a.preload, a.chains)
+                small = min(n, 64)
+                ok, sbody, _, emu = agx_loop.check(small, a.steps, a.loop_kind, active=min(a.count, 32), preload=a.preload, chains_n=a.chains)
+                diff = [i for i, (x, y) in enumerate(zip(body, sbody)) if x != y]
+                if not ok or len(body) != len(sbody) or any(not 8 <= i < 12 for i in diff):
+                    raise RuntimeError(f'emulator gate failed for trips={n}')
+                name = f'loop-{a.loop_kind}-c{a.chains}-s{a.steps}-k{n}'
+                state.setdefault('emulator', []).append({'name': name, 'emulated_trips': small, 'executed': emu['executed'],
+                                                         'differs_only_in_trip_immediate': True})
+            elif n is None:
                 name, body, want = 'control', bytes.fromhex('620978563412'), 0x12345678
             else:
                 name, body, want = f'{a.kind}-c{a.chains}-{n}', chains.body(n, a.kind, a.chains, a.preload, gpu), chains.oracle(n, a.kind, a.preload)

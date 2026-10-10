@@ -152,3 +152,18 @@ VkResult error" as "no fault".
 * The opcode-scan kernel log was captured after the fact, and that session's scan
   outputs were lost. Its 286 timeouts / 73 Unmapped read faults cannot be matched
   to opcodes. See [kernel log evidence](../results/2026-10-10-opcode-scan-kernel-log/README.md).
+
+### Loops, 2026-10-10
+
+* **Short loop bodies give impossible throughputs.** Four fadd32 chains × 64 steps
+  measured 0.31 ns/instr (~3 instructions per cycle per SIMD group). Part of the
+  ~86 ns per-iteration overhead overlaps with the body, so subtracting it as a
+  constant fails. With 512-step bodies, 4 chains equal 2 chains. A 1-instruction
+  body hides entirely.
+* **"Two clock states" was an incomplete reading.** Runs of a few ms saw two levels;
+  40-submit runs show ≥4 levels spanning 3.16×. Identify the state per sample.
+* **Without `push_exec` before the loop,** finished lanes and out-of-bounds lanes
+  share r0l = 1 after `while_icmp`, and the post-loop store would be skipped.
+  Caught in design, not on hardware.
+* applegpu's assembler needs `if_fcmp r0l, eq, 0.0, 0.0, 1` for `push_exec` and
+  `pc+N` / `pc-N` branch syntax. A zero offset prints as `pc+0`.
