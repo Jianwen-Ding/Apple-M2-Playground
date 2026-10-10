@@ -1,0 +1,77 @@
+{
+ "passed": true,
+ "utc": "20261010T233124718137Z",
+ "path": "direct-drm",
+ "kind": "chase",
+ "chains": 1,
+ "loop_kind": null,
+ "steps": null,
+ "trips": 3,
+ "stride": 64,
+ "count": 33,
+ "repeats": 1,
+ "gprs": 16,
+ "preload": 268435456,
+ "variants": [
+  {
+   "name": "chase-4096-s2-k3",
+   "n": 4096,
+   "code_bytes": 118,
+   "oracle": 960,
+   "footprint": 4096,
+   "stride": 64,
+   "hops": 6,
+   "seed": 1,
+   "returncode": 0,
+   "setup": [
+    {
+     "params": {
+      "gen": 14,
+      "variant": "C",
+      "rev": 17,
+      "clusters": 4,
+      "vm_start": 16384,
+      "vm_end": 549755781120,
+      "kernel_min": 536870912,
+      "ts_hz": 1000000000,
+      "max_khz": 1398000,
+      "features": 1,
+      "g14x": 1
+     }
+    },
+    {
+     "usc_words_hex": "1d08c000000000114d9000000d0c002000008d0200018800"
+    },
+    {
+     "cdm_hex": "02000000001000000000000000000040400000000100000001000000200000000100000001000000ffff0f600000004000000000"
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "wait": 0,
+     "errno": 0,
+     "host_ns": 526419,
+     "fw_ts": [
+      16522669947291,
+      16522669960000
+     ],
+     "drm_time": [
+      16522669470000,
+      16522669998500
+     ]
+    }
+   ],
+   "buffer_ok": true,
+   "mismatches": []
+  }
+ ],
+ "emulator": [
+  {
+   "name": "chase-4096-s2-k3",
+   "emulated_trips": 3,
+   "executed": 26,
+   "differs_only_in_trip_immediate": true
+  }
+ ]
+}

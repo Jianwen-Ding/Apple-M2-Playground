@@ -1,0 +1,87 @@
+{
+ "passed": true,
+ "checks": [
+  {
+   "check": "runs-passed",
+   "passed": true,
+   "runs": 5
+  },
+  {
+   "check": "oracles",
+   "passed": true,
+   "variants": 40,
+   "hops": 13248006
+  },
+  {
+   "check": "emulator-gated",
+   "passed": true
+  },
+  {
+   "check": "first-level-hit",
+   "passed": true,
+   "warm_ns": {
+    "2048": 36.0,
+    "8192": 37.8
+   },
+   "cold_over_warm": 3.12,
+   "cycles_warm_at_1398": 50.3,
+   "cycles_cold_at_444": 49.9
+  },
+  {
+   "check": "capacity-step-8k-12k",
+   "passed": true,
+   "ns_8k": 37.8,
+   "ns_12k": 90.7
+  },
+  {
+   "check": "second-level",
+   "passed": true,
+   "warm_ns": {
+    "12288": 90.7,
+    "16384": 92.0,
+    "32768": 96.2,
+    "65536": 104.4
+   },
+   "fresh_32k_first8": [
+    276,
+    274,
+    167,
+    126,
+    126,
+    126,
+    97,
+    97
+   ],
+   "cycles_cold": 122,
+   "cycles_warm": 134
+  },
+  {
+   "check": "plateau-1m-16m",
+   "passed": true,
+   "warm_ns": {
+    "1048576": 348.6,
+    "4194304": 348.7,
+    "16777216": 351.0
+   }
+  },
+  {
+   "check": "beyond-32m-rises",
+   "passed": true,
+   "warm_ns": [
+    351.7,
+    369.7,
+    378.5,
+    387.9
+   ]
+  },
+  {
+   "check": "page-stride-follows-lines",
+   "passed": true,
+   "ns_16_pages_1kib_lines": 40.4,
+   "ns_1024_pages_64kib_lines": 104.2,
+   "ns_64b_stride_64kib": 104.4,
+   "ns_16384_pages_1mib_lines": 380.7,
+   "ns_64b_stride_1mib": 348.6
+  }
+ ]
+}

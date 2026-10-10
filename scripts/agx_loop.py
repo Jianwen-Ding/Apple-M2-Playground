@@ -76,10 +76,72 @@ def loop_body(trips, steps, kind='iadd8', preload=0x10000000, chains_n=1):
     return body, chains.oracle(trips*steps, kind, preload)
 
 
-def emulate(body, active, max_steps=2_000_000):
+CHASE_LOAD = 'device_load 0, i32, x, r2, u8_u9, r2, unsigned'  # r2 = table[r2] (element-scaled index)
+TABLE_VA = 0x1100100000  # data BO + 1 MiB in tests/drm_compute.c
+
+
+def chase_body(trips, steps, start=0):
+    """Return bytes for `trips` iterations of `steps` dependent loads r2 = table[r2] (each followed by wait 0)."""
+    if not (1 <= trips <= 0x7fffffff and 1 <= steps <= 256):
+        raise ValueError('bounded trips/steps required')
+    head = chains.mov_imm(3, 0)+chains.mov_imm(4, trips)+chains.mov_imm(2, start)
+    head += encode('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
+    loop = (encode(CHASE_LOAD)+encode('wait 0'))*steps
+    loop += encode('iadd r3, 1, r3.sx')
+    loop += encode('while_icmp r0l, ult, r3, r4, 1')
+    jump = encode(f'jmp_exec_any pc-{len(loop)}', f'jmp_exec_any pc-{len(loop)}')
+    return head+loop+jump+encode('pop_exec r0l, 1')
+
+
+def chase_table(entries, stride_words, seed=1):
+    """Single random cycle (Sattolo) over entries spaced stride_words apart; other words 0xffffffff."""
+    import array
+    import random
+    rng = random.Random(seed)
+    order = array.array('I', range(entries))
+    for i in range(entries-1, 0, -1):
+        j = rng.randrange(i)
+        order[i], order[j] = order[j], order[i]
+    table = array.array('I', [0xffffffff])*(entries*stride_words)
+    table[0::stride_words] = array.array('I', (v*stride_words for v in order))  # next element index (in words)
+    return table
+
+
+def chase_oracle(table, hops, start=0):
+    """Index after `hops` dependent loads; raises if the chain leaves the cycle."""
+    period = None
+    x = start
+    seen = 0
+    for _ in range(hops):
+        x = table[x]
+        if x == 0xffffffff: raise ValueError('chain left the cycle')
+        seen += 1
+        if x == start:
+            period = seen
+            break
+    if period is None: return x
+    x = start
+    for _ in range(hops % period): x = table[x]
+    return x
+
+
+class _Memory:
+    def __init__(self, base, words):
+        self.base, self.words = base, words
+    def get_u32(self, address):
+        i, r = divmod(address-self.base, 4)
+        if r or not 0 <= i < len(self.words): raise RuntimeError(f'emulated load outside table: {address:#x}')
+        return self.words[i]
+
+
+def emulate(body, active, max_steps=2_000_000, table=None):
     """Run body on one 32-lane SIMD group; lanes < active start at r0l=0, others 1."""
     _, g = _tools()
-    st = g.CoreState(num_registers=8)
+    class Uniforms(g.Uniforms):
+        def get_reg64(self, regid, thread=None):  # applegpu's uniform-base path passes a thread
+            return super().get_reg64(regid)
+    unif = Uniforms(); unif.set_reg32(8, TABLE_VA & 0xffffffff); unif.set_reg32(9, TABLE_VA >> 32)
+    st = g.CoreState(num_registers=8, uniforms=unif, device_memory=_Memory(TABLE_VA, table or []))
     for t in range(g.SIMD_WIDTH):
         st.set_reg16(0, t, 0 if t < active else 1)
         st.set_reg32(2, t, 0xdeadbeef)  # stale; the body must overwrite r2
@@ -103,6 +165,16 @@ def emulate(body, active, max_steps=2_000_000):
     return {'r2': [st.get_reg32(2, t) for t in range(g.SIMD_WIDTH)],
             'r0l': [st.get_reg16(0, t) for t in range(g.SIMD_WIDTH)],
             'exec': list(st.exec), 'executed': executed, 'counts': trace}
+
+
+def check_chase(trips, steps, table, active=17, start=0):
+    """Emulate a chase loop against `table`; active lanes must hold the host oracle."""
+    body = chase_body(trips, steps, start)
+    want = chase_oracle(table, trips*steps, start)
+    r = emulate(body, active, table=table)
+    ok = (all(r['r2'][t] == want for t in range(active)) and r['r0l'] == [0]*active+[1]*(32-active)
+          and r['counts'].get('jmp_exec_any') == trips and r['counts'].get('device_load') == trips*steps)
+    return ok, body, want, r
 
 
 def check(trips, steps, kind='iadd8', active=17, preload=0x10000000, chains_n=1):

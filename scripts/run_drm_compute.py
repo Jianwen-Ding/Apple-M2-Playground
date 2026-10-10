@@ -40,9 +40,12 @@ def build_main(body):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--kind', choices=sorted(chains.KINDS)+['control', 'loop'], default='control')
+    p.add_argument('--kind', choices=sorted(chains.KINDS)+['control', 'loop', 'chase'], default='control')
     p.add_argument('--loop-kind', choices=sorted(chains.KINDS), default='iadd8', help='chain instruction inside --kind loop')
-    p.add_argument('--steps', type=int, default=1, help='chain steps per loop iteration (--kind loop)')
+    p.add_argument('--steps', type=int, default=1, help='chain steps / dependent loads per loop iteration (loop, chase)')
+    p.add_argument('--trips', type=int, default=1000, help='loop trips for --kind chase (--lengths = footprints in bytes)')
+    p.add_argument('--stride', type=int, default=64, help='bytes between chased elements (--kind chase)')
+    p.add_argument('--seed', type=int, default=1)
     p.add_argument('--chains', type=int, choices=(1, 2, 4), default=1)
     p.add_argument('--lengths', default='0')
     p.add_argument('--count', type=int, default=33)
@@ -55,7 +58,7 @@ def main():
     p.add_argument('--cc', default=os.environ.get('CC', 'cc'))
     a = p.parse_args()
     lengths = [None] if a.kind == 'control' else [int(x) for x in a.lengths.split(',')]
-    limit = 10_000_000 if a.kind == 'loop' else 100000
+    limit = {'loop': 10_000_000, 'chase': 512 << 20}.get(a.kind, 100000)
     if not (1 <= a.repeats <= 64 and 1 <= a.count <= 65536 and all(n is None or 0 <= n <= limit for n in lengths)):
         p.error('bounded repeats/count/lengths required')
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
@@ -63,6 +66,7 @@ def main():
     out.mkdir(parents=True, exist_ok=False)
     state = {'passed': False, 'utc': stamp, 'path': 'direct-drm', 'kind': a.kind, 'chains': a.chains,
              'loop_kind': a.loop_kind if a.kind == 'loop' else None, 'steps': a.steps if a.kind == 'loop' else None,
+             'trips': a.trips if a.kind == 'chase' else None, 'stride': a.stride if a.kind == 'chase' else None,
              'count': a.count, 'repeats': a.repeats, 'gprs': a.gprs, 'preload': a.preload, 'variants': []}
     save = lambda: (out/'record.json').write_text(json.dumps(state, indent=1)+'\n')
     exe = out/'drm_compute'
@@ -84,6 +88,21 @@ def main():
                 name = f'loop-{a.loop_kind}-c{a.chains}-s{a.steps}-k{n}'
                 state.setdefault('emulator', []).append({'name': name, 'emulated_trips': small, 'executed': emu['executed'],
                                                          'differs_only_in_trip_immediate': True})
+            elif a.kind == 'chase':
+                # n = footprint in bytes; one random cycle over n/stride elements.
+                if a.stride % 4 or n % a.stride or n < 2*a.stride: raise ValueError('footprint/stride mismatch')
+                table = agx_loop.chase_table(n//a.stride, a.stride//4, a.seed)
+                tpath = out/f'table-{n}.bin'; tpath.write_bytes(table.tobytes())
+                body = agx_loop.chase_body(a.trips, a.steps)
+                want = agx_loop.chase_oracle(table, a.trips*a.steps)
+                small = min(a.trips, 16)
+                ok, sbody, _, emu = agx_loop.check_chase(small, a.steps, table, active=min(a.count, 32))
+                diff = [i for i, (x, y) in enumerate(zip(body, sbody)) if x != y]
+                if not ok or len(body) != len(sbody) or any(not 8 <= i < 12 for i in diff):
+                    raise RuntimeError(f'emulator gate failed for footprint={n}')
+                name = f'chase-{n}-s{a.steps}-k{a.trips}'
+                state.setdefault('emulator', []).append({'name': name, 'emulated_trips': small, 'executed': emu['executed'],
+                                                         'differs_only_in_trip_immediate': True})
             elif n is None:
                 name, body, want = 'control', bytes.fromhex('620978563412'), 0x12345678
             else:
@@ -91,8 +110,10 @@ def main():
             code = build_main(body)
             path = out/(name+'.bin'); path.write_bytes(code+bytes(16)); rb = out/(name+'.readback')
             rec = {'name': name, 'n': n, 'code_bytes': len(code), 'oracle': want}
+            if a.kind == 'chase': rec.update({'footprint': n, 'stride': a.stride, 'hops': a.trips*a.steps, 'seed': a.seed})
             state['variants'].append(rec)
             argv = [str(exe), a.device, str(path), str(a.count), str(rb), str(a.repeats), str(a.gprs)]
+            if a.kind == 'chase': argv.append(str(tpath))
             try:
                 res = subprocess.run(argv, capture_output=True, timeout=a.timeout)
                 rec['returncode'] = res.returncode; stdout = res.stdout.decode(errors='replace')
@@ -109,6 +130,7 @@ def main():
             rec['buffer_ok'] = w == expected
             rec['mismatches'] = [[i, w[i]] for i in range(len(w)) if w[i] != expected[i]][:16]
             rb.unlink(); save()
+            if a.kind == 'chase': tpath.unlink()
             print(json.dumps({'variant': name, 'ok': rec['buffer_ok'],
                               'fw_ns': [s['fw_ts'][1]-s['fw_ts'][0] for s in rec['samples']],
                               'host_ns': [s['host_ns'] for s in rec['samples']]}), flush=True)

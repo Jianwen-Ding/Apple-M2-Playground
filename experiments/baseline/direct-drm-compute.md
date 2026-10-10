@@ -32,6 +32,8 @@ USC addresses (shader code and pipeline words) are 32-bit offsets from
 ```
 
 The uniform buffer holds u4 = 0 (index offset), u5 = count and u6_u7 = output VA.
+Since the load-latency work, the word preloads 12 halfs: u8_u9 is the VA of an
+optional table file copied to data BO + 1 MiB (`drm_compute ... gprs table.bin`).
 That is exactly what the pinned control's main reads. Honeykrisp's preamble
 normally loads them from its descriptor tables. Here they come straight from
 memory, so the main runs unchanged with no preamble.

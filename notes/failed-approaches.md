@@ -167,3 +167,17 @@ VkResult error" as "no fault".
   Caught in design, not on hardware.
 * applegpu's assembler needs `if_fcmp r0l, eq, 0.0, 0.0, 1` for `push_exec` and
   `pc+N` / `pc-N` branch syntax. A zero offset prints as `pc+0`.
+
+### Pointer chase, 2026-10-10
+
+* applegpu's `device_load` exec with a uniform base calls `Uniforms.get_reg64`
+  with an extra thread argument and crashes. `agx_loop.emulate` subclasses
+  `Uniforms` to accept it.
+* Building a 256 MiB table as a Python list needs several GB. `chase_table` uses
+  `array('I')` (1.3 s for 64 M words).
+* The first coarse curve looked noisy at 16–64 KiB because of clock-state
+  transitions inside short runs. Use ≥ 30 submits and report warm/cold windows
+  separately.
+* Elements exactly 16 KiB apart conflict in the first level: 64 such lines
+  (4 KiB) miss although 8 KiB of contiguous lines hit. Do not use page-aligned
+  strides to measure capacity.

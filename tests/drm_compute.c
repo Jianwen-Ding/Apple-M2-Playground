@@ -9,8 +9,11 @@
  * Output buffer layout matches tests/vulkan_compute.c (8 guards, rounded
  * payload, 8 guards, 16 patterned tail words) so oracles carry over.
  *
- * usage: drm_compute node code.bin count readback repeats [gprs]
- * Bounded: count <= 65536, repeats <= 64, 3 s wait per submit. */
+ * Optional table file: copied to data BO offset 1 MiB, its VA passed in u8_u9
+ * (pointer-chase / load probes). The control main never reads u8 onward.
+ *
+ * usage: drm_compute node code.bin count readback repeats [gprs [table.bin]]
+ * Bounded: count <= 65536, repeats <= 64, table <= 512 MiB, 3 s wait per submit. */
 #define _POSIX_C_SOURCE 200809L
 #include <drm/drm.h>
 #include <drm/asahi_drm.h>
@@ -69,11 +72,11 @@ static void put64(uint8_t *p, uint64_t v) { memcpy(p, &v, 8); }
 int main(int argc, char **argv)
 {
     setvbuf(stdout, NULL, _IONBF, 0);
-    require(argc == 6 || argc == 7, "usage: node code.bin count readback repeats [gprs]");
+    require(argc >= 6 && argc <= 8, "usage: node code.bin count readback repeats [gprs [table.bin]]");
     char *end;
     unsigned long count = strtoul(argv[3], &end, 10); require(*end == 0 && count >= 1 && count <= 65536, "count");
     unsigned long reps = strtoul(argv[5], &end, 10); require(*end == 0 && reps >= 1 && reps <= 64, "repeats");
-    unsigned long gprs = argc == 7 ? strtoul(argv[6], &end, 10) : 8;
+    unsigned long gprs = argc >= 7 ? strtoul(argv[6], &end, 10) : 8;
     require(gprs >= 8 && gprs <= 256, "gprs");
 
     FILE *f = fopen(argv[2], "rb"); require(f != NULL, "code-open");
@@ -103,7 +106,16 @@ int main(int argc, char **argv)
     const uint64_t page = 16384;
     uint64_t usc_size = (0x2000 + code_size + 64 + page - 1) & ~(page - 1);
     uint32_t rounded = (uint32_t)((count + 31) / 32 * 32), words = 8 + rounded + 8 + 16;
-    uint64_t data_size = (0x8000 + (uint64_t)words * 4 + page - 1) & ~(page - 1);
+    const uint64_t table_off = 1u << 20;
+    uint64_t table_size = 0;
+    FILE *tf = NULL;
+    if (argc == 8) {
+        tf = fopen(argv[7], "rb"); require(tf != NULL, "table-open");
+        require(fseek(tf, 0, SEEK_END) == 0, "table-seek"); long tn = ftell(tf); rewind(tf);
+        require(tn > 0 && tn <= (512l << 20) && tn % 4 == 0, "table-size"); table_size = (uint64_t)tn;
+    }
+    require(0x8000 + (uint64_t)words * 4 <= table_off, "output-fits-below-table");
+    uint64_t data_size = ((table_size ? table_off + table_size : 0x8000 + (uint64_t)words * 4) + page - 1) & ~(page - 1);
     struct bo usc = bo_create(usc_size, vc.vm_id, shader_base, DRM_ASAHI_BIND_READ);
     struct bo data = bo_create(data_size, vc.vm_id, data_base, DRM_ASAHI_BIND_READ | DRM_ASAHI_BIND_WRITE);
     struct bo tsb = bo_create(page, vc.vm_id, 0, 0);
@@ -111,13 +123,18 @@ int main(int argc, char **argv)
                                               .handle = tsb.handle, .range = page};
     io(DRM_IOCTL_ASAHI_GEM_BIND_OBJECT, &bo_ts, "bind-timestamps");
 
+    if (tf) {
+        require(fread(data.map + table_off, 1, table_size, tf) == table_size && fclose(tf) == 0, "table-read");
+        printf("{\"table\":{\"bytes\":%" PRIu64 ",\"va\":%" PRIu64 "}}\n", table_size, data.va + table_off);
+    }
+
     /* USC BO: pipeline words at 0x1000, code at 0x2000 (USC-relative = BO offset). */
     const uint32_t usc_words = 0x1000, code_off = 0x2000;
     memcpy(usc.map + code_off, code, code_size);
     const uint64_t unif_va = data.va + 0x0, out_va = data.va + 0x8000, cdm_va = data.va + 0x4000;
     uint8_t *w = usc.map + usc_words;
-    /* USC Uniform: tag 0x1d, start halfs 8 (u4), size 8 halfs (u4..u7), buffer >> 2 at bit 26. */
-    put64(w, 0x1dull | (8ull << 8) | (8ull << 20) | ((unif_va >> 2) << 26)); w += 8;
+    /* USC Uniform: tag 0x1d, start halfs 8 (u4), size 12 halfs (u4..u9), buffer >> 2 at bit 26. */
+    put64(w, 0x1dull | (8ull << 8) | (12ull << 20) | ((unif_va >> 2) << 26)); w += 8;
     /* USC Shared, none: tag 0x4d, layout vertex/compute 0x24 at bit 10, bytes 65536 -> groups(256) of 8 bits = 0 ("all"). */
     put32(w, 0x4du | (0x24u << 10)); w += 4;
     /* USC Shader: tag 0x0d, unk_2 = 3 at bit 10 (compute), code address at bit 16 (6 bytes). */
@@ -130,8 +147,9 @@ int main(int argc, char **argv)
     for (uint8_t *q = usc.map + usc_words; q < w; q++) printf("%02x", *q);
     printf("\"}\n");
 
-    /* Uniforms u4 = 0, u5 = count, u6_u7 = output VA. */
+    /* Uniforms u4 = 0, u5 = count, u6_u7 = output VA, u8_u9 = table VA (0 without a table). */
     put32(data.map + 0, 0); put32(data.map + 4, (uint32_t)count); put64(data.map + 8, out_va);
+    put64(data.map + 16, table_size ? data.va + table_off : 0);
 
     /* CDM control stream. */
     uint8_t *c = data.map + 0x4000;

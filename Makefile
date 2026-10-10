@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -33,6 +33,8 @@ help:
 	@echo 'make agx-loop-test      Loop emulator gate tests + 3 small hardware loops (direct DRM)'
 	@echo 'make verify-loops       Verify retained loop latency/throughput evidence offline'
 	@echo 'make agx-loops          Reproduce the loop latency/throughput matrix (~1 min GPU time)'
+	@echo 'make agx-memory         Pointer-chase load latency, 2 KiB..256 MiB (~4 min GPU time)'
+	@echo 'make verify-memory      Verify retained load-latency evidence offline'
 	@echo 'make gpu-faults LOG=... Summarize Asahi GPU timeouts/faults in a kernel log'
 	@echo 'make opcode-scan        GPU-FAULTING: undecoded opcode effects (needs CONFIRM_GPU_FAULTS=1)'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
@@ -162,3 +164,11 @@ agx-loops:
 	done; done; done
 	@for c in 1 2; do $(PYTHON) -B scripts/run_drm_compute.py --kind loop --loop-kind fadd4 --chains $$c --steps 512 --lengths 2000 --count 32 --repeats 40 --timeout 120 --device "$(DEVICE)" --output "$(LOOPDIR)-warm-fadd4-c$$c" || exit 1; done
 	@for n in 32 1216 4864 9728 19456 38912; do $(PYTHON) -B scripts/run_drm_compute.py --kind loop --loop-kind fadd4 --chains 2 --steps 512 --lengths 2000 --count $$n --repeats 30 --timeout 120 --device "$(DEVICE)" --output "$(LOOPDIR)-groups-$$n" || exit 1; done
+
+MEMDIR = $(SCRATCH_ROOT)/drm-compute/runs/memory-$$(date -u +%Y%m%dT%H%M%SZ)
+agx-memory:
+	$(PYTHON) -B scripts/run_drm_compute.py --kind chase --lengths 2048,4096,8192,12288,16384,24576,32768,49152,65536,131072,262144,524288,1048576,2097152,4194304,8388608,16777216,33554432,67108864,134217728,268435456 --steps 16 --trips 1000 --count 32 --repeats 30 --timeout 300 --device "$(DEVICE)" --output "$(MEMDIR)-fine"
+	$(PYTHON) -B scripts/run_drm_compute.py --kind chase --stride 16384 --lengths 262144,1048576,4194304,16777216,33554432,67108864,134217728,268435456 --steps 16 --trips 1000 --count 32 --repeats 12 --timeout 300 --device "$(DEVICE)" --output "$(MEMDIR)-pages"
+
+verify-memory:
+	$(PYTHON) -B scripts/verify_agx_memory.py
