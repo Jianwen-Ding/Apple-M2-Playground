@@ -47,7 +47,7 @@ HALF = {'f32 then f16 read of low half': ['fadd32 r6, r6, r24', 'fadd16 r6l, r6l
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'groups'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -68,6 +68,18 @@ def main():
     elif a.what == 'pairs':
         for name, (x, y) in PAIRS.items():
             res[name] = per_rep(R, [x, y])[0]; print(f'{name:20s} cycles/pair {res[name]:.2f}', flush=True)
+    elif a.what == 'groups':
+        # latency-bound single chains: per-trip cycles with 1 SIMD group vs ~4 per core (per-core span)
+        G = {'iadd chain': ['iadd r6, r6, r24'], 'fadd32 chain': ['fadd32 r6, r6, r24'], 'imadd chain': ['imadd r6, r6, r25, r24'],
+             'rcp chain': ['rcp r6, r6'], 'shuffle chain': ['simd_shuffle r6, r6, r26l'], 'fmadd32 chain': ['fmadd32 r6, r6, r25, r24'],
+             'iadd 2 chains': ['iadd r6, r6, r24', 'iadd r7, r7, r24'], 'mixed chain': ['iadd r6, r6, r24', 'fadd32 r6, r6, r24', 'imadd r6, r6, r25, r24', 'bfi r6, r6, r24, r26']}
+        for name, lines in G.items():
+            parts = [e(x) for x in lines]*8; body = b''.join(parts)
+            B.check_body(body, [len(x) for x in parts])
+            one = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'one')
+            four = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'gpu')
+            res[name] = {'one': one['cycles'], 'four_per_core': four['cycles'], 'ratio': four['cycles']/one['cycles'], 'groups_per_core': four['groups_per_core']}
+            print(f"{name:16s} 1 group {one['cycles']:7.1f}  4/core {four['cycles']:7.1f}  ratio {res[name]['ratio']:.3f}", flush=True)
     elif a.what == 'values':
         # same instruction sequences with different data: benchmark chains (NaN/inf/trivial) vs finite values.
         # r24 = 1 (int) / 0.0f, r25 = 1.0f; the loop preloads r5..r12 with 1.5f (cost_hw.counted).

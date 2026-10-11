@@ -36,6 +36,12 @@ Model (every parameter measured on this GPU):
 | **24 random kernels, 1 SIMD group (out of sample)** | **4.3%** | 14.5% | 14.8% |
 | **24 random kernels, 4 SIMD groups per core (out of sample)** | **9.8%** | 18.3% | 24.0% |
 
+**Measurement noise floor (4 groups per core).** Per-core span timings repeat to about ±6%: the same body
+measured twice gave 49.7 / 46.8 (iadd chain) and 42.0 / 45.1 (fadd32 chain) cycles per trip, and the empty
+loop 33.5–35.6 (35.3 with one group). Latency-bound chains at 4 groups per core came out 0.93–1.13 × their
+single-group cost (`groups.json`), so ratios below 1 are noise, not speed-ups. The 4-group validation error is
+therefore only modestly above what the measurement can resolve; single-group measurements repeat within ~1%.
+
 Errors are prediction minus measurement relative to the measurement. The random kernels mix 52 of the
 benchmarked forms with random register dependencies over r5–r12; they were not used for fitting, except
 that the issue rule was chosen among three candidates by their score:
