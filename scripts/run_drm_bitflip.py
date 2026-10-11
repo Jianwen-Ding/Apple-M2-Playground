@@ -142,6 +142,9 @@ def main():
     p.add_argument('--baseline', action='append', default=[], help="extra KEY=ASM baseline (repeatable)")
     p.add_argument('--raw', action='append', default=[], help="KEY:LABEL=HEX raw candidate compared with KEY's baseline (repeatable)")
     p.add_argument('--high-preload', help='first,last register to also preload with distinct values (needs --gprs > 2*last)')
+    p.add_argument('--sweep', action='append', default=[], help='KEY:start:size sweeps every value of that bit range (repeatable)')
+    p.add_argument('--prefix', default='', help='hex bytes placed before every candidate (and the reference), e.g. input setup')
+    p.add_argument('--max-faults', type=int, default=1, help='stop after this many faults (each must be followed by a passing control)')
     p.add_argument('--masks', help='comma list of hex XOR masks to apply as extra flips (multi-bit)')
     p.add_argument('--device', default='/dev/dri/renderD128')
     p.add_argument('--gprs', type=int, default=64)
@@ -159,14 +162,15 @@ def main():
         k, asm = kv.split('=', 1); BASELINES[k] = asm
     keys = a.only.split(',') if a.only else list(BASELINES)
     jobs = []
+    prefix = bytes.fromhex(a.prefix)
     def job(name, key, n, size, flip):
-        cand = n.to_bytes(size, 'little')
+        cand = prefix+n.to_bytes(size, 'little')
         for layout in 'AB':
             body, seg = build(cand, layout)
             D.decode_check([s for s in seg if s[0] not in ('lane-mix', 'high-preload')])
             jobs.append({'name': f'{name}-{layout}', 'key': key, 'flip': flip, 'layout': layout, 'body': body, 'cand': cand.hex()})
     for layout in 'AB':
-        body, _ = build(D.WAIT, layout)
+        body, _ = build(bytes.fromhex(a.prefix)+D.WAIT, layout)
         jobs.append({'name': f'ref-wait-{layout}', 'key': 'ref', 'flip': None, 'layout': layout, 'body': body, 'cand': '3800'})
     plan = {}
     for key in keys:
@@ -182,6 +186,13 @@ def main():
             for v in vals:
                 job(f'{key}-{field}{v}', key, (n & ~(((1 << sz)-1) << st)) | v << st, size, {'field': field, 'value': v})
             continue
+        for sw in a.sweep:
+            k2, st, sz = sw.split(':'); st, sz = int(st), int(sz)
+            if k2 != key: continue
+            cur = (n >> st) & ((1 << sz)-1)
+            for v in range(1 << sz):
+                if v != cur:
+                    job(f'{key}-s{st}_{v}', key, (n & ~(((1 << sz)-1) << st)) | v << st, size, {'field': f'b{st}+{sz}', 'value': v})
         bits = [] if a.no_gaps else gap_bits(d)
         bits += [int(x) for x in a.bits.split(',')] if a.bits else []
         plan[key] = {'descriptor': d.name, 'size': size, 'baseline_hex': n.to_bytes(size, 'little').hex(), 'bits': bits}
@@ -221,6 +232,7 @@ def main():
             ev = [json.loads(l) for l in res.stdout.decode(errors='replace').splitlines() if l.startswith('{')]
             smp = [e for e in ev if 'rep' in e]
             rec['fw_ns'] = [e['fw_ts'][1]-e['fw_ts'][0] for e in smp]
+            rec['host_ns'] = [e['host_ns'] for e in smp]; rec['returncode'] = res.returncode
             normal = res.returncode == 0 and bool(smp) and all(e['fw_ts'][0] and e['fw_ts'][1] and e['host_ns'] < 50_000_000 for e in smp)
             if res.returncode == 0:
                 w = list(struct.unpack('<64I', rb.read_bytes()))
@@ -241,9 +253,13 @@ def main():
             rec = run(jb); state['results'].append(rec)
             print(json.dumps({'name': rec['name'], 'fault': rec['fault']}), flush=True)
             if rec['fault']:
+                import time
+                time.sleep(2)
                 chk = run({'name': 'recovery', 'key': 'ctrl', 'flip': None, 'layout': '-', 'body': ctrl_body, 'cand': ''})
-                state['recovery_fault'] = chk['fault']
-                raise RuntimeError(f"fault on {rec['name']} (control after: {'FAILED' if chk['fault'] else 'ok'})")
+                state.setdefault('faults', []).append({'name': rec['name'], 'control_after_ok': not chk['fault']})
+                save()
+                if chk['fault'] or len(state['faults']) >= a.max_faults:
+                    raise RuntimeError(f"fault on {rec['name']} (control after: {'FAILED' if chk['fault'] else 'ok'})")
             if len(state['results']) % 40 == 0: save()
         state['complete'] = True
     except Exception as e:
