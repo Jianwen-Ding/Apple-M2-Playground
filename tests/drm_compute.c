@@ -18,7 +18,8 @@
  *   AGX_LOCAL_X/Y/Z                   CDM local size (global X stays the rounded count)
  *   AGX_GLOBAL_Y/Z                    CDM global size in Y/Z (threads; default 1)
  *   AGX_WORD0_OR                      bits ORed into CDM launch word 0
- *   AGX_HELPER_DATA, AGX_HELPER_CFG   drm_asahi_helper_program data/cfg (binary stays 0)
+ *   AGX_HELPER_DATA, AGX_HELPER_CFG   drm_asahi_helper_program data/cfg ("table" = table VA)
+ *   AGX_HELPER_CODE, AGX_HELPER_OFF   helper program file at USC offset AGX_HELPER_OFF (default 0x4000); binary = offset | 1
  *   AGX_SAMPLER_COUNT                 sampler_count with sampler_heap = zeroed data page at +0x6000
  *   AGX_PRIORITY                      queue priority (0 low, 1 medium)
  *   AGX_USC_ORDER                     order of USC pipeline words (default "ushrn")
@@ -129,6 +130,16 @@ int main(int argc, char **argv)
             (code_off >= usc_words + 64 || code_off + code_size + 64 <= usc_words), "usc-offsets");
     require(cdm_off % 8 == 0 && cdm_off >= 0x100 && cdm_off + 0x100 <= 0x6000, "cdm-offset");
     uint64_t usc_end = (usc_words + 64 > code_off + code_size + 64) ? usc_words + 64 : code_off + code_size + 64;
+    /* Optional helper program at AGX_HELPER_OFF (default 0x4000), after the main code. */
+    static uint8_t helper_code[0x10000]; size_t helper_size = 0;
+    const uint32_t helper_off = (uint32_t)env("AGX_HELPER_OFF", 0x4000);
+    const char *hc = getenv("AGX_HELPER_CODE");
+    if (hc && *hc) {
+        FILE *hf = fopen(hc, "rb"); require(hf != NULL, "helper-code-open");
+        helper_size = fread(helper_code, 1, sizeof helper_code, hf); require(helper_size > 0 && helper_size < sizeof helper_code && feof(hf), "helper-code-read"); fclose(hf);
+        require(helper_off % 64 == 0 && helper_off >= code_off + code_size + 64 && helper_off >= usc_words + 0x400, "helper-placement");
+        if (helper_off + helper_size + 64 > usc_end) usc_end = helper_off + helper_size + 64;
+    }
     uint64_t usc_size = (usc_end + page - 1) & ~(page - 1);
     uint32_t rounded = (uint32_t)((count + 31) / 32 * 32), words = 8 + rounded + 8 + 16;
     const uint64_t table_off = 1u << 20;
@@ -175,6 +186,12 @@ int main(int argc, char **argv)
         require(pre_off + pre_size + 64 <= usc_size && (pre_off + pre_size + 64 <= code_off || pre_off >= code_off + code_size + 64) &&
                 pre_off + pre_size + 64 <= (usc_words > pre_off ? usc_words : usc_size), "preshader-placement");
         memcpy(usc.map + pre_off, pre, pre_size);
+    }
+    uint32_t helper_binary = 0;
+    if (helper_size) {
+        memcpy(usc.map + helper_off, helper_code, helper_size);
+        helper_binary = helper_off | 1;   /* tagged USC pointer, as Mesa's agx_helper_program() */
+        printf("{\"helper\":{\"bytes\":%zu,\"binary\":%u}}\n", helper_size, helper_binary);
     }
     for (const char *o = order; *o; o++) {
         if (*o == 'u') {
@@ -238,7 +255,8 @@ int main(int argc, char **argv)
             .c = {.cdm_ctrl_stream_base = cdm_va, .cdm_ctrl_stream_end = cdm_end,
                   .ts = {.start = {.handle = bo_ts.object_handle, .offset = 0},
                          .end = {.handle = bo_ts.object_handle, .offset = 8}},
-                  .helper = {.binary = 0, .cfg = (uint32_t)env("AGX_HELPER_CFG", 0), .data = env("AGX_HELPER_DATA", 0)},
+                  .helper = {.binary = helper_binary, .cfg = (uint32_t)env("AGX_HELPER_CFG", 0),
+                             .data = (getenv("AGX_HELPER_DATA") && !strcmp(getenv("AGX_HELPER_DATA"), "table")) ? data.va + table_off : env("AGX_HELPER_DATA", 0)},
                   .sampler_count = (uint32_t)env("AGX_SAMPLER_COUNT", 0),
                   .sampler_heap = env("AGX_SAMPLER_COUNT", 0) ? data.va + 0x6000 : 0},
         };

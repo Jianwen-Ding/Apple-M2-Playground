@@ -207,3 +207,17 @@ VkResult error" as "no fault".
 * A non-atomic per-core counter (load/add/store) read 1, but overlapping runs could
   have produced the same result. The device atomic add was validated (65,536
   exact) and the count repeated with it.
+
+### Custom helper program, 2026-10-11 — PROBABLE GPU HANG/RECOVERY
+
+* Owner-approved. One submission of a hand-built helper (`run_drm_helper.py`): a
+  256-selector scan stored through SR146/147, then a doorbell loop. The submit
+  "succeeded", but it took 0.50 s, firmware timestamps were not written, and each
+  helper stopped after 7 of 256 stores. Treat it as a hang recovered by firmware.
+  See [evidence](../results/2026-10-11-helper-attempt/README.md).
+* Do not judge success from syncobj wait alone. Check host time and whether the
+  firmware timestamps were written (0/0 means the command did not complete
+  normally).
+* If retried: ring the first doorbell immediately (as Mesa does), keep the helper
+  to a handful of registers, and do any logging between requests. Run only with
+  the owner watching, ideally with dmesg.

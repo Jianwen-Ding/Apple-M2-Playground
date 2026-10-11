@@ -76,6 +76,18 @@ def loop_body(trips, steps, kind='iadd8', preload=0x10000000, chains_n=1):
     return body, chains.oracle(trips*steps, kind, preload)
 
 
+def store_regbase(reg, base_reg, index_reg):
+    """device_store 0, i32, x, r<reg>, r<base>_r<base+1>, r<index>, unsigned: 64-bit register base."""
+    _, g = _tools()
+    ref = bytes.fromhex('45112c0e00c01200')
+    n = g.opcode_to_number(ref); d = g.get_instruction_descriptor(n)
+    f = dict(d.decode_fields(n)); f.update(R=2*reg, At=0, A=2*base_reg, O=2*index_reg)
+    x = d.encode_fields(f); m = g.get_instruction_descriptor(x)
+    if m is not d or dict(m.decode_fields(x)) != f or m.decode_size(x) != 8:
+        raise ValueError('register-base store encoding mismatch')
+    return x.to_bytes(8, 'little')
+
+
 def store(reg, base_uniform, index_reg):
     """device_store 0, i32, x, r<reg>, u<base>_u<base+1>, r<index>, unsigned (the control's store form).
 
