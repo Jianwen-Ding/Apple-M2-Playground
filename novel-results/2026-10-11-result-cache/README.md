@@ -27,6 +27,10 @@ the value its register received D instructions earlier):
   the same register costs about 0.9 cycles; writing the low and high halves independently costs nothing;
   a SIMD shuffle or reduction fed by an ALU result costs 0.7–1.8 cycles more than shuffle→shuffle chains.
 
+16-bit forms recover only slowly beyond D = 16 (`rotation16-extended.json`: 1.49 at 20, 1.35 at 24, 1.31 at 32,
+1.28 at 38 units per instruction; beyond 19 destinations the rotation mixes low and high halves). No single
+writeback time fits (W = D·(1+stall) rises from ~20 to ~49), so the 16-bit rule remains open.
+
 Not established: behaviour with several SIMD groups per core (whether the cache is per group or per
 scheduler), whether loads and multi-cycle units write through the same path, and the exact 16-bit rule.
 
