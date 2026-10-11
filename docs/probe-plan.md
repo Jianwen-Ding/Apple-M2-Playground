@@ -7,9 +7,9 @@
 | P0 | Repeatable environment capture, build, and DRM access check | Implemented; see baseline evidence in `results/` |
 | P1 | Read-only Asahi parameter query and confirmed GPU identity | Complete for driver identity/topology; [G14C, 38 enabled mask bits](../experiments/baseline/device-params.md); product name is source interpretation |
 | P2 | Minimal GPU compute submission with deterministic memory readback | Complete through Mesa GLES: [22 dispatches, 26 whole-buffer readbacks](../experiments/baseline/compute-readback.md); reviewed smoke command `make compute` |
-| P3 | Execute a known AGX instruction sequence and compare against a host oracle | Proven narrow scope: [pinned G14C B1 move-immediate field](../experiments/arithmetic/first-agx-instruction.md), with guarded readback; other decoder labels remain hypotheses |
-| P4 | Controlled instruction and operand variations with stored evidence | First one-bit immediate variation passed at counts 33/257; broader operand/register/ALU coverage pending |
-| P5 | Timing probes with a validated time source and repeatable measurements | Driver GET_TIME baseline complete ([evidence](../experiments/timing/driver-time.md)); [GLES elapsed calibration failed](../experiments/timing/gles-timer-calibration.md); pairs, shader counter and ISA timing remain unvalidated |
+| P3 | Execute a known AGX instruction sequence and compare against a host oracle | Complete: direct-DRM submission with exact host oracles is the standard harness (`tests/drm_compute.c`) |
+| P4 | Controlled instruction and operand variations with stored evidence | 131 of 159 applegpu descriptors mapped or classified ([coverage](isa-coverage.md)); ALU gap bits, sub-op spaces, atomics, float/int64 semantics, memory ordering in [novel results](../novel-results/README.md) |
+| P5 | Timing probes with a validated time source and repeatable measurements | In-shader CPU clock, loop/ALU latency, load latency, occupancy (direct atomic counters) — see novel results |
 
 ## Probe areas
 
@@ -27,7 +27,16 @@ earlier request; its completed calibration evidence is retained, without further
 capability queries or timer sweeps in this integration. A driver time query is not proof of an ISA clock
 register, and host ioctl latency is not instruction latency.
 
-## First follow-up work
+## Status on 2026-10-11 (after the atomics/semantics session)
+
+Done without GPU hangs (0 recovered timeouts this boot): device and threadgroup atomics (Mesa ops 0–10),
+fp32/fp16 add/mul/fma semantics, 64-bit integer and pointer arithmetic, occupancy, cross-core memory
+ordering, else/while_fcmp, and the stack path through Mesa. Deferred because they risk hangs and need a
+reboot to be available: atomic ops 11–15 and u-bits, `call`/`ret`/`jmp_incomplete`/`jmp_if_skipping_doorbell`,
+direct-DRM scratch (helper program), and the remaining unknown-opcode probes. The 28 open descriptors
+are otherwise fragment-only or need texture/sampler state.
+
+## First follow-up work (historical)
 
 1. Preserve the completed [parameter](../experiments/baseline/device-params.md)
    and [driver-time](../experiments/timing/driver-time.md) controls when building
