@@ -286,3 +286,9 @@ VkResult error" as "no fault".
   4-component slots (16 bytes for i32). Use Mesa's form instead: byte offset in the base register,
   index 0. Before concluding that a size field has the wrong units, check how the probe addresses memory.
 
+### In-shader clock, 2026-10-11
+
+* Polling a CPU-written word from a shader returned the same value for the whole dispatch,
+  even with Mesa's coherent load bit. The GPU caches the line after the first read. Re-read
+  with `device_barrier_1`/`unknown_barrier_1` + a coherent load, or read a line not yet touched.
+

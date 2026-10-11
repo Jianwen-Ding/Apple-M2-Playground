@@ -149,4 +149,6 @@ reconstructs shader bytes and buffers with the Python standard library;
 * `verify_barrier_stress.py`: offline checks of `results/2026-10-11-barrier-0x68-vs-0x78/`.
 * `run_drm_tg_layout.py`: threadgroup memory addressing (index stride per format, component mask,
   base+index, base-addressed capacity). `verify_tg_addressing.py [DIR]` checks its output.
+* `run_drm_cpu_clock.py`: in-shader clock (CPU timer thread in `tests/drm_compute.c`, `AGX_CPU_CLOCK`);
+  load policy × barrier × loop length. `verify_in_shader_clock.py [DIR]` checks it.
 

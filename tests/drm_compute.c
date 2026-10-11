@@ -28,6 +28,11 @@
  *   AGX_SHARED_WORD                   full 32-bit USC Shared word (tag 0x4d must be kept by the caller)
  *   AGX_SHADER_UNK2                   USC Shader word unk_2 field (default 3, Mesa's compute value)
  *   AGX_TABLE_OUT                     write the table region back to this path after the last submit
+ *   AGX_CPU_CLOCK                     word index in the table: a CPU thread keeps writing, while the
+ *                                     submits run, word[i] = spin counter and word[i+1] = low 32 bits
+ *                                     of CNTVCT_EL0 (the ARM generic timer). Calibration is printed.
+ *   AGX_CPU_CLOCK_FLUSH               1 = clean each write to the point of coherency (dc cvac)
+ *   AGX_CPU_CLOCK_LINES               write the pair to this many copies, 32 words (128 B) apart (default 1)
  *
  * usage: drm_compute node code.bin count readback repeats [gprs [table.bin]]
  * Bounded: count <= 65536, repeats <= 64, table <= 512 MiB, 3 s wait per submit. */
@@ -45,6 +50,8 @@
 #include <sys/mman.h>
 #include <time.h>
 #include <unistd.h>
+#include <pthread.h>
+#include <stdatomic.h>
 
 static int fd = -1;
 static void require(int ok, const char *stage)
@@ -90,6 +97,27 @@ static uint64_t env(const char *name, uint64_t fallback)
     char *end; uint64_t x = strtoull(v, &end, 0); require(*end == 0, name); return x;
 }
 static void put64(uint8_t *p, uint64_t v) { memcpy(p, &v, 8); }
+
+static volatile uint32_t *clock_words;
+static atomic_int clock_run, clock_flush, clock_lines = 1;
+static uint64_t clock_iters, clock_t0, clock_t1;
+static inline uint64_t cntvct(void) { uint64_t v; __asm__ volatile("isb; mrs %0, cntvct_el0" : "=r"(v)); return v; }
+static void *clock_thread(void *arg)
+{
+    (void)arg;
+    uint32_t n = 0;
+    clock_t0 = cntvct();
+    while (atomic_load_explicit(&clock_run, memory_order_relaxed)) {
+        ++n;
+        for (int l = 0; l < clock_lines; l++) {
+            volatile uint32_t *w = clock_words + 32 * l;
+            w[0] = n; w[1] = (uint32_t)cntvct();
+            if (clock_flush) __asm__ volatile("dc cvac, %0" :: "r"(w) : "memory");
+        }
+    }
+    clock_t1 = cntvct(); clock_iters = n;
+    return NULL;
+}
 
 int main(int argc, char **argv)
 {
@@ -248,6 +276,18 @@ int main(int argc, char **argv)
     io(DRM_IOCTL_SYNCOBJ_CREATE, &sc, "syncobj-create");
 
     uint32_t *out = (uint32_t *)(data.map + 0x8000);
+    pthread_t clock_tid;
+    const char *cw = getenv("AGX_CPU_CLOCK");
+    if (cw && *cw) {
+        unsigned long wi = strtoul(cw, NULL, 0);
+        atomic_store(&clock_lines, (int)env("AGX_CPU_CLOCK_LINES", 1));
+        require(clock_lines >= 1 && clock_lines <= 64 && table_size > 0 && (wi + 32 * (uint64_t)clock_lines) * 4 <= table_size, "cpu-clock-word");
+        clock_words = (volatile uint32_t *)(data.map + table_off) + wi;
+        atomic_store(&clock_flush, (int)env("AGX_CPU_CLOCK_FLUSH", 0));
+        atomic_store(&clock_run, 1);
+        require(pthread_create(&clock_tid, NULL, clock_thread, NULL) == 0, "cpu-clock-thread");
+        while (clock_words[0] == 0) ;   /* running before the first submit */
+    }
     for (unsigned long rep = 0; rep < reps; rep++) {
         for (uint32_t j = 0; j < words; j++) out[j] = j < words - 16 ? 0xcdcdcdcdu : 0xa5a50000u + j - (words - 16);
         memset(tsb.map, 0, 32);
@@ -280,6 +320,12 @@ int main(int argc, char **argv)
         require(r == 0, "syncobj-wait");
         struct drm_syncobj_array reset = {.handles = (uint64_t)(uintptr_t)&sc.handle, .count_handles = 1};
         io(DRM_IOCTL_SYNCOBJ_RESET, &reset, "syncobj-reset");
+    }
+    if (cw && *cw) {
+        atomic_store(&clock_run, 0); pthread_join(clock_tid, NULL);
+        uint64_t frq; __asm__ volatile("mrs %0, cntfrq_el0" : "=r"(frq));
+        printf("{\"cpu_clock\":{\"iters\":%" PRIu64 ",\"cntvct\":[%" PRIu64 ",%" PRIu64 "],\"cntfrq\":%" PRIu64 ",\"flush\":%d}}\n",
+               clock_iters, clock_t0, clock_t1, frq, (int)clock_flush);
     }
     const char *tout = getenv("AGX_TABLE_OUT");
     if (tout && *tout) {

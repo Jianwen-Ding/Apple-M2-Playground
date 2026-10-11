@@ -65,6 +65,8 @@ make sync-probe             # GPU: 0x18/0x78 barrier/wait and ending-opcode test
 make verify-sync-and-end    # Check retained sync/end evidence offline
 make barrier-stress         # GPU: 0x68 vs 0x78 message-passing stress (CONFIRM_GPU_FAULTS=1)
 make verify-barrier-stress  # Check retained barrier-stress evidence offline
+make test-in-shader-clock   # GPU: read a CPU-written timer inside a shader
+make verify-in-shader-clock # Check retained in-shader clock evidence offline
 ```
 
 Run records and binaries go to scratch. Baseline/DRM runs use

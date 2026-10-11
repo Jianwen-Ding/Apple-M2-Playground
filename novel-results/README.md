@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-11 In-shader clock: CPU-written timer read via coherent load after device_barrier_1; two Mesa barriers invalidate](2026-10-11-in-shader-clock/README.md)
 - [2026-10-11 Threadgroup memory addressing: byte base + 16-byte (vec4) index slots; declared size exact](2026-10-11-tg-memory-addressing/README.md)
 - [2026-10-11 0x78 = barrier over aligned 4-SIMD-group blocks, 0x68 = whole workgroup](2026-10-11-barrier-0x68-vs-0x78/README.md)
 - [2026-10-11 0x78 (4-SIMD-group) barrier, 0x18 fixed-cost op, ending opcodes indistinguishable; threadgroup memory on direct DRM](2026-10-11-sync-and-end-opcodes/README.md)
