@@ -37,3 +37,18 @@ A new finding needs a reproducible hardware test, exact input and observed
 output, a documented scope, and a reference to the software baseline it extends
 or contradicts. Re-run the control and the changed case before promoting it.
 Use [the finding template](../templates/finding.md).
+
+## GPU hang safety
+
+A GPU timeout costs about 0.5 s and a firmware recovery, and recoveries accumulate: after
+about 44 in one boot the device wedged until reboot ([failed approaches](../notes/failed-approaches.md)).
+
+* `scripts/gpu_safety.py` keeps a per-boot timeout budget (default 30, `AGX_HANG_BUDGET`) under
+  `/scratch/apple-m2-playground/hang-budget/`. `run_drm_bitflip.py` refuses to start when the
+  budget is spent and records every fault; the atomics runners record theirs.
+* `run_drm_bitflip.py --prescreen-length` drops candidates whose applegpu-decoded length differs
+  from the baseline's, so decode-desync hangs never reach the GPU.
+* Prefer experiments whose encodings Mesa emits (checked against Mesa's `agx_pack.c` formula),
+  vary inputs rather than encodings where possible, avoid backward branches (use straight-line
+  code), and confirm every derived address without dereferencing it first.
+* Run expected-hang candidates once, last, and only when a reboot is available.

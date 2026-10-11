@@ -20,6 +20,7 @@ import argparse, datetime, json, os, shlex, struct, subprocess, sys, time
 from pathlib import Path
 
 import agx_loop
+import gpu_safety
 import run_drm_compute as drm
 import run_drm_atomic as DA
 from run_drm_tg_layout import tg, shared_word
@@ -131,6 +132,7 @@ def main():
                 rec['fault'] = True; state['results'].append(rec); time.sleep(2)
                 c = submit(drm.build_main(bytes.fromhex('620978563412')), words)
                 state['fault'] = {'name': jb['name'], 'control_after_ok': c is not None}
+                gpu_safety.record(f"{Path(__file__).name} {jb['name']}")
                 raise RuntimeError(f"fault on {jb['name']}; stopping")
             o, t = got; tgw = t[192:192+N]; notes = []
             opn = OPS[jb['op']]

@@ -28,6 +28,7 @@ import subprocess
 import sys
 
 import agx_loop
+import gpu_safety
 import run_drm_compute as drm
 import run_drm_opcode_describe as D
 
@@ -152,6 +153,8 @@ def main():
     p.add_argument('--timeout', type=int, default=20)
     p.add_argument('--output', type=Path)
     p.add_argument('--dry-run', action='store_true')
+    p.add_argument('--prescreen-length', action='store_true',
+                   help="skip candidates whose applegpu-decoded length differs from the baseline's (decode-desync hangs)")
     p.add_argument('--cc', default=os.environ.get('CC', 'cc'))
     a = p.parse_args()
     _, g = tools()
@@ -164,7 +167,12 @@ def main():
     keys = a.only.split(',') if a.only else list(BASELINES)
     jobs = []
     prefix = bytes.fromhex(a.prefix)
+    skipped = []
     def job(name, key, n, size, flip):
+        if a.prescreen_length and flip is not None:
+            b = n.to_bytes(size, 'little'); d = g.get_instruction_descriptor(g.opcode_to_number(b))
+            if d is None or d.decode_size(g.opcode_to_number(b)) != size:
+                skipped.append(name); return
         cand = prefix+n.to_bytes(size, 'little')
         for layout in 'AB':
             body, seg = build(cand, layout)
@@ -209,11 +217,12 @@ def main():
     if a.names:
         import re
         jobs = [j for j in jobs if j['key'] == 'ref' or re.search(a.names, j['name'])]
-    print(json.dumps({'jobs': len(jobs), 'plan': plan if a.dry_run else len(plan)}), flush=True)
+    print(json.dumps({'jobs': len(jobs), 'plan': plan if a.dry_run else len(plan), 'prescreen_skipped': skipped}), flush=True)
     if a.dry_run:
         return 0
     if os.environ.get('CONFIRM_GPU_FAULTS') != '1':
         sys.exit('refusing: flipped bits are untested encodings. Re-run with CONFIRM_GPU_FAULTS=1.')
+    gpu_safety.require_budget(1)
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
     out = a.output or Path('/scratch/apple-m2-playground/drm-compute/bitflip')/stamp
     out.mkdir(parents=True, exist_ok=False)
@@ -261,12 +270,14 @@ def main():
             if rec['fault']: faulted.add(jb['name'][:-2])
             print(json.dumps({'name': rec['name'], 'fault': rec['fault']}), flush=True)
             if rec['fault']:
+                if gpu_safety.record('bitflip '+rec['name']) >= gpu_safety.LIMIT:
+                    state['budget_exhausted'] = True
                 import time
                 time.sleep(2)
                 chk = run({'name': 'recovery', 'key': 'ctrl', 'flip': None, 'layout': '-', 'body': ctrl_body, 'cand': ''})
                 state.setdefault('faults', []).append({'name': rec['name'], 'control_after_ok': not chk['fault']})
                 save()
-                if chk['fault'] or len(state['faults']) >= a.max_faults:
+                if chk['fault'] or len(state['faults']) >= a.max_faults or state.get('budget_exhausted'):
                     raise RuntimeError(f"fault on {rec['name']} (control after: {'FAILED' if chk['fault'] else 'ok'})")
             if len(state['results']) % 40 == 0: save()
         state['complete'] = True

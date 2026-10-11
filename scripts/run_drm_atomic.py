@@ -25,6 +25,7 @@ import argparse, datetime, json, os, random, shlex, struct, subprocess, sys, tim
 from pathlib import Path
 
 import agx_loop
+import gpu_safety
 import run_drm_compute as drm
 
 REPO = Path(__file__).resolve().parents[1]
@@ -238,6 +239,7 @@ def main():
                 state['results'].append(rec); time.sleep(2)
                 c = submit('control', ctrl, words, N)
                 state['fault'] = {'name': jb['name'], 'control_after_ok': not c['fault']}
+                gpu_safety.record(f"{Path(__file__).name} {jb['name']}")
                 raise RuntimeError(f"fault on {jb['name']}; stopping (control after: {'ok' if not c['fault'] else 'FAILED'})")
             tab = rec['table']; notes = []
             if not rec['guards']: notes.append('guard words changed')
