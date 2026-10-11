@@ -23,8 +23,9 @@ How it works (details: docs/shader-capture.md)
      agx_cost.decode/trace/simulate for 1 and 4 SIMD groups per core.
 
 Options: --out DIR (default /scratch/apple-m2-playground/capture/<utc>), --json FILE,
---ir (extra run with AGX_MESA_DEBUG=shaders, cache disabled, to attach Mesa's NIR/AGX IR),
---groups 1,4, --path auto|static|emulate, --loop-trips N, --timeout 60, --mesa auto|25.1|25.3.
+--ir (extra run with AGX_MESA_DEBUG=shaders,shaderdb, cache disabled, to attach Mesa's NIR/AGX IR),
+--ir-dump FILE (attach an existing dump offline), --groups 1,4, --path auto|static|emulate,
+--loop-trips N, --timeout 60, --mesa auto|25.1|25.3|gl=25.1,vulkan=25.3.
 SAFETY: only use with programs that go through Mesa's own GLES/Vulkan drivers.
 """
 import argparse, datetime, json, os, re, struct, subprocess, sys
@@ -62,11 +63,22 @@ VK_MAGIC = b'MesaVkShaderBin\x00'
 VK_HEADER = 72          # struct vk_shader_bin_header (src/vulkan/runtime/vk_shader.c)
 
 
+# Exact Mesa versions whose struct layouts were checked with tests/agx_cache_layout.c (the structs
+# are copied from these tags). Any other version is refused unless --mesa forces a layout.
+KNOWN_VERSIONS = {'25.1.9': '25.1', '25.3.6': '25.3'}
+
+
+def vkey(v):
+    """Numeric sort key for a version string ('25.10.0' > '25.3.6')."""
+    return tuple(int(x) for x in re.findall(r'\d+', v))
+
+
 def installed_versions():
     """Mesa versions of the installed GL (libgallium-X.Y.Z.so) and Vulkan (libvulkan_asahi.so) drivers."""
     out = {}
-    g = sorted(Path('/usr/lib64').glob('libgallium-*.so'))
-    if g: out['gl'] = re.search(r'libgallium-(\d+\.\d+\.\d+)', g[-1].name).group(1)
+    g = [m.group(1) for f in Path('/usr/lib64').glob('libgallium-*.so')
+         if (m := re.fullmatch(r'libgallium-(\d+\.\d+\.\d+)\.so', f.name))]
+    if g: out['gl'] = max(g, key=vkey)
     vk = Path('/usr/lib64/libvulkan_asahi.so')
     if vk.exists():
         m = re.search(rb'Mesa (\d+\.\d+\.\d+)', vk.read_bytes())
@@ -74,8 +86,28 @@ def installed_versions():
     return out
 
 
-def layout_for(version):
-    return '25.3' if version and tuple(map(int, version.split('.')[:2])) >= (25, 3) else '25.1'
+def select_layouts(arg):
+    """--mesa -> ({api: layout}, {api: version or 'forced'}). auto: exact whitelisted versions of the
+    installed drivers only; unknown versions raise SystemExit with an explanation."""
+    if arg != 'auto':
+        spec = dict(x.split('=', 1) if '=' in x else (None, x) for x in arg.split(','))
+        if None in spec: spec = {'gl': spec[None], 'vulkan': spec[None], **{k: v for k, v in spec.items() if k}}
+        out = {}
+        for api, v in spec.items():
+            if api not in ('gl', 'vulkan'): raise SystemExit(f'--mesa: unknown API {api!r} (use gl=..., vulkan=...)')
+            lay = v if v in LAYOUTS else KNOWN_VERSIONS.get(v)
+            if lay is None: raise SystemExit(f'--mesa: unknown layout {v!r}; use one of {sorted(LAYOUTS)} or {sorted(KNOWN_VERSIONS, key=vkey)}')
+            out[api] = lay
+        return out, {api: f'forced ({spec[api]})' for api in out}
+    inst = installed_versions()
+    bad = {api: v for api, v in inst.items() if v not in KNOWN_VERSIONS}
+    if bad or not inst:
+        what = ', '.join(f'{api} driver is Mesa {v}' for api, v in bad.items()) or 'no Asahi Mesa driver found in /usr/lib64'
+        raise SystemExit(
+            f'agx_capture: {what}; blob layouts are only verified for Mesa {", ".join(sorted(KNOWN_VERSIONS, key=vkey))}.\n'
+            '  Diff the structs listed in tests/agx_cache_layout.c against that version and add it to KNOWN_VERSIONS,\n'
+            '  or force a layout with --mesa 25.1|25.3 (or --mesa gl=25.1 to parse only GL items).')
+    return {api: KNOWN_VERSIONS[v] for api, v in inst.items()}, inst
 
 
 # ---- cache container parsing --------------------------------------------------------------------
@@ -181,11 +213,14 @@ def parse_honeykrisp(d, L, version):
     return out
 
 
-def parse_blob(d, versions):
-    """Try Gallium then honeykrisp layouts; a parse must consume the blob exactly."""
+def parse_blob(d, layouts):
+    """Try Gallium then honeykrisp layouts (APIs without a selected layout are not tried); a parse
+    must consume the blob exactly."""
     errs = []
     for api in ('gl', 'vulkan') if d[:16] != VK_MAGIC else ('vulkan',):
-        v = layout_for(versions.get(api)); L = LAYOUTS[v]
+        if api not in layouts:
+            errs.append(f'{api}: no layout selected'); continue
+        v = layouts[api]; L = LAYOUTS[v]
         try:
             if api == 'gl':
                 sh, end = parse_gallium(d, L)
@@ -248,7 +283,8 @@ _P = None
 
 
 def loops_in(code, ins):
-    """Backward jmp_exec_any/none branches -> [(target_pc, branch_pc)]."""
+    """Backward jmp_exec_any/none branches -> [(target_pc, branch_pc)]. `ins` is any list of
+    {pc, size, name} (the disassembly listing or agx_cost.decode output)."""
     _, g = agx_loop._tools(); out = []
     for r in ins:
         if r['name'] in ('jmp_exec_any', 'jmp_exec_none'):
@@ -268,15 +304,16 @@ def unrolled(static, loops, trips):
     return pcs
 
 
-def cost(code, groups, path_mode, loop_trips=None):
-    """Run agx_cost on one region. Returns dict (cycles per group count, per-pc stats) or {'error'}."""
+def cost(code, groups, path_mode, loops, loop_trips=None):
+    """Run agx_cost on one region. Returns dict (cycles per group count, per-pc stats) or {'error'}.
+    The error text (e.g. agx_cost's ValueError for an instruction it does not model) is shown in the
+    listing instead of cycles."""
     global _P
     try:
         import agx_cost
         if _P is None: _P = agx_cost.Params()
         ins = agx_cost.decode(code, _P)
         static = [r['pc'] for r in ins]
-        loops = loops_in(code, ins)
         mode = path_mode if path_mode != 'auto' else ('emulate' if loops else 'static')
         if loop_trips and loops: mode = f'static, {len(loops)} loop(s) x{loop_trips}'
         skipped = []
@@ -286,7 +323,8 @@ def cost(code, groups, path_mode, loop_trips=None):
                 pcs, sk = agx_cost.trace(code); skipped = sorted(sk)
             except Exception as e:                          # emulator limits: fall back to one pass
                 mode = f'static (emulate failed: {e})'; pcs = static
-        res = {'path': mode, 'dynamic_instructions': len(pcs), 'emulator_skipped': skipped, 'cycles': {}, 'per_pc': {}}
+        res = {'path': mode, 'dynamic_instructions': len(pcs), 'emulator_skipped': skipped, 'cycles': {}, 'per_pc': {},
+               'loop_back_branches': {b: pcs.count(b) for _, b in loops}}
         for G in groups:
             cyc, st = agx_cost.simulate(ins, pcs, _P, G, detail=True)
             res['cycles'][G] = cyc
@@ -299,9 +337,40 @@ def cost(code, groups, path_mode, loop_trips=None):
 
 
 # ---- IR dump (optional) -------------------------------------------------------------------------
-def ir_sections(text):
+STAGE_ABBREV = {'vertex': 'VS', 'tess_ctrl': 'TCS', 'tess_eval': 'TES', 'geometry': 'GS', 'fragment': 'FS',
+                'compute': 'CS', 'task': 'TASK', 'mesh': 'MESH', 'kernel': 'CL'}   # _mesa_shader_stage_to_abbrev
+SHADERDB_NAMES = {'instrs': 'instrs', 'alu': 'alu_cycles', 'fscib': 'fscib_cycles', 'ic': 'ic_cycles',
+                  'code size': 'code_size', 'gprs': 'gprs', 'uniforms': 'uniforms', 'scratch': 'scratch',
+                  'threads': 'threads', 'loops': 'loops', 'preamble inst': 'preamble_instrs'}
+
+
+def agx_functions(lines):
+    """Final AGX IR of each function in one shader section. agx_compile_function_nir prints the AGX
+    IR three times per function (before scheduling, after scheduling, after RA + lowering); each
+    printout starts at 'block0 {'. Functions come in NIR declaration order. Returns
+    [{entrypoint, preamble, instrs, stack_words}] or None if the printouts do not line up."""
+    decls = [l for l in lines if l.startswith('decl_function ')]
+    prints, cur = [], None
+    for l in lines:
+        if re.match(r'^block0 \{', l):
+            cur = []; prints.append(cur)
+        if cur is not None and re.match(r'^   \S', l):
+            cur.append(l.strip())
+    if not decls or len(prints) != 3 * len(decls):
+        return None
+    out = []
+    for d, final in zip(decls, prints[2::3]):
+        m = next((re.match(r'stack_adjust #([0-9a-f]+)$', x) for x in final if x.startswith('stack_adjust #')), None)
+        out.append(dict(entrypoint='(entrypoint)' in d, preamble='preamble' in d.split('(')[0] or '@preamble' in d,
+                        instrs=len(final), stack_words=int(m.group(1), 16) if m else 0))
+    return out
+
+
+def ir_sections(text, stderr_text=''):
     """Split an AGX_MESA_DEBUG=shaders dump into per-shader sections (NIR, then AGX IR before and
-    after register allocation). A section ends at the first line that does not look like IR."""
+    after register allocation). A section ends at the first line that does not look like IR.
+    With `shaderdb`, Mesa also prints one agx2_stats line per (non-internal) shader to stderr, in the
+    same order as the sections; those are attached when the counts and stages agree."""
     ir_line = re.compile(r'^(\s|$|\}|block\d+ \{|shader: |decl_|impl |[a-z_0-9]+: |\d+ = |r\d)')
     secs, cur = [], None
     for line in text.splitlines():
@@ -314,7 +383,95 @@ def ir_sections(text):
             cur['lines'].append(line)
             m = re.match(r'workgroup_size: (\d+), (\d+), (\d+)', line)
             if m and cur['workgroup_size'] is None: cur['workgroup_size'] = [int(x) for x in m.groups()]
-    return [dict(stage=c['stage'], workgroup_size=c['workgroup_size'], text='\n'.join(c['lines']).rstrip()) for c in secs]
+    out = [dict(index=j, stage=c['stage'], workgroup_size=c['workgroup_size'], functions=agx_functions(c['lines']),
+                stats=None, text='\n'.join(c['lines']).rstrip()) for j, c in enumerate(secs)]
+    stats = []
+    for line in stderr_text.splitlines():
+        m = re.match(r'^([A-Z]+) shader: (\d+ instrs, .*)$', line)
+        if not m: continue
+        st = {}
+        for item in m.group(2).split(', '):
+            if (mm := re.fullmatch(r'(\d+):(\d+) spills:fills', item)):
+                st['spills'], st['fills'] = int(mm.group(1)), int(mm.group(2))
+            elif (mm := re.fullmatch(r'(\d+) (.+)', item)) and mm.group(2) in SHADERDB_NAMES:
+                st[SHADERDB_NAMES[mm.group(2)]] = int(mm.group(1))
+        stats.append((m.group(1), st))
+    if stats and len(stats) == len(out) and all(STAGE_ABBREV.get(s['stage']) == a for s, (a, _) in zip(out, stats)):
+        for s, (_, st) in zip(out, stats): s['stats'] = st
+    return out, len(stats)
+
+
+def ir_checks(sh, sec):
+    """(strict, tie_break) property comparisons between a captured shader and an IR section.
+    Each entry is (name, ok) for properties both sides report."""
+    i = sh['info']; strict = [('stage', sec['stage'] == i['stage_name'])]
+    if i['stage'] == 5 and sec['workgroup_size']:
+        strict.append(('workgroup size', sec['workgroup_size'] == i['workgroup_size']))
+    tie = []
+    fns = sec['functions']
+    if fns is not None:
+        main = next((f for f in fns if f['entrypoint']), None)
+        pre = next((f for f in fns if f['preamble']), None)
+        strict.append(('preamble present', bool(pre) == bool(i['has_preamble'])))
+        if main:
+            strict += [('instruction count', main['instrs'] == i['stats']['instrs']),
+                       ('stack size', main['stack_words'] == i['scratch_size'])]
+        if pre:
+            strict.append(('preamble stack size', pre['stack_words'] == i['preamble_scratch_size']))
+        regs = {r['name']: r for r in sh.get('regions', [])}
+        if main and 'main' in regs: tie.append(('main disassembly length', main['instrs'] == len(regs['main']['listing'])))
+        if pre and 'preamble' in regs: tie.append(('preamble disassembly length', pre['instrs'] == len(regs['preamble']['listing'])))
+    if sec['stats']:
+        common = [k for k in sec['stats'] if k in i['stats']]
+        strict.append(('shaderdb stats', all(sec['stats'][k] == i['stats'][k] for k in common)))
+    return strict, tie
+
+
+def match_ir(shaders, secs):
+    """Attach IR sections to captured shaders only when the assignment is unambiguous.
+    Identical sections (same text and stats) form one group that may be assigned as many times as it
+    occurs. A shader is matched to a group when that group is its only candidate and the group has
+    room for every unassigned shader that could still claim it; assigned groups are then removed from
+    the other shaders' candidates and the process repeats. Shaders with no candidate are
+    'driver-internal?'; shaders left with several candidates (or competing for one) are 'ambiguous'."""
+    groups = {}
+    for s in secs:
+        groups.setdefault((s['text'], tuple(sorted((s['stats'] or {}).items()))), []).append(s['index'])
+    G = list(groups.values()); cap = [len(m) for m in G]
+    cand, used = {}, {}
+    for k, sh in enumerate(shaders):
+        full, part = set(), set()
+        for g, members in enumerate(G):
+            strict, tie = ir_checks(sh, secs[members[0]])
+            if all(ok for _, ok in strict):
+                full.add(g)
+                if all(ok for _, ok in tie): part.add(g)
+                used[k, g] = [n for n, _ in strict + tie]
+        cand[k] = part if len(full) > 1 and part else full       # tie-breakers only narrow, never empty
+    assigned, changed = {}, True
+    while changed:
+        changed = False
+        for g in range(len(G)):
+            claim = [k for k in cand if k not in assigned and g in cand[k]]
+            sole = [k for k in claim if cand[k] == {g}]
+            if sole and len(claim) <= cap[g]:
+                for k in sole: assigned[k] = g
+                cap[g] -= len(sole); changed = True
+                if cap[g] == 0:
+                    for k in cand:
+                        if k not in assigned: cand[k].discard(g)
+    for k, sh in enumerate(shaders):
+        if k in assigned:
+            g = assigned[k]; sec = secs[G[g][0]]
+            sh['ir'] = sec['text']; sh['kind'] = 'application shader'
+            sh['ir_match'] = dict(status='matched', sections=G[g], properties=used[k, g])
+        elif cand[k]:
+            idx = sorted(j for g in cand[k] for j in G[g])
+            sh['kind'] = f"ambiguous: {len(idx)} AGX_MESA_DEBUG=shaders sections fit (#{', #'.join(map(str, idx))}); IR not attached"
+            sh['ir_match'] = dict(status='ambiguous', sections=idx)
+        else:
+            sh['kind'] = 'driver-internal? (not in AGX_MESA_DEBUG=shaders dump)'
+            sh['ir_match'] = dict(status='unmatched')
 
 
 # ---- main ---------------------------------------------------------------------------------------
@@ -326,13 +483,28 @@ def analyse(shaders, groups, path_mode, outdir, loop_trips=None):
             listing, pad = disassemble(raw)
             code = raw[:sum(r['size'] for r in listing)]
             fn = outdir / f'shader{k}-{name}.bin'; fn.write_bytes(code)
-            c = cost(code, groups, path_mode, loop_trips)
+            try:
+                loops = loops_in(code, listing)
+            except Exception:
+                loops = []
+            c = cost(code, groups, path_mode, loops, loop_trips)
             for r in listing:
                 if 'per_pc' in c:
                     r['class'] = c['class'].get(r['pc']); r['sim'] = c['per_pc'].get(r['pc'], {})
+                if r['name'] == 'stack_adjust':
+                    r['class'] = 'stack_adjust'          # agx_cost decodes it as stack_store
+            c = {k2: v for k2, v in c.items() if k2 not in ('per_pc', 'class')}
+            if loops and not loop_trips:
+                where = ', '.join(f'{t}..{b}' for t, b in loops)
+                if 'error' in c:
+                    c['warning'] = f"loop trip count unknown ({len(loops)} loop(s), pc {where}); pass --loop-trips N"
+                else:
+                    n = c['loop_back_branches']
+                    c['warning'] = (f"loop trip count unknown: costs assume {', '.join(str(n[b]) for _, b in loops)} trip(s) "
+                                    f"for {len(loops)} loop(s) (pc {where}; path {c['path']}, the emulator sees zero "
+                                    "uniforms and memory); pass --loop-trips N")
             sh['regions'].append(dict(name=name, offset=s, bytes=len(code), padding_instructions=pad,
-                                      file=str(fn), listing=listing,
-                                      cost={k2: v for k2, v in c.items() if k2 not in ('per_pc', 'class')}))
+                                      file=str(fn), listing=listing, loops=[list(x) for x in loops], cost=c))
 
 
 def render(shaders, groups):
@@ -350,7 +522,13 @@ def render(shaders, groups):
         s = i['stats']
         L.append(f"  Mesa stats: instrs {s['instrs']}  alu {s['alu_cycles']}  fscib {s['fscib_cycles']}  ic {s['ic_cycles']}"
                  f"  threads {s['threads']}  loops {s['loops']}  spills {s['spills']}  fills {s['fills']}")
-        if sh.get('ir'): L.append(f"  Mesa IR: matched AGX_MESA_DEBUG=shaders section ({len(sh['ir'].splitlines())} lines, in JSON)")
+        m = sh.get('ir_match')
+        if m and m['status'] == 'matched':
+            L.append(f"  Mesa IR: AGX_MESA_DEBUG=shaders section #{m['sections'][0]} ({len(sh['ir'].splitlines())} lines, in JSON);"
+                     f" matched on {', '.join(m['properties'])}")
+        for r in sh['regions']:
+            if r['cost'].get('warning'):
+                L.append(f"  !!! WARNING ({r['name']}): {r['cost']['warning']}")
         for r in sh['regions']:
             c = r['cost']
             L.append(f"  --- {r['name']} @{r['offset']}  {r['bytes']} B  {len(r['listing'])} instructions"
@@ -358,7 +536,7 @@ def render(shaders, groups):
             if 'error' in c:
                 L.append(f"      cost model unavailable: {c['error']}")
             else:
-                L.append('      predicted cycles: ' + '  '.join(f"{G} group{'s' if G > 1 else ''}/core = {c['cycles'][G]}" for G in groups)
+                L.append(f"      predicted cycles{' (LOOP TRIPS UNKNOWN, see warning)' if c.get('warning') else ''}: " + '  '.join(f"{G} group{'s' if G > 1 else ''}/core = {c['cycles'][G]}" for G in groups)
                          + f"   (path {c['path']}, {c['dynamic_instructions']} dynamic instrs"
                          + (f", emulator skipped {','.join(c['emulator_skipped'])}" if c['emulator_skipped'] else '') + ')')
             hdr = f"      {'pc':>5}  {'hex':<24} {'class':<14}" + ''.join(f" {'n@'+str(G):>5} {'stall@'+str(G):>8}" for G in groups) + '  disassembly'
@@ -384,23 +562,26 @@ def main():
     ap.add_argument('--json', type=Path)
     ap.add_argument('--cache', type=Path, help='analyse an existing MESA_SHADER_CACHE_DIR instead of running')
     ap.add_argument('--blob', type=Path, nargs='+', help='analyse shader blobs (Vulkan shader-object export or raw)')
-    ap.add_argument('--ir', action='store_true', help='extra run with AGX_MESA_DEBUG=shaders to attach Mesa IR')
+    ap.add_argument('--ir', action='store_true', help='extra run with AGX_MESA_DEBUG=shaders,shaderdb to attach Mesa IR')
+    ap.add_argument('--ir-dump', type=Path, help='attach an existing AGX_MESA_DEBUG=shaders stdout dump (shaderdb stats '
+                    'are read from ir-stderr.txt next to it if present)')
     ap.add_argument('--groups', default='1,4')
     ap.add_argument('--path', choices=['auto', 'static', 'emulate'], default='auto')
     ap.add_argument('--loop-trips', type=int, help='assume every loop runs N times (static path) instead of emulating')
     ap.add_argument('--timeout', type=int, default=60)
     ap.add_argument('--cwd', type=Path, help='working directory for the command (default: <out>/run)')
-    ap.add_argument('--mesa', default='auto', help='layout: auto (installed drivers), 25.1 or 25.3')
+    ap.add_argument('--mesa', default='auto', help='layout: auto (installed drivers, exact verified versions only), '
+                    '25.1, 25.3, or per API: gl=25.1,vulkan=25.3')
     ap.add_argument('--quiet', action='store_true', help='do not print the listing')
     ap.add_argument('cmd', nargs=argparse.REMAINDER)
     a = ap.parse_args()
     cmd = a.cmd[1:] if a.cmd[:1] == ['--'] else a.cmd
     if not (cmd or a.cache or a.blob): ap.error('give -- <command>, --cache or --blob')
     groups = [int(x) for x in a.groups.split(',')]
-    versions = installed_versions() if a.mesa == 'auto' else {'gl': a.mesa + '.0', 'vulkan': a.mesa + '.0'}
+    layouts, versions = select_layouts(a.mesa)
     out = (a.out or SCRATCH / datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')).resolve()
     out.mkdir(parents=True, exist_ok=True)
-    report = {'command': cmd, 'out': str(out), 'mesa_versions': versions, 'runs': [], 'skipped_items': []}
+    report = {'command': cmd, 'out': str(out), 'mesa_versions': versions, 'layouts': layouts, 'runs': [], 'skipped_items': []}
     shaders = []
 
     if cmd:
@@ -418,13 +599,14 @@ def main():
         print(f'[capture] command exit {rc}; cache {cache}', file=sys.stderr)
         a.cache = cache
         if a.ir:
-            env = clean_env({'MESA_SHADER_CACHE_DISABLE': 'true', 'AGX_MESA_DEBUG': 'shaders'})
+            env = clean_env({'MESA_SHADER_CACHE_DISABLE': 'true', 'AGX_MESA_DEBUG': 'shaders,shaderdb'})
             try:
                 r = subprocess.run(cmd, cwd=cwd, env=env, capture_output=True, timeout=a.timeout)
-                rc, so = r.returncode, r.stdout
+                rc, so, se = r.returncode, r.stdout, r.stderr
             except subprocess.TimeoutExpired as e:
-                rc, so = 'timeout', e.stdout or b''
-            (out/'ir-dump.txt').write_bytes(so)
+                rc, so, se = 'timeout', e.stdout or b'', e.stderr or b''
+            (out/'ir-dump.txt').write_bytes(so); (out/'ir-stderr.txt').write_bytes(se)
+            a.ir_dump = out/'ir-dump.txt'
             report['runs'].append({'kind': 'ir-dump', 'returncode': rc})
 
     if a.cache:
@@ -432,7 +614,7 @@ def main():
             try:
                 typ, gpu, payload = item_payload(item)
                 if typ == 1: report['skipped_items'].append({'source': src, 'reason': 'GLSL program metadata'}); continue
-                sh = parse_blob(payload, versions)
+                sh = parse_blob(payload, layouts)
             except (ValueError, IndexError, struct.error) as e:
                 report['skipped_items'].append({'source': src, 'reason': str(e)[:200]}); continue
             for s in sh: s.update(source=src, cache_key=key, gpu=gpu)
@@ -442,30 +624,31 @@ def main():
         if d[:4] == ZSTD_MAGIC:
             d = subprocess.run(['zstd', '-d', '-q', '-c'], input=d, capture_output=True, check=True).stdout
         try:
-            sh = parse_blob(d, versions)
+            sh = parse_blob(d, layouts)
         except (ValueError, IndexError, struct.error) as e:
             report['skipped_items'].append({'source': str(f), 'reason': str(e)[:200]}); continue
         for s in sh: s.update(source=str(f))
         shaders += sh
 
-    if (out/'ir-dump.txt').exists() and a.ir:
-        secs = ir_sections((out/'ir-dump.txt').read_text(errors='replace'))
-        used = set()
-        for sh in shaders:
-            i = sh['info']
-            for j, s in enumerate(secs):
-                if j in used or s['stage'] != i['stage_name']: continue
-                if i['stage'] == 5 and s['workgroup_size'] and s['workgroup_size'] != i['workgroup_size']: continue
-                sh['ir'] = s['text']; sh['kind'] = 'application shader'; used.add(j); break
-            else:
-                sh['kind'] = 'driver-internal? (not in AGX_MESA_DEBUG=shaders dump)'
-
     analyse(shaders, groups, a.path, out, a.loop_trips)
+    if a.ir and not a.ir_dump and a.cache and (a.cache.parent / 'ir-dump.txt').exists():
+        a.ir_dump = a.cache.parent / 'ir-dump.txt'               # --cache <old out>/cache --ir
+    if a.ir_dump:
+        se = a.ir_dump.parent / 'ir-stderr.txt'
+        secs, nstats = ir_sections(a.ir_dump.read_text(errors='replace'), se.read_text(errors='replace') if se.exists() else '')
+        report['ir_sections'] = [{k: v for k, v in s.items() if k != 'text'} for s in secs]
+        if nstats and not any(s['stats'] for s in secs):
+            print(f'[capture] {nstats} shaderdb stats line(s) do not line up with {len(secs)} IR section(s); not used', file=sys.stderr)
+        match_ir(shaders, secs)
     text = render(shaders, groups)
     (out/'listing.txt').write_text(text + '\n')
     if not a.quiet: print(text)
     print(f"[capture] {len(shaders)} shader(s), {len(report['skipped_items'])} other cache item(s); listing {out/'listing.txt'}",
           file=sys.stderr)
+    for k, sh in enumerate(shaders):
+        for r in sh['regions']:
+            if r['cost'].get('warning'):
+                print(f"[capture] WARNING shader {k} {r['name']}: {r['cost']['warning']}", file=sys.stderr)
     for s in shaders:
         s['binary_hex'] = s.pop('binary').hex()
     report['shaders'] = shaders

@@ -10,5 +10,9 @@ Produced on the M2 Max (G14C B1): GLES through Mesa 25.1.9, Vulkan through Mesa 
 | `listing-gles-index.txt` | `agx_capture.py --ir -- gles_compute index 64 /dev/dri/renderD128` |
 | `listing-vulkan-index.txt` | `agx_capture.py --blob exported.bin`, where `exported.bin` is the `vkGetShaderBinaryDataEXT` output of `vulkan_compute export index.spv 64 ...` and `vulkan-index.comp` is the shader |
 
+The listings were regenerated after the review fixes (IR matching on stage, workgroup size,
+final-IR instruction count, stack size and shaderdb stats; `stack_adjust` class; loop trip count
+warning). The GLES runs were repeated with `--ir`, which now uses `AGX_MESA_DEBUG=shaders,shaderdb`.
 Cycle counts come from `scripts/agx_cost.py` as it was on 2026-10-11, while that model was still being
-written. Treat them as model output, not measurements.
+changed, so they differ from earlier versions of these files. Treat them as model output, not
+measurements.

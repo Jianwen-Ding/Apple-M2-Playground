@@ -13,7 +13,8 @@
  * Serialization: src/gallium/drivers/asahi/agx_disk_cache.c write_shader() (GL) and
  * src/asahi/vulkan/hk_shader.c hk_api_shader_serialize() (Vulkan).
  * Note blob_write_uint32() aligns the blob to 4 bytes before writing (src/util/blob.c).
- * scripts/agx_capture.py hardcodes the printed numbers.
+ * scripts/agx_capture.py hardcodes the printed numbers and accepts only these exact versions
+ * (KNOWN_VERSIONS) unless --mesa forces a layout; add a version there only after checking it here.
  */
 #include <stdbool.h>
 #include <stddef.h>
