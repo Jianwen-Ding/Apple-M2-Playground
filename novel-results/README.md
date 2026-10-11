@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-11 Occupancy: min(96, 2*floor(3328/(2*halves))) SIMD groups per core; small workgroups cap lower](2026-10-11-occupancy/README.md)
 - [2026-10-11 64-bit integers: iadd/isub/imad 64-bit forms exact, zero/sign extension rule, register-pair pointers into device_load](2026-10-11-int64/README.md)
 - [2026-10-11 Float semantics: fp32 DAZ + flush-before-rounding, fused fma, canonical NaN, sat NaN→0; fp16 full IEEE](2026-10-11-float-semantics/README.md)
 - [2026-10-11 Device + threadgroup atomics: all 11 Mesa ops exact with return values, contention serializable, cmpxchg single winner](2026-10-11-atomics/README.md)
