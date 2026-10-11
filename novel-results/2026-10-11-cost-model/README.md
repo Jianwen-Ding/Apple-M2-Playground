@@ -36,9 +36,11 @@ fitted empty-loop cost (35.25 units, predicted 35.27) from both sides, which is 
 
 | Dataset | Role | 1 group: whole trip | 1 group: body | 4 groups/core: whole trip | 4 groups/core: body |
 | --- | --- | --- | --- | --- | --- |
-| 24 random 24-instr kernels | selection (issue rule chosen here) | 5.1% (max 15%) | 7.1% (max 23%) | 11.4% | 15.4% |
-| **24 new 24-instr kernels** | **held out** | **5.3%** (max 12%) | **7.8%** (max 20%) | **10.4%** | **13.6%** |
+| 24 random 24-instr kernels | selection (issue rule chosen here) | 5.1% (max 15%) | 7.1% (max 23%) | 10.4% | 14.0% |
+| **24 new 24-instr kernels** | **held out** | **5.3%** (max 12%) | **7.8%** (max 20%) | **10.4%** | **13.1%** |
 | **12 new 48-instr kernels** | **held out** | **3.6%** (max 8.4%) | **4.3%** (max 11%) | **9.2%** | **10.8%** |
+
+(4-group columns after the shared-unit change; the 1-group columns are unchanged by it.)
 
 Fitting sets (not evidence of accuracy): the 60 benchmark loops reproduce to 0.4% latency / 0.4% issue /
 1.9% per-core throughput; the register rotation used to fit the result cache to 1.7% (32-bit); the memory
