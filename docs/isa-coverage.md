@@ -143,8 +143,8 @@ Top-level 7-bit opcodes that applegpu cannot decode are all classified in
 | `texture_sample` | 8/12 | 0 |  | open: needs texture/sampler/image state |
 | `texture_load` | 8/12 | 0 |  | open: needs texture/sampler/image state |
 | `threadgroup_barrier` | 2/2 | 8 |  | [mapped](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
-| `atomic` | 8/8 | 0 | u1, u2, u3, u4, u5 | open: planned (op 0-15, u1-u5); blocked by device wedge, needs reboot |
-| `threadgroup_atomic` | 6/10 | 3 | u1, u3, u4, u5 | open: planned after atomic; needs reboot |
+| `atomic` | 8/8 | 0 | u1, u2, u3, u4, u5 | [mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run (hang risk)](../novel-results/2026-10-11-atomics/README.md) |
+| `threadgroup_atomic` | 6/10 | 3 | u1, u3, u4, u5 | [mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run (hang risk)](../novel-results/2026-10-11-atomics/README.md) |
 | `TODO.after_sampling1` | 2/2 | 0 |  | [hangs in compute](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `TODO.after_sampling2` | 2/2 | 0 |  | [hangs in compute](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `TODO.unk30C0` | 6/6 | 0 |  | [inert](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
@@ -166,4 +166,4 @@ Top-level 7-bit opcodes that applegpu cannot decode are all classified in
 | `zs_emit` | 4/4 | 2 | u0 | open: fragment-stage only (needs a render pipeline, not direct-DRM compute) |
 | `memory_barrier` | 2/2 | 0 |  | [used by the in-shader clock probe (gap bits not swept)](../novel-results/2026-10-11-in-shader-clock/README.md) |
 
-159 descriptors; 127 mapped or classified, 32 open.
+159 descriptors; 129 mapped or classified, 30 open.

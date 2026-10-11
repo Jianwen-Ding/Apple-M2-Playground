@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-11 Device + threadgroup atomics: all 11 Mesa ops exact with return values, contention serializable, cmpxchg single winner](2026-10-11-atomics/README.md)
 - [2026-10-11 Memory/control/SR gap bits: device_load/store bit 31 disables the access; get_sr bit 22 undefined; rest inert](2026-10-11-mem-control-gap-bits/README.md)
 - [2026-10-11 Sub-op spaces: funop hangs/aliases, iunop Morton spread, 128 simd_op encodings, shuffle variants](2026-10-11-subop-spaces/README.md)
 - [2026-10-11 fmadd 10-byte form: lane-offset (fused shuffle-up) source A; fmadd32 bit 52; other ALU gap bits inert; constant-bit flips (bfi-family code 110, bitop b15, wait b7 hang)](2026-10-11-fmadd-lane-offset/README.md)

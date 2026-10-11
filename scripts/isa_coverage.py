@@ -40,9 +40,12 @@ STATUS.update({
     'jmp_exec_none': ('used by the granularity probes (gap bits not swept)', OPC),
     'memory_barrier': ('used by the in-shader clock probe (gap bits not swept)', F+'2026-10-11-in-shader-clock/README.md'),
 })
+ATOM = F+'2026-10-11-atomics/README.md'
+STATUS.update({
+    'atomic': ('mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run (hang risk)', ATOM),
+    'threadgroup_atomic': ('mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run (hang risk)', ATOM),
+})
 TODO_REASON = {
-    'atomic': 'planned (op 0-15, u1-u5); blocked by device wedge, needs reboot',
-    'threadgroup_atomic': 'planned after atomic; needs reboot',
     'call': 'not run: a bad target can hang the GPU', 'ret': 'not run: a bad target can hang the GPU',
     'jmp_if_skipping_doorbell': 'not run: may loop on itself',
     'jmp_incomplete': 'not run: branch semantics unknown, could loop',
