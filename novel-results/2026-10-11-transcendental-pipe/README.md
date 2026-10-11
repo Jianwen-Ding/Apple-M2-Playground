@@ -35,7 +35,12 @@ unit per core. Hardware does not.
    24 instructions 10.4% → 7.9%, 48 instructions 9.9% → 9.6%. A grid fit that used the probes for the unit
    costs (`sfu-coregrid.json`) needed `rsqrt` at 2.3 cycles and broke the `rsqrt` benchmark row (+126%).
 3. **Not understood at 4 groups:** pure `rcp` costs 232 units with 8 chains but 197 with 4 (repeatable,
-   `sfurepeat.json`); `rsqrt`+`rcp` costs 258 although `rsqrt` alone sustains ~1 per cycle per core. `log2`+`floor` measured 207 in one run and 232 twice later. The cost of mixing latencies
+   `sfurepeat.json`); `rsqrt`+`rcp` costs 258 although `rsqrt` alone sustains ~1 per cycle per core.
+   A chain-count sweep (`rcpchains.json`, 30–32 ops per trip) isolates it: `rcp` with 2 / 4 / 6 chains costs
+   1.62–1.67 cycles per op at 4 groups (model 1.6), with 8 chains 1.88; `log2` with 8 chains is normal (1.00).
+   So it is specific to 8 concurrent `rcp` chains, not to `rcp` or to 8 chains. Also from the sweep: latency-bound
+   `log2` (2 chains) costs 152.5 at 4 groups vs 132.9 predicted, so a dependent transcendental's latency seems to
+   grow by ~15% when other groups share the pipe (their writebacks interleave); not modelled. `log2`+`floor` measured 207 in one run and 232 twice later. The cost of mixing latencies
    across groups seems to depend on how the groups interleave.
 
 ## Integer multiply, bit-field and convert share the same writeback pipe (`sfuimad.json`)
@@ -78,7 +83,7 @@ Held-out random kernels (median whole-trip error, bias):
 ## Reproducer and evidence
 
 `python3 scripts/cost_probes.py sfupairs`; `results/2026-10-11-cost-model/sfupairs.json`, `sfumix.json`,
-`sfuswitch.json`, `sfurepeat.json`, `sfu-coregrid.json`, `sfuimad.json` (`cost_probes.py sfuimad`). Checked by `scripts/verify_cost_model.py`.
+`sfuswitch.json`, `sfurepeat.json`, `sfu-coregrid.json`, `sfuimad.json` (`cost_probes.py sfuimad`), `rcpchains.json`. Checked by `scripts/verify_cost_model.py`.
 
 ## Compiler implications
 
