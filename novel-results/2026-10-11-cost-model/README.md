@@ -24,6 +24,8 @@ Model (every parameter measured on this GPU):
 * device loads complete after the measured fast or slow load-to-use time (47 / 65 real cycles), deferred by
   ALU work issued while they are pending (see Memory below;
   `--load-latency` overrides) and `wait` drains a scoreboard slot;
+* an idle `wait` costs 4.9 units inside a loop of <= 512 bytes and 10.9 otherwise
+  ([wait finding](../2026-10-11-wait-cost/README.md));
 * a taken backward jump costs about 33 extra real cycles, fit so an empty counted-loop trip costs the measured 35.25 units.
 
 ## Accuracy

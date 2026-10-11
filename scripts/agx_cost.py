@@ -142,7 +142,9 @@ class Params:
             'threadgroup_store': {'issue': (g('tg_store_fast_issue_ref', 17.1), g('tg_store_slow_issue_ref', 36.2)), 'done': (0.0, 0.0)}}
         self.space_switch = g('mem_space_switch_ref', 13.3)
         self.quiet = {'load': g('mem_quiet_load_ref', 20.0), 'tg': g('mem_quiet_tg_ref', 20.0), 'device_store': g('mem_quiet_device_store_ref', 33.6)}
-        self.wait_idle = g('wait_idle_ref', 4.85)
+        self.wait_idle = g('wait_idle_ref', 4.89)
+        self.wait_idle_big = g('wait_idle_big_ref', 10.9)
+        self.loop_buffer = c.get('loop_buffer_bytes', 512)
         self.branch = c.get('branch_taken_real')        # set by fit_branch() if missing
         self.allow_unknown = False
 
@@ -220,7 +222,22 @@ def decode(code, P):
             rec.update(kind='alu', unit='mov_imm', unmeasured=True)
             if regops: rec['dst'] = regops[0][1]; rec['src'] = set().union(set(), *[r for _, r in regops[1:]])
         out.append(rec); pc += size
-    return out
+    return mark_loops(out, P)
+
+
+def mark_loops(instrs, P):
+    """Tag each instruction with the byte size of its innermost backward-jump loop (None outside loops)."""
+    _, g = agx_loop._tools()
+    loops = []
+    for r in instrs:
+        if r['name'] == 'jmp_exec_any':
+            m = re.search(r'pc-(\d+)', r['text'])
+            if m:
+                start = r['pc']-int(m.group(1)); loops.append((start, r['pc']+r['size']))
+    for r in instrs:
+        sizes = [b-a for a, b in loops if a <= r['pc'] < b]
+        r['loop_bytes'] = min(sizes) if sizes else None
+    return instrs
 
 
 def trace(code, active=32, max_steps=500_000):
@@ -384,7 +401,8 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 ii = T
                 for h in r['dst']: ready[gi][h] = t+tk(P.load_latency)
             elif kind == 'wait':
-                ii = T if slots[gi][r['slot']] else tk(P.wait_idle); slots[gi][r['slot']] = []
+                small = r.get('loop_bytes') is not None and r['loop_bytes'] <= P.loop_buffer
+                ii = T if slots[gi][r['slot']] else tk(P.wait_idle if small else P.wait_idle_big); slots[gi][r['slot']] = []
                 pending[gi] = [p_ for p_ in pending[gi] if p_[0] != r['slot']]
             elif kind == 'control':
                 ii = CI

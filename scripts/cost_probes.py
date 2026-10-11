@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -155,6 +155,14 @@ def main():
             m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one', extra_env=env)
             res[name] = (m['cycles']-EMPTY_TRIP)/8
             print(f'{name:26s} {res[name]:6.1f} ref units/rep', flush=True)
+    elif a.what == 'waits':
+        # cost of wait instructions whose slot has nothing pending (no memory instructions in the loop)
+        for slot in (0, 1):
+            for k in (1, 2, 4, 8, 16, 24, 28, 30, 31, 32, 40):
+                body = (e(f'wait {slot}')*k)*8
+                m = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'one')
+                res[f'{slot},{k}'] = (m['cycles']-EMPTY_TRIP)/8
+                print(f'wait {slot} x {k:2d} per rep: {res[f"{slot},{k}"]:7.1f} units/rep  ({res[f"{slot},{k}"]/k:5.2f} per wait)', flush=True)
     elif a.what == 'values2':
         # identical instruction sequences; only the preloaded constants differ (r26/r27 set before the loop)
         one, near1, half, zero = 0x3f800000, 0x3f800347, 0x3f000000, 0
