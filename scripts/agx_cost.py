@@ -39,6 +39,7 @@ ISSUE_PER_CORE = 4.0
 # low by 1.049, so one unit = 1.049 real cycles. `--real-cycles` applies it.
 REAL_CYCLES_PER_UNIT = 1.049
 RESULT_CACHE = 8          # per SIMD group: the last 8 written registers are readable at producer latency
+RF_WRITEBACK16 = 17       # same for a 16-bit (half) result; see the fit in the cost-model README
 RF_WRITEBACK = 17         # a value evicted from the result cache is readable from the register file this
                           # many cycles after its producer issued (fit: D = 9/10/12/16 rotation, cost-model README)
 READ_PORTS = 4.0          # 32-bit register-operand reads per core per cycle (fit, see the bench finding)
@@ -203,11 +204,12 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     rcache = [[] for _ in range(groups)]                # 32-bit register ids, most recent last
     wtime = [dict() for _ in range(groups)]             # 32-bit register -> issue cycle of its last write
     unit_tok = defaultdict(float); port_tok = 0.0
-    W = cal.get('rf_writeback_cycles', RF_WRITEBACK); NC = cal.get('result_cache_entries', RESULT_CACHE)
+    W = cal.get('rf_writeback_cycles', RF_WRITEBACK); W16 = cal.get('rf_writeback16_cycles', RF_WRITEBACK16); NC = cal.get('result_cache_entries', RESULT_CACHE)
     def src_ready(gi, h):
         r = ready[gi][h]; reg = h//2
         if reg in wtime[gi] and reg not in rcache[gi]:
-            r = max(r, wtime[gi][reg]+W)
+            t, narrow = wtime[gi][reg]
+            r = max(r, t+(W16 if narrow else W))
         return r
     stats = defaultdict(lambda: {'n': 0, 'stall': 0, 'issue_cycle_sum': 0})
     cyc = 0; done = 0; last_issue = [0]*groups; pend_branch = [(None, 0)]*groups
@@ -263,7 +265,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             if r['kind'] in ('alu', 'load'):
                 for reg in sorted({h//2 for h in r['dst']}):
                     if reg in rcache[gi]: rcache[gi].remove(reg)
-                    rcache[gi].append(reg); wtime[gi][reg] = cyc
+                    rcache[gi].append(reg); wtime[gi][reg] = (cyc, len(r['dst']) == 1)
                     if len(rcache[gi]) > NC: rcache[gi].pop(0)
             st = stats[r['pc']]; st['n'] += 1
             stall = cyc-last_issue[gi]-1 if nxt[gi] else 0

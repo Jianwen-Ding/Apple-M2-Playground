@@ -52,6 +52,14 @@ that the issue rule was chosen among three candidates by their score:
 | shared complex pipe | 8.1% | 14.9% | 3.9% (max 14.5%) |
 | per-unit family | 14.8% | 19.0% | 3.9% (max 14.5%) |
 
+Residual analysis (24 random kernels, single group): the error correlates weakly with 16-bit writes
+(+1.7 cycles each unexplained, r = 0.35), SIMD reductions (−2.5, r = −0.50) and transcendentals (−1.0, r = −0.24).
+Targeted probes (`half.json`) rule out the obvious causes: mixed-width write-after-write costs ~0.87 per pair
+in either direction, reading a fresh 16-bit result as 16 or 32 bits is an ordinary dependency, reductions
+cost 23.8 cycles before an independent and 25.5 before a dependent successor (both as modelled), and a
+separate 16-bit writeback time (17/22/26 cycles) leaves the random-kernel error unchanged. With 24 kernels
+these correlations may be noise.
+
 Known gaps: all rules under-predict random kernels (bias −4% with 1 group, −9% with 4), so some
 contention is missing; a multi-cycle instruction followed by independent simple ALU instructions overlaps
 on hardware more than the default rule allows; bfi/imadd followed by 4–8 iadds costs ~1–2 cycles more than

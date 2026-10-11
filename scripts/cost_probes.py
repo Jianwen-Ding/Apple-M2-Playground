@@ -39,7 +39,14 @@ PAIRS = {'iadd>iadd': ('iadd r6, r6, r24', 'iadd r6, r6, r24'), 'fadd32>iadd': (
          'iadd>simd_shuffle': ('iadd r6, r6, r24', 'simd_shuffle r6, r6, r26l'), 'fadd32>convert': ('fadd32 r6, r6, r24', 'convert u32_to_f, r6, r6, rte'),
          'fadd16>fadd32': ('fadd16 r6l, r6l, r24l', 'fadd32 r6, r6, r24'), 'iadd>fmadd32': ('iadd r6, r6, r24', 'fmadd32 r6, r6, r25, r24'),
          'simd_iadd>iadd': ('simd_iadd r6, r6', 'iadd r6, r6, r24')}
-HALF = {'f32 then f16 read of low half': ['fadd32 r6, r6, r24', 'fadd16 r6l, r6l, r24l'],
+HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'fadd16 r6l, r7l, r24l'],
+        'f16 write r6l then f32 read of r6 (merge)': ['fadd16 r6l, r6l, r24l', 'fadd32 r9, r6, r24'],
+        'f16 write r6l then f16 read of r6l': ['fadd16 r6l, r6l, r24l', 'fadd16 r9l, r6l, r24l'],
+        'f16 write r6l then f32 read of r7 (control)': ['fadd16 r6l, r6l, r24l', 'fadd32 r9, r7, r24'],
+        'simd_iadd then dependent iadd': ['simd_iadd r6, r6', 'iadd r6, r6, r24'],
+        'simd_iadd then independent iadd': ['simd_iadd r6, r6', 'iadd r7, r7, r24'],
+        'simd_iadd then dependent fadd32': ['simd_iadd r6, r6', 'fadd32 r6, r6, r24'],
+'f32 then f16 read of low half': ['fadd32 r6, r6, r24', 'fadd16 r6l, r6l, r24l'],
         'f16 chain': ['fadd16 r6l, r6l, r24l', 'fadd16 r6l, r6l, r24l'],
         'f16 low/high independent': ['fadd16 r6l, r6l, r24l', 'fadd16 r6h, r6h, r24l'],
         'f16 write r6l then independent f32 write r6': ['fadd16 r6l, r7l, r24l', 'fadd32 r6, r8, r24']}
