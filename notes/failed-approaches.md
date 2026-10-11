@@ -311,3 +311,18 @@ VkResult error" as "no fault".
   which looked like `sr81` saturating at 1, and a 2^16 run stored past the end of the output with no bounds
   check (no fault or kernel message seen). Use `AGX_GLOBAL_X` to decouple the grid from the output size,
   and keep an `index < count` check in any probe that computes store indices from SRs.
+
+### ISA bit mapping session, 2026-10-11 (device wedged at the end)
+
+* **Recovered GPU timeouts accumulate; after ~44 in one boot the device wedged.** Every hang in this
+  session (24 funop functions, 2 convert round values, 5 constant-bit flips, 4 fixed TODO
+  encodings) was followed by a passing control dispatch. The last one, `TODO.unk0C00` (0x000c),
+  logged an unmapped UL1C read at 0x1000000900 during recovery; one control still passed, then
+  every later submit failed with syncobj ETIME (3 s, no firmware timestamps) and "Job canceled on
+  DRM scheduler teardown". Same signature as the 0x5c wedge: reboot required.
+  Run known-hanging encodings at most once, and run them last. Prefer sweeps that are proven
+  hang-free (`--max-faults` small) and reboot between batches that are expected to hang.
+* Not run because of the wedge: the device `atomic` sweep (op 0–15, bits 25, 26, 28–31, 42–46 of
+  the `1500208e10500400` form with a return value in r5). The runner call is in the session's
+  `scripts/run_drm_bitflip.py --raw` usage; nothing about atomics was measured.
+* `kernel.log` in the workspace is live (it shows these timeouts); earlier notes calling it a boot snapshot were wrong.
