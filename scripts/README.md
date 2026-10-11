@@ -152,3 +152,10 @@ reconstructs shader bytes and buffers with the Python standard library;
 * `run_drm_cpu_clock.py`: in-shader clock (CPU timer thread in `tests/drm_compute.c`, `AGX_CPU_CLOCK`);
   load policy × barrier × loop length. `verify_in_shader_clock.py [DIR]` checks it.
 
+
+## Shader capture
+
+`agx_capture.py -- <command>` runs a GLES/Vulkan program through Mesa with a fresh shader
+cache and parses every cached AGX binary into its main shader, preamble and rodata. It prints a
+disassembly annotated with `agx_cost.py` predictions (`make capture-demo`; see
+`docs/shader-capture.md`). `tests/agx_cache_layout.c` prints the struct layouts it relies on.

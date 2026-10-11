@@ -325,3 +325,9 @@ bench:
 
 verify-bench:
 	$(PYTHON) -B scripts/verify_bench.py
+
+.PHONY: capture-demo
+capture-demo:
+	mkdir -p "$(SCRATCH_ROOT)/capture/demo"
+	$(CC) -std=c11 -O2 -I"$(PROBE_INCLUDE)" tests/gles_compute.c -o "$(SCRATCH_ROOT)/capture/demo/gles_compute" -ldl
+	$(PYTHON) -B scripts/agx_capture.py --ir --out "$(SCRATCH_ROOT)/capture/demo" -- "$(SCRATCH_ROOT)/capture/demo/gles_compute" private 64 $(DEVICE)
