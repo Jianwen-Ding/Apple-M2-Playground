@@ -167,6 +167,7 @@ class Params:
         self.quiet = {'load': g('mem_quiet_load_ref', 20.0), 'tg': g('mem_quiet_tg_ref', 20.0), 'device_store': g('mem_quiet_device_store_ref', 33.6)}
         self.wait_idle = g('wait_idle_ref', 4.89)
         self.wait_drain = g('wait_drain_ref', 17.0)
+        self.store_after_wait = g('store_after_wait_ref', 10.6)    # storeseries.json, from the previous wait's issue
         self.wait_idle_big = g('wait_idle_big_ref', 10.9)
         self.wait_run_long = c.get('wait_run_long', 31)
         self.branch = c.get('branch_taken_real')        # set by fit_branch() if missing
@@ -354,6 +355,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     last_alu = [-10**9]*groups               # tick of the group's last ALU issue (quiet-time rule)
     alu_done = [-10**9]*groups               # latest completion tick of the group's ALU results (wait drain)
     last_wait = [-10**9]*groups              # issue tick of the group's previous wait
+    wait_done = [-10**9]*groups              # completion tick of the group's previous wait
     sfu_iss = [-10**9]*groups; sfu_wb = [-10**9]*groups; sfu_slow = [-10**9]*groups   # transcendental pipe state
     core_sfu = {'wb': -10**9, 'slow': -10**9, 'fast': -10**9}
     alu_since_mem = [False]*groups           # an ALU instruction issued since the group's last memory instruction
@@ -469,6 +471,10 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 m_ = P.mem.get(r['name'], P.mem['device_store'])
                 q = P.quiet['tg' if r['name'].startswith('threadgroup') else 'device_store']
                 delay = max(0, last_alu[gi]+tk(q)-t)
+                if not r['name'].startswith('threadgroup'):
+                    # storeseries.json: a device store starts >= 10.6 units after the previous wait issued
+                    # (iadd, k idle waits, store: 4.9 units per extra wait from k = 4; 10.2-10.7 for k = 4..16)
+                    delay = max(delay, last_wait[gi]+tk(P.store_after_wait)-t)
                 ii = delay+tk(m_['issue'][0]); slow = 0
                 st_done = max(t+ii+tk(m_['done'][1]), t+tk(m_['issue'][0])+tk(m_['done'][0]))   # completion overlaps the quiet delay
                 cls_ = 'tg' if r['name'].startswith('threadgroup') else 'device_store'
@@ -483,7 +489,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 # than wait_drain after the latest ALU result (waitdrain.json, waitdrain-slots.json); pending slot work is handled by the slot check above. The long-run
                 # ~11-unit mode of many consecutive waits is not understood and not modelled.
                 done_ = max(t+T, alu_done[gi]+tk(P.wait_drain))
-                ii = done_-t; last_wait[gi] = t; slots[gi][r['slot']] = []
+                ii = done_-t; last_wait[gi] = t; wait_done[gi] = done_; slots[gi][r['slot']] = []
                 pending[gi] = [p_ for p_ in pending[gi] if p_[0] != r['slot']]
             elif kind == 'control':
                 ii = CI

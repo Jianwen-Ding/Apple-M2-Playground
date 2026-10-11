@@ -64,6 +64,15 @@ waits between an `iadd` and a store the store part falls from 35.9 to ~24 units 
 plain store loop fast. `iadd, store, load, wait` (72.6) is also faster than the model (81.6): the load
 overlaps the delayed store. These are fit-set observations; no held-out memory kernels exist yet.
 
+**A device store also waits for the previous `wait` (`storeseries.json`).** `iadd`, k idle `wait`s, device store
+(× 8): 35.8 / 35.7 / 36.7 / 43.6 / 63.1 / 82.5 / 101.9 units for k = 0 / 1 / 2 / 4 / 8 / 12 / 16, the same for
+`wait 0` and `wait 1`. Up to two waits hide in the 34-unit store quiet time. From four on, each extra wait costs
+its 4.9-unit spacing and the store starts 10.2–10.7 units after the last wait issued (the wait after the draining
+wait is free, [wait-drain finding](../2026-10-11-wait-drain/README.md)). Modelled as "a device store starts
+≥ 10.6 units after the previous wait issued": 14 cases within 3%, where the model had been up to 17% under.
+Not explained: a store followed by 8 or 16 `iadd`s costs 44.6 / 52.6 (model 40.1 / 48.5); restarting the quiet
+time at the end of the loop's taken branch would explain it but breaks the back-to-back store loop (3.3 → 7.2).
+
 **Several loads in flight (`multiload.json`).** Back-to-back device loads overlap (two: 46.7, three: 52.4
 units per repetition). But a load issued after ALU work while an earlier load is still pending does not start
 until that load completes, then takes the fast latency: `iadd, load, iadd, load, wait` costs 102.7 (not ~68),

@@ -12,6 +12,7 @@ Datasets and their role (results/2026-10-11-cost-model and the instruction bench
   review2    FIT/INFO  threadgroup deferral and load window are checked; store-window cases are reported
   waitdrain  FIT       wait after ALU work
   ctlspacer  FIT       exec push/pop and while_icmp chains alone and before wait / load / store
+  storeser   FIT       device store after k idle waits (store >= 10.6 units after the previous wait issued)
   sfupairs   FIT       transcendental pairs / mixes, per-group and core-level pipe (12-point grid for the core level)
   NOTE: the selection set's 1-group limits were raised (whole trip 0.06 -> 0.07, body only 0.08 -> 0.10) when the
         per-group transcendental pipe replaced 3-cycle group blocking for rcp (5.1% -> 6.6%, body 7.1% -> 9.1%;
@@ -177,6 +178,14 @@ for groups, key, lim in ((1, 'one', 0.08), (4, 'four', 0.27)):   # 4 groups: rsq
         serr.append((H.predict(H.counted(b_, 100), H.counted(b_, 500), 400, groups)-m)/m)
     md, p90, mx, b = stats(serr)
     check(mx <= lim, f'transcendental pairs and mixes, {groups} group(s)/core (FIT, {len(serr)} cases): median |err| {md:.3f}, max {mx:.3f} (limit {lim})')
+ssr = json.loads((R/'storeseries.json').read_text()); serr = []
+for n, v in ssr.items():
+    if n.startswith('store,'): continue
+    k = int(n.split()[1]); b_ = (e('iadd r14, r14, 1')+e('wait 1' if 'wait1' in n else 'wait 0')*k+agx_loop.store(5, 8, 26))*8
+    serr.append(((H.predict(H.counted(b_, 100, consts=H.MEM_CONSTS), H.counted(b_, 500, consts=H.MEM_CONSTS), 400, 1)-EMPTY_MEAS)/8-v['measured'])/v['measured'])
+md, p90, mx, b = stats(serr)
+check(mx <= 0.05, f'device store after k idle waits (FIT, {len(serr)} cases, k = 0..16, both slots): median |err| {md:.3f}, max {mx:.3f}')
+print('info store, k iadd (first store of a trip, open residual): ' + '; '.join(f"{n}: measured {v['measured']:.1f}, predicted {v['predicted']:.1f}" for n, v in ssr.items() if n.startswith('store,')))
 for fname, role in (('heldout-mem24.json', 'DISCOVERY (revealed the wait drain)'), ('heldout-mem24b.json', 'HELD OUT')):
     rk = json.loads((R/fname).read_text())
     for gm, groups, lim in (('one', 1, 0.07 if 'b.json' in fname else 0.08), ('gpu', 4, 0.12)):
