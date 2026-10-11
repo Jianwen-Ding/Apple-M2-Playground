@@ -134,3 +134,10 @@ reconstructs shader bytes and buffers with the Python standard library;
 * `analyze_opcode_describe.py RECORD [--jobs]`: summary against the reference-body oracle.
 * `verify_opcode_describe.py`: offline checks of `results/2026-10-11-opcode-describe/`.
 
+## Sync and ending opcodes (2026-10-11)
+
+* `run_drm_sync_probe.py --suite {barrier,tgcheck,memwait,tgwait,scope,endcost,endpend,endfollow}`:
+  differential tests against threadgroup/memory barriers and `stop`; it refuses the faulting opcodes.
+* `analyze_sync_probe.py RECORD`: the floor (minimum) estimator for timing suites.
+* `verify_sync_and_end.py`: offline checks of `results/2026-10-11-sync-and-end-opcodes/`.
+

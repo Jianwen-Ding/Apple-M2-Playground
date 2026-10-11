@@ -254,3 +254,18 @@ VkResult error" as "no fault".
 * Delegation 2026-10-11: AGY (Antigravity) needs an interactive Google login (`agy`), and
   its run failed at authentication. OpenCode's run ended with ECONNRESET after it had
   written its report. Only Claude submitted GPU work; the delegated agents were offline-only.
+
+### Sync probes, 2026-10-11
+
+* **Short timing dispatches are unusable for small differences.** A < 1 ms loop flipped from
+  831 to 382 µs mid-session on the same core (SR20). Bracketing each candidate with references
+  kept too few stable pairs and once gave a negative cost. 50,000-trip dispatches (about 6.5 ms)
+  have a floor stable to < 1.5%; take the minimum.
+* Multi-SIMD-group timing on one core is confounded by issue contention: `wait` alone measured
+  1.5 ns in one run and 13 ns in another at 8 groups. Do not infer a shared unit from that.
+* Not run on purpose: a group ending (stop/ends) while another waits at a barrier, and
+  0x68/0x78 executed by different groups at the same point. Either could deadlock the
+  workgroup, i.e. cause a GPU timeout/fault.
+* applegpu's assembler cannot encode `threadgroup_load/store` (no `encode_string` for the base).
+  Pack them from Mesa `agx_pack.c:769-792` and require an exact decode.
+

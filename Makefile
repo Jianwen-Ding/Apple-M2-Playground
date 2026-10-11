@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -43,6 +43,9 @@ help:
 	@echo 'make opcode-describe    Describe the 49 non-faulting undecoded opcodes (needs CONFIRM_GPU_FAULTS=1)'
 	@echo 'make test-opcode-describe  Hardware regression subset for the opcode descriptions'
 	@echo 'make verify-opcode-describe  Verify retained opcode-description evidence offline'
+	@echo 'make sync-probe         0x18/0x78 barrier/wait tests and ending-opcode tests (needs CONFIRM_GPU_FAULTS=1)'
+	@echo 'make test-sync-and-end  Hardware regression subset for the sync/end finding'
+	@echo 'make verify-sync-and-end  Verify retained sync/end evidence offline'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
 	@echo 'Override SCRATCH_ROOT, DEVICE, PYTHON, CC, or PROBE_INCLUDE as needed.'
 
@@ -203,3 +206,17 @@ test-opcode-describe:
 
 verify-opcode-describe:
 	$(PYTHON) -B scripts/verify_opcode_describe.py
+
+SYNCDIR = $(SCRATCH_ROOT)/drm-compute/sync-probe/make-$$(date -u +%Y%m%dT%H%M%SZ)
+sync-probe:
+	@test "$(CONFIRM_GPU_FAULTS)" = 1 || { echo 'needs CONFIRM_GPU_FAULTS=1'; exit 1; }
+	@for s in barrier tgcheck endpend endfollow; do $(PYTHON) -B scripts/run_drm_sync_probe.py --suite $$s --device "$(DEVICE)" --output "$(SYNCDIR)-$$s" || exit 1; done
+	@for s in memwait tgwait scope; do $(PYTHON) -B scripts/run_drm_sync_probe.py --suite $$s --trips 50000 --repeats 4 --device "$(DEVICE)" --output "$(SYNCDIR)-$$s" || exit 1; done
+	$(PYTHON) -B scripts/run_drm_sync_probe.py --suite endcost --times 3 --device "$(DEVICE)" --output "$(SYNCDIR)-endcost"
+
+test-sync-and-end:
+	@test "$(CONFIRM_GPU_FAULTS)" = 1 || { echo 'needs CONFIRM_GPU_FAULTS=1'; exit 1; }
+	$(PYTHON) -B tests/test_sync_and_end.py --hardware
+
+verify-sync-and-end:
+	cd scripts && $(PYTHON) -B verify_sync_and_end.py

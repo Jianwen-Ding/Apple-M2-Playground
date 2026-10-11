@@ -52,7 +52,9 @@ it is corrupted whenever the dispatch is disturbed, probably by preemption or a 
 switch that saves only the declared registers. The count is in **16-bit halves** (Mesa
 `max_reg + 1`; `AGX_NUM_REGS` = 256).
 
-Not established: what 0x18/0x78 synchronize with; whether the 6-byte no-ops have
+Follow-up: [0x78 is a threadgroup barrier; 0x18 waits on none of the tested resources](../2026-10-11-sync-and-end-opcodes/README.md).
+
+Not established: what 0x18 synchronizes with; whether the 6-byte no-ops have
 a meaning when other operand bytes are used; whether the ends opcodes differ from each
 other in any way (e.g. in fragment shaders or with pending memory operations); and why
 the "ends" form exists alongside `stop`.
