@@ -1,6 +1,6 @@
 # New hardware findings
 
-- [2026-10-11 Cost model (agx_cost.py): cycle simulator validated on random kernels, 4.3% / 9.8% median error at 1 / 4 groups per core](2026-10-11-cost-model/README.md)
+- [2026-10-11 Cost model (agx_cost.py): cycle simulator; held-out kernels 3.6-5.3% / 9.2-10.4% median error at 1 / 4 groups per core](2026-10-11-cost-model/README.md)
 - [2026-10-11 Result cache: last 8 written registers are fast; older values wait for a ~17-cycle writeback](2026-10-11-result-cache/README.md)
 - [2026-10-11 Instruction benchmarks: 60 forms; latency and issue classes, register-operand reads halve fp32/int core throughput (cycles in reference units, x1.049 real)](2026-10-11-instruction-bench/README.md)
 - [2026-10-11 Stack memory through Mesa: stack_adjust/store/load binary captured from a working shader; scratch helper setup documented](2026-10-11-stack-via-mesa/README.md)

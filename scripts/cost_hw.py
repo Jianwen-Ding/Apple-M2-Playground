@@ -39,9 +39,10 @@ def kernel(seed, length, ops=POOL):
     return lines, body
 
 
-def counted(body, trips, init=True):
+def counted(body, trips, init=True, consts=(1, 0x3f800000, 5, 7)):
+    """Counted loop around `body`; r24..r27 preloaded with `consts`, r5..r12 with 1.5f."""
     head = mov(3, 0)+mov(4, trips)
-    if init: head += b''.join(mov(24+k, v) for k, v in enumerate((1, 0x3f800000, 5, 7)))+b''.join(mov(r, 0x3fc00000) for r in range(5, 13))
+    if init: head += b''.join(mov(24+k, v) for k, v in enumerate(consts))+b''.join(mov(r, 0x3fc00000) for r in range(5, 13))
     head += e('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
     lp = body+e('iadd r3, 1, r3.sx')+e('while_icmp r0l, ult, r3, r4, 1')
     lp += e(f'jmp_exec_any pc-{len(lp)}', f'jmp_exec_any pc-{len(lp)}')
@@ -90,7 +91,7 @@ def predict(phase_a, phase_b, units, groups):
     c = []
     for code in (phase_a, phase_b):
         ins = C.decode(code, P); pcs, _ = C.trace(code); c.append(C.simulate(ins, pcs, P, groups))
-    return (c[1]-c[0])/units
+    return C.to_ref(c[1]-c[0])/units      # reference units, like the stored measurements
 
 
 def main():

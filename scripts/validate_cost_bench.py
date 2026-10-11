@@ -14,7 +14,7 @@ for op, v in b.items():
         for S in (16, 64):
             code = B.loop(op, ch, S, T); ins = C.decode(code, P); pcs, _ = C.trace(code)
             c.append(C.simulate(ins, pcs, P, groups))
-        return (c[1]-c[0])/(T*48)
+        return C.to_ref(c[1]-c[0])/(T*48)
     pred = {'latency': slope(1, 1), 'simd_issue': slope(8, 1), 'gpu': slope(8, 4)/4}
     meas = {m: v[m]['cycles_per_step'] for m in pred}
     rows.append((op, pred, meas))

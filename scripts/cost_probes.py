@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'groups'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -87,6 +87,41 @@ def main():
             four = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'gpu')
             res[name] = {'one': one['cycles'], 'four_per_core': four['cycles'], 'ratio': four['cycles']/one['cycles'], 'groups_per_core': four['groups_per_core']}
             print(f"{name:16s} 1 group {one['cycles']:7.1f}  4/core {four['cycles']:7.1f}  ratio {res[name]['ratio']:.3f}", flush=True)
+    elif a.what == 'memory':
+        # device memory costs. 'line 1' loads read table words 32..63 (no other writer during those tests);
+        # the first variants read word 0, the CPU clock line (coherence traffic: not an ordinary hit);
+        # stores write table words 32..63 (between the clock line and the timestamp regions).
+        st = agx_loop.store(5, 8, 14)
+        M = {'control: iadd': ['iadd r14, r1, 32'],
+             'load line 1 + wait 0': ['iadd r13, r1, 32', 'device_load 0, i32, x, r6, u8_u9, r13, unsigned', 'wait 0'],
+             '2 loads line 1 + one wait': ['iadd r13, r1, 32', 'device_load 0, i32, x, r6, u8_u9, r13, unsigned', 'device_load 0, i32, x, r7, u8_u9, r13, unsigned', 'wait 0'],
+             'load line 1 + wait + dependent iadd': ['iadd r13, r1, 32', 'device_load 0, i32, x, r6, u8_u9, r13, unsigned', 'wait 0', 'iadd r6, r6, r24'],
+             'load + wait 0 (L1 hit)': ['iadd r14, r1, 32', 'device_load 0, i32, x, r6, u8_u9, r13, unsigned', 'wait 0'],
+             'load + wait 0 + dependent iadd': ['iadd r14, r1, 32', 'device_load 0, i32, x, r6, u8_u9, r13, unsigned', 'wait 0', 'iadd r6, r6, r24'],
+             '2 loads + one wait 0': ['iadd r14, r1, 32', 'device_load 0, i32, x, r6, u8_u9, r13, unsigned', 'device_load 0, i32, x, r7, u8_u9, r13, unsigned', 'wait 0'],
+             'store (no wait)': ['iadd r14, r1, 32', st],
+             'store + wait 0': ['iadd r14, r1, 32', st, 'wait 0']}
+        for name, lines in M.items():
+            parts = [x if isinstance(x, bytes) else e(x) for x in lines]*8
+            body = b''.join(parts)
+            B.check_body(body, [len(x) for x in parts]) if False else None
+            m = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'one')
+            res[name] = (m['cycles']-EMPTY_TRIP)/8
+            print(f'{name:34s} cycles/rep {res[name]:7.2f}', flush=True)
+    elif a.what == 'values2':
+        # identical instruction sequences; only the preloaded constants differ (r26/r27 set before the loop)
+        one, near1, half, zero = 0x3f800000, 0x3f800347, 0x3f000000, 0
+        V = {'fmul32 x*r27, r27=1.0': (['fmul32 r6, r6, r27'], (1, one, 5, one)),
+             'fmul32 x*r27, r27=1.0001': (['fmul32 r6, r6, r27'], (1, one, 5, near1)),
+             'fmadd32 x*r27+r26, 1.0/0.0': (['fmadd32 r6, r6, r27, r26'], (1, one, zero, one)),
+             'fmadd32 x*r27+r26, 1.0001/0.5': (['fmadd32 r6, r6, r27, r26'], (1, one, half, near1)),
+             'fadd32 x+r26, r26=0.0': (['fadd32 r6, r6, r26'], (1, one, zero, one)),
+             'fadd32 x+r26, r26=0.5': (['fadd32 r6, r6, r26'], (1, one, half, one))}
+        for name, (lines, consts) in V.items():
+            parts = [e(x) for x in lines]*8; body = b''.join(parts)
+            B.check_body(body, [len(x) for x in parts])
+            m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one')
+            res[name] = (m['cycles']-EMPTY_TRIP)/8; print(f'{name:34s} cycles/rep {res[name]:.2f}', flush=True)
     elif a.what == 'values':
         # same instruction sequences with different data: benchmark chains (NaN/inf/trivial) vs finite values.
         # r24 = 1 (int) / 0.0f, r25 = 1.0f; the loop preloads r5..r12 with 1.5f (cost_hw.counted).

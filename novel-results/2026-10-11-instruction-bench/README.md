@@ -10,9 +10,11 @@
 > that `.cache` never helps and that FP16 runs at full rate with register operands were wrong (see below).
 > (4) Six single-group runs ran at the 968 MHz level, not ~1,333 (ref units 923). (5) The log2 and exp2 chains
 > reach NaN and +inf after a few steps, and float/int constants make several ops trivial (x+0, x·1). A
-> follow-up (`cost_probes.py values`, `results/2026-10-11-cost-model/values.json`) found timing value-independent
-> within 0.3 cycles: log2/exp2 alternating on finite values costs the sum of the NaN/inf chains, fmul/fmadd by
-> 1.0001 cost the same as by 1.0, and rcp through 0 and inf costs the same as rcp(1.5).
+> controlled follow-up (`cost_probes.py values2`, `results/2026-10-11-cost-model/values2.json`) ran identical
+> code with only the preloaded constants changed: fmul32 ×1.0 / ×1.0001 1.87 / 1.87, fmadd32 1.99 / 1.99,
+> fadd32 +0.0 / +0.5 1.85 / 1.86 units per step, so timing is value-independent for these cases. (An earlier
+> probe, `values`, also changed the instruction mix and is not evidence either way; log2/exp2 on NaN/inf vs
+> finite values agreed within 0.3 units there.)
 
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, compute stage.
 309 dispatches, no fault or timeout. Only instruction forms that already ran on hardware were used.

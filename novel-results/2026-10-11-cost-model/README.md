@@ -21,41 +21,50 @@ Model (every parameter measured on this GPU):
 * an issue interval blocks the whole SIMD group (the "group" rule; see accuracy below for alternatives);
 * the 8-entry per-group result cache with ~17-cycle register-file writeback
   ([finding](../2026-10-11-result-cache/README.md)) and a 1-cycle 32-after-16-bit partial write hazard;
-* loads complete after the L1 latency (50 cycles, [load finding](../2026-10-10-agx-load-latency/README.md);
+* device loads complete after the measured load-to-use time (about 65 real cycles, see Memory below;
   `--load-latency` overrides) and `wait` drains a scoreboard slot;
-* a taken backward jump costs 31 extra cycles, fit so an empty counted-loop trip costs the measured 35.3.
+* a taken backward jump costs about 33 extra real cycles, fit so an empty counted-loop trip costs the measured 35.25 units.
 
 ## Accuracy
 
-| Dataset (stored hardware measurements) | Median abs. error | 90th pct | Max |
-| --- | --- | --- | --- |
-| 60 benchmark loops: latency (in-sample) | 1.9% | 5.1% | 5.2% |
-| 60 benchmark loops: single-group issue (in-sample) | 2.5% | 5.8% | 10.1% |
-| 60 benchmark loops: 4 groups per core (in-sample) | 4.0% | 11.8% | 47% (`.cache` forms) |
-| register rotation, 32-bit, D = 4–16 | 3.5% | | 11.3% |
-| **24 random kernels, 1 SIMD group (out of sample)** | **4.3%** | 14.5% | 14.8% |
-| **24 random kernels, 4 SIMD groups per core (out of sample)** | **9.8%** | 18.3% | 24.0% |
-| **held out: 24 new 24-instruction kernels, 1 group** | **4.6%** | 10.6% | 13.8% |
-| **held out: same, 4 groups per core** | **9.8%** | 15.7% | 20.9% |
-| **held out: 12 new 48-instruction kernels, 1 group** | **3.4%** | 7.0% | 8.1% |
-| **held out: same, 4 groups per core** | **9.0%** | 13.9% | 18.0% |
+Revised after an independent review (decode, units, method; see "Revision" below). Errors are |prediction −
+measurement| / measurement, medians unless stated, from `make verify-cost-model`. "Body only" removes the
+fitted empty-loop cost (35.25 units, predicted 35.27) from both sides, which is the fairer figure.
 
-**Measurement noise floor (4 groups per core).** Per-core span timings repeat to about ±6%: the same body
-measured twice gave 49.7 / 46.8 (iadd chain) and 42.0 / 45.1 (fadd32 chain) cycles per trip, and the empty
-loop 33.5–35.6 (35.3 with one group). Latency-bound chains at 4 groups per core came out 0.93–1.13 × their
-single-group cost (`groups.json`), so ratios below 1 are noise, not speed-ups. The 4-group validation error is
-therefore only modestly above what the measurement can resolve; single-group measurements repeat within ~1%.
+| Dataset | Role | 1 group: whole trip | 1 group: body | 4 groups/core: whole trip | 4 groups/core: body |
+| --- | --- | --- | --- | --- | --- |
+| 24 random 24-instr kernels | selection (issue rule chosen here) | 5.1% (max 15%) | 7.1% (max 23%) | 11.4% | 15.4% |
+| **24 new 24-instr kernels** | **held out** | **5.3%** (max 12%) | **7.8%** (max 20%) | **10.4%** | **13.6%** |
+| **12 new 48-instr kernels** | **held out** | **3.6%** (max 8.4%) | **4.3%** (max 11%) | **9.2%** | **10.8%** |
 
-Errors are prediction minus measurement relative to the measurement. The random kernels mix 52 of the
-benchmarked forms with random register dependencies over r5–r12; they were not used for fitting, except
-that the issue rule was chosen among three candidates by their score. The two held-out sets (new seeds 5000+
-and 6000+, measured after every model choice was frozen) confirm the same accuracy:
+Fitting sets (not evidence of accuracy): the 60 benchmark loops reproduce to 0.4% latency / 0.4% issue /
+1.9% per-core throughput; the register rotation used to fit the result cache to 1.7% (32-bit); the memory
+probes to 1.5%. The model under-predicts kernels systematically (bias −2% to −5% with one group, −9% to −11%
+with four), and the 4-group figures sit near the ±6% repeatability of the 4-group measurement itself.
+
+Issue-rule choice (made on the selection set, before the revision; whole-trip medians):
 
 | Issue-interval rule | random, 1 group | random, 4 groups/core | leader + k independent iadds |
 | --- | --- | --- | --- |
 | group-blocking (default) | 4.3% | 9.8% | 7.9% (max 42%) |
 | shared complex pipe | 8.1% | 14.9% | 3.9% (max 14.5%) |
 | per-unit family | 14.8% | 19.0% | 3.9% (max 14.5%) |
+
+**Revision (after review).** Registers now come from applegpu's operand objects (vector loads/stores and
+16-bit pairs were previously dropped); atomics are decoded from their fields; every descriptor has an explicit
+class (texture, iterator, async, stack, tile, barrier, `stack_adjust`), unknown ones raise; stores hold a
+scoreboard slot; parameters are in real cycles and stay fractional (0.1-cycle simulation ticks, because 8-byte
+chains really take 2.1 cycles per step); each instruction's issue interval is charged to itself and waits
+to the waiting instruction; the immediate-operand variant is used only with at most one register source;
+the partial-write rule applies only between 16- and 32-bit writes; the trace flags loops whose condition
+depends on uniforms or on instructions the emulator cannot run (their trip count is then unknown).
+Classes without hardware data (texture, iterator, threadgroup and stack memory, tile, barriers,
+threadgroup atomics) reuse device-memory or 1-cycle costs and are reported as `unmeasured`.
+
+Memory parameters come from `cost_probes.py memory` (`memory.json`): device load to use 63 units on a line no
+other agent writes (73 on a line the CPU keeps writing), a second independent load +2.6, stores to one address
+35 units each (+4.7 with a wait; only the repeated-address case was measured). The 2026-10-10 load-latency
+finding reports ~50 cycles for a dependent chase; the gap is unresolved.
 
 Residual analysis (24 random kernels, single group): the error correlates weakly with 16-bit writes
 (+1.7 cycles each unexplained, r = 0.35), SIMD reductions (−2.5, r = −0.50) and transcendentals (−1.0, r = −0.24).

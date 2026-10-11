@@ -13,6 +13,7 @@ Produced on the M2 Max (G14C B1): GLES through Mesa 25.1.9, Vulkan through Mesa 
 The listings were regenerated after the review fixes (IR matching on stage, workgroup size,
 final-IR instruction count, stack size and shaderdb stats; `stack_adjust` class; loop trip count
 warning). The GLES runs were repeated with `--ir`, which now uses `AGX_MESA_DEBUG=shaders,shaderdb`.
-Cycle counts come from `scripts/agx_cost.py` as it was on 2026-10-11, while that model was still being
-changed, so they differ from earlier versions of these files. Treat them as model output, not
-measurements.
+Cycle counts come from the revised `scripts/agx_cost.py` (real cycles; see
+novel-results/2026-10-11-cost-model): listings were regenerated offline from the saved caches and IR dumps
+(`--cache`, `--ir-dump`, `--blob`) after the model revision. Treat them as model output, not measurements;
+store costs use the repeated-address store measurement and are likely pessimistic for streaming stores.
