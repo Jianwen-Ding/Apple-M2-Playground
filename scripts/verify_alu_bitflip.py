@@ -125,6 +125,26 @@ check('fmadd16 k=1: lane i gets A(i-1)+C(i) (lanes 1-29 except 16, where the f16
 p = lo(h['x0900'])
 check('fmadd16 bit 72 (pairs): even lanes get C only', all(p[i] == i for i in range(0, 32, 2)))
 
+# 6. Constant-bit flips (const1): every effect is another known instruction, an intl-family alias, or a hang.
+c1 = load('const1'); cb = {r['name']: r for r in c1['results']}
+dec = json.load(open(D/'const1-decodes.json'))
+hangs = sorted(r['name'][:-2] for r in c1['results'] if r['fault'])
+check('constant flips: exactly extr b27, shlhi b26, asrh b15 (the unnamed bfi-family code b27,b26 set / b15 clear), bitop b15, wait b7 hang',
+      hangs == sorted(['extr-rc27', 'shlhi-rc26', 'asrh-rc15', 'bitop-rc15', 'wait-rc7']))
+FAM = {'bfi': (0, 0, 0), 'bfeil': (0, 0, 1), 'extr': (0, 1, 0), 'asr': (0, 1, 1), 'shlhi': (1, 0, 0), 'shrhi': (1, 0, 1), 'asrh': (1, 1, 1)}
+ok = True
+for k, code in FAM.items():
+    for bit, pos in ((27, 0), (26, 1), (15, 2)):
+        new = list(code); new[pos] ^= 1; new = tuple(new)
+        name = next((n for n, c in FAM.items() if c == new), None)
+        d = dec[f'{k}:b{bit}']
+        ok &= (name is None and d is None and cb[f'{k}-rc{bit}-A']['fault']) or (d is not None and d[0] == name and not cb[f'{k}-rc{bit}-A']['fault'])
+check('bfi family: bits (27, 26, 15) select bfi/bfeil/extr/asr/shlhi/shrhi/asrh; code (1,1,0) hangs', ok)
+A6, B6 = cb['intl-base-A']['table'][7], cb['intl-base-A']['table'][8]
+check('intl b26 = bitrev(A), b27 = popcount(A) (iunop ops with a B operand present)',
+      cb['intl-rc26-A']['table'][6] == [int(f'{a:032b}'[::-1], 2) for a in A6] and cb['intl-rc27-A']['table'][6] == [bin(a).count('1') for a in A6])
+check('intl b15 = convert with register mode r6l (0x0606 -> f_to_u16 rte) of B (~9e15) -> 0xffff', cb['intl-rc15-A']['table'][6] == [0xffff]*32)
+
 ok = all(c for _, c in checks)
 print(f'{sum(c for _, c in checks)}/{len(checks)} checks passed')
 sys.exit(0 if ok else 1)

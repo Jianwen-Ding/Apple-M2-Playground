@@ -1,4 +1,4 @@
-# fmadd has a 10-byte form with a lane-offset operand; applegpu's other ALU gap bits are inert
+# fmadd has a 10-byte form with a lane-offset operand; ALU gap and constant bits mapped
 
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, compute.
 
@@ -29,6 +29,16 @@ Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, co
    (integer, bitfield, shifts, bitop, float add/mul/fma, transcendental, compare-select,
    ballots, SIMD/quad shuffles and reductions, `wait` bits 9–15) changed nothing: no
    register, lane or length change and no fault.
+
+5. **Constant-bit flips (93 single flips of applegpu's fixed bits beyond the opcode byte, `const1`).**
+   60 inert, 26 turn into another known instruction, 2 switch mov_imm between its 16/32-bit forms,
+   5 hang the GPU (recovered):
+   * bfi / bfeil / extr / asr / shlhi / shrhi / asrh are one opcode (0x2e) with a 3-bit selector
+     (bits 27, 26, 15) = 000 / 001 / 010 / 011 / 100 / 101 / 111. **Code 110 hangs.**
+   * `bitop` bit 15 and `wait` bit 7 hang.
+   * Ballot bit 48 switches between the SIMD and quad forms; `simd_shuffle` bit 15 makes it a `simd_op`.
+   * `intl` bits 26 / 27 give bitrev / popcount of A (the iunop ops with a B operand present);
+     bit 15 makes the encoding a `convert` whose mode comes from register A (see the sub-op finding).
 
 ## Relationship to existing knowledge
 

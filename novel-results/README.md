@@ -2,7 +2,7 @@
 
 - [2026-10-11 Memory/control/SR gap bits: device_load/store bit 31 disables the access; get_sr bit 22 undefined; rest inert](2026-10-11-mem-control-gap-bits/README.md)
 - [2026-10-11 Sub-op spaces: funop hangs/aliases, iunop Morton spread, 128 simd_op encodings, shuffle variants](2026-10-11-subop-spaces/README.md)
-- [2026-10-11 fmadd 10-byte form: lane-offset (fused shuffle-up) source A; fmadd32 bit 52; other ALU gap bits inert](2026-10-11-fmadd-lane-offset/README.md)
+- [2026-10-11 fmadd 10-byte form: lane-offset (fused shuffle-up) source A; fmadd32 bit 52; other ALU gap bits inert; constant-bit flips (bfi-family code 110, bitop b15, wait b7 hang)](2026-10-11-fmadd-lane-offset/README.md)
 - [2026-10-11 In-shader clock: CPU-written timer read via coherent load after device_barrier_1; two Mesa barriers invalidate](2026-10-11-in-shader-clock/README.md)
 - [2026-10-11 Threadgroup memory addressing: byte base + 16-byte (vec4) index slots; declared size exact](2026-10-11-tg-memory-addressing/README.md)
 - [2026-10-11 0x78 = barrier over aligned 4-SIMD-group blocks, 0x68 = whole workgroup](2026-10-11-barrier-0x68-vs-0x78/README.md)

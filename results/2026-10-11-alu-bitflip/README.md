@@ -14,6 +14,7 @@ Every file is a gzipped runner record (per-lane r0..r23 for both length layouts)
 | `fma-hazard`, `fma-cross-rep` | Cross-half reads: write-to-read distance, layout dependence, 8 repeats |
 | `fma-b52`, `fma-b52b`, `fma-b52c`, `fma-b52d` | Bit 52 (8-byte form) over register sets and 31 chosen float triples |
 | `fma16-lane` | fmadd16 10-byte form |
+| `const1`, `const1-decodes.json` | 93 single flips of applegpu constant bits (beyond the opcode byte) of 19 instructions; what applegpu decodes each as |
 
 Gap-bit result: 210 of 213 flips had no observable effect on any register, lane or the
 instruction length. The other three are fmadd32 b52, fmadd32 b53 and fmadd16 b53; see the
