@@ -1,4 +1,4 @@
-# Direct-DRM undecoded-opcode classification — 2026-10-11 (STOPPED: device unresponsive after 0x5c)
+# Direct-DRM undecoded-opcode classification — 2026-10-11 (56 of 59 classified; 0x5c/0x64/0x74 not rerun)
 
 Owner-approved, `CONFIRM_GPU_FAULTS=1`. `scripts/run_drm_opcode_scan.py` ran each
 of the 59 opcodes applegpu cannot decode (minus excluded 0x6e) as a two-byte
@@ -10,6 +10,7 @@ stopped itself.
 | --- | --- |
 | `validate-0x18.json` | Single-candidate sanity check (0x18, known no-op from the earlier Vulkan scan) before the full run |
 | `scan-1.json` | Full scan record: 40 classified, stopped after 0x5c |
+| `scan-2.json` | Resume after reboot: the 16 opcodes never executed by any earlier scan, 0 faults |
 | `post-0x5c-control-fails.json` | Unchanged-control dispatch after 0x5c: SUBMIT itself failed (syncobj wait timed out, errno 62/ETIME, 3.0 s) |
 
 ## Result
@@ -38,8 +39,52 @@ stopped itself.
 * **18 opcodes were never reached**: 0x5d, 0x5f, 0x60, 0x63, 0x64, 0x67, 0x6b,
   0x6c, 0x6d, 0x70, 0x73, 0x74, 0x77, 0x78, 0x7b, 0x7c, 0x7d, 0x7f.
 
+## Resume after reboot (scan-2)
+
+The machine was rebooted after the 0x5c wedge. The unchanged preload control passed
+first, so the device was healthy again. On the owner's instruction, only opcodes that had
+**never crashed in any earlier scan** were run. That skipped 0x5c (direct-DRM wedge)
+and 0x64/0x74 (whole-dispatch faults in the 2026-10-04 Vulkan scan). The run used
+`--max-faults 1`, so it would have stopped at the first new fault:
+
+```sh
+CONFIRM_GPU_FAULTS=1 python3 -B scripts/run_drm_opcode_scan.py \
+  --opcodes 0x5d,0x5f,0x60,0x63,0x67,0x6b,0x6c,0x6d,0x70,0x73,0x77,0x78,0x7b,0x7c,0x7d,0x7f \
+  --max-faults 1 --pause 2
+```
+
+All 16 completed normally. Firmware time was 6.5-8.2 µs, host time 0.2-0.6 ms, and
+every guard word was intact. **0 faults.**
+
+* **9 no-ops:** 0x5f, 0x63, 0x67, 0x6b, 0x73, 0x77, 0x78, 0x7b, 0x7f
+* **7 end the thread/group:** 0x5d, 0x60, 0x6c, 0x6d, 0x70, 0x7c, 0x7d
+
+The kernel log in the container shows no GPU-driver timeout or recovery lines. It may
+be a boot-time snapshot, though (live `dmesg` needs root), so this is supporting
+evidence only.
+
+## Combined classification (scan-1 + scan-2, two-byte `op | Dt=2 | D=r2` form)
+
+| Class | Opcodes |
+| --- | --- |
+| no-op (33) | every opcode with low bits `0b11` (0x03, 0x07, …, 0x7f), plus 0x18 |
+| ends thread/group (16) | 0x01, 0x0d, 0x1d, 0x2c, 0x2d, 0x3c, 0x3d, 0x4d, 0x50, 0x5d, 0x60, 0x6c, 0x6d, 0x70, 0x7c, 0x7d |
+| fault, recovered (6) | 0x06, 0x24, 0x34, 0x44, 0x46, 0x54 |
+| fault, device wedged until reboot (1) | 0x5c |
+| not run (3) | 0x64, 0x74 (Vulkan-scan faulters, skipped on purpose); 0x6e (excluded, LeftoverLocals class) |
+
+Patterns, observed with this one operand encoding only:
+* All 32 undecoded opcodes with low two bits `0b11` are inert. Of the low-`0b00`
+  opcodes, only 0x18 is.
+* The `…1100`/`…1101` opcodes (0x2c/0x2d, 0x3c/0x3d, 0x6c/0x6d, 0x7c/0x7d, and the
+  `…1101` members 0x0d/0x1d/0x4d/0x5d) end execution cleanly. 0x5c is the exception
+  in that column, and it is the only opcode that wedged the device.
+* Every fault so far has an opcode ≡ 0, 4 or 6 (mod 8) in the 0x04-0x74 range.
+  Other operand encodings (wider forms, other Dt values) were not tested.
+
 ## Status
 
-The scan is **not resumed** pending the owner confirming the device is usable
-again (a reboot may be needed; this session cannot check or perform one). No
-further GPU submissions were attempted after the three failed recovery checks.
+Classification is complete except for the three deliberately skipped opcodes. **Do
+not rerun 0x5c without the owner's agreement:** on direct DRM it left SUBMIT failing
+(ETIME) until a reboot. 0x64/0x74 are expected to fault and are skipped for the same
+reason.

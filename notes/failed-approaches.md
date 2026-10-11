@@ -223,3 +223,13 @@ VkResult error" as "no fault".
   future attempt would first need the conditions under which firmware feeds
   helper requests/END (cfg, binary tag bits, stack-using main, scratch header),
   e.g. from a trace of Mesa running a spilling shader.
+
+### Direct-DRM opcode scan, 2026-10-11 — DEVICE WEDGE ON 0x5c
+
+* 0x5c on the direct DRM path did not recover the way the other faulting opcodes did.
+  Its own dispatch hit the 3 s syncobj ceiling, and every later SUBMIT failed with
+  ETIME until the machine was **rebooted**. In the Vulkan scan, the same opcode
+  appeared to recover. A clean recovery in one path does not predict the other.
+* After the reboot, the owner allowed only opcodes that had never crashed. The 16
+  remaining ones ran with `--max-faults 1` and produced 0 faults. 0x5c, 0x64 and 0x74 stay
+  unrun. See [evidence](../results/2026-10-11-opcode-scan-drm/README.md).
