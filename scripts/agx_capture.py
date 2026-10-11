@@ -310,6 +310,8 @@ def cost(code, groups, path_mode, loops, loop_trips=None):
     listing instead of cycles."""
     global _P
     try:
+        # agx_cost lives in the AGX-Performance-Simulator repository; point AGX_SIM_SCRIPTS at its scripts/
+        if os.environ.get('AGX_SIM_SCRIPTS'): sys.path.insert(0, os.environ['AGX_SIM_SCRIPTS'])
         import agx_cost
         if _P is None: _P = agx_cost.Params()
         ins = agx_cost.decode(code, _P)

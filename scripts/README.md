@@ -157,5 +157,7 @@ reconstructs shader bytes and buffers with the Python standard library;
 
 `agx_capture.py -- <command>` runs a GLES/Vulkan program through Mesa with a fresh shader
 cache and parses every cached AGX binary into its main shader, preamble and rodata. It prints a
-disassembly annotated with `agx_cost.py` predictions (`make capture-demo`; see
-`docs/shader-capture.md`). `tests/agx_cache_layout.c` prints the struct layouts it relies on.
+disassembly, annotated with `agx_cost.py` cycle predictions when the cost model from
+[AGX-Performance-Simulator](https://github.com/Jianwen-Ding/AGX-Performance-Simulator) is available (`AGX_SIM_SCRIPTS=<that repo>/scripts`;
+otherwise each region shows `cost model unavailable`). See `make capture-demo` and
+`docs/shader-capture.md`. `tests/agx_cache_layout.c` prints the struct layouts it relies on.

@@ -3,8 +3,10 @@
 `scripts/agx_capture.py` works like a Metal shader capture for Asahi Mesa. It runs a GLES or Vulkan
 program through Mesa's own driver, collects every AGX binary that Mesa compiled, splits each one
 into rodata, main shader and preamble, and disassembles them with applegpu. Each instruction is then
-annotated with the `scripts/agx_cost.py` cycle model, which predicts issue counts and stall cycles
-for 1 and 4 SIMD groups per core.
+annotated with the `agx_cost.py` cycle model, which predicts issue counts and stall cycles
+for 1 and 4 SIMD groups per core. The model now lives in
+[AGX-Performance-Simulator](https://github.com/Jianwen-Ding/AGX-Performance-Simulator); set `AGX_SIM_SCRIPTS` to that repository's `scripts/`
+directory to enable the cycle columns (without it every region prints `cost model unavailable`).
 
 ## Usage
 
