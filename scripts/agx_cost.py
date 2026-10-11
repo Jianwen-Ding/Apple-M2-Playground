@@ -141,6 +141,7 @@ class Params:
         self.defer_fast = c.get('device_load_defer_fast_ref', 31.0)*K
         self.defer_slow = c.get('device_load_defer_slow_ref', 56.0)*K
         self.defer_delayed_extra = c.get('device_load_defer_delayed_extra_ref', 5.0)*K
+        self.tg_defer = c.get('tg_load_defer_ref', 20.0)*K
         self.load_ii = max(1.0, c.get('device_load_extra_inflight_ref', 2.6)*K)
         g = lambda k, d: c.get(k, d)*K
         self.mem = {   # per memory class: (fast, slow) issue occupancy, latency / completion, in real cycles
@@ -152,7 +153,7 @@ class Params:
         self.quiet = {'load': g('mem_quiet_load_ref', 20.0), 'tg': g('mem_quiet_tg_ref', 20.0), 'device_store': g('mem_quiet_device_store_ref', 33.6)}
         self.wait_idle = g('wait_idle_ref', 4.89)
         self.wait_idle_big = g('wait_idle_big_ref', 10.9)
-        self.loop_buffer = c.get('loop_buffer_bytes', 512)
+        self.wait_run_long = c.get('wait_run_long', 31)
         self.branch = c.get('branch_taken_real')        # set by fit_branch() if missing
         self.allow_unknown = False
 
@@ -234,8 +235,9 @@ def decode(code, P):
 
 
 def mark_loops(instrs, P):
-    """Tag each instruction with the byte size of its innermost backward-jump loop (None outside loops)."""
-    _, g = agx_loop._tools()
+    """Tag each instruction with its innermost backward-jump loop size in bytes (None outside loops)
+    and each wait with the length of the run of consecutive waits it belongs to (waitruns.json:
+    a run of >= 31 consecutive waits costs ~11 units per wait instead of ~4.9)."""
     loops = []
     for r in instrs:
         if r['name'] == 'jmp_exec_any':
@@ -245,6 +247,15 @@ def mark_loops(instrs, P):
     for r in instrs:
         sizes = [b-a for a, b in loops if a <= r['pc'] < b]
         r['loop_bytes'] = min(sizes) if sizes else None
+    i = 0
+    while i < len(instrs):
+        if instrs[i]['name'] == 'wait':
+            j = i
+            while j < len(instrs) and instrs[j]['name'] == 'wait': j += 1
+            for k in range(i, j): instrs[k]['wait_run'] = j-i
+            i = j
+        else:
+            i += 1
     return instrs
 
 
@@ -320,7 +331,6 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     slots = [defaultdict(list) for _ in range(groups)]
     rcache = [[] for _ in range(groups)]; wtime = [dict() for _ in range(groups)]; last_w = [dict() for _ in range(groups)]
     tok = {}; port = READ_PORTS*T; issue_tok = ISSUE_PER_CORE*T
-    alu_since_wait = [False]*groups          # slow state: ALU issued while no load outstanding since the last memory op
     load_busy = [0]*groups                   # tick until which a load of this group is outstanding
     last_alu = [-10**9]*groups               # tick of the group's last ALU issue (quiet-time rule)
     last_space = [None]*groups
@@ -400,10 +410,11 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 cls_ = 'tg' if tgop else 'device_load'
                 if {cls_, last_space[gi]} == {'tg', 'device_store'}: ii += tk(P.space_switch)
                 last_space[gi] = cls_
-                alu_since_wait[gi] = False; load_busy[gi] = max(load_busy[gi], t+lat)
+                load_busy[gi] = max(load_busy[gi], t+lat)
                 for h in r['dst']: ready[gi][h] = t+lat
                 slots[gi][r['slot']].append(t+lat)
-                pending[gi].append([r['slot'], t+lat, delay+tk(P.defer_fast)+(tk(P.defer_delayed_extra) if delay else 0), r['dst']])
+                dfr = tk(P.tg_defer) if tgop else tk(P.defer_fast)+(tk(P.defer_delayed_extra) if delay else 0)
+                pending[gi].append([r['slot'], t+lat, delay+dfr, r['dst']])
             elif kind == 'store':
                 m_ = P.mem.get(r['name'], P.mem['device_store'])
                 q = P.quiet['tg' if r['name'].startswith('threadgroup') else 'device_store']
@@ -414,13 +425,13 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 if {cls_, last_space[gi]} == {'tg', 'device_store'}: ii += tk(P.space_switch)   # spaces.json
                 last_space[gi] = cls_
                 slots[gi][r['slot']].append(st_done)
-                alu_since_wait[gi] = False
             elif kind == 'tg_atomic':
                 ii = T
                 for h in r['dst']: ready[gi][h] = t+tk(P.load_latency)
             elif kind == 'wait':
-                small = r.get('loop_bytes') is not None and r['loop_bytes'] <= P.loop_buffer
-                ii = T if slots[gi][r['slot']] else tk(P.wait_idle if small else P.wait_idle_big); slots[gi][r['slot']] = []
+                # idle wait: ~4.9 units. Long runs of consecutive waits can cost ~11 each, but the trigger is not
+                # understood (wait-cost finding), so it is not modelled.
+                ii = T if slots[gi][r['slot']] else tk(P.wait_idle); slots[gi][r['slot']] = []
                 pending[gi] = [p_ for p_ in pending[gi] if p_[0] != r['slot']]
             elif kind == 'control':
                 ii = CI

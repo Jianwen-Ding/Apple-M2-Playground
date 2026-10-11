@@ -35,7 +35,8 @@
  "quiet_note": "Quiet-time rule (supersedes memstate_note): a memory instruction effectively starts no earlier than Q after the group's last ALU issue (Q ~20 units for loads and threadgroup ops, ~33.6 for device stores); loads then complete their fast latency after that start. A wait whose slot has nothing pending costs ~4.85 units (window probe, iadd + k x wait 1 + load); the jump at 32 such waits per repetition is the >512-byte loop-body step (wait_note).",
  "device_load_defer_delayed_extra_ref": 5.0,
  "wait_idle_big_ref": 10.9,
- "loop_buffer_bytes": 512,
- "wait_note": "waits.json: a wait with nothing pending costs 4.89 units inside a loop body of <= 512 bytes and ~10.9 when the body is larger (31+ two-byte waits x 8 reps + 18 B loop control). Independent iadd bodies up to 2 KiB show no such limit, so the effect is specific to wait. Straight-line (non-loop) code is assumed to behave like a large loop.",
- "space_note": "spaces.json: only transitions between a device store and a threadgroup access (either order) cost extra, ~6.7 units each; device<->threadgroup loads and threadgroup store -> device load cost nothing extra."
+ "wait_note": "waits.json + waitruns.json: an idle wait costs ~4.89 units; waits in a run of >= 31 consecutive waits cost ~10.9 each. Not a body-size effect: 30 waits + iadd (564 B) and 16 waits, iadd, 16 waits (596 B) are fast, 8 waits + 6 iadd (532 B) is fast, 31 waits (516 B) and 31 waits + iadd (580 B) are slow. The run-length explanation also fails (16 waits, iadd, 16 waits concatenates into 32-wait runs and is fast); not modelled.",
+ "space_note": "spaces.json: only transitions between a device store and a threadgroup access (either order) cost extra, ~6.7 units each; device<->threadgroup loads and threadgroup store -> device load cost nothing extra.",
+ "tg_load_defer_ref": 20.0,
+ "tg_defer_note": "review2.json: tg load, iadd, wait = 42.0 and tg load, 8 iadd, wait = 53.6 units (tg load, wait = 22.9): ALU in flight defers threadgroup-load completion to >= ALU issue + ~20 units."
 }

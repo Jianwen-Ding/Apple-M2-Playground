@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch', 'review2'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -155,6 +155,31 @@ def main():
             m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one', extra_env=env)
             res[name] = (m['cycles']-EMPTY_TRIP)/8
             print(f'{name:26s} {res[name]:6.1f} ref units/rep', flush=True)
+    elif a.what == 'review2':
+        # decisive probes requested by the second review (all archived)
+        from run_drm_tg_layout import tg, shared_word
+        env = {'AGX_SHARED_WORD': str(shared_word(2048))}
+        consts = (1, 0x3f800000, 32, 7)
+        st = agx_loop.store(5, 8, 26); L = e('device_load 0, i32, x, r6, u8_u9, r26, unsigned')
+        A = e('iadd r14, r14, 1'); W0 = e('wait 0'); W1 = e('wait 1')
+        TL = tg(True, 'i32', 7, base=None, index=0)
+        I = lambda k: b''.join(e('iadd r%d, r%d, 1' % (15+i % 8, 15+i % 8)) for i in range(k))
+        M = {}
+        for k in (1, 2, 4, 8, 16): M[f'A store, {k} iadd'] = [st, I(k)]                 # count vs time
+        for k in (0, 1, 2, 3, 4, 6, 8):
+            M[f'B iadd, {k} wait1, load, wait0'] = [A, W1*k, L, W0]
+            M[f'B iadd, {k} wait1, store'] = [A, W1*k, st]
+        M['C tg load, iadd, wait'] = [TL, A, W0]; M['C tg load, 8 iadd, wait'] = [TL, I(8), W0]
+        M['C tg load, wait'] = [TL, W0]
+        M['D 8 wait + 6 iadd (532 B, 112 instr)'] = [W0*8, I(6)]
+        M['D 8 wait + 4 iadd (404 B, 96 instr)'] = [W0*8, I(4)]
+        M['E iadd, store, load, wait'] = [A, st, L, W0]; M['E store, load, wait'] = [st, L, W0]
+        M['E load, store, wait'] = [L, st, W0]
+        for name, parts in M.items():
+            body = b''.join(parts)*8
+            m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one', extra_env=env)
+            res[name] = (m['cycles']-EMPTY_TRIP)/8
+            print(f'{name:42s} {res[name]:6.1f} units/rep', flush=True)
     elif a.what == 'sfuswitch':
         # one SIMD group: independent transcendentals of one function vs mixed functions
         V = {'log2 x3': ['log2 r6, r6', 'log2 r7, r7', 'log2 r8, r8'], 'floor x3': ['floor r6, r6', 'floor r7, r7', 'floor r8, r8'],
