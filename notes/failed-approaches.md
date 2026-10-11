@@ -292,3 +292,13 @@ VkResult error" as "no fault".
   even with Mesa's coherent load bit. The GPU caches the line after the first read. Re-read
   with `device_barrier_1`/`unknown_barrier_1` + a coherent load, or read a line not yet touched.
 
+
+### Grid-size caps, 2026-10-11
+
+* **A previous session raised the 65536-thread harness cap straight to 2^20 and the host crashed
+  (kernel/machine down, reboot needed).** That edit was never committed, and no kernel log from that
+  boot survived, so the exact launch is unknown. The control main only stores `out[8 + x]` when
+  `x < count`, and the CDM global-size fields are 32-bit, so neither explains it by itself.
+  Retry plan (this session): caps raised to 2^24 with the table moved past a large output; step one
+  power of two at a time, separately for a large X grid (output scales) and a large Y grid (output
+  fixed at 32 lanes), one process per step, pushing before each new size.

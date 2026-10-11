@@ -59,7 +59,7 @@ def main():
     a = p.parse_args()
     lengths = [None] if a.kind == 'control' else [int(x) for x in a.lengths.split(',')]
     limit = {'loop': 10_000_000, 'chase': 512 << 20, 'stream': 1 << 20}.get(a.kind, 100000)
-    if not (1 <= a.repeats <= 64 and 1 <= a.count <= 65536 and all(n is None or 0 <= n <= limit for n in lengths)):
+    if not (1 <= a.repeats <= 64 and 1 <= a.count <= 1 << 24 and all(n is None or 0 <= n <= limit for n in lengths)):
         p.error('bounded repeats/count/lengths required')
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
     out = a.output or Path('/scratch/apple-m2-playground/drm-compute/runs')/stamp
