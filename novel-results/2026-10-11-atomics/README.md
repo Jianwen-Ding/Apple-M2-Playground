@@ -26,7 +26,21 @@ add, sub, xchg, cmpxchg, umin, imin, umax, imax, and, or, xor.
 * **cmpxchg operand order** is Mesa's: source register S holds the **new** value, S+1 the
   **compare** value.
 
-Encoding (checked bit-for-bit two ways, applegpu fields and Mesa `agx_pack.c` formula):
+Encoding (checked bit-for-bit two ways, applegpu fields and a **Python transcription** of the
+Mesa `agx_pack.c` formula). Neither check runs Mesa itself: the "Mesa" side is
+`run_drm_atomic.mesa_atomic` (device) and `run_drm_tg_atomic.mesa_local_atomic` (threadgroup),
+hand-copied from `agx_pack.c`. Re-reading `agx_pack.c:795-827` (`AGX_OPCODE_ATOMIC`) against
+`mesa_atomic`: every field (exact bits 0x15 | 1<<26 | 1<<31 | 5<<44, op<<6, R/A/O split fields,
+At<<27, scoreboard<<30, Rt<<47, S<<48, O>>8<<56) matches, with three fixed choices: the index is a
+register (Mesa's Ot bit 24 is never set), bit 25 is Mesa's `src[2].abs` (unsigned index), and
+bit 45 (`needs_g13x_coherency`) is always clear, which is what Mesa's `agx_gather_device_key`
+selects for this single-die G14 (it is set only for multi-cluster G13 or multi-die parts).
+`mesa_local_atomic` likewise matches `agx_pack.c:829-857` (`AGX_OPCODE_LOCAL_ATOMIC`) for the one
+form used: register base (At = 0), immediate index 0 (Ot = 1), 32-bit destination (Mesa's Rt is
+"destination ≥ 32 bits", set here together with Ra when returning). The
+offline `verify_atomics.py` re-checks the device encodings against this transcription only; the
+threadgroup encodings were checked against `mesa_local_atomic` and applegpu at generation time
+(`local_atomic()` raises on disagreement), not in the offline verifier.
 
 ```text
 device:      0x15 | op<<6 | R<<10 | A<<16 | O<<20 | Ou(25) | 1<<26 | At<<27 | 1<<31

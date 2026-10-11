@@ -6,8 +6,10 @@ The [direct-DRM scan](../../results/2026-10-11-opcode-scan-drm/README.md) found 
 values that applegpu cannot decode and that run without a GPU fault. It split them into 33
 "no-ops" and 16 "ends". This finding describes each one: its instruction length, its
 register effects, which lanes and groups it affects, the effect of operand bits, and its cost.
-The 9 faulting opcodes (0x06 0x24 0x34 0x44 0x46 0x54 0x5c 0x64 0x74) and 0x6e were
-**not run**.
+The 7 opcodes that faulted in the direct-DRM scan (0x06 0x24 0x34 0x44 0x46 0x54 0x5c), 0x64 and
+0x74, and 0x6e were **not run** here. 0x64/0x74 were never run on direct DRM: they are presumed
+faulting only because they lost every store of the dispatch in the 2026-10-04 Vulkan scan, whose
+per-opcode outputs were not retained ([failed approaches](../../notes/failed-approaches.md)).
 
 ## Claim and scope
 
@@ -19,7 +21,7 @@ Each opcode was tested in 8 operand encodings: `base` = `op | 2<<7 | 4<<9` (the 
 | Opcodes | Length | What it does |
 | --- | --- | --- |
 | **0x03 0x07 0x0b 0x0f 0x13 0x17 0x1b 0x1f 0x23 0x27 0x2b 0x2f 0x33 0x37 0x3b 0x3f 0x43 0x47 0x4b 0x4f 0x53 0x57 0x5b 0x5f 0x63 0x67 0x6b 0x73 0x77 0x7b 0x7f** (all 31 undecoded opcodes with low bits `0b11`) | **6 bytes** in all 8 encodings | **True no-op.** No change to r0l or r1–r23 for any tested bits 7–15 or tested operand bytes 2–5 (`6240 3800`, `3800 6240`). In a loop, it takes exactly as long as a 6-byte `mov_imm` (within 1% in every run), i.e. it issues at full rate. The earlier scan's "no-op" class hid the length: it silently swallowed 4 bytes of `wait` padding. |
-| **0x18, 0x78** | **2 bytes** | **Bit 7 clear** (`base`, `zero`, `d6`, `dt0`, `b15`): no register effect. Its loop takes 3.9–5.0× as long as a 6-byte `mov_imm` loop, and the cost drifts within a process, so this is **not a plain no-op**. It behaves like a synchronizing control instruction. **Bit 7 set** (0x98, 0xf8): ends execution exactly as the "ends" group below does. This mirrors the control family `xxxx1000`: `trap` 0x08 / `stop` 0x88, `wait` 0x38, `threadgroup_barrier` 0x68. |
+| **0x18, 0x78** | **2 bytes** | **Bit 7 clear** (`base`, `zero`, `d6`, `dt0`, `b15`): no register effect. Its loop takes 3.9–5.0× as long as a 6-byte `mov_imm` loop, and the cost drifts within a process, so this is **not a plain no-op**. It behaves like a synchronizing control instruction. **Bit 7 set** (0x98, 0xf8): ends execution exactly as the "ends" group below does. In the known `xxxx1000` control encodings bit 7 has **no common meaning**: only `trap` 0x08 / `stop` 0x88 pairs a bit-7-clear op with an ending op. `wait` 0x38 with bit 7 (0xb8) **hangs the GPU** ([ALU gap-bit finding](../2026-10-11-fmadd-lane-offset/README.md)); `threadgroup_barrier` 0x68 with bit 7 (0xe8, applegpu `TODO.unkE800`) had no observable effect in a one-SIMD-group run ([gap-bit finding](../2026-10-11-mem-control-gap-bits/README.md)); and the bit-7 forms of Mesa's fragment-only `wait_pix` 0x48 / `signal_pix` 0x58 (4 bytes) and applegpu's `doorbell` 0x28 were not run. So 0x18→0x98 and 0x78→0xf8 resemble the trap/stop pair only; there is no family-wide "bit 7 ends" rule. |
 | **0x01 0x0d 0x1d 0x2c 0x2d 0x3c 0x3d 0x4d 0x50 0x5d 0x60 0x6c 0x6d 0x70 0x7c 0x7d** | — (nothing after them runs) | **End the whole SIMD group, ignoring the exec mask.** The result is the same in all 8 encodings. Stores issued before them reach memory. No instruction after them runs, including the control's own `pop_exec`/`stop` suffix. The dispatch completes normally (no fault, normal firmware time). |
 
 ### Ending semantics compared with `stop` (0x88)
@@ -82,8 +84,10 @@ in Mesa (`AGX2.xml`, `agx_opcodes.py`), applegpu or the resources guide. Copilot
 analysis of the length rules gave bit 15 as the conventional length bit
 (`AGX2.xml:7`, applegpu `length_bit_pos`). It *predicted* a 2-byte length for the
 low-`0b11` class; hardware shows 6 bytes, with bit 15 having no effect on any of them. The
-`xxxx1000` pattern for 0x18/0x78 comes from the known encodings of `trap` 0x08, `stop` 0x88,
-`wait` 0x38 and `threadgroup_barrier` 0x68 (`agx_opcodes.py:322-405`).
+`xxxx1000` grouping for 0x18/0x78 comes from the known encodings of `trap` 0x08, `stop` 0x88,
+`wait` 0x38, `wait_pix` 0x48, `signal_pix` 0x58 and `threadgroup_barrier` 0x68
+(`agx_opcodes.py:322-405`), plus applegpu's `doorbell` 0x28; the bit-7 behaviour differs between
+them (see the table).
 
 ## Compiler implications and limitations
 

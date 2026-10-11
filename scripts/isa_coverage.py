@@ -12,12 +12,20 @@ REPO = Path(__file__).resolve().parents[1]
 F = '../novel-results/'
 ALU, SUB, MEM = F+'2026-10-11-fmadd-lane-offset/README.md', F+'2026-10-11-subop-spaces/README.md', F+'2026-10-11-mem-control-gap-bits/README.md'
 OPC = F+'2026-10-11-opcode-descriptions/README.md'
-done_alu = ('mov_imm iadd imadd convert bfi bfeil extr shlhi shrhi asr asrh bitop bitrev popcount intl ffs fmadd32 fmadd16 fadd32 fadd16 '
+done_alu = ('mov_imm iadd imadd convert bfi bfeil extr shlhi shrhi asr asrh bitop fmadd32 fmadd16 fadd32 fadd16 '
             'fmul32 fmul16 floor ceil trunc rint rcp rsqrt rsqrt_special sin_pt_1 sin_pt_2 log2 exp2 icmpsel fcmpsel icmp_ballot fcmp_ballot '
             'icmp_quad_ballot fcmp_quad_ballot simd_shuffle simd_shuffle_down simd_shuffle_up simd_shuffle_xor simd_shuffle_rotate_up '
             'quad_shuffle quad_shuffle_down quad_shuffle_up quad_shuffle_xor quad_shuffle_rotate_up simd_shuf_op').split()
 STATUS = {n: ('mapped', ALU) for n in done_alu}
-STATUS.update({n: ('mapped (sub-op space)', SUB) for n in ('funop', 'iunop', 'simd_op', 'dfdx', 'dfdy')})
+STATUS.update({n: ('mapped (sub-op space)', SUB) for n in ('funop', 'simd_op', 'dfdx', 'dfdy')})
+# intl/bitrev/popcount/ffs/iunop are one encoding space (0x3e, op2 = bits 26-27), not separate instructions
+STATUS.update({
+    'iunop': ('mapped; applegpu catch-all (op1 != 0) for the same 0x3e space as intl/bitrev/popcount/ffs (aliases)', SUB),
+    'intl': ('mapped (= iunop op2 00 with B operand; Morton interleave per applegpu/Mesa)', SUB),
+    'bitrev': ('mapped (= iunop op2 01; alias space with intl/popcount/ffs)', SUB),
+    'popcount': ('mapped (= iunop op2 10; alias space with intl/bitrev/ffs)', SUB),
+    'ffs': ('mapped (= iunop op2 11, highest set bit; alias space with intl/bitrev/popcount)', SUB),
+})
 for n in ('quad_and quad_or quad_xor quad_iadd quad_fadd quad_fmul quad_prefix_iadd quad_prefix_fadd quad_prefix_fmul quad_min.u quad_max.u '
           'quad_min.s quad_max.s quad_min.f quad_max.f simd_and simd_or simd_xor simd_iadd simd_fadd simd_fmul simd_prefix_iadd simd_prefix_fadd '
           'simd_prefix_fmul simd_prefix_and simd_prefix_or simd_prefix_xor simd_prefix_min.s simd_prefix_min.u simd_prefix_max.s simd_prefix_max.u '
@@ -25,15 +33,17 @@ for n in ('quad_and quad_or quad_xor quad_iadd quad_fadd quad_fmul quad_prefix_i
     STATUS[n] = ('mapped (128-entry simd_op model)', SUB)
 STATUS.update({
     'get_sr': ('mapped (bit 22 undefined)', MEM), 'TODO.sr_thing': ('mapped earlier: bit-15 get_sr writes nothing', F+'2026-10-10-sr-geometry-core-id/README.md'),
-    'wait': ('mapped (bit 7 hangs; slots 2/3 hand-encoded)', MEM), 'threadgroup_barrier': ('mapped', MEM),
-    'if_icmp': ('mapped', MEM), 'if_fcmp': ('mapped', MEM), 'while_icmp': ('mapped', MEM), 'while_fcmp': ('equals while_icmp (straight-line, 42 cases)', F+'2026-10-11-cf-float/README.md'),
-    'else_icmp': ('mapped', MEM), 'else_fcmp': ('equals else_icmp (straight-line, 42 cases)', F+'2026-10-11-cf-float/README.md'), 'pop_exec': ('mapped', MEM),
+    'wait': ('mapped (bits 9-15 inert; bit 7 = 0xb8 hangs)', ALU),
+    'threadgroup_barrier': ('mapped (gap bits 8-15: no observable effect with one SIMD group; scope effects untested)', MEM),
+    'if_icmp': ('mapped', MEM), 'if_fcmp': ('mapped', MEM), 'while_icmp': ('mapped', MEM), 'while_fcmp': ('equals while_icmp for lt/gt/eq only (3 of 8 conds; straight-line, 42 cases)', F+'2026-10-11-cf-float/README.md'),
+    'else_icmp': ('mapped', MEM), 'else_fcmp': ('equals else_icmp for lt/gt/eq only (3 of 8 conds; straight-line, 42 cases)', F+'2026-10-11-cf-float/README.md'), 'pop_exec': ('mapped', MEM),
     'device_load': ('mapped (bit 31 disables)', MEM), 'device_store': ('mapped (bit 31 drops)', MEM),
     'device_load.TODO': ('u-fields not swept (u4 = cache hint per Mesa)', MEM), 'device_store.TODO': ('u-fields not swept', MEM),
     'threadgroup_load': ('mapped', MEM), 'threadgroup_store': ('mapped', MEM), 'uniform_store': ('mapped (preshader only)', MEM),
-    'TODO.unk51': ('ends the SIMD group (= no_var)', MEM), 'no_var': ('ends the SIMD group in compute', MEM),
+    'TODO.unk51': ('ends the SIMD group (= no_var with u=0)', MEM),
+    'no_var': ('u=0 form (0x00000051) ends the SIMD group in compute; Mesa emits u=1 (0x80000051), not run', MEM),
     'TODO.after_sampling1': ('hangs in compute', MEM), 'TODO.after_sampling2': ('hangs in compute', MEM), 'TODO.unk0C00': ('hangs; last before wedge', MEM),
-    'TODO.unk40C0': ('fails fast in compute', MEM), 'TODO.unk30C0': ('inert', MEM), 'TODO.unkC0000000': ('inert', MEM), 'TODO.unkE800': ('inert', MEM),
+    'TODO.unk40C0': ('fails fast in compute', MEM), 'TODO.unk30C0': ('inert', MEM), 'TODO.unkC0000000': ('inert', MEM), 'TODO.unkE800': ('0x68 + bit 7: no observable effect with one SIMD group; scope effects untested', MEM),
     'doorbell': ('inert', MEM), 'simd_matrix_fmadd32': ('reached via shuffle bit 27; operands not mapped', SUB), 'simd_matrix_fmadd16': ('reached via shuffle bit 27; operands not mapped', SUB),
     'stop': ('known', OPC), 'trap': ('known', OPC),
     'jmp_exec_any': ('used by every loop probe (gap bits not swept)', F+'2026-10-10-agx-loop-alu-timing/README.md'),
@@ -78,7 +88,10 @@ def main():
     out = ['# AGX ISA coverage (applegpu descriptors vs. hardware results)', '',
            'Generated by `scripts/isa_coverage.py` (offline). "Gap bits" = bits applegpu leaves unaccounted in the longest form.',
            'Top-level 7-bit opcodes that applegpu cannot decode are all classified in',
-           f'[opcode descriptions]({OPC}) (33 no-op, 16 ends, 7 fault, 0x64/0x74/0x6e not run).', '',
+           f'[opcode descriptions]({OPC}): 31 no-op (low bits `0b11`, 6 bytes), 0x78 a 4-SIMD-group barrier',
+           f'([0x68 vs 0x78]({F}2026-10-11-barrier-0x68-vs-0x78/README.md)), 0x18 a fixed-cost op of unknown target',
+           f'([sync opcodes]({F}2026-10-11-sync-and-end-opcodes/README.md)), 16 ends, 7 fault on direct DRM;',
+           '0x64/0x74 never run on direct DRM (presumed faulting from the 2026-10-04 Vulkan scan, outputs not retained); 0x6e not run.', '',
            '| Descriptor | Bytes | Gap bits | Unknown fields | Status |', '| --- | --- | --- | --- | --- |']
     for name, sz, gaps, unk, st, link in rows:
         out.append(f'| `{name}` | {sz} | {gaps} | {unk} | {f"[{st}]({link})" if link else st} |')

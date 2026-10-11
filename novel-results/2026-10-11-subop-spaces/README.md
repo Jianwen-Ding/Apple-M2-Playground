@@ -14,9 +14,22 @@ Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, co
 * Constant bits 34–41 are ignored.
 * dfdx / dfdy work in compute shaders: exact `x[lane|1] − x[lane&~1]` and `x[lane|2] − x[lane&~2]`.
 
-**iunop (0x3e with bits 28–37 zero).** op2 (bits 26–27): **00 = Morton bit spread** (bit i of the
-low 16 bits → bit 2i; unnamed in applegpu and Mesa), 01 bitrev, 10 popcount, 11 index of the highest
-set bit (applegpu/Mesa call it `ffs`). op1 (bits 38–39) and bits 28–37 are ignored.
+**iunop / intl (0x3e, bit 15 = 0).** applegpu decodes this one encoding space as four aliasing
+descriptors selected by op2 (bits 26–27): `intl` 00 (a two-source op whose B operand occupies
+bits 28–37, extension bits 40–41), `bitrev` 01, `popcount` 10, `ffs` 11; its catch-all `iunop` descriptor covers the
+same encodings with op1 (bits 38–39) nonzero. Mesa likewise has `intl` = `(0x3E, 6, _)` and
+iunop `bitrev`/`popcount`/`ffs` (`agx_opcodes.py:368`, `:213–215`). Measured with bits 28–37 zero:
+* op2 00 is applegpu's **`intl`** ("INTerLeave bits (Morton encode)", `applegpu.py:3123`) with
+  B = immediate 0 (applegpu disassembles the encoding as `intl r5, r6, 0`): bit i of the low
+  16 bits of A → bit 2i. This confirms applegpu's documented semantics on hardware; the name and
+  the Morton reading are applegpu's, not new here. With a register B (`intl r5, r6, r7`, in the
+  [ALU constant-bit run](../2026-10-11-fmadd-lane-offset/README.md)) the result matches applegpu's
+  interleave (A bits → even, B bits → odd) on all 32 lanes of one input set.
+* 01 bitrev, 10 popcount, 11 index of the highest set bit (applegpu/Mesa call it `ffs`;
+  applegpu's own comment says "find leading set-bit").
+* op1 (bits 38–39) is ignored for all four op2 values.
+* Bits 28–37 were flipped **only with op2 = 01** (bitrev, a unary op), where they are ignored.
+  For op2 = 00 those bits are intl's B operand; they were not swept there.
 
 **simd_op (0x6f, bit 15 = 1).** Mesa's 5-bit op (bit 28, bits 38–40, bit 47) × kind (bits 29–30:
 quad reduce, simd reduce, quad exclusive prefix, simd exclusive prefix). All 128 combinations run.
@@ -39,8 +52,10 @@ op1 (bit 47):
   `agx_lower_divergent_shuffle.c` describes); measured here on two index patterns.
 
 **convert (0x3e, bit 15 = 1).** What applegpu/Mesa call the 2-bit `round` field (bits 26–27) is
-a **direction** bit plus a hang bit: bit 26 = 0 float→int, 1 int→float; bit 27 set (values 2, 3)
-**hangs the GPU**. The 6-bit mode (bits 16–21): bit 0 signed, bit 1 rounding (0 toward zero,
+a **direction** bit plus a bit that hung when set: bit 26 = 0 float→int, 1 int→float. Bit 27 was
+set in only **2 encodings, both mode 10** (field values 2 and 3, each run with both input sets),
+and **both hung the GPU** (4 of 4 dispatches). Bit 27 with any other mode was not run, so
+"bit 27 hangs" is established for mode 10 only. The 6-bit mode (bits 16–21): bit 0 signed, bit 1 rounding (0 toward zero,
 1 nearest-even), bits 2–3 width, bits 4–5 ignored. Model check: 7,864 lane results, 0 mismatches.
 * Widths 8 / 16 / 32 saturate float→int; signed 8/16-bit results are **not sign-extended**
   (−8 → 0xf8). Int→float reads the low 8/16/32 bits, signed per bit 0, rounding per bit 1.
@@ -66,15 +81,18 @@ compute f(a, b) bitwise. The two B-only tables (0011 = ¬b, 1100 = b) return **A
 ## Relationship to existing knowledge
 
 Mesa `agx_opcodes.py` / `agx_compiler.h` name 13 funop values, 3 iunop values, 12 simd_op values, 8 shuffles and 10 convert modes;
-applegpu adds rotate-up. This sweep accounts for every value of those fields: the hangs, the
-aliases, the Morton spread, the 128-entry simd_op structure and NaN prefix identities are new here.
+applegpu adds rotate-up and names `intl` (Morton interleave, which Mesa also defines). This sweep
+accounts for every value of those fields: the hangs, the aliases, the 128-entry simd_op structure
+and NaN prefix identities are new here. iunop op2 00 is applegpu/Mesa's `intl` with B = 0; only
+its hardware confirmation is new.
 Expected values come from Python models of each operation applied to the per-lane inputs read
 back from the same dispatch.
 
 ## Compiler implications
 
-* PTX `brev`, `popc`, `bfind` map to iunop 01/10/11; iunop 00 gives a one-instruction Morton
-  spread for 2D tiling.
+* PTX `brev`, `popc`, `bfind` map to iunop 01/10/11. applegpu/Mesa's `intl` (op2 00) gives a
+  one-instruction Morton interleave for 2D tiling (hardware-confirmed here for B = 0 and one
+  register-B input set).
 * Never emit funop functions 2/3/5/7/11/15: they hang the GPU.
 * `__shfl_*_sync` with lane-divergent indices must use Mesa's quad-uniform lowering.
 * `__reduce_*_sync` and warp scans map directly onto simd_op; seed exclusive fmin/fmax scans
