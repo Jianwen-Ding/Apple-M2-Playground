@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -68,6 +68,8 @@ help:
 	@echo 'make verify-occupancy   Verify retained occupancy evidence offline'
 	@echo 'make test-memory-ordering  Hardware: cross-workgroup message-passing litmus'
 	@echo 'make verify-memory-ordering  Verify retained memory-ordering evidence offline'
+	@echo 'make bench              Hardware: latency/issue/per-core throughput for 60 instruction forms (~30 min)'
+	@echo 'make verify-bench        Verify retained benchmark evidence offline'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
 	@echo 'Override SCRATCH_ROOT, DEVICE, PYTHON, CC, or PROBE_INCLUDE as needed.'
 
@@ -317,3 +319,9 @@ test-memory-ordering:
 
 verify-memory-ordering:
 	$(PYTHON) -B scripts/verify_memory_ordering.py
+
+bench:
+	$(PYTHON) -B scripts/run_bench.py --modes latency,simd_issue,gpu
+
+verify-bench:
+	$(PYTHON) -B scripts/verify_bench.py

@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-11 Instruction benchmarks: 60 forms; ~4 SIMD instr/clk/core peak, register-operand reads halve fp32/int throughput; latency and unit classes](2026-10-11-instruction-bench/README.md)
 - [2026-10-11 Stack memory through Mesa: stack_adjust/store/load binary captured from a working shader; scratch helper setup documented](2026-10-11-stack-via-mesa/README.md)
 - [2026-10-11 else_fcmp / while_fcmp equal their integer twins (42 straight-line cases)](2026-10-11-cf-float/README.md)
 - [2026-10-11 Cross-core memory ordering: f533 is the store release, memory_barrier alone reorders; acquire = wait + f59d](2026-10-11-memory-ordering/README.md)

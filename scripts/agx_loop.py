@@ -253,14 +253,14 @@ class _Memory:
         return self.words[i]
 
 
-def emulate(body, active, max_steps=2_000_000, table=None, lane_ids=False):
+def emulate(body, active, max_steps=2_000_000, table=None, lane_ids=False, num_registers=24):
     """Run body on one 32-lane SIMD group; lanes < active start at r0l=0, others 1."""
     _, g = _tools()
     class Uniforms(g.Uniforms):
         def get_reg64(self, regid, thread=None):  # applegpu's uniform-base path passes a thread
             return super().get_reg64(regid)
     unif = Uniforms(); unif.set_reg32(8, TABLE_VA & 0xffffffff); unif.set_reg32(9, TABLE_VA >> 32)
-    st = g.CoreState(num_registers=24, uniforms=unif, device_memory=_Memory(TABLE_VA, table or []))
+    st = g.CoreState(num_registers=num_registers, uniforms=unif, device_memory=_Memory(TABLE_VA, table or []))
     for t in range(g.SIMD_WIDTH):
         st.set_reg16(0, t, 0 if t < active else 1)
         st.set_reg32(2, t, 0xdeadbeef)  # stale; the body must overwrite r2

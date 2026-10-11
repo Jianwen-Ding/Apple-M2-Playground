@@ -326,3 +326,16 @@ VkResult error" as "no fault".
   the `1500208e10500400` form with a return value in r5). The runner call is in the session's
   `scripts/run_drm_bitflip.py --raw` usage; nothing about atomics was measured.
 * `kernel.log` in the workspace is live (it shows these timeouts); earlier notes calling it a boot snapshot were wrong.
+
+### Instruction benchmark timing, 2026-10-11
+
+* **Whole-dispatch firmware times across separate dispatches cannot give cycles.** The GPU clock
+  moves between at least 419, 922, 1,058, 1,330 and 1,398 MHz between and within dispatches; a
+  two-dispatch slope gave negative and inconsistent throughputs (even `fadd32 x, x, 0.125`).
+  Calibrate inside the dispatch with the CPU timer and a reference chain instead (`run_bench.py`).
+* **Per-group slopes are wrong in GPU-wide runs.** SIMD groups start up to 1.7 ms apart and
+  groups sharing a busy unit (rcp, rsqrt) are not scheduled fairly, so a group's phase overlaps
+  other groups' different phases. Aggregate per core (SR20) using first-in/last-out phase spans.
+* **8 SIMD groups per core breaks the in-dispatch reference.** The dependent iadd reference then
+  needs the core's whole issue rate; inferred clocks ranged 244–2,547 MHz. Throughput above
+  4 groups per core is therefore unmeasured.
