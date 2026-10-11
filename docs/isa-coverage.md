@@ -55,9 +55,9 @@ Top-level 7-bit opcodes that applegpu cannot decode are all classified in
 | `if_icmp` | 6/6 | 2 |  | [mapped](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `if_fcmp` | 6/6 | 2 |  | [mapped](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `while_icmp` | 6/6 | 2 |  | [mapped](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
-| `while_fcmp` | 6/6 | 2 |  | [same descriptor family as while_icmp; not run](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
+| `while_fcmp` | 6/6 | 2 |  | [equals while_icmp (straight-line, 42 cases)](../novel-results/2026-10-11-cf-float/README.md) |
 | `else_icmp` | 6/6 | 2 |  | [mapped](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
-| `else_fcmp` | 6/6 | 2 |  | [same family as else_icmp; not run](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
+| `else_fcmp` | 6/6 | 2 |  | [equals else_icmp (straight-line, 42 cases)](../novel-results/2026-10-11-cf-float/README.md) |
 | `icmpsel` | 8/10 | 13 |  | [mapped](../novel-results/2026-10-11-fmadd-lane-offset/README.md) |
 | `fcmpsel` | 8/10 | 9 |  | [mapped](../novel-results/2026-10-11-fmadd-lane-offset/README.md) |
 | `icmp_ballot` | 8/8 | 2 |  | [mapped](../novel-results/2026-10-11-fmadd-lane-offset/README.md) |

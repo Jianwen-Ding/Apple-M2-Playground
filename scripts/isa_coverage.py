@@ -26,8 +26,8 @@ for n in ('quad_and quad_or quad_xor quad_iadd quad_fadd quad_fmul quad_prefix_i
 STATUS.update({
     'get_sr': ('mapped (bit 22 undefined)', MEM), 'TODO.sr_thing': ('mapped earlier: bit-15 get_sr writes nothing', F+'2026-10-10-sr-geometry-core-id/README.md'),
     'wait': ('mapped (bit 7 hangs; slots 2/3 hand-encoded)', MEM), 'threadgroup_barrier': ('mapped', MEM),
-    'if_icmp': ('mapped', MEM), 'if_fcmp': ('mapped', MEM), 'while_icmp': ('mapped', MEM), 'while_fcmp': ('same descriptor family as while_icmp; not run', MEM),
-    'else_icmp': ('mapped', MEM), 'else_fcmp': ('same family as else_icmp; not run', MEM), 'pop_exec': ('mapped', MEM),
+    'if_icmp': ('mapped', MEM), 'if_fcmp': ('mapped', MEM), 'while_icmp': ('mapped', MEM), 'while_fcmp': ('equals while_icmp (straight-line, 42 cases)', F+'2026-10-11-cf-float/README.md'),
+    'else_icmp': ('mapped', MEM), 'else_fcmp': ('equals else_icmp (straight-line, 42 cases)', F+'2026-10-11-cf-float/README.md'), 'pop_exec': ('mapped', MEM),
     'device_load': ('mapped (bit 31 disables)', MEM), 'device_store': ('mapped (bit 31 drops)', MEM),
     'device_load.TODO': ('u-fields not swept (u4 = cache hint per Mesa)', MEM), 'device_store.TODO': ('u-fields not swept', MEM),
     'threadgroup_load': ('mapped', MEM), 'threadgroup_store': ('mapped', MEM), 'uniform_store': ('mapped (preshader only)', MEM),
