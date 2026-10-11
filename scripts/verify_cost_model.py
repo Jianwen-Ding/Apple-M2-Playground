@@ -12,6 +12,7 @@ Datasets and their role (results/2026-10-11-cost-model and the instruction bench
   review2    FIT/INFO  threadgroup deferral and load window are checked; store-window cases are reported
   waitdrain  FIT       wait after ALU work
   ctlspacer  FIT       exec push/pop and while_icmp chains alone and before wait / load / store
+  sfuimad    INFO      transcendental + imad/bit-field/convert pairs (shared in-order writeback; reported, not checked)
   storeser   FIT       device store after k idle waits (store >= 10.6 units after the previous wait issued)
   sfupairs   FIT       transcendental pairs / mixes, per-group and core-level pipe (12-point grid for the core level)
   NOTE: the selection set's 1-group limits were raised (whole trip 0.06 -> 0.07, body only 0.08 -> 0.10) when the
@@ -178,6 +179,16 @@ for groups, key, lim in ((1, 'one', 0.08), (4, 'four', 0.27)):   # 4 groups: rsq
         serr.append((H.predict(H.counted(b_, 100), H.counted(b_, 500), 400, groups)-m)/m)
     md, p90, mx, b = stats(serr)
     check(mx <= lim, f'transcendental pairs and mixes, {groups} group(s)/core (FIT, {len(serr)} cases): median |err| {md:.3f}, max {mx:.3f} (limit {lim})')
+si = json.loads((R/'sfuimad.json').read_text())
+OPI = dict(OPS_, imadd='imadd r{r}, r{r}, r25, r24', bitrev='bitrev r{r}, r{r}', convert='convert u32_to_f, r{r}, r{r}, rte', fadd32='fadd32 r{r}, r{r}, r24')
+for groups, key in ((1, 'one'), (4, 'four')):
+    ierr, worst = [], []
+    for n, v in si.items():
+        a_, b2 = n.split('+'); b_ = b''.join(e(OPI[a_ if k % 2 == 0 else b2].format(r=5+k)) for k in range(8))*4
+        p_ = H.predict(H.counted(b_, 100), H.counted(b_, 500), 400, groups); ierr.append((p_-v[key])/v[key]); worst.append((abs(ierr[-1]), n, v[key], p_))
+    md, p90, mx, b = stats(ierr); w = max(worst)
+    print(f'info transcendental + integer-multiply/bit-field/convert pairs, {groups} group(s)/core ({len(ierr)} cases): median |err| {md:.3f}, '
+          f'max {mx:.3f} ({w[1]}: measured {w[2]:.1f}, predicted {w[3]:.1f})', flush=True)
 ssr = json.loads((R/'storeseries.json').read_text()); serr = []
 for n, v in ssr.items():
     if n.startswith('store,'): continue

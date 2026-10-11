@@ -86,7 +86,7 @@ SFU_PIPE = True          # sfupairs.json: per-group transcendental pipe (spacing
 SFU_SPACING = 2.0        # cycles between transcendental issues of one SIMD group
 PIPE_CLASSES = ('sfu', 'imadbf')   # sfuimad.json: integer multiply / bit-field / convert share the in-order writeback
 CORE_IMAD = 'fast'       # core unit used by the imadbf class ('fast' = shared with fast transcendentals, or 'own')
-SFU_GROUP_BLOCK = 1.0    # cycles a transcendental occupies its SIMD group (not the op's full issue interval)
+SFU_GROUP_BLOCK = 2.0    # cycles a transcendental occupies its SIMD group (not the op's full issue interval)
 SFU_WB_GAP = 2.0         # cycles between transcendental writebacks of one SIMD group (in order)
 SFU_SLOW = {'rcp': 3.0, 'rsqrt': 4.0, 'rsqrt_special': 4.0}   # cycles in the slow stage
 # core-level transcendental pipe shared by the SIMD groups of a core (sfupairs.json, sfumix.json, sfurepeat.json):
