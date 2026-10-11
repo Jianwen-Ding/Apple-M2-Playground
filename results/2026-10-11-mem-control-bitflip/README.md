@@ -12,3 +12,4 @@
 | `cf-gaps` | if_icmp/if_fcmp/while_icmp/else_icmp bits 46–47, pop_exec bit 8 inside if/mov/pop structures |
 | `tg-gaps` | threadgroup_store/load gap bits in a store → barrier → load round trip (4 KiB shared) |
 | `ustore-pre-*` | uniform_store in the preshader with bits 30, 31, 48; main reads u20 |
+| `todo-fixed` | 9 fixed TODO encodings from applegpu (jmp_if_skipping_doorbell not run) |

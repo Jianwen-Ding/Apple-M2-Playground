@@ -18,6 +18,15 @@ applegpu leaves these bits unaccounted; single flips on hardware give:
 | `threadgroup_load` / `threadgroup_store` | 4, 7, 35, 40–47, 62–63 | none; bits 4 and 7 lie in the opcode byte, so 0x79/0x39/0xe9/0xa9 are aliases |
 | `uniform_store` (preshader) | 30, 31, 48 | none (u20 still receives the value) |
 
+**Fixed encodings applegpu lists as TODO** (run once each, in the describe body):
+
+| Encoding | Result |
+| --- | --- |
+| `TODO.after_sampling1` (0x101c), `TODO.after_sampling2` (0x62cc), `TODO.unk0C00` (0x000c) | GPU timeout (3 s wait, firmware recovery) |
+| `TODO.unk40C0` (0xc040, 6 bytes) | fast failure (no firmware timestamps) |
+| `TODO.unk30C0`, `TODO.unkC0000000`, `TODO.unkE800` (= 0x68 with bit 7), `doorbell` (0x0028) | no register or length effect |
+| 0x00000051 (`TODO.unk51`; applegpu now decodes it as `no_var`) | ends the SIMD group (no later store runs), like the "ends" opcodes |
+
 Also measured: `uniform_store` from the **main** shader does not produce a readable uniform
 (the read returns unrelated values); from the preshader it works. Mesa only emits it in the preamble.
 

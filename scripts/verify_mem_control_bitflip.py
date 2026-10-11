@@ -60,5 +60,14 @@ for b in (4, 7, 35, 40, 41, 42, 43, 44, 45, 46, 47, 62, 63):
 check('threadgroup_load/store gap bits 4, 7, 35, 40-47, 62-63: round trip unchanged', ok)
 vals = [[x for x in load(f'ustore-pre-{k}')['results'] if x['name'] == 'us-base-A'][0]['table'][6] for k in ('base', 'b30', 'b31', 'b48')]
 check('uniform_store (preshader) bits 30, 31, 48 inert: u20 = 0x12345678 in all four', all(v == [0x12345678]*32 for v in vals))
+t = {x['flip']['raw']: x for x in load('todo-fixed')['results'] if x['layout'] == 'A' and x['flip']}
+check('fixed TODO encodings: after_sampling1/2 and unk0C00 time out (>3 s), unk40C0 fails fast; control passes after each',
+      all(t[k]['fault'] and t[k]['host_ns'][0] > 3e9 for k in ('after_sampling1', 'after_sampling2', 'unk0C00')) and
+      t['unk40C0']['fault'] and t['unk40C0']['host_ns'][0] < 5e6 and all(f['control_after_ok'] for f in load('todo-fixed')['faults']))
+tb = {x['name']: x for x in load('todo-fixed')['results']}
+check('fixed TODO encodings unk30C0, unkC0000000, unkE800, doorbell: no register/length effect',
+      all(not A.diff_regs(tb[f'fx-base-{L}']['table'], tb[f'fx-r{k}-{L}']['table']) for k in ('unk30C0', 'unkC0000000', 'unkE800', 'doorbell') for L in 'AB'))
+check('0x51 (applegpu no_var / TODO.unk51) ends the SIMD group in compute: earlier store kept, no later store',
+      t['unk51']['table'][0] == [0xb0b0b0b0]*32 and t['unk51']['table'][25] == [0xcdcdcdcd]*32)
 print(f'{sum(checks)}/{len(checks)} checks passed')
 sys.exit(0 if all(checks) else 1)
