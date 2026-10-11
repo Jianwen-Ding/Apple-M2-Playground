@@ -359,6 +359,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     alu_done = [-10**9]*groups               # latest completion tick of the group's ALU results (wait drain)
     last_wait = [-10**9]*groups              # issue tick of the group's previous wait
     wait_done = [-10**9]*groups              # completion tick of the group's previous wait
+    last_idle_wait = [-10**9]*groups         # issue tick of the group's previous wait with nothing pending
     sfu_iss = [-10**9]*groups; sfu_wb = [-10**9]*groups; sfu_slow = [-10**9]*groups   # transcendental pipe state
     core_sfu = {'wb': -10**9, 'slow': -10**9, 'fast': -10**9, 'imad': -10**9}
     alu_since_mem = [False]*groups           # an ALU instruction issued since the group's last memory instruction
@@ -484,9 +485,10 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 q = P.quiet['tg' if r['name'].startswith('threadgroup') else 'device_store']
                 delay = max(0, last_alu[gi]+tk(q)-t)
                 if not r['name'].startswith('threadgroup'):
-                    # storeseries.json: a device store starts >= 10.6 units after the previous wait issued
+                    # storeseries.json: a device store starts >= 10.6 units after the previous idle wait issued
+                    # (a wait that waited for memory does not delay it: spaces.json 'dev store, tg load, wait')
                     # (iadd, k idle waits, store: 4.9 units per extra wait from k = 4; 10.2-10.7 for k = 4..16)
-                    delay = max(delay, last_wait[gi]+tk(P.store_after_wait)-t)
+                    delay = max(delay, last_idle_wait[gi]+tk(P.store_after_wait)-t)
                 ii = delay+tk(m_['issue'][0]); slow = 0
                 st_done = max(t+ii+tk(m_['done'][1]), t+tk(m_['issue'][0])+tk(m_['done'][0]))   # completion overlaps the quiet delay
                 cls_ = 'tg' if r['name'].startswith('threadgroup') else 'device_store'
@@ -501,6 +503,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 # than wait_drain after the latest ALU result (waitdrain.json, waitdrain-slots.json); pending slot work is handled by the slot check above. The long-run
                 # ~11-unit mode of many consecutive waits is not understood and not modelled.
                 done_ = max(t+T, alu_done[gi]+tk(P.wait_drain))
+                if not slots[gi][r['slot']]: last_idle_wait[gi] = t      # nothing was pending on the slot
                 ii = done_-t; last_wait[gi] = t; wait_done[gi] = done_; slots[gi][r['slot']] = []
                 pending[gi] = [p_ for p_ in pending[gi] if p_[0] != r['slot']]
             elif kind == 'control':
