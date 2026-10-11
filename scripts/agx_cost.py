@@ -299,6 +299,7 @@ def fit_branch(P):
     return P.branch
 
 
+TOKSCALE = 100             # unit/port/issue tokens per tick (fractional instruction costs stay exact)
 TICKS = 10                 # simulation quantum: 0.1 real cycle (latencies such as 2.098 stay fractional)
 
 
@@ -336,8 +337,8 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     def bucket_of(u):
         """(bucket, tokens per instruction, bucket rate per cycle) for a benchmark row."""
         sh = P.shared_of.get(u)
-        if sh: return sh, int(round(T/max(P.unit_cap[u], 1e-3))), 1.0
-        return P.unit_bucket[u], T, P.unit_cap[u]
+        if sh: return sh, int(round(T*TOKSCALE/max(P.unit_cap[u], 1e-3))), 1.0
+        return P.unit_bucket[u], T*TOKSCALE, P.unit_cap[u]
 
     def refill(dt):
         nonlocal port, issue_tok
@@ -345,8 +346,8 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
         port = min(port+READ_PORTS*dt, (READ_PORTS+4)*T)
         issue_tok = min(issue_tok+ISSUE_PER_CORE*dt, ISSUE_PER_CORE*T)
         for b_ in tok:
-            if b_ in SHARED_UNITS: tok[b_] = min(tok[b_]+dt, 2*T)        # 1 unit-cycle per cycle, small burst
-            else: tok[b_] = min(tok[b_]+P.unit_cap[b_]*dt, (P.unit_cap[b_]+1)*T)
+            if b_ in SHARED_UNITS: tok[b_] = min(tok[b_]+dt*TOKSCALE, 2*T*TOKSCALE)        # 1 unit-cycle per cycle
+            else: tok[b_] = min(tok[b_]+P.unit_cap[b_]*dt*TOKSCALE, (P.unit_cap[b_]+1)*T*TOKSCALE)
 
     t = 0; done = 0
     while done < groups:
@@ -366,7 +367,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             u = r['unit']
             if u:
                 bk, cost, cap = bucket_of(u)
-                if bk not in tok: tok[bk] = (cap+1)*T
+                if bk not in tok: tok[bk] = (cap+1)*T*TOKSCALE
                 need_port = min(r['reads32'], READ_PORTS)*T
                 if tok[bk] < cost or port < need_port: wake.append(t+1); continue
             if r['dst'] and len(r['dst']) in (1, 2):

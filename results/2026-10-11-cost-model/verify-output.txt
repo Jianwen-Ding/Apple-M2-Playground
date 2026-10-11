@@ -11,9 +11,9 @@ ok   memory state probes (FIT, 15 cases): median |err| 0.025, max 0.120
 ok   memory-space transitions (FIT, 7 cases): median |err| 0.007, max 0.028
 ok   idle wait cost incl. the 512-byte step (FIT, 8 cases): median |err| 0.006, max 0.038
 ok   random-kernels.json (SELECTION), 1 group(s)/core: whole trip median 0.051 p90 0.143 max 0.153 bias -0.049 | body only median 0.071 p90 0.208 max 0.228 (limits 0.06/0.08)
-ok   random-kernels.json (SELECTION), 4 group(s)/core: whole trip median 0.104 p90 0.190 max 0.231 bias -0.097 | body only median 0.140 p90 0.266 max 0.348 (limits 0.12/0.17)
+ok   random-kernels.json (SELECTION), 4 group(s)/core: whole trip median 0.104 p90 0.190 max 0.231 bias -0.100 | body only median 0.143 p90 0.265 max 0.347 (limits 0.12/0.17)
 ok   heldout24.json (HELD OUT), 1 group(s)/core: whole trip median 0.053 p90 0.109 max 0.123 bias -0.046 | body only median 0.078 p90 0.152 max 0.200 (limits 0.06/0.09)
-ok   heldout24.json (HELD OUT), 4 group(s)/core: whole trip median 0.104 p90 0.162 max 0.229 bias -0.092 | body only median 0.131 p90 0.221 max 0.344 (limits 0.12/0.15)
+ok   heldout24.json (HELD OUT), 4 group(s)/core: whole trip median 0.104 p90 0.162 max 0.230 bias -0.091 | body only median 0.131 p90 0.221 max 0.345 (limits 0.12/0.15)
 ok   heldout48.json (HELD OUT), 1 group(s)/core: whole trip median 0.036 p90 0.072 max 0.084 bias -0.020 | body only median 0.043 p90 0.084 max 0.108 (limits 0.045/0.05)
-ok   heldout48.json (HELD OUT), 4 group(s)/core: whole trip median 0.092 p90 0.147 max 0.186 bias -0.091 | body only median 0.108 p90 0.175 max 0.231 (limits 0.1/0.12)
+ok   heldout48.json (HELD OUT), 4 group(s)/core: whole trip median 0.091 p90 0.147 max 0.185 bias -0.090 | body only median 0.108 p90 0.175 max 0.230 (limits 0.1/0.12)
 0 failures
