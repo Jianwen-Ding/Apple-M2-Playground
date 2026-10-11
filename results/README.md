@@ -43,3 +43,5 @@ No novel ISA finding is implied by a successful environment or DRM access test.
   213 applegpu gap bits on 53 instructions; fmadd 10-byte lane-offset form; fmadd32 bit 52.
 - [2026-10-11 sub-op spaces](2026-10-11-subop-spaces/README.md):
   every value of funop / iunop / simd_op / shuffle op fields.
+- [2026-10-11 memory/control gap bits](2026-10-11-mem-control-bitflip/README.md):
+  device_load/store, get_sr, barrier, if/else/while/pop, threadgroup ops, uniform_store.
