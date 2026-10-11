@@ -1,0 +1,65 @@
+{
+ "passed": false,
+ "utc": "20261011T011753504240Z",
+ "path": "direct-drm",
+ "kind": "control",
+ "chains": 1,
+ "loop_kind": null,
+ "steps": null,
+ "trips": null,
+ "stride": null,
+ "count": 257,
+ "repeats": 2,
+ "gprs": 16,
+ "preload": 268435456,
+ "variants": [
+  {
+   "name": "control",
+   "n": null,
+   "code_bytes": 54,
+   "oracle": 305419896,
+   "returncode": 1,
+   "setup": [
+    {
+     "params": {
+      "gen": 14,
+      "variant": "C",
+      "rev": 17,
+      "clusters": 4,
+      "vm_start": 16384,
+      "vm_end": 549755781120,
+      "kernel_min": 536870912,
+      "ts_hz": 1000000000,
+      "max_khz": 1398000,
+      "features": 1,
+      "g14x": 1
+     }
+    },
+    {
+     "usc_words_hex": "1d08c000000000114d9000000d0c002000008d0200018800"
+    },
+    {
+     "cdm_hex": "02000000001000000000000000000040200100000100000001000000200000000100000001000000ffff0f600000004000000000"
+    }
+   ],
+   "samples": [
+    {
+     "rep": 0,
+     "wait": -1,
+     "errno": 62,
+     "host_ns": 3035379820,
+     "fw_ts": [
+      0,
+      0
+     ],
+     "drm_time": [
+      22911457716583,
+      22914493095458
+     ]
+    }
+   ],
+   "stdout_tail": "{\"params\":{\"gen\":14,\"variant\":\"C\",\"rev\":17,\"clusters\":4,\"vm_start\":16384,\"vm_end\":549755781120,\"kernel_min\":536870912,\"ts_hz\":1000000000,\"max_khz\":1398000,\"features\":1,\"g14x\":1}}\n{\"usc_words_hex\":\"1d08c000000000114d9000000d0c002000008d0200018800\"}\n{\"cdm_hex\":\"02000000001000000000000000000040200100000100000001000000200000000100000001000000ffff0f600000004000000000\"}\n{\"rep\":0,\"wait\":-1,\"errno\":62,\"host_ns\":3035379820,\"fw_ts\":[0,0],\"drm_time\":[22911457716583,22914493095458]}\n{\"failure\":\"syncobj-wait\",\"errno\":62}\n"
+  }
+ ],
+ "error": "RuntimeError: submission failed: control"
+}
