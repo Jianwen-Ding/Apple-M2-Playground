@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch', 'review2', 'waitdrain', 'multiload', 'sfupairs'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch', 'review2', 'waitdrain', 'multiload', 'sfupairs', 'sfuimad'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -173,6 +173,23 @@ def main():
             name = f'{a_}+{b_}'
             res[name] = {'one': one['cycles'], 'four': four['cycles'], 'pred_one': p1, 'pred_four': p4}
             print(f"{name:12s} 1g {one['cycles']:6.1f} (pred {p1:6.1f})  4/core {four['cycles']:6.1f} (pred {p4:6.1f})", flush=True)
+    elif a.what == 'sfuimad':
+        # do integer-multiply/bit-field/convert results share the transcendentals' in-order writeback?
+        OPS_ = {'log2': 'log2 r{r}, r{r}', 'floor': 'floor r{r}, r{r}', 'rcp': 'rcp r{r}, r{r}', 'imadd': 'imadd r{r}, r{r}, r25, r24',
+                'bitrev': 'bitrev r{r}, r{r}', 'convert': 'convert u32_to_f, r{r}, r{r}, rte', 'fadd32': 'fadd32 r{r}, r{r}, r24'}
+        PAIRS = [('imadd', 'imadd'), ('bitrev', 'bitrev'), ('log2', 'imadd'), ('log2', 'bitrev'), ('log2', 'convert'), ('floor', 'imadd'),
+                 ('rcp', 'imadd'), ('log2', 'fadd32'), ('convert', 'convert')]
+        for a_, b_ in PAIRS:
+            lines = [OPS_[a_ if k % 2 == 0 else b_].format(r=5+k) for k in range(8)]
+            body = b''.join(e(x) for x in lines)*4
+            B.check_body(body, [len(e(x)) for x in lines]*4)
+            one = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'one')
+            four = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'gpu')
+            p1 = H.predict(H.counted(body, 100), H.counted(body, 500), 400, 1)
+            p4 = H.predict(H.counted(body, 100), H.counted(body, 500), 400, 4)
+            name = f'{a_}+{b_}'
+            res[name] = {'one': one['cycles'], 'four': four['cycles'], 'pred_one': p1, 'pred_four': p4}
+            print(f"{name:16s} 1g {one['cycles']:6.1f} (pred {p1:6.1f})  4/core {four['cycles']:6.1f} (pred {p4:6.1f})", flush=True)
     elif a.what == 'multiload':
         # several device loads in flight, ALU work between them, and loads writing the same register
         consts = (1, 0x3f800000, 32, 7)

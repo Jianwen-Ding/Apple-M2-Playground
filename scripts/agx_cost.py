@@ -81,9 +81,12 @@ SPACE = {'device_load': 'device', 'device_load.TODO': 'device', 'device_store': 
          'stack_load': 'stack', 'stack_store': 'stack'}
 CTL_AS_ALU = True
 CROSS_BUMP = True
+ARBITRATION = 'hash'       # 'rr': round robin by tick; 'gto': greedy-then-oldest
 SFU_PIPE = True          # sfupairs.json: per-group transcendental pipe (spacing, slow stage, in-order writeback)
 SFU_SPACING = 2.0        # cycles between transcendental issues of one SIMD group
-SFU_GROUP_BLOCK = 2.0    # cycles a transcendental occupies its SIMD group (not the op's full issue interval)
+PIPE_CLASSES = ('sfu', 'imadbf')   # sfuimad.json: integer multiply / bit-field / convert share the in-order writeback
+CORE_IMAD = 'fast'       # core unit used by the imadbf class ('fast' = shared with fast transcendentals, or 'own')
+SFU_GROUP_BLOCK = 1.0    # cycles a transcendental occupies its SIMD group (not the op's full issue interval)
 SFU_WB_GAP = 2.0         # cycles between transcendental writebacks of one SIMD group (in order)
 SFU_SLOW = {'rcp': 3.0, 'rsqrt': 4.0, 'rsqrt_special': 4.0}   # cycles in the slow stage
 # core-level transcendental pipe shared by the SIMD groups of a core (sfupairs.json, sfumix.json, sfurepeat.json):
@@ -357,7 +360,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     last_wait = [-10**9]*groups              # issue tick of the group's previous wait
     wait_done = [-10**9]*groups              # completion tick of the group's previous wait
     sfu_iss = [-10**9]*groups; sfu_wb = [-10**9]*groups; sfu_slow = [-10**9]*groups   # transcendental pipe state
-    core_sfu = {'wb': -10**9, 'slow': -10**9, 'fast': -10**9}
+    core_sfu = {'wb': -10**9, 'slow': -10**9, 'fast': -10**9, 'imad': -10**9}
     alu_since_mem = [False]*groups           # an ALU instruction issued since the group's last memory instruction
     last_space = [None]*groups
     pending = [[] for _ in range(groups)]       # [slot, completion tick, latency ticks, dst halves] of in-flight loads
@@ -373,7 +376,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     def bucket_of(u):
         """(bucket, tokens per instruction, bucket rate per cycle) for a benchmark row."""
         sh = P.shared_of.get(u)
-        if sh == 'sfu' and CORE_SFU: return 'sfu_core_free', 0, 1.0
+        if sh in (PIPE_CLASSES if SFU_PIPE else ('sfu',)) and CORE_SFU: return 'sfu_core_free', 0, 1.0
         if sh: return sh, int(round(T*TOKSCALE/max(P.unit_cap[u], 1e-3))), 1.0
         return P.unit_bucket[u], T*TOKSCALE, P.unit_cap[u]
 
@@ -386,10 +389,16 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             if b_ in SHARED_UNITS: tok[b_] = min(tok[b_]+dt*TOKSCALE, 2*T*TOKSCALE)        # 1 unit-cycle per cycle
             else: c_ = P.unit_cap.get(b_, 1.0); tok[b_] = min(tok[b_]+c_*dt*TOKSCALE, (c_+1)*T*TOKSCALE)
 
-    t = 0; done = 0
+    t = 0; done = 0; last_gi = 0; last_iss = [0]*groups
     while done < groups:
         issued = 0
-        order = list(range(groups)); k0 = (t//T) % groups; order = order[k0:]+order[:k0]
+        if ARBITRATION == 'hash':
+            k0 = ((t//T)*2654435761 >> 7) % groups; order = list(range(groups)); order = order[k0:]+order[:k0]
+        elif ARBITRATION == 'gto':
+            # greedy-then-oldest: the group that issued last keeps priority, then the one idle longest
+            order = sorted(range(groups), key=lambda g_: (g_ != last_gi, last_iss[g_]))
+        else:
+            order = list(range(groups)); k0 = (t//T) % groups; order = order[k0:]+order[:k0]
         wake = []
         for gi in order:
             if nxt[gi] >= len(pcs): continue
@@ -413,7 +422,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 blk = [wtime[gi][reg][0]+2*T for reg in {h//2 for h in r['dst']}
                        if reg in last_w[gi] and {last_w[gi][reg], wid} == {1, 2} and wtime[gi][reg][0]+2*T > t]
                 if blk: wake.append(max(blk)); continue
-            sfu_op = SFU_PIPE and u and P.shared_of.get(u) == 'sfu'
+            sfu_op = SFU_PIPE and u and P.shared_of.get(u) in PIPE_CLASSES
             if sfu_op:
                 L_ = tk(P.rows[u]['lat'])
                 gate = max(sfu_iss[gi]+tk(SFU_SPACING), sfu_wb[gi]+tk(SFU_WB_GAP)-L_,
@@ -421,7 +430,8 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 if CORE_SFU and groups > 1:
                     cs_ = CORE_SFU
                     gate = max(gate, core_sfu['wb']+tk(cs_['wb_gap'])-L_,
-                               core_sfu['slow'] if u in cs_['slow'] else core_sfu['fast'])
+                               core_sfu['slow'] if u in cs_['slow'] else
+                               core_sfu['imad'] if (P.shared_of.get(u) == 'imadbf' and CORE_IMAD == 'own') else core_sfu['fast'])
                 if gate > t: wake.append(gate); continue
             # ---- issue at tick t
             issue_tok -= T
@@ -439,6 +449,8 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                     if CORE_SFU and groups > 1:
                         core_sfu['wb'] = max(core_sfu['wb'], t+lat)
                         if u in CORE_SFU['slow']: core_sfu['slow'] = t+tk(CORE_SFU['slow'][u])
+                        elif P.shared_of.get(u) == 'imadbf':
+                            core_sfu['imad' if CORE_IMAD == 'own' else 'fast'] = t+tk(1.0/P.unit_cap[u])
                         else: core_sfu['fast'] = t+tk(CORE_SFU['fast'])
                 for h in r['dst']: ready[gi][h] = t+lat
                 last_alu[gi] = t; alu_done[gi] = max(alu_done[gi], t+lat); alu_since_mem[gi] = True
@@ -518,7 +530,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             st = stats[r['pc']]; st['n'] += 1
             st['stall'] += (t-free[gi]) if nxt[gi] else 0
             st['issue'] += occ; st['branch'] += branch
-            free[gi] = t+occ; last_t = max(last_t, free[gi])
+            free[gi] = t+occ; last_t = max(last_t, free[gi]); last_gi = gi; last_iss[gi] = t
             nxt[gi] += 1; issued += 1
             if nxt[gi] >= len(pcs): done += 1
         if done >= groups: break
