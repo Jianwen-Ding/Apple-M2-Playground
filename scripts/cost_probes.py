@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch', 'review2', 'waitdrain', 'multiload'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch', 'review2', 'waitdrain', 'multiload', 'sfupairs'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -155,6 +155,24 @@ def main():
             m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one', extra_env=env)
             res[name] = (m['cycles']-EMPTY_TRIP)/8
             print(f'{name:26s} {res[name]:6.1f} ref units/rep', flush=True)
+    elif a.what == 'sfupairs':
+        # throughput-bound pairs of transcendentals: 8 independent chains, two op types alternating,
+        # 1 group and ~4 groups per core; is a mix slower than the sum of each op's shared-unit cost?
+        OPS_ = {'log2': 'log2 r{r}, r{r}', 'floor': 'floor r{r}, r{r}', 'rcp': 'rcp r{r}, r{r}', 'exp2': 'exp2 r{r}, r{r}',
+                'rsqrt': 'rsqrt r{r}, r{r}'}
+        PAIRS = [('log2', 'log2'), ('rcp', 'rcp'), ('floor', 'floor'), ('log2', 'rcp'), ('floor', 'rcp'), ('log2', 'floor'),
+                 ('log2', 'exp2'), ('rsqrt', 'log2'), ('rsqrt', 'rcp')]
+        for a_, b_ in PAIRS:
+            lines = [OPS_[a_ if k % 2 == 0 else b_].format(r=5+k) for k in range(8)]
+            body = b''.join(e(x) for x in lines)*4
+            B.check_body(body, [len(e(x)) for x in lines]*4)
+            one = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'one')
+            four = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'gpu')
+            p1 = H.predict(H.counted(body, 100), H.counted(body, 500), 400, 1)
+            p4 = H.predict(H.counted(body, 100), H.counted(body, 500), 400, 4)
+            name = f'{a_}+{b_}'
+            res[name] = {'one': one['cycles'], 'four': four['cycles'], 'pred_one': p1, 'pred_four': p4}
+            print(f"{name:12s} 1g {one['cycles']:6.1f} (pred {p1:6.1f})  4/core {four['cycles']:6.1f} (pred {p4:6.1f})", flush=True)
     elif a.what == 'multiload':
         # several device loads in flight, ALU work between them, and loads writing the same register
         consts = (1, 0x3f800000, 32, 7)

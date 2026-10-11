@@ -81,6 +81,10 @@ SPACE = {'device_load': 'device', 'device_load.TODO': 'device', 'device_store': 
          'stack_load': 'stack', 'stack_store': 'stack'}
 CTL_AS_ALU = True
 CROSS_BUMP = True
+SFU_PIPE = True          # sfupairs.json: per-group transcendental pipe (spacing, slow stage, in-order writeback)
+SFU_SPACING = 2.0        # cycles between transcendental issues of one SIMD group
+SFU_WB_GAP = 2.0         # cycles between transcendental writebacks of one SIMD group (in order)
+SFU_SLOW = {'rcp': 3.0, 'rsqrt': 4.0, 'rsqrt_special': 4.0}   # cycles in the slow stage
 CONTROL = {'if_icmp', 'if_fcmp', 'else_icmp', 'else_fcmp', 'while_icmp', 'while_fcmp', 'pop_exec', 'push_exec',
            'jmp_exec_any', 'jmp_exec_none', 'stop', 'trap', 'TODO.unk51', 'no_var'}
 BARRIERS = {'threadgroup_barrier', 'memory_barrier', 'wait_pix', 'signal_pix', 'TODO.unkE800'}
@@ -342,6 +346,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     last_alu = [-10**9]*groups               # tick of the group's last ALU issue (quiet-time rule)
     alu_done = [-10**9]*groups               # latest completion tick of the group's ALU results (wait drain)
     last_wait = [-10**9]*groups              # issue tick of the group's previous wait
+    sfu_iss = [-10**9]*groups; sfu_wb = [-10**9]*groups; sfu_slow = [-10**9]*groups   # transcendental pipe state
     alu_since_mem = [False]*groups           # an ALU instruction issued since the group's last memory instruction
     last_space = [None]*groups
     pending = [[] for _ in range(groups)]       # [slot, completion tick, latency ticks, dst halves] of in-flight loads
@@ -396,6 +401,12 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 blk = [wtime[gi][reg][0]+2*T for reg in {h//2 for h in r['dst']}
                        if reg in last_w[gi] and {last_w[gi][reg], wid} == {1, 2} and wtime[gi][reg][0]+2*T > t]
                 if blk: wake.append(max(blk)); continue
+            sfu_op = SFU_PIPE and u and P.shared_of.get(u) == 'sfu'
+            if sfu_op:
+                L_ = tk(P.rows[u]['lat'])
+                gate = max(sfu_iss[gi]+tk(SFU_SPACING), sfu_wb[gi]+tk(SFU_WB_GAP)-L_,
+                           sfu_slow[gi] if u in SFU_SLOW else -10**9)
+                if gate > t: wake.append(gate); continue
             # ---- issue at tick t
             issue_tok -= T
             if u:
@@ -403,6 +414,12 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             kind = r['kind']; row = P.rows.get(u) if u else None; branch = 0
             if kind == 'alu':
                 lat, ii = tk(row['lat']), tk(row['ii'])
+                if sfu_op:
+                    # the pipe, not the SIMD group, carries the transcendental's issue interval
+                    # (rcp chain + 3 iadd: 72.6 units, not 83.3; log2+rcp alternating = pure log2)
+                    sfu_iss[gi] = t; sfu_wb[gi] = max(sfu_wb[gi], t+lat)
+                    if u in SFU_SLOW: sfu_slow[gi] = t+tk(SFU_SLOW[u])
+                    ii = T
                 for h in r['dst']: ready[gi][h] = t+lat
                 last_alu[gi] = t; alu_done[gi] = max(alu_done[gi], t+lat); alu_since_mem[gi] = True
                 for p_ in pending[gi]:          # ALU issue defers in-flight loads
