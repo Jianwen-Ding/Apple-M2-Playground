@@ -33,8 +33,15 @@ rises to 1.54× at 240–248 halves (`loop-timing-summary.txt`, 32-lane workgrou
 dispatches ran at about half time regardless of register count, which looks like a GPU clock
 change; medians are used.
 
+**Threadgroup memory (added 2026-10-11).** With 16 register halves and `--shared` declarations, resident
+workgroups per core = **floor(65,536 / declared bytes)** (128-lane workgroups: 1 KiB → 96 groups (cap), 4 KiB → 16
+workgroups, 12 KiB → 5, 24 KiB → 2, 32 KiB → 2, 48–64 KiB → 1; 256-lane: 8 KiB → 8, 16 KiB → 4, 21.5 KiB → 2).
+A core has **64 KiB of threadgroup memory**, allocated per workgroup in 256-byte units, and the most
+restrictive of registers, threadgroup memory and the 96-group cap sets occupancy. Reproduce with
+`scripts/run_drm_occupancy.py --gprs 16 --shared 1024,4096,… --local-x 128` (`tg-sweep-lx128.json`, `tg-sweep-lx256.json`).
+
 Not established: why 32/64-lane workgroups cap lower (workgroup slots per core or launch
-rate), the effect of threadgroup memory on occupancy, 256 declared halves (the launch field
+rate), 256 declared halves (the launch field
 wraps to 0 there and was not tested), and preamble register use.
 
 ## Reproducer and evidence

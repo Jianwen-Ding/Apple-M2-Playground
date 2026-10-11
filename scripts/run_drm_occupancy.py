@@ -37,6 +37,8 @@ def main():
     p.add_argument('--count', type=int, default=1 << 20)
     p.add_argument('--repeats', type=int, default=2)
     p.add_argument('--local-x', type=int, default=0, help='workgroup size (AGX_LOCAL_X); 0 = harness default')
+    p.add_argument('--shared', default='', help='sweep declared threadgroup memory (bytes, multiples of 256; 65536 = field 0) '
+                                               'at the first --gprs value instead of sweeping registers')
     p.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/drm-compute/occupancy-atomic'))
     a = p.parse_args()
     out = a.output; out.mkdir(parents=True, exist_ok=True)
@@ -45,12 +47,14 @@ def main():
     code = drm.build_main(body(a.steps))
     (out/'c.bin').write_bytes(code+bytes(16))
     rec = {'local_x': a.local_x, 'steps': a.steps, 'count': a.count, 'code_bytes': len(code), 'points': []}
+    sweep = [(int(a.gprs.split(',')[0]), int(x)) for x in a.shared.split(',')] if a.shared else [(int(x), 0) for x in a.gprs.split(',')]
     for rep in range(a.repeats):
-        for g in [int(x) for x in a.gprs.split(',')]:
+        for g, sh in sweep:
+            senv = {'AGX_SHARED_WORD': str(0x4d | 1 << 8 | 0x24 << 10 | (((sh // 256) & 255) << 24))} if sh else {}
             (out/'t.bin').write_bytes(bytes(4*320))
             try:
                 r = subprocess.run([str(exe), '/dev/dri/renderD128', str(out/'c.bin'), str(a.count), str(out/'rb'), '1', str(g), str(out/'t.bin')],
-                                   capture_output=True, timeout=20, env={'AGX_TABLE_OUT': str(out/'t.out'), 'PATH': '/usr/bin', **({'AGX_LOCAL_X': str(a.local_x)} if a.local_x else {})})
+                                   capture_output=True, timeout=20, env={'AGX_TABLE_OUT': str(out/'t.out'), 'PATH': '/usr/bin', **senv, **({'AGX_LOCAL_X': str(a.local_x)} if a.local_x else {})})
             except subprocess.TimeoutExpired:
                 sys.exit(f'timeout at gprs {g}; stopping')
             smp = [json.loads(l) for l in r.stdout.decode().splitlines() if '"rep"' in l]
@@ -58,7 +62,7 @@ def main():
             w = struct.unpack(f'<{a.count+32}I', (out/'rb').read_bytes())[8:8+a.count]
             t = struct.unpack('<320I', (out/'t.out').read_bytes())
             peak = max(w)+1
-            pt = {'rep': rep, 'gprs': g, 'peak_lanes_any_core': peak, 'peak_simd_groups': peak/32,
+            pt = {'rep': rep, 'gprs': g, 'shared_bytes': sh, 'peak_lanes_any_core': peak, 'peak_simd_groups': peak/32,
                   'counters_back_to_zero': all(v == 0 for v in t[256:320]), 'fw_ns': smp[0]['fw_ts'][1]-smp[0]['fw_ts'][0]}
             rec['points'].append(pt)
             print(json.dumps(pt), flush=True)

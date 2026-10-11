@@ -23,4 +23,11 @@ for lx in (64, 256):
     p = json.loads(gzip.open(R/f'lx{lx}-points.json.gz').read())['points']
     g16 = [x['peak_simd_groups'] for x in p if x['gprs'] == 16][0]
     check(all(x['peak_simd_groups'] == model(x['gprs']) for x in p if x['gprs'] >= 48), f'{lx}-lane workgroups follow the model at 48+ halves (16 halves: {g16:.0f})')
+for lx in (128, 256):
+    tp = json.loads((R/f'tg-sweep-lx{lx}.json').read_text())['points']
+    gpw = lx//32
+    want = lambda sh: min(96, gpw*(65536//sh))
+    check(all(abs(x['peak_simd_groups']-want(x['shared_bytes'])) < 1e-9 and x['counters_back_to_zero'] for x in tp),
+          f'threadgroup memory, {lx}-lane workgroups: resident groups = min(96, groups/wg * floor(65536 / declared bytes)): '
+          + ', '.join(f"{x['shared_bytes']}:{x['peak_simd_groups']:.0f}" for x in tp))
 print(f'{fails} failures'); sys.exit(1 if fails else 0)

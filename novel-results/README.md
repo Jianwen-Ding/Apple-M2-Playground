@@ -15,7 +15,7 @@
 - [2026-10-11 Stack memory through Mesa: stack_adjust/store/load binary captured from a working shader; scratch helper setup documented](2026-10-11-stack-via-mesa/README.md)
 - [2026-10-11 else_fcmp / while_fcmp equal their integer twins (42 straight-line cases)](2026-10-11-cf-float/README.md)
 - [2026-10-11 Cross-core memory ordering: f533 is the store release, memory_barrier alone reorders; acquire = wait + f59d](2026-10-11-memory-ordering/README.md)
-- [2026-10-11 Occupancy: min(96, 2*floor(3328/(2*halves))) SIMD groups per core; small workgroups cap lower](2026-10-11-occupancy/README.md)
+- [2026-10-11 Occupancy: min(96, 2*floor(3328/(2*halves))) SIMD groups per core; small workgroups cap lower; 64 KiB threadgroup memory per core: floor(65536/declared) workgroups](2026-10-11-occupancy/README.md)
 - [2026-10-11 64-bit integers: iadd/isub/imad 64-bit forms exact, zero/sign extension rule, register-pair pointers into device_load](2026-10-11-int64/README.md)
 - [2026-10-11 Float semantics: fp32 DAZ + flush-before-rounding, fused fma, canonical NaN, sat NaN→0; fp16 full IEEE](2026-10-11-float-semantics/README.md)
 - [2026-10-11 Device + threadgroup atomics: all 11 Mesa ops exact with return values, contention serializable, cmpxchg single winner](2026-10-11-atomics/README.md)
