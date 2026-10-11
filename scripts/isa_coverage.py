@@ -45,6 +45,9 @@ STATUS.update({
     'atomic': ('mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run (hang risk)', ATOM),
     'threadgroup_atomic': ('mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run (hang risk)', ATOM),
 })
+STK = F+'2026-10-11-stack-via-mesa/README.md'
+STATUS.update({'stack_store': ('Mesa form runs exactly through Mesa; binary captured (also decodes Mesa stack_adjust)', STK),
+               'stack_load': ('Mesa form runs exactly through Mesa; binary captured', STK)})
 TODO_REASON = {
     'call': 'not run: a bad target can hang the GPU', 'ret': 'not run: a bad target can hang the GPU',
     'jmp_if_skipping_doorbell': 'not run: may loop on itself',
@@ -52,7 +55,7 @@ TODO_REASON = {
 }
 FRAG = {'iter', 'iterproj', 'TODO.ldcf', 'st_var', 'st_var_final', 'wait_pix', 'signal_pix', 'sample_mask', 'zs_emit', 'TODO.ld/st_tile', 'image_write_block'}
 TEX = {'tex_state_store', 'sampler_state_store', 'image_write', 'texture_sample', 'texture_load', 'map', 'TODO.unk75_alt'}
-STACK = {'stack_store', 'stack_load', 'stack_get_ptr', 'TODO.stack_adjust', 'TODO.stack_adjust2', 'async_store', 'async_load', 'TODO.pop_exec2'}
+STACK = {'stack_get_ptr', 'TODO.stack_adjust', 'TODO.stack_adjust2', 'async_store', 'async_load', 'TODO.pop_exec2'}
 
 
 def main():

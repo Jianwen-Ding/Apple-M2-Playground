@@ -134,8 +134,8 @@ Top-level 7-bit opcodes that applegpu cannot decode are all classified in
 | `device_store` | 6/8 | 1 | u6 | [mapped (bit 31 drops)](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `device_load.TODO` | 6/8 | 1 | u1, u3, u4, u5 | [u-fields not swept (u4 = cache hint per Mesa)](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `device_store.TODO` | 6/8 | 1 | u6, u1, u3, u4, u5 | [u-fields not swept](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
-| `stack_store` | 6/8 | 13 |  | open: needs scratch/stack memory (helper program; earlier attempts hung) |
-| `stack_load` | 6/8 | 13 |  | open: needs scratch/stack memory (helper program; earlier attempts hung) |
+| `stack_store` | 6/8 | 13 |  | [Mesa form runs exactly through Mesa; binary captured (also decodes Mesa stack_adjust)](../novel-results/2026-10-11-stack-via-mesa/README.md) |
+| `stack_load` | 6/8 | 13 |  | [Mesa form runs exactly through Mesa; binary captured](../novel-results/2026-10-11-stack-via-mesa/README.md) |
 | `stack_get_ptr` | 6/8 | 26 |  | open: needs scratch/stack memory (helper program; earlier attempts hung) |
 | `TODO.stack_adjust` | 6/8 | 18 |  | open: needs scratch/stack memory (helper program; earlier attempts hung) |
 | `threadgroup_load` | 6/8 | 13 |  | [mapped](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
@@ -166,4 +166,4 @@ Top-level 7-bit opcodes that applegpu cannot decode are all classified in
 | `zs_emit` | 4/4 | 2 | u0 | open: fragment-stage only (needs a render pipeline, not direct-DRM compute) |
 | `memory_barrier` | 2/2 | 0 |  | [used by the in-shader clock probe (gap bits not swept)](../novel-results/2026-10-11-in-shader-clock/README.md) |
 
-159 descriptors; 129 mapped or classified, 30 open.
+159 descriptors; 131 mapped or classified, 28 open.

@@ -104,9 +104,9 @@ static void readback(GLuint buffer, size_t words, const char *name) {
 }
 int main(int argc, char **argv) {
     setvbuf(stdout, NULL, _IONBF, 0);
-    if (argc != 4) { fprintf(stderr, "usage: %s control|constant|index|invalid count render-node\n", argv[0]); return 2; }
+    if (argc != 4) { fprintf(stderr, "usage: %s control|constant|index|invalid|private count render-node\n", argv[0]); return 2; }
     const char *mode = argv[1], *expected_node = argv[3];
-    if (strcmp(mode, "control") && strcmp(mode, "constant") && strcmp(mode, "index") && strcmp(mode, "invalid")) return 2;
+    if (strcmp(mode, "control") && strcmp(mode, "constant") && strcmp(mode, "index") && strcmp(mode, "invalid") && strcmp(mode, "private")) return 2;
     char *end = NULL;
     unsigned long parsed = strtoul(argv[2], &end, 10);
     if (!*argv[2] || *end || parsed < 1 || parsed > 257) return 2;
@@ -165,10 +165,17 @@ int main(int argc, char **argv) {
     char source[1024];
     const char *expression = !strcmp(mode, "index") ? "(i * 0x9e3779b9u) ^ 0x12345678u" : "0x12345678u";
     if (!strcmp(mode, "invalid")) expression = "INTENTIONAL_UNDECLARED_IDENTIFIER";
+    /* "private": a dynamically indexed 1024-entry private array, which Mesa places in scratch (stack) memory. */
+    const char *prelude = "";
+    if (!strcmp(mode, "private")) {
+        prelude = "uint pick(uint i) { uint a[1024]; for (uint k=0u; k<1024u; k++) a[k] = (i*k) ^ (0x1234u*k); "
+                  "return a[(i*7u)&1023u] + a[(i*13u+5u)&1023u]; }\n";
+        expression = "pick(i)";
+    }
     int length = snprintf(source, sizeof(source),
         "#version 320 es\nprecision highp int;\nlayout(local_size_x=32, local_size_y=1, local_size_z=1) in;\n"
-        "layout(std430, binding=0) buffer Output { uint data[]; };\nuniform uint count;\n"
-        "void main() { uint i=gl_GlobalInvocationID.x; if (i < count) data[8u+i]=%s; }\n", expression);
+        "layout(std430, binding=0) buffer Output { uint data[]; };\nuniform uint count;\n%s"
+        "void main() { uint i=gl_GlobalInvocationID.x; if (i < count) data[8u+i]=%s; }\n", prelude, expression);
     if (length < 0 || (size_t)length >= sizeof(source)) fail("shader-source-size");
     save("shader.comp", source, (size_t)length);
     GLuint shader = p_glCreateShader(GL_COMPUTE_SHADER);
