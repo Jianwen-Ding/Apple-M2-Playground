@@ -339,3 +339,14 @@ VkResult error" as "no fault".
 * **8 SIMD groups per core breaks the in-dispatch reference.** The dependent iadd reference then
   needs the core's whole issue rate; inferred clocks ranged 244–2,547 MHz. Throughput above
   4 groups per core is therefore unmeasured.
+
+### Cost model, 2026-10-11
+
+* **"Loop bodies over ~512 B / 64 instructions fetch slowly" was wrong.** A body of 9 instructions repeated
+  8 times ran 2× slower, but bodies of up to 2 KiB of independent 8-byte iadds run at one per cycle
+  (`fetch-body-size.json`). The trigger was 9+ distinct destination registers (the result-cache finding).
+* **Whole-dispatch firmware time across dispatches** cannot calibrate cycles (see the instruction benchmark
+  notes above); the cost model is validated only with the in-dispatch CPU timer.
+* **Issue-interval rules.** Letting a multi-cycle instruction block only its own unit family matches
+  "leader + k independent iadds" tests (3.9%) but triples the random-kernel error (4.3% → 14.8%); one shared
+  pipe for all multi-cycle classes is in between. The default blocks the whole group. The true rule is open.

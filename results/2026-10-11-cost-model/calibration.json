@@ -1,0 +1,13 @@
+{
+ "control_issue_cycles": 1,
+ "control_latency": 2,
+ "get_sr_issue": 2,
+ "get_sr_latency": 3,
+ "device_load_l1_cycles": 50,
+ "measured": {
+  "loop_trip_cycles_empty": 35.25450901803607,
+  "get_sr_issue_cycles": 2.092184368737475,
+  "get_sr_extra_dependent_cycles": 1.4423076923076925
+ },
+ "branch_taken_cycles": 31
+}

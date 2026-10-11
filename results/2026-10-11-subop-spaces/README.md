@@ -2,7 +2,7 @@
 
 `scripts/run_drm_bitflip.py --sweep/--masks/--prefix` on the direct DRM path; identification
 by `scripts/identify_funop.py`, `scripts/identify_simd_op.py`, `scripts/identify_shuffle.py`;
-offline checks `scripts/verify_subop_spaces.py` (16 checks, `make verify-subop-spaces`).
+offline checks `scripts/verify_subop_spaces.py` (33 checks, `make verify-subop-spaces`).
 
 | File | Baseline / inputs | Encodings |
 | --- | --- | --- |

@@ -160,7 +160,17 @@ MODES = {   # name: (op chains, lanes, local_x)
     'gpu': (8, CORES*4*32, 32),     # analysed per core (SR20), see analyse_gpu
     'gpu8': (8, CORES*8*32, 32),    # 8 groups/core: tests whether more groups add throughput
 }
-TICK_NS = 1e9/24e6      # CNTVCT is 24 MHz
+TICK_NS = 1e9/24e6
+# GPU DVFS levels (Asahi t602x-common.dtsi opp-table-gpu). Clocks inferred with the 2-unit iadd reference
+# come out low by REAL_CYCLES_PER_UNIT; record the nearest level as a sanity check of each measurement.
+DVFS_MHZ = (444, 612, 808, 968, 1110, 1236, 1338, 1398)
+REAL_CYCLES_PER_UNIT = 1.049
+
+
+def nearest_level(mhz):
+    real = mhz*REAL_CYCLES_PER_UNIT
+    lvl = min(DVFS_MHZ, key=lambda f: abs(f-real))
+    return lvl, abs(real-lvl)/lvl      # CNTVCT is 24 MHz
 
 
 def analyse(ts, trips, s1, s2, max_drift=0.02):
@@ -236,6 +246,7 @@ def main():
             for mode in a.modes.split(','):
                 ch, count, lx = MODES[mode]
                 body = program(op, ch, S1, S2, a.trips, count, a.warm)
+                accepted = False
                 for attempt in range(1, 9):
                     # back-to-back submits warm the clock; the table holds the last one
                     fw, ts = R.run(body, count, 2+attempt, lx, clock=True)
@@ -246,13 +257,15 @@ def main():
                         if m.get('cores_used', 0) >= 10:
                             prev = res.get('_prev_'+mode)
                             if prev and abs(prev-m['lanes_per_cycle_per_core']) <= 0.05*m['lanes_per_cycle_per_core']:
-                                m['previous_dispatch_lanes'] = prev; break
+                                m['previous_dispatch_lanes'] = prev; accepted = True; break
                             res['_prev_'+mode] = m['lanes_per_cycle_per_core']
                     else:
                         m = analyse(ts, a.trips, S1, S2)
-                        if m['stable_groups'] >= max(1, m['groups']//2): break
-                m['fw_ns'] = fw; m['attempts'] = attempt
-                if 'cycles_per_step' not in m:
+                        if m['stable_groups'] >= max(1, m['groups']//2): accepted = True; break
+                m['fw_ns'] = fw; m['attempts'] = attempt; m['accepted'] = accepted
+                if 'mhz' in m: m['dvfs_level_mhz'], m['dvfs_mismatch'] = nearest_level(m['mhz'])
+                if not accepted or 'cycles_per_step' not in m:
+                    m.pop('cycles_per_step', None)
                     res[mode] = m; print(json.dumps({'op': op, 'mode': mode, 'unstable_clock': True})); continue
                 res[mode] = m
             if 'gpu' in res and 'cycles_per_step' in res['gpu']:

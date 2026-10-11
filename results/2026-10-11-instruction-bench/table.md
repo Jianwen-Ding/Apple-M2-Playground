@@ -1,3 +1,6 @@
+Cycle values are in reference units (dependent 8-byte `iadd x, x, 1` step = 2); real cycles = value x 1.049
+(clocks inferred this way are the DVFS levels / 1.049). `mov_imm` has no source register: its latency column is its issue interval.
+
 | Instruction | Class | Latency (cycles) | Issue interval, 1 SIMD group (cycles) | Lanes / cycle / core | SIMD instr / cycle / core |
 | --- | --- | --- | --- | --- | --- |
 | `iadd rx, rx, c0` | Integer | 2.0 | 1.06 | 64 | 1.99 |
@@ -22,7 +25,7 @@
 | `intl rx, rx, c0` | Bit/shift | 2.9 | 2.00 | 32 | 0.99 |
 | `icmpsel ult, rx, rx, c0, rx, c1` | Compare-select | 2.0 | 2.13 | 38 | 1.19 |
 | `fcmpsel lt, rx, rx, c0, rx, c1` | Compare-select | 2.0 | 2.13 | 38 | 1.19 |
-| `mov_imm rx, 305419896, 0b0` | Move | 1.0 | 1.04 | 123 | 3.84 |
+| `mov_imm rx, 305419896, 0b0` | Move | n/a | 1.04 | 123 | 3.84 |
 | `iadd rx, rx, 1` | Integer | 2.0 | 1.06 | 121 | 3.77 |
 | `iadd rx, rx, c0.cache` | Integer | 2.0 | 2.04 | 66 | 2.05 |
 | `imadd rx, rx, c1.cache, c0.cache` | Integer | 2.9 | 1.99 | 34 | 1.06 |

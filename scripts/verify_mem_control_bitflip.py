@@ -27,7 +27,7 @@ def raws(n, layout='A'):
 m = load('misc1'); by = {r['name']: r for r in m['results']}
 def cls(key, bit):
     return A.classify(by[f'{key}-b{bit}-A'], by[f'{key}-b{bit}-B'], by[f'{key}-base-A'], by[f'{key}-base-B'])[0]
-check('threadgroup_barrier bits 8-15 inert', all(cls('tgb', b) == 'same' for b in range(8, 16)))
+check('threadgroup_barrier bits 8-15: no effect with one SIMD group (scope untested)', all(cls('tgb', b) == 'same' for b in range(8, 16)))
 check('get_sr bits 23-25, 30-31 inert; bit 22 changes the result', all(cls('gsr', b) == 'same' for b in (23, 24, 25, 30, 31)) and cls('gsr', 22) == 'dest')
 check('device_load bit 31 (long form): result 0', by['dld-b31-A']['table'][6] == [0]*32 and by['dld-base-A']['table'][6] == [0xb0b0b0b0]*32)
 r = raws('dld-b31cpu')
