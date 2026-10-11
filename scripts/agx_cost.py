@@ -83,8 +83,14 @@ CTL_AS_ALU = True
 CROSS_BUMP = True
 SFU_PIPE = True          # sfupairs.json: per-group transcendental pipe (spacing, slow stage, in-order writeback)
 SFU_SPACING = 2.0        # cycles between transcendental issues of one SIMD group
+SFU_GROUP_BLOCK = 2.0    # cycles a transcendental occupies its SIMD group (not the op's full issue interval)
 SFU_WB_GAP = 2.0         # cycles between transcendental writebacks of one SIMD group (in order)
 SFU_SLOW = {'rcp': 3.0, 'rsqrt': 4.0, 'rsqrt_special': 4.0}   # cycles in the slow stage
+# core-level transcendental pipe shared by the SIMD groups of a core (sfupairs.json, sfumix.json, sfurepeat.json;
+# fitted on a 12-point grid): rcp/rsqrt use a slow unit, the others a fast one, writebacks in order 0.5 cycles apart.
+# Replaces the shared 'sfu' token bucket. Not captured: rcp with 8 chains vs 4 (232 vs 197 units, repeatable) and
+# run-to-run variation of mixed-latency pairs (log2+floor 207 vs 232).
+CORE_SFU = {'wb_gap': 0.5, 'slow': {'rcp': 1.75, 'rsqrt': 2.3, 'rsqrt_special': 2.3}, 'fast': 1.0}
 CONTROL = {'if_icmp', 'if_fcmp', 'else_icmp', 'else_fcmp', 'while_icmp', 'while_fcmp', 'pop_exec', 'push_exec',
            'jmp_exec_any', 'jmp_exec_none', 'stop', 'trap', 'TODO.unk51', 'no_var'}
 BARRIERS = {'threadgroup_barrier', 'memory_barrier', 'wait_pix', 'signal_pix', 'TODO.unkE800'}
@@ -347,6 +353,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     alu_done = [-10**9]*groups               # latest completion tick of the group's ALU results (wait drain)
     last_wait = [-10**9]*groups              # issue tick of the group's previous wait
     sfu_iss = [-10**9]*groups; sfu_wb = [-10**9]*groups; sfu_slow = [-10**9]*groups   # transcendental pipe state
+    core_sfu = {'wb': -10**9, 'slow': -10**9, 'fast': -10**9}
     alu_since_mem = [False]*groups           # an ALU instruction issued since the group's last memory instruction
     last_space = [None]*groups
     pending = [[] for _ in range(groups)]       # [slot, completion tick, latency ticks, dst halves] of in-flight loads
@@ -362,6 +369,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     def bucket_of(u):
         """(bucket, tokens per instruction, bucket rate per cycle) for a benchmark row."""
         sh = P.shared_of.get(u)
+        if sh == 'sfu' and CORE_SFU: return 'sfu_core_free', 0, 1.0
         if sh: return sh, int(round(T*TOKSCALE/max(P.unit_cap[u], 1e-3))), 1.0
         return P.unit_bucket[u], T*TOKSCALE, P.unit_cap[u]
 
@@ -372,7 +380,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
         issue_tok = min(issue_tok+ISSUE_PER_CORE*dt, ISSUE_PER_CORE*T)
         for b_ in tok:
             if b_ in SHARED_UNITS: tok[b_] = min(tok[b_]+dt*TOKSCALE, 2*T*TOKSCALE)        # 1 unit-cycle per cycle
-            else: tok[b_] = min(tok[b_]+P.unit_cap[b_]*dt*TOKSCALE, (P.unit_cap[b_]+1)*T*TOKSCALE)
+            else: c_ = P.unit_cap.get(b_, 1.0); tok[b_] = min(tok[b_]+c_*dt*TOKSCALE, (c_+1)*T*TOKSCALE)
 
     t = 0; done = 0
     while done < groups:
@@ -406,6 +414,10 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 L_ = tk(P.rows[u]['lat'])
                 gate = max(sfu_iss[gi]+tk(SFU_SPACING), sfu_wb[gi]+tk(SFU_WB_GAP)-L_,
                            sfu_slow[gi] if u in SFU_SLOW else -10**9)
+                if CORE_SFU and groups > 1:
+                    cs_ = CORE_SFU
+                    gate = max(gate, core_sfu['wb']+tk(cs_['wb_gap'])-L_,
+                               core_sfu['slow'] if u in cs_['slow'] else core_sfu['fast'])
                 if gate > t: wake.append(gate); continue
             # ---- issue at tick t
             issue_tok -= T
@@ -419,7 +431,11 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                     # (rcp chain + 3 iadd: 72.6 units, not 83.3; log2+rcp alternating = pure log2)
                     sfu_iss[gi] = t; sfu_wb[gi] = max(sfu_wb[gi], t+lat)
                     if u in SFU_SLOW: sfu_slow[gi] = t+tk(SFU_SLOW[u])
-                    ii = T
+                    ii = tk(SFU_GROUP_BLOCK)
+                    if CORE_SFU and groups > 1:
+                        core_sfu['wb'] = max(core_sfu['wb'], t+lat)
+                        if u in CORE_SFU['slow']: core_sfu['slow'] = t+tk(CORE_SFU['slow'][u])
+                        else: core_sfu['fast'] = t+tk(CORE_SFU['fast'])
                 for h in r['dst']: ready[gi][h] = t+lat
                 last_alu[gi] = t; alu_done[gi] = max(alu_done[gi], t+lat); alu_since_mem[gi] = True
                 for p_ in pending[gi]:          # ALU issue defers in-flight loads

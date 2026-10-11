@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-11 transcendentals: in-order writeback and a slow stage decide which pairs mix freely (log2+rcp free, log2+floor 50% slower)](2026-10-11-transcendental-pipe/README.md)
 - [2026-10-11 exec-stack instructions chain through r0l and count as ALU work for wait and memory (cost model had them at an assumed 1 cycle)](2026-10-11-exec-control-cost/README.md)
 - [2026-10-11 wait drains ALU work: completes ~17 units after the latest ALU result, on any slot (found via held-out memory kernels)](2026-10-11-wait-drain/README.md)
 - [2026-10-11 wait costs ~5 units when idle; some long runs of waits cost ~11 each (trigger unknown; not a loop-buffer effect)](2026-10-11-wait-cost/README.md)
