@@ -1,6 +1,6 @@
 {
  "command": [],
- "out": "/scratch/apple-m2-playground/capture/final4/private",
+ "out": "/scratch/apple-m2-playground/capture/final5/private",
  "mesa_versions": {
   "gl": "25.1.9",
   "vulkan": "25.3.6"
@@ -112,7 +112,7 @@
      "offset": 128,
      "bytes": 198,
      "padding_instructions": 8,
-     "file": "/scratch/apple-m2-playground/capture/final4/private/shader0-main.bin",
+     "file": "/scratch/apple-m2-playground/capture/final5/private/shader0-main.bin",
      "listing": [
       {
        "pc": 0,
@@ -236,7 +236,7 @@
         },
         "4": {
          "n": 4,
-         "stall": 2.9
+         "stall": 6.0
         }
        }
       },
@@ -254,7 +254,7 @@
         },
         "4": {
          "n": 4,
-         "stall": 6.1
+         "stall": 8.0
         }
        }
       },
@@ -268,11 +268,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 1.0
+         "stall": 1.1
         },
         "4": {
          "n": 4,
-         "stall": 4.0
+         "stall": 4.4
         }
        }
       },
@@ -430,11 +430,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 1.0
+         "stall": 1.1
         },
         "4": {
          "n": 4,
-         "stall": 4.0
+         "stall": 4.4
         }
        }
       },
@@ -502,11 +502,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 1.0
+         "stall": 1.1
         },
         "4": {
          "n": 4,
-         "stall": 4.0
+         "stall": 4.4
         }
        }
       },
@@ -705,8 +705,8 @@
        "stack_store"
       ],
       "cycles": {
-       "1": 250.8,
-       "4": 254.5
+       "1": 250.7,
+       "4": 255.7
       },
       "loop_back_branches": {
        "88": 1
@@ -719,7 +719,7 @@
      "offset": 384,
      "bytes": 20,
      "padding_instructions": 8,
-     "file": "/scratch/apple-m2-playground/capture/final4/private/shader0-preamble.bin",
+     "file": "/scratch/apple-m2-playground/capture/final5/private/shader0-preamble.bin",
      "listing": [
       {
        "pc": 0,
@@ -884,7 +884,7 @@
      "offset": 0,
      "bytes": 24,
      "padding_instructions": 0,
-     "file": "/scratch/apple-m2-playground/capture/final4/private/shader1-main.bin",
+     "file": "/scratch/apple-m2-playground/capture/final5/private/shader1-main.bin",
      "listing": [
       {
        "pc": 0,
@@ -918,7 +918,7 @@
         },
         "4": {
          "n": 4,
-         "stall": 3.0
+         "stall": 2.5
         }
        }
       },
@@ -936,7 +936,7 @@
         },
         "4": {
          "n": 4,
-         "stall": 2.9
+         "stall": 5.4
         }
        }
       },
@@ -954,7 +954,7 @@
         },
         "4": {
          "n": 4,
-         "stall": 4.4
+         "stall": 1.5
         }
        }
       }
@@ -966,7 +966,7 @@
       "emulator_skipped": [],
       "cycles": {
        "1": 4.4,
-       "4": 7.9
+       "4": 8.5
       },
       "loop_back_branches": {}
      }
@@ -976,7 +976,7 @@
      "offset": 128,
      "bytes": 44,
      "padding_instructions": 8,
-     "file": "/scratch/apple-m2-playground/capture/final4/private/shader1-preamble.bin",
+     "file": "/scratch/apple-m2-playground/capture/final5/private/shader1-preamble.bin",
      "listing": [
       {
        "pc": 0,
@@ -1180,7 +1180,7 @@
      "offset": 0,
      "bytes": 146,
      "padding_instructions": 8,
-     "file": "/scratch/apple-m2-playground/capture/final4/private/shader2-main.bin",
+     "file": "/scratch/apple-m2-playground/capture/final5/private/shader2-main.bin",
      "listing": [
       {
        "pc": 0,
@@ -1520,7 +1520,7 @@
         },
         "4": {
          "n": 4,
-         "stall": 5.8
+         "stall": 8.9
         }
        }
       },
@@ -1534,11 +1534,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 1.0
+         "stall": 1.1
         },
         "4": {
          "n": 4,
-         "stall": 4.0
+         "stall": 4.4
         }
        }
       },
@@ -1568,7 +1568,7 @@
       "emulator_skipped": [],
       "cycles": {
        "1": 78.4,
-       "4": 80.3
+       "4": 81.4
       },
       "loop_back_branches": {}
      }
@@ -1578,7 +1578,7 @@
      "offset": 256,
      "bytes": 142,
      "padding_instructions": 8,
-     "file": "/scratch/apple-m2-playground/capture/final4/private/shader2-preamble.bin",
+     "file": "/scratch/apple-m2-playground/capture/final5/private/shader2-preamble.bin",
      "listing": [
       {
        "pc": 0,

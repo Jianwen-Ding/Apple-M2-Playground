@@ -37,19 +37,23 @@ fitted empty-loop cost (35.25 units, predicted 35.27) from both sides, which is 
 
 | Dataset | Role | 1 group: whole trip | 1 group: body | 4 groups/core: whole trip | 4 groups/core: body |
 | --- | --- | --- | --- | --- | --- |
-| 24 random 24-instr kernels | selection (issue rule chosen here) | 5.1% (max 15%) | 7.1% (max 23%) | 10.4% | 14.0% |
-| **24 new 24-instr kernels** | **held out** | **5.3%** (max 12%) | **7.8%** (max 20%) | **10.4%** | **13.1%** |
-| **12 new 48-instr kernels** | **held out** | **3.6%** (max 8.4%) | **4.3%** (max 11%) | **9.2%** | **10.8%** |
+| 24 random 24-instr kernels | selection (issue rule chosen here) | 5.1% (max 15%) | 7.2% (max 24%) | 6.3% (max 19%) | 9.4% |
+| **24 new 24-instr kernels** | **held out** | **5.7%** (max 13%) | **8.8%** (max 19%) | **8.3%** (max 21%) | **11.3%** |
+| **12 new 48-instr kernels** | **held out** | **3.8%** (max 8.0%) | **4.5%** (max 10%) | **4.3%** (max 9.5%) | **5.1%** |
 
-(4-group columns after the shared-unit change; the 1-group columns are unchanged by it.)
+Latest verifier run (`results/2026-10-11-cost-model/verify-output.txt`), after the
+[exec-control](../2026-10-11-exec-control-cost/README.md), [transcendental pipe](../2026-10-11-transcendental-pipe/README.md)
+and store-after-wait rules. The 4-group columns improved most (48 instructions: 9.2% → 4.3%, bias −9% → −4%): the
+integer multiply / bit-field / convert class was misclassified as a separate unit, and the simulator's
+round-robin arbitration kept SIMD groups in lockstep. The 1-group held-out columns moved by under 0.5 points.
 
 **Kernels with memory instructions** (`cost_hw.py --memory`: ~15% device/threadgroup loads and stores, ~6%
 waits; whole-trip medians):
 
 | Dataset | Role | 1 group | 4 groups/core |
 | --- | --- | --- | --- |
-| 24 kernels, seeds 7000+ | discovery: revealed the [wait drain](../2026-10-11-wait-drain/README.md) (15.0% → 5.6%) | 5.6% | 6.4% |
-| **24 kernels, seeds 8000+** | **held out** (measured after the wait-drain rule) | **4.6%** (p90 8.5%, max 12.1%) | **6.3%** (max 21%) |
+| 24 kernels, seeds 7000+ | discovery: revealed the [wait drain](../2026-10-11-wait-drain/README.md) (15.0% → 5.5%) | 5.5% | 6.5% |
+| **24 kernels, seeds 8000+** | **held out** (measured after the wait-drain rule) | **4.5%** (p90 8.1%, max 12.0%) | **6.0%** (max 20%) |
 
 The held-out memory set first scored 5.6% / 10.1% (max 28.6%); its worst kernel had several loads in flight with
 ALU work between them. Separate probes (`multiload.json`) then showed that a load issued after ALU work while
