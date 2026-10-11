@@ -5,12 +5,12 @@ shader 0: compute main  [gl (Mesa 25.1 layout)]  application shader
   Mesa stats: instrs 10  alu 6  fscib 6  ic 4  threads 1024  loops 0  spills 0  fills 0
   Mesa IR: AGX_MESA_DEBUG=shaders section #0 (137 lines, in JSON); matched on stage, workgroup size, preamble present, instruction count, stack size, preamble stack size, shaderdb stats, main disassembly length, preamble disassembly length
   --- main @128  54 B  10 instructions (+8 padding)
-      predicted cycles: 1 group/core = 54.9  4 groups/core = 56.9   (path static, 10 dynamic instrs)
+      predicted cycles: 1 group/core = 54.9  4 groups/core = 56.8   (path static, 10 dynamic instrs)
          pc  hex                      class            n@1  stall@1   n@4  stall@4  disassembly
           0  72051004                 get_sr             1      0.0     4      0.0  get_sr r1, sr80 (thread_position_in_grid.x)
           4  62000000                 mov_imm            1      0.0     4      0.0  mov_imm r0l, 0
           8  522842821800             control            1      0.0     4      0.0  if_icmp r0l, ult, r1, u4, 1
-         14  1e0942a658000000         imadd              1      0.0     4      3.0  imadd r2, r1.sx, u5.sx, 0
+         14  1e0942a658000000         imadd              1      0.0     4      2.9  imadd r2, r1.sx, u5.sx, 0
          22  7e0944ca5800             and                1      1.0     4      4.0  xor r2, r2, u6
          28  0e05082064000000         iadd_imm           1      0.0     4      0.0  iadd r1, 8, r1.sx
          36  4511240e00c01200         store              1      1.0     4      4.0  device_store 0, i32, x, r2, u2_u3, r1, unsigned, 0
@@ -52,7 +52,7 @@ shader 2: compute main  [gl (Mesa 25.1 layout)]  driver-internal? (not in AGX_ME
   gprs(16-bit) main 24 preamble 8  push uniforms 70  stack 0/0 words  local 0 B  wg [1, 1, 1]
   Mesa stats: instrs 21  alu 21  fscib 21  ic 4  threads 1024  loops 0  spills 0  fills 0
   --- main @0  146 B  21 instructions (+8 padding)
-      predicted cycles: 1 group/core = 78.4  4 groups/core = 80.4   (path static, 21 dynamic instrs)
+      predicted cycles: 1 group/core = 78.4  4 groups/core = 80.3   (path static, 21 dynamic instrs)
          pc  hex                      class            n@1  stall@1   n@4  stall@4  disassembly
           0  1a81a0012500             fmul32             1      0.0     4      0.0  fmul32 r0, u16, r8
           6  3a81a82125400200         fmadd32            1      1.0     4      4.0  fmadd32 r0, u20, r9, r0
@@ -72,7 +72,7 @@ shader 2: compute main  [gl (Mesa 25.1 layout)]  driver-internal? (not in AGX_ME
         112  3a9dbe6125460200         fmadd32            1      0.0     4      0.0  fmadd32 r7, u31, r11, r3
         120  72011004                 get_sr             1      0.0     4      0.0  get_sr r0, sr80 (thread_position_in_grid.x)
         124  72051104                 get_sr             1      0.0     4      0.0  get_sr r1, sr81 (thread_position_in_grid.y)
-        128  1e01424658400601         imadd              1      0.9     4      5.9  imadd r0, r1.sx, u34.sx, r0.sx
+        128  1e01424658400601         imadd              1      0.9     4      5.8  imadd r0, r1.sx, u34.sx, r0.sx
         136  4521000e40c8f200         store              1      1.0     4      4.0  device_store 0, i32, xyzw, r4_r5_r6_r7, u32_u33, r0, unsigned, lsl 2, 0
         144  8800                     control            1      0.0     4      0.0  stop
   --- preamble @256  142 B  23 instructions (+8 padding)

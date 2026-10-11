@@ -4,13 +4,13 @@ shader 0: compute variant:main  [vulkan (Mesa 25.3 layout)]
   gprs(16-bit) main 6 preamble 8  push uniforms 20  stack 0/0 words  local 0 B  wg [32, 1, 1]
   Mesa stats: instrs 11  alu 7  fscib 7  ic 4  threads 1024  loops 0  spills 0  fills 0
   --- main @128  62 B  11 instructions (+8 padding)
-      predicted cycles: 1 group/core = 56.9  4 groups/core = 58.9   (path static, 11 dynamic instrs)
+      predicted cycles: 1 group/core = 56.9  4 groups/core = 58.8   (path static, 11 dynamic instrs)
          pc  hex                      class            n@1  stall@1   n@4  stall@4  disassembly
           0  f2051004                 get_sr             1      0.0     4      0.0  get_sr r1.cache, sr80 (thread_position_in_grid.x)
           4  0e05c28658000000         iadd               1      0.9     4      3.6  iadd r1, r1.discard.sx, u4.sx
          12  62000000                 mov_imm            1      0.0     4      0.0  mov_imm r0l, 0
          16  522842a21800             control            1      0.0     4      0.0  if_icmp r0l, ult, r1, u5, 1
-         22  9e09820659000000         imadd_cache        1      0.0     4      3.0  imadd r2.cache, r1.cache.sx, u8.sx, 0
+         22  9e09820659000000         imadd_cache        1      0.0     4      2.9  imadd r2.cache, r1.cache.sx, u8.sx, 0
          30  7e09442a5900             and                1      1.0     4      4.0  xor r2, r2, u9
          36  0e05082064000000         iadd_imm           1      0.0     4      0.0  iadd r1, 8, r1.sx
          44  45112c0e00c01200         store              1      1.0     4      4.0  device_store 0, i32, x, r2, u6_u7, r1, unsigned, 0
