@@ -370,3 +370,15 @@ VkResult error" as "no fault".
   each phase register is written after every other setup block.
 * **Removing the barriers** to test lockstep effects breaks the one-group reference (group 0's timestamps no
   longer bracket the others' work).
+
+### Memory and whole-dispatch timing, 2026-10-11
+
+* **Short simulated runs mislead cache models**: replaying a short trace to "warm" caches made every streaming
+  window look cached; with no warm-up the first pass was all misses. Simulate the hardware's trip count.
+* **Shared streaming windows involve reuse across cores**: a 1–64 MiB window read by every core (grid stride) ran
+  2–5× faster than a per-core cache model predicts. Use a private window per workgroup to measure per-core capacity.
+* **Sub-millisecond dispatches measure the DVFS state**: the same 50 µs kernel ran at ~2.5× its top-clock time
+  for a whole 12-dispatch run, and one 500 µs case read 484 µs in one process and 1,055 µs in the next. Size
+  validation dispatches to several ms, warm up first, take the minimum.
+* **Workgroups are not placed round-robin**: 38 workgroups on 38 cores leave 4 cores idle and 4 with two, which
+  doubled a predicted time. Measure placement (SR20 + SR0) before modelling dispatch time.
