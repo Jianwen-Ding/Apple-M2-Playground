@@ -35,6 +35,10 @@ Model (every parameter measured on this GPU):
 | register rotation, 32-bit, D = 4–16 | 3.5% | | 11.3% |
 | **24 random kernels, 1 SIMD group (out of sample)** | **4.3%** | 14.5% | 14.8% |
 | **24 random kernels, 4 SIMD groups per core (out of sample)** | **9.8%** | 18.3% | 24.0% |
+| **held out: 24 new 24-instruction kernels, 1 group** | **4.6%** | 10.6% | 13.8% |
+| **held out: same, 4 groups per core** | **9.8%** | 15.7% | 20.9% |
+| **held out: 12 new 48-instruction kernels, 1 group** | **3.4%** | 7.0% | 8.1% |
+| **held out: same, 4 groups per core** | **9.0%** | 13.9% | 18.0% |
 
 **Measurement noise floor (4 groups per core).** Per-core span timings repeat to about ±6%: the same body
 measured twice gave 49.7 / 46.8 (iadd chain) and 42.0 / 45.1 (fadd32 chain) cycles per trip, and the empty
@@ -44,7 +48,8 @@ therefore only modestly above what the measurement can resolve; single-group mea
 
 Errors are prediction minus measurement relative to the measurement. The random kernels mix 52 of the
 benchmarked forms with random register dependencies over r5–r12; they were not used for fitting, except
-that the issue rule was chosen among three candidates by their score:
+that the issue rule was chosen among three candidates by their score. The two held-out sets (new seeds 5000+
+and 6000+, measured after every model choice was frozen) confirm the same accuracy:
 
 | Issue-interval rule | random, 1 group | random, 4 groups/core | leader + k independent iadds |
 | --- | --- | --- | --- |

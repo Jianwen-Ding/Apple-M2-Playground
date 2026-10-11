@@ -98,6 +98,8 @@ def main():
     ap.add_argument('what', choices=['calibrate', 'validate'])
     ap.add_argument('--kernels', type=int, default=24)
     ap.add_argument('--length', type=int, default=24)
+    ap.add_argument('--seed-base', type=int, default=1000)
+    ap.add_argument('--name', default='validation.json')
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -119,9 +121,9 @@ def main():
     else:
         out = []
         for k in range(a.kernels):
-            lines, body = kernel(1000+k, a.length)
+            lines, body = kernel(a.seed_base+k, a.length)
             pa, pb = counted(body, 100), counted(body, 500)
-            row = {'seed': 1000+k, 'ops': [x for _, x in lines]}
+            row = {'seed': a.seed_base+k, 'length': a.length, 'ops': [x for _, x in lines]}
             for gm, groups in (('one', 1), ('gpu', 4)):
                 m = measure(R, pa, pb, 400, gm)
                 p = predict(pa, pb, 400, groups)
@@ -130,7 +132,7 @@ def main():
             out.append(row)
             print(json.dumps({'seed': row['seed'], 'one': [round(row['one']['measured'] or -1, 1), round(row['one']['predicted'], 1)],
                               'gpu': [round(row['gpu']['measured'] or -1, 1), round(row['gpu']['predicted'], 1)]}), flush=True)
-            (a.output/'validation.json').write_text(json.dumps(out)+'\n')
+            (a.output/a.name).write_text(json.dumps(out)+'\n')
         for gm in ('one', 'gpu'):
             err = sorted(abs(r[gm]['predicted']-r[gm]['measured'])/r[gm]['measured'] for r in out if r[gm]['measured'])
             print(gm, 'median rel err', round(err[len(err)//2], 3), 'p90', round(err[int(.9*len(err))], 3), 'max', round(err[-1], 3))

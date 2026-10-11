@@ -46,13 +46,14 @@ check(md <= 0.05 and mx <= 0.12, f'rotation (32-bit forms): median |err| {md:.3f
 md, p90, mx, b = stats(rerr[16:])
 print(f'info rotation (fadd16): median |err| {md:.3f}, max {mx:.3f} (16-bit writeback not modelled beyond D=9)')
 
-rk = json.loads((R/'random-kernels.json').read_text())
-for gm, groups, lim in (('one', 1, 0.06), ('gpu', 4, 0.12)):
+for fname, lim1, lim4 in (('random-kernels.json', 0.06, 0.12), ('heldout24.json', 0.06, 0.12), ('heldout48.json', 0.05, 0.12)):
+  rk = json.loads((R/fname).read_text())
+  for gm, groups, lim in (('one', 1, lim1), ('gpu', 4, lim4)):
     errs = []
     for x in rk:
         lines, body = H.kernel(x['seed'], len(x['ops']))
         p = H.predict(H.counted(body, 100), H.counted(body, 500), 400, groups)
         errs.append((p-x[gm]['measured'])/x[gm]['measured'])
     md, p90, mx, b = stats(errs)
-    check(md <= lim, f'random kernels, {groups} group(s)/core: median |err| {md:.3f} (limit {lim}), p90 {p90:.3f}, max {mx:.3f}, bias {b:+.3f}')
+    check(md <= lim, f'{fname}, {groups} group(s)/core: median |err| {md:.3f} (limit {lim}), p90 {p90:.3f}, max {mx:.3f}, bias {b:+.3f}')
 print(f'{fails} failures'); sys.exit(1 if fails else 0)
