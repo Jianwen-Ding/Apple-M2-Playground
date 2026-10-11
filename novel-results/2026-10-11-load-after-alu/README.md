@@ -41,7 +41,8 @@ units (device) or 17.1 (threadgroup); a device store completes ~18 units after a
 threadgroup loads serialize (~23 units each). Transitions between a device store and a threadgroup access
 (either order) cost ~6.7 units each; device↔threadgroup loads and a threadgroup store followed by a device
 load cost nothing extra (`spaces.json`); a `wait` whose slot has nothing pending costs ~4.9
-units, and 32 of them per repetition blew up to 424 units (unexplained).
+units, and the jump at 32 such waits per repetition is the >512-byte loop-body step of the
+[wait-cost finding](../2026-10-11-wait-cost/README.md).
 
 | Body per repetition (units) | measured |
 | --- | --- |

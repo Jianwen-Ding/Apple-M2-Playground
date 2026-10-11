@@ -32,7 +32,7 @@
  "mem_quiet_tg_ref": 20.0,
  "mem_quiet_device_store_ref": 33.6,
  "wait_idle_ref": 4.89,
- "quiet_note": "Quiet-time rule (supersedes memstate_note): a memory instruction effectively starts no earlier than Q after the group's last ALU issue (Q ~20 units for loads and threadgroup ops, ~33.6 for device stores); loads then complete their fast latency after that start. A wait whose slot has nothing pending costs ~4.85 units (window probe, iadd + k x wait 1 + load); 32 such waits per repetition blow up to 424 units (unexplained).",
+ "quiet_note": "Quiet-time rule (supersedes memstate_note): a memory instruction effectively starts no earlier than Q after the group's last ALU issue (Q ~20 units for loads and threadgroup ops, ~33.6 for device stores); loads then complete their fast latency after that start. A wait whose slot has nothing pending costs ~4.85 units (window probe, iadd + k x wait 1 + load); the jump at 32 such waits per repetition is the >512-byte loop-body step (wait_note).",
  "device_load_defer_delayed_extra_ref": 5.0,
  "wait_idle_big_ref": 10.9,
  "loop_buffer_bytes": 512,
