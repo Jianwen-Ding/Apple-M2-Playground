@@ -152,6 +152,7 @@ class Params:
         self.space_switch = g('mem_space_switch_ref', 13.3)
         self.quiet = {'load': g('mem_quiet_load_ref', 20.0), 'tg': g('mem_quiet_tg_ref', 20.0), 'device_store': g('mem_quiet_device_store_ref', 33.6)}
         self.wait_idle = g('wait_idle_ref', 4.89)
+        self.wait_drain = g('wait_drain_ref', 17.0)
         self.wait_idle_big = g('wait_idle_big_ref', 10.9)
         self.wait_run_long = c.get('wait_run_long', 31)
         self.branch = c.get('branch_taken_real')        # set by fit_branch() if missing
@@ -333,6 +334,8 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     tok = {}; port = READ_PORTS*T; issue_tok = ISSUE_PER_CORE*T
     load_busy = [0]*groups                   # tick until which a load of this group is outstanding
     last_alu = [-10**9]*groups               # tick of the group's last ALU issue (quiet-time rule)
+    alu_done = [-10**9]*groups               # latest completion tick of the group's ALU results (wait drain)
+    last_wait = [-10**9]*groups              # issue tick of the group's previous wait
     last_space = [None]*groups
     pending = [[] for _ in range(groups)]       # [slot, completion tick, latency ticks, dst halves] of in-flight loads
     last_t = 0
@@ -373,6 +376,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             if r['kind'] == 'wait':
                 pend = slots[gi][r['slot']]
                 if pend and max(pend) > t: wake.append(max(pend)); continue
+                if last_wait[gi]+tk(P.wait_idle) > t: wake.append(last_wait[gi]+tk(P.wait_idle)); continue   # wait issue spacing
             if issue_tok < T: wake.append(t+1); continue
             u = r['unit']
             if u:
@@ -393,7 +397,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             if kind == 'alu':
                 lat, ii = tk(row['lat']), tk(row['ii'])
                 for h in r['dst']: ready[gi][h] = t+lat
-                last_alu[gi] = t
+                last_alu[gi] = t; alu_done[gi] = max(alu_done[gi], t+lat)
                 for p_ in pending[gi]:          # ALU issue defers in-flight loads
                     newdone = t+p_[2]
                     if newdone > p_[1]:
@@ -429,9 +433,11 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 ii = T
                 for h in r['dst']: ready[gi][h] = t+tk(P.load_latency)
             elif kind == 'wait':
-                # idle wait: ~4.9 units. Long runs of consecutive waits can cost ~11 each, but the trigger is not
-                # understood (wait-cost finding), so it is not modelled.
-                ii = T if slots[gi][r['slot']] else tk(P.wait_idle); slots[gi][r['slot']] = []
+                # a wait cannot issue sooner than wait_idle after the previous wait issued, and completes no earlier
+                # than wait_drain after the latest ALU result (waitdrain.json, waitdrain-slots.json); pending slot work is handled by the slot check above. The long-run
+                # ~11-unit mode of many consecutive waits is not understood and not modelled.
+                done_ = max(t+T, alu_done[gi]+tk(P.wait_drain))
+                ii = done_-t; last_wait[gi] = t; slots[gi][r['slot']] = []
                 pending[gi] = [p_ for p_ in pending[gi] if p_[0] != r['slot']]
             elif kind == 'control':
                 ii = CI

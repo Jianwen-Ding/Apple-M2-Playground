@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-11 wait drains ALU work: completes ~17 units after the latest ALU result, on any slot (found via held-out memory kernels)](2026-10-11-wait-drain/README.md)
 - [2026-10-11 wait costs ~5 units when idle; some long runs of waits cost ~11 each (trigger unknown; not a loop-buffer effect)](2026-10-11-wait-cost/README.md)
 - [2026-10-11 Memory instructions start ~20 (loads, threadgroup) / ~34 (device stores) units after the last ALU issue; ALU in flight defers loads (resolves the load-latency discrepancy)](2026-10-11-load-after-alu/README.md)
 - [2026-10-11 Cost model (agx_cost.py): cycle simulator; held-out kernels 3.6-5.3% / 9.2-10.4% median error at 1 / 4 groups per core](2026-10-11-cost-model/README.md)

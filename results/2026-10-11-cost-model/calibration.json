@@ -38,5 +38,7 @@
  "wait_note": "waits.json + waitruns.json: an idle wait costs ~4.89 units; waits in a run of >= 31 consecutive waits cost ~10.9 each. Not a body-size effect: 30 waits + iadd (564 B) and 16 waits, iadd, 16 waits (596 B) are fast, 8 waits + 6 iadd (532 B) is fast, 31 waits (516 B) and 31 waits + iadd (580 B) are slow. The run-length explanation also fails (16 waits, iadd, 16 waits concatenates into 32-wait runs and is fast); not modelled.",
  "space_note": "spaces.json: only transitions between a device store and a threadgroup access (either order) cost extra, ~6.7 units each; device<->threadgroup loads and threadgroup store -> device load cost nothing extra.",
  "tg_load_defer_ref": 20.0,
- "tg_defer_note": "review2.json: tg load, iadd, wait = 42.0 and tg load, 8 iadd, wait = 53.6 units (tg load, wait = 22.9): ALU in flight defers threadgroup-load completion to >= ALU issue + ~20 units."
+ "tg_defer_note": "review2.json: tg load, iadd, wait = 42.0 and tg load, 8 iadd, wait = 53.6 units (tg load, wait = 22.9): ALU in flight defers threadgroup-load completion to >= ALU issue + ~20 units.",
+ "wait_drain_ref": 17.0,
+ "wait_drain_note": "waitdrain.json, waitdrain-slots.json: a wait completes no earlier than ~17 units after the latest ALU result completes (iadd+wait 19.1, rcp+wait 21.9, simd_iadd+wait 37.2), and no earlier than ~4.9 after the previous wait issued (a second wait right after the first is free). Same for wait 0 and wait 1. Found from held-out memory kernels (heldout-mem24.json), whose error correlated with the number of waits."
 }

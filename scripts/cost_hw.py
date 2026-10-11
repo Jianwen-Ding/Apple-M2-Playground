@@ -39,6 +39,61 @@ def kernel(seed, length, ops=POOL):
     return lines, body
 
 
+MEM_CONSTS = (1, 0x3f800000, 32, 7)     # r26 = 32 (table word 32, the only store target), r27 = 7 (read-only line)
+
+
+def mem_kernel(seed, length, p_mem=0.15):
+    """Random kernel mixing benchmarked ALU forms with memory instructions. ALU instructions use r5..r12;
+    loads write r13..r15, which nothing reads, so no load result is consumed without its wait. Addresses:
+    device loads from words 32 / 7 (r26 / r27), device stores only to word 32, threadgroup loads/stores at
+    immediate slots 0..7 (2 KiB declared). Random wait 0 instructions drain the loads/stores."""
+    from run_drm_tg_layout import tg
+    rng = random.Random(seed)
+    lines, parts = [], []
+    for _ in range(length):
+        x = rng.random()
+        if x < p_mem:
+            kind = rng.choice(['dload', 'dload', 'dstore', 'tgload', 'tgstore'])
+            d = rng.randint(13, 15); src = rng.randint(5, 12); slot = rng.randint(0, 7)
+            if kind == 'dload':
+                idx = rng.choice([26, 27]); t = f'device_load 0, i32, x, r{d}, u8_u9, r{idx}, unsigned'; b = e(t)
+            elif kind == 'dstore':
+                b = agx_loop.store(src, 8, 26); t = f'device_store r{src} -> word 32'
+            elif kind == 'tgload':
+                b = tg(True, 'i32', d, base=None, index=slot); t = f'threadgroup_load r{d} <- slot {slot}'
+            else:
+                b = tg(False, 'i32', src, base=None, index=slot); t = f'threadgroup_store r{src} -> slot {slot}'
+        elif x < p_mem+0.06:
+            b = e('wait 0'); t = 'wait 0'
+        else:
+            _, t = rand_instr(rng, POOL); b = e(t)
+        lines.append(t); parts.append(b)
+    lines.append('wait 0'); parts.append(e('wait 0'))
+    body = b''.join(parts)
+    mem_gate(body, [len(x) for x in parts])
+    return lines, body
+
+
+def mem_gate(body, lengths):
+    """Decode-check a mixed body: exact lengths; only known ALU / memory / wait instructions; ALU
+    destinations >= r5; load destinations r13..r15; no control flow."""
+    _, g = agx_loop._tools()
+    p = 0
+    for want in lengths:
+        n = g.opcode_to_number(body[p:p+16]); d = g.get_instruction_descriptor(n)
+        if d is None or d.decode_size(n) != want: raise ValueError(f'length mismatch at {p}')
+        n &= (1 << 8*want)-1; f = dict(d.decode_fields(n))
+        if d.name in ('device_load', 'threadgroup_load'):
+            if not 26 <= f['R'] <= 31: raise ValueError(f'load destination outside r13..r15 at {p}')
+        elif d.name in ('device_store', 'threadgroup_store', 'wait'):
+            pass
+        elif d.name in B.CONTROL:
+            raise ValueError(f'control flow in body: {d.name}')
+        else:
+            if f.get('D', 0) < 10: raise ValueError(f'{d.name} writes below r5')
+        p += want
+
+
 def counted(body, trips, init=True, consts=(1, 0x3f800000, 5, 7)):
     """Counted loop around `body`; r24..r27 preloaded with `consts`, r5..r12 with 1.5f."""
     head = mov(3, 0)+mov(4, trips)
@@ -107,6 +162,7 @@ def main():
     ap.add_argument('--length', type=int, default=24)
     ap.add_argument('--seed-base', type=int, default=1000)
     ap.add_argument('--name', default='validation.json')
+    ap.add_argument('--memory', action='store_true', help='random kernels with memory instructions (mem_kernel)')
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -128,11 +184,20 @@ def main():
     else:
         out = []
         for k in range(a.kernels):
-            lines, body = kernel(a.seed_base+k, a.length)
-            pa, pb = counted(body, 100), counted(body, 500)
-            row = {'seed': a.seed_base+k, 'length': a.length, 'ops': [x for _, x in lines]}
+            if a.memory:
+                lines, body = mem_kernel(a.seed_base+k, a.length)
+                pa, pb = counted(body, 100, consts=MEM_CONSTS), counted(body, 500, consts=MEM_CONSTS)
+            else:
+                lines, body = kernel(a.seed_base+k, a.length)
+                pa, pb = counted(body, 100), counted(body, 500)
+            row = {'seed': a.seed_base+k, 'length': a.length, 'memory': a.memory,
+                   'ops': lines if a.memory else [x for _, x in lines]}
             for gm, groups in (('one', 1), ('gpu', 4)):
-                m = measure(R, pa, pb, 400, gm)
+                env = None
+                if a.memory:
+                    from run_drm_tg_layout import shared_word
+                    env = {'AGX_SHARED_WORD': str(shared_word(2048))}
+                m = measure(R, pa, pb, 400, gm, extra_env=env)
                 p = predict(pa, pb, 400, groups)
                 if gm == 'gpu' and m: p = p   # core cycles per trip with 4 groups each doing one trip
                 row[gm] = {'measured': m and m['cycles'], 'predicted': p, 'mhz': m and m['mhz']}

@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch', 'review2'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch', 'review2', 'waitdrain'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -155,6 +155,20 @@ def main():
             m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one', extra_env=env)
             res[name] = (m['cycles']-EMPTY_TRIP)/8
             print(f'{name:26s} {res[name]:6.1f} ref units/rep', flush=True)
+    elif a.what == 'waitdrain':
+        # does an idle wait drain in-flight ALU results? X alone vs X followed by wait 0 (independent X)
+        X = {'iadd': 'iadd r{r}, r{r}, 1', 'imadd': 'imadd r{r}, r{r}, r25, r24', 'rcp': 'rcp r{r}, r{r}',
+             'simd_shuffle': 'simd_shuffle r{r}, r{r}, r26l', 'simd_iadd': 'simd_iadd r{r}, r{r}', 'fadd32': 'fadd32 r{r}, r{r}, r24'}
+        for name, tmpl in X.items():
+            for with_wait in (False, True):
+                parts = []
+                for k in range(8):
+                    parts.append(e(tmpl.format(r=5+k % 8)))
+                    if with_wait: parts.append(e('wait 0'))
+                body = b''.join(parts)
+                m = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'one')
+                res[f'{name}|{with_wait}'] = (m['cycles']-EMPTY_TRIP)/8
+            print(f"{name:13s} alone {res[f'{name}|False']:6.2f}  + wait {res[f'{name}|True']:6.2f}  (wait adds {res[f'{name}|True']-res[f'{name}|False']:5.2f})", flush=True)
     elif a.what == 'review2':
         # decisive probes requested by the second review (all archived)
         from run_drm_tg_layout import tg, shared_word
