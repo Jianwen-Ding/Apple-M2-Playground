@@ -14,3 +14,6 @@ offline checks `scripts/verify_subop_spaces.py` (16 checks, `make verify-subop-s
 | `cvt0-halves`, `cvt0-ints` | `convert f_to_u32, r5, r6, rtz` (bit 26 = 0) | all 64 modes |
 | `cvt-f2i` | Mesa forms f_to_u32/f_to_s32 rtz | sanity |
 | `cvt-regmode` | r5 = 11 before the convert | mode operand type bits 22–24 |
+| `icmpsel-cc`, `fcmpsel-cc` | A = (7·lane & 15) − 8, B = (5·lane & 15) − 8 (ints / floats) | cc bits 61–63, all 8 |
+| `iballot-cc`, `iballot-ccn`, `fballot-cc` | same inputs | cc × invert bit 47 |
+| `bitop-tt` | `and r5, r6, r7`, r6 hashed | all 16 truth tables |

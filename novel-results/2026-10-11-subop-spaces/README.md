@@ -1,4 +1,4 @@
-# funop, iunop, simd_op, shuffle and convert sub-op spaces fully mapped
+# ALU sub-op spaces fully mapped: funop, iunop, simd_op, shuffles, convert, conditions, bitop
 
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, compute.
 
@@ -53,6 +53,15 @@ a **direction** bit plus a hang bit: bit 26 = 0 float→int, 1 int→float; bit 
 * Bits 22–25 are the operand type of the mode slot: **bit 22 or 23 = mode read from a
   register** (the 6-bit field is then the half-register index), **bit 24 = from a uniform
   register**. Conversion mode can therefore differ per lane. Bits 38–39 and 42–43 are ignored.
+
+**Condition codes.** icmpsel / fcmpsel (cc bits 61–63) and icmp/fcmp ballots (cc 61–63, invert
+bit 47): the unnamed **icond 3 and 7 and fcond 4 are "never"**; with the invert bit they are
+"always", so `icmp_ballot` with cc = 3 and invert = 1 returns the active-lane mask in one
+instruction. The other codes match Mesa (ltn/gtn equal lt/gt for the non-NaN inputs used).
+
+**bitop truth tables (bits 26, 27, 38, 39).** With truth-table index (b << 1) | a, 14 of 16 tables
+compute f(a, b) bitwise. The two B-only tables (0011 = ¬b, 1100 = b) return **A unchanged**
+(applegpu's `bitop_mov_a`): there is no single-bitop ¬b or b.
 
 ## Relationship to existing knowledge
 

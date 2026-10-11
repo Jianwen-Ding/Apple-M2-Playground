@@ -112,5 +112,42 @@ check('convert: mode operand type bit 22/23 = register (r5l = 11 -> s32_to_f), b
       all(lab[1 << b] == [C.CANDS['s32_to_f'](u) for u in x] for b in (22, 23)) and lab[1 << 24] == [C.CANDS['u8_to_f'](u) for u in x])
 for f in paths.values(): os.unlink(f)
 
+# condition codes: icond 3/7 and fcond 4 are 'never' ('always' with the invert bit)
+import struct  # noqa: E402
+f32 = lambda u: struct.unpack('<f', struct.pack('<I', u))[0]
+s32 = lambda u: u-(1 << 32) if u >> 31 else u
+ICC = {0: lambda a, b: a == b, 1: lambda a, b: a < b, 2: lambda a, b: a > b, 3: lambda a, b: False,
+       4: lambda a, b: s32(a) == s32(b), 5: lambda a, b: s32(a) < s32(b), 6: lambda a, b: s32(a) > s32(b), 7: lambda a, b: False}
+FCC = {0: lambda a, b: f32(a) == f32(b), 1: lambda a, b: f32(a) < f32(b), 2: lambda a, b: f32(a) > f32(b), 3: lambda a, b: f32(a) < f32(b),
+       4: lambda a, b: False, 5: lambda a, b: f32(a) >= f32(b), 6: lambda a, b: f32(a) <= f32(b), 7: lambda a, b: f32(a) > f32(b)}
+for name, cc, nb in (('icmpsel-cc', ICC, 10), ('fcmpsel-cc', FCC, 10)):
+    ok = True; seen = set()
+    for r in load(name)['results']:
+        if r['layout'] != 'A' or r['key'] == 'ref': continue
+        n = int.from_bytes(bytes.fromhex(r['cand'])[-nb:], 'little'); c = n >> 61 & 7; seen.add(c)
+        t = r['table']
+        ok &= all(d == (x if cc[c](a, b) else y) for a, b, x, y, d in zip(t[7], t[8], t[9], t[10], t[6]))
+    check(f'{name.split("-")[0]}: all 8 condition codes match (icond 3/7, fcond 4 = never)', ok and seen == set(range(8)))
+for name, cc in (('iballot-cc', ICC), ('iballot-ccn', ICC), ('fballot-cc', FCC)):
+    ok = True
+    for r in load(name)['results']:
+        if r['layout'] != 'A' or r['key'] == 'ref': continue
+        n = int.from_bytes(bytes.fromhex(r['cand'])[-8:], 'little'); c, inv = n >> 61 & 7, n >> 47 & 1
+        t = r['table']
+        want = sum((cc[c](a, b) != bool(inv)) << l for l, (a, b) in enumerate(zip(t[7], t[8])))
+        ok &= all(v == want for v in t[6])
+    check(f'{name}: ballot of every condition code, invert bit 47 negates (never -> always = active mask)', ok)
+ok = True; tts = set()
+for r in load('bitop-tt')['results']:
+    if r['layout'] != 'A' or r['key'] != 'bitop': continue
+    n = int.from_bytes(bytes.fromhex(r['cand'])[-6:], 'little')
+    tt = (n >> 26 & 1) | (n >> 27 & 1) << 1 | (n >> 38 & 1) << 2 | (n >> 39 & 1) << 3; tts.add(tt)
+    A, Bv, Dv = r['table'][7], r['table'][8], r['table'][6]
+    if tt in (0b0011, 0b1100):
+        ok &= Dv == A
+    else:
+        ok &= all(d == sum(((tt >> (((b >> i) & 1) << 1 | ((a >> i) & 1))) & 1) << i for i in range(32)) for a, b, d in zip(A, Bv, Dv))
+check('bitop: 14 truth tables = f(a,b) with index (b<<1)|a; the B-only tables 0011/1100 return A', ok and tts == set(range(16)))
+
 print(f'{sum(checks)}/{len(checks)} checks passed')
 sys.exit(0 if all(checks) else 1)
