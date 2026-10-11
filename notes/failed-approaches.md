@@ -302,3 +302,7 @@ VkResult error" as "no fault".
   Retry plan (this session): caps raised to 2^24 with the table moved past a large output; step one
   power of two at a time, separately for a large X grid (output scales) and a large Y grid (output
   fixed at 32 lanes), one process per step, pushing before each new size.
+* **Outcome:** the retry passed every step from 2^16 to 2^24 threads, X and Y forms, with exact
+  buffers ([runs](../results/2026-10-11-grid-size-cap/README.md)). The crash was in that session's
+  uncommitted harness edit (most likely the output/table/BO sizing), not in the grid size. When raising a
+  bound, keep every derived size (output words, BO size, table offset) consistent and step up gradually.

@@ -5,6 +5,7 @@
   "count": 65536,
   "global_y": null,
   "threads": 65536,
+  "output_bytes": 262272,
   "passed": true,
   "buffer_ok": true,
   "fw_ns": [
@@ -19,6 +20,7 @@
   "count": 131072,
   "global_y": null,
   "threads": 131072,
+  "output_bytes": 524416,
   "passed": true,
   "buffer_ok": true,
   "fw_ns": [
@@ -33,6 +35,7 @@
   "count": 262144,
   "global_y": null,
   "threads": 262144,
+  "output_bytes": 1048704,
   "passed": true,
   "buffer_ok": true,
   "fw_ns": [
@@ -47,6 +50,7 @@
   "count": 524288,
   "global_y": null,
   "threads": 524288,
+  "output_bytes": 2097280,
   "passed": true,
   "buffer_ok": true,
   "fw_ns": [
@@ -56,11 +60,87 @@
   "cdm_hex": "02000000001000000000000000000040000008000100000001000000200000000100000001000000ffff0f600000004000000000"
  },
  {
+  "run": "x-1048576",
+  "form": "x",
+  "count": 1048576,
+  "global_y": null,
+  "threads": 1048576,
+  "output_bytes": 4194432,
+  "passed": true,
+  "buffer_ok": true,
+  "fw_ns": [
+   111583,
+   109250
+  ],
+  "cdm_hex": "02000000001000000000000000000040000010000100000001000000200000000100000001000000ffff0f600000004000000000"
+ },
+ {
+  "run": "x-2097152",
+  "form": "x",
+  "count": 2097152,
+  "global_y": null,
+  "threads": 2097152,
+  "output_bytes": 8388736,
+  "passed": true,
+  "buffer_ok": true,
+  "fw_ns": [
+   214833,
+   215125
+  ],
+  "cdm_hex": "02000000001000000000000000000040000020000100000001000000200000000100000001000000ffff0f600000004000000000"
+ },
+ {
+  "run": "x-4194304",
+  "form": "x",
+  "count": 4194304,
+  "global_y": null,
+  "threads": 4194304,
+  "output_bytes": 16777344,
+  "passed": true,
+  "buffer_ok": true,
+  "fw_ns": [
+   406583,
+   419958
+  ],
+  "cdm_hex": "02000000001000000000000000000040000040000100000001000000200000000100000001000000ffff0f600000004000000000"
+ },
+ {
+  "run": "x-8388608",
+  "form": "x",
+  "count": 8388608,
+  "global_y": null,
+  "threads": 8388608,
+  "output_bytes": 33554560,
+  "passed": true,
+  "buffer_ok": true,
+  "fw_ns": [
+   784416,
+   808958
+  ],
+  "cdm_hex": "02000000001000000000000000000040000080000100000001000000200000000100000001000000ffff0f600000004000000000"
+ },
+ {
+  "run": "x-16777216",
+  "form": "x",
+  "count": 16777216,
+  "global_y": null,
+  "threads": 16777216,
+  "output_bytes": 67108992,
+  "passed": true,
+  "buffer_ok": true,
+  "fw_ns": [
+   1548792,
+   1567792
+  ],
+  "cdm_hex": "02000000001000000000000000000040000000010100000001000000200000000100000001000000ffff0f600000004000000000"
+ },
+ {
   "run": "y-2048",
   "form": "y",
   "count": 32,
   "global_y": 2048,
   "threads": 65536,
+  "output_bytes": 256,
   "passed": true,
   "buffer_ok": true,
   "fw_ns": [
@@ -75,6 +155,7 @@
   "count": 32,
   "global_y": 4096,
   "threads": 131072,
+  "output_bytes": 256,
   "passed": true,
   "buffer_ok": true,
   "fw_ns": [
@@ -89,6 +170,7 @@
   "count": 32,
   "global_y": 8192,
   "threads": 262144,
+  "output_bytes": 256,
   "passed": true,
   "buffer_ok": true,
   "fw_ns": [
@@ -103,6 +185,7 @@
   "count": 32,
   "global_y": 16384,
   "threads": 524288,
+  "output_bytes": 256,
   "passed": true,
   "buffer_ok": true,
   "fw_ns": [
@@ -110,5 +193,80 @@
    51500
   ],
   "cdm_hex": "02000000001000000000000000000040200000000040000001000000200000000100000001000000ffff0f600000004000000000"
+ },
+ {
+  "run": "y-32768",
+  "form": "y",
+  "count": 32,
+  "global_y": 32768,
+  "threads": 1048576,
+  "output_bytes": 256,
+  "passed": true,
+  "buffer_ok": true,
+  "fw_ns": [
+   99584,
+   98166
+  ],
+  "cdm_hex": "02000000001000000000000000000040200000000080000001000000200000000100000001000000ffff0f600000004000000000"
+ },
+ {
+  "run": "y-65536",
+  "form": "y",
+  "count": 32,
+  "global_y": 65536,
+  "threads": 2097152,
+  "output_bytes": 256,
+  "passed": true,
+  "buffer_ok": true,
+  "fw_ns": [
+   192541,
+   190125
+  ],
+  "cdm_hex": "02000000001000000000000000000040200000000000010001000000200000000100000001000000ffff0f600000004000000000"
+ },
+ {
+  "run": "y-131072",
+  "form": "y",
+  "count": 32,
+  "global_y": 131072,
+  "threads": 4194304,
+  "output_bytes": 256,
+  "passed": true,
+  "buffer_ok": true,
+  "fw_ns": [
+   377667,
+   377875
+  ],
+  "cdm_hex": "02000000001000000000000000000040200000000000020001000000200000000100000001000000ffff0f600000004000000000"
+ },
+ {
+  "run": "y-262144",
+  "form": "y",
+  "count": 32,
+  "global_y": 262144,
+  "threads": 8388608,
+  "output_bytes": 256,
+  "passed": true,
+  "buffer_ok": true,
+  "fw_ns": [
+   747125,
+   751500
+  ],
+  "cdm_hex": "02000000001000000000000000000040200000000000040001000000200000000100000001000000ffff0f600000004000000000"
+ },
+ {
+  "run": "y-524288",
+  "form": "y",
+  "count": 32,
+  "global_y": 524288,
+  "threads": 16777216,
+  "output_bytes": 256,
+  "passed": true,
+  "buffer_ok": true,
+  "fw_ns": [
+   1498041,
+   1489209
+  ],
+  "cdm_hex": "02000000001000000000000000000040200000000000080001000000200000000100000001000000ffff0f600000004000000000"
  }
 ]
