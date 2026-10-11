@@ -80,6 +80,7 @@ SPACE = {'device_load': 'device', 'device_load.TODO': 'device', 'device_store': 
          'atomic': 'device', 'threadgroup_load': 'tg', 'threadgroup_store': 'tg', 'threadgroup_atomic': 'tg',
          'stack_load': 'stack', 'stack_store': 'stack'}
 CTL_AS_ALU = True
+CROSS_BUMP = True
 CONTROL = {'if_icmp', 'if_fcmp', 'else_icmp', 'else_fcmp', 'while_icmp', 'while_fcmp', 'pop_exec', 'push_exec',
            'jmp_exec_any', 'jmp_exec_none', 'stop', 'trap', 'TODO.unk51', 'no_var'}
 BARRIERS = {'threadgroup_barrier', 'memory_barrier', 'wait_pix', 'signal_pix', 'TODO.unkE800'}
@@ -333,6 +334,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     BR = tk(P.branch); CL = tk(cal.get('control_latency', 2)); CI = tk(cal.get('control_issue_cycles', 1))
     nxt = [0]*groups; free = [0]*groups
     ready = [defaultdict(int) for _ in range(groups)]
+    crossed = [dict() for _ in range(groups)]   # half -> ready tick after its one while-crossing bump
     slots = [defaultdict(list) for _ in range(groups)]
     rcache = [[] for _ in range(groups)]; wtime = [dict() for _ in range(groups)]; last_w = [dict() for _ in range(groups)]
     tok = {}; port = READ_PORTS*T; issue_tok = ISSUE_PER_CORE*T
@@ -450,6 +452,13 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 pending[gi] = [p_ for p_ in pending[gi] if p_[0] != r['slot']]
             elif kind == 'control':
                 ii = CI
+                if CROSS_BUMP and r['src']-{0}:
+                    # ctlspacer.json: a result produced before a register-compare control instruction (while_icmp)
+                    # and read after it arrives one control latency later, once however many it crosses
+                    # (while,iadd chain 3.8 not 2.0; while,iadd,iadd 5.7; while,while,iadd 4.1; push/pop: no effect)
+                    for h, rr in list(ready[gi].items()):
+                        if rr+CL > t and crossed[gi].get(h) != rr:
+                            ready[gi][h] = rr+CL; crossed[gi][h] = rr+CL
                 for h in r['dst']: ready[gi][h] = t+CL
                 # ctlspacer.json: control instructions count as ALU work for the wait drain and the memory quiet time
                 if CTL_AS_ALU:

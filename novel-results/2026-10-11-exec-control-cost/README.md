@@ -27,17 +27,40 @@ dependency and no effect on memory or `wait`.
    memory quiet time measured from the last control instruction, not from the last `iadd`
    ([load-after-ALU finding](../2026-10-11-load-after-alu/README.md)).
 
+3. **A result read across a `while_icmp` arrives one control latency (1.9 units) late, once.** Measured with
+   the loop skeleton's own always-true `while_icmp r0l, ult, r3, r4, 1` placed in the body:
+
+   | body per repetition (× 8) | measured | no crossing rule | with rule |
+   | --- | --- | --- | --- |
+   | `while_icmp` | 2.0 | 1.8 | 1.8 |
+   | `while_icmp`, `iadd` (one chain) | 3.8 | 2.0 | 3.7 |
+   | `while_icmp`, `fadd32` (one chain) | 3.9 | 2.0 | 3.7 |
+   | `while_icmp`, `iadd`, `iadd` (same chain) | 5.7 | 4.0 | 5.7 |
+   | `while_icmp`, `while_icmp`, `iadd` | 4.1 | 3.9 | 3.9 |
+   | `while_icmp`, `iadd` on 8 rotating registers | 2.5 | 2.0 | 2.0 |
+   | `push_exec`, `iadd`, `pop_exec`, `iadd` | 3.8 | 4.0 | 4.0 |
+
+   A chain that crosses two `while_icmp`s pays once, and `push_exec`/`pop_exec` (whose compare reads only
+   immediates) do not trigger it. Blocking the next instruction until the exec mask is written does not fit
+   (it predicts 5.9 for the push/iadd/pop/iadd row). The rotating-register row stays 20% under.
+   Every counted loop ends in a `while_icmp`, so loop-carried chains pay this per trip; on the held-out random
+   kernels (24 and 48 instructions per trip) it changes no prediction measurably, because the crossing latency
+   is hidden behind the body.
+
 So exec-stack instructions are not a usable non-ALU spacer for the store-window question; that stays open.
 
-Not established: other control instructions (`if_icmp`, `while_icmp`, `else_*`, `jmp_exec_*`) in isolation;
+Not established: `if_icmp`, `else_*` and `jmp_exec_*` in isolation; whether it is the register read of the
+compare or the instruction class that triggers rule 3;
 divergent exec masks; several SIMD groups.
 
 ## Reproducer and evidence
 
-`results/2026-10-11-cost-model/ctlspacer.json`; checked by `scripts/verify_cost_model.py` (13 cases, max 8.4%).
+`results/2026-10-11-cost-model/ctlspacer.json`; checked by `scripts/verify_cost_model.py` (20 cases, limit 10%).
 
 ## Compiler implications
 
 * Short `if` regions are not free: each `push_exec` / `pop_exec` pair with nothing between costs ~3.7 units,
   and a `wait` or memory instruction right after one pays the drain or quiet time as if ALU work preceded it.
 * Put independent ALU work between a push and its pop when possible; it hides the r0l chain.
+* In a tight loop, a loop-carried dependency costs ~1.9 units more per trip than its latency suggests;
+  unrolling or two interleaved accumulators hide it.
