@@ -233,3 +233,24 @@ VkResult error" as "no fault".
 * After the reboot, the owner allowed only opcodes that had never crashed. The 16
   remaining ones ran with `--max-faults 1` and produced 0 faults. 0x5c, 0x64 and 0x74 stay
   unrun. See [evidence](../results/2026-10-11-opcode-scan-drm/README.md).
+
+### Opcode descriptions, 2026-10-11
+
+* **Register count is in 16-bit halves.** `--gprs 32` declares r0–r15 only. A probe that used
+  r0–r26 under it passed 890 of 894 dispatches. The other 4 (the slowest, > 15 µs) lost or
+  misplaced stores. None reproduced on rerun, and one of them never executed the opcode
+  under test. Before blaming an opcode, check the declared count against the highest
+  register used (×2).
+* **Do not subtract an empty loop to get per-instruction ns.** Short bodies overlap the
+  taken-branch overhead, so the costs do not add. Absolute loop times also varied 2.2×
+  between processes (the 462 / 336 / 213 µs states). Compare raw times from the same run.
+  A repeat that gave `mov_imm` at 0.31 ns instead of 2.26 ns exposed this.
+* A "no-op" verdict from a scan with `wait` padding hides the instruction length. Every
+  low-`0b11` opcode is 6 bytes and swallowed the padding. Use the marker layout
+  (`mov_imm rNl, 56` = `62 xx 38 00`, upper half `wait`) whenever length matters.
+* The brief given to delegated agents listed 0x6f as a scanned no-op, and both agents
+  repeated it. 0x6f is decoded by applegpu (subgroup op), and the 33 no-ops include 0x78. Derive
+  opcode lists from the retained scan record, not from summaries.
+* Delegation 2026-10-11: AGY (Antigravity) needs an interactive Google login (`agy`), and
+  its run failed at authentication. OpenCode's run ended with ECONNRESET after it had
+  written its report. Only Claude submitted GPU work; the delegated agents were offline-only.

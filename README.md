@@ -59,6 +59,8 @@ make verify-loops  # Check loop latency/throughput evidence offline
 make verify-memory # Check pointer-chase load-latency evidence offline
 make verify-sr-direct # Check direct-DRM differential SR scan evidence offline
 make gpu-faults  # Summarize GPU timeouts/faults in a kernel log (LOG=...)
+make opcode-describe        # GPU: describe the 49 non-faulting undecoded opcodes (CONFIRM_GPU_FAULTS=1)
+make verify-opcode-describe # Check retained opcode-description evidence offline
 ```
 
 Run records and binaries go to scratch. Baseline/DRM runs use

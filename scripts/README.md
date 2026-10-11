@@ -125,3 +125,12 @@ runner's `--help` for selector/count options. `verify_sr_evidence.py` independen
 reconstructs shader bytes and buffers with the Python standard library;
 `verify_sr_findings.py` checks the retained lane/context observations. Run
 `make verify-sr` without GPU access.
+
+## Opcode descriptions (2026-10-11)
+
+* `run_drm_opcode_describe.py`: length/register, granularity and timing suites for the 49
+  non-faulting undecoded opcodes (`--dry-run` builds and checks every body offline;
+  `--names REGEX --repeat N` reruns selected jobs). It refuses the faulting opcodes.
+* `analyze_opcode_describe.py RECORD [--jobs]`: summary against the reference-body oracle.
+* `verify_opcode_describe.py`: offline checks of `results/2026-10-11-opcode-describe/`.
+

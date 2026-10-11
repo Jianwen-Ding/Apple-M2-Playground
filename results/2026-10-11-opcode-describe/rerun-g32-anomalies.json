@@ -1,0 +1,452 @@
+[
+{
+"name": "ref-wait-A",
+"fault": false,
+"fw_ns": [
+12084
+],
+"bad_slots": []
+},
+{
+"name": "ref-wait-A",
+"fault": false,
+"fw_ns": [
+13250
+],
+"bad_slots": []
+},
+{
+"name": "ref-wait-A",
+"fault": false,
+"fw_ns": [
+12959
+],
+"bad_slots": []
+},
+{
+"name": "ref-wait-A",
+"fault": false,
+"fw_ns": [
+13167
+],
+"bad_slots": []
+},
+{
+"name": "ref-wait-A",
+"fault": false,
+"fw_ns": [
+12583
+],
+"bad_slots": []
+},
+{
+"name": "ref-wait-B",
+"fault": false,
+"fw_ns": [
+12917
+],
+"bad_slots": []
+},
+{
+"name": "ref-wait-B",
+"fault": false,
+"fw_ns": [
+12916
+],
+"bad_slots": []
+},
+{
+"name": "ref-wait-B",
+"fault": false,
+"fw_ns": [
+12459
+],
+"bad_slots": []
+},
+{
+"name": "ref-wait-B",
+"fault": false,
+"fw_ns": [
+11875
+],
+"bad_slots": []
+},
+{
+"name": "ref-wait-B",
+"fault": false,
+"fw_ns": [
+13333
+],
+"bad_slots": []
+},
+{
+"name": "op-07-dt0-A",
+"fault": false,
+"fw_ns": [
+13000
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-07-dt0-A",
+"fault": false,
+"fw_ns": [
+13250
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-07-dt0-A",
+"fault": false,
+"fw_ns": [
+12792
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-07-dt0-A",
+"fault": false,
+"fw_ns": [
+13166
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-07-dt0-A",
+"fault": false,
+"fw_ns": [
+12209
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-07-dt0-B",
+"fault": false,
+"fw_ns": [
+11750
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-07-dt0-B",
+"fault": false,
+"fw_ns": [
+12667
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-07-dt0-B",
+"fault": false,
+"fw_ns": [
+13125
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-07-dt0-B",
+"fault": false,
+"fw_ns": [
+13083
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-07-dt0-B",
+"fault": false,
+"fw_ns": [
+13917
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-0f-b15-A",
+"fault": false,
+"fw_ns": [
+12709
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-0f-b15-A",
+"fault": false,
+"fw_ns": [
+12625
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-0f-b15-A",
+"fault": false,
+"fw_ns": [
+13208
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-0f-b15-A",
+"fault": false,
+"fw_ns": [
+13084
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-0f-b15-A",
+"fault": false,
+"fw_ns": [
+13083
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-0f-b15-B",
+"fault": false,
+"fw_ns": [
+13166
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-0f-b15-B",
+"fault": false,
+"fw_ns": [
+12791
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-0f-b15-B",
+"fault": false,
+"fw_ns": [
+12791
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-0f-b15-B",
+"fault": false,
+"fw_ns": [
+13000
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-0f-b15-B",
+"fault": false,
+"fw_ns": [
+12750
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-3b-d6-A",
+"fault": false,
+"fw_ns": [
+12625
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-3b-d6-A",
+"fault": false,
+"fw_ns": [
+12625
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-3b-d6-A",
+"fault": false,
+"fw_ns": [
+12458
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-3b-d6-A",
+"fault": false,
+"fw_ns": [
+12917
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-3b-d6-A",
+"fault": false,
+"fw_ns": [
+12625
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-3b-d6-B",
+"fault": false,
+"fw_ns": [
+12667
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-3b-d6-B",
+"fault": false,
+"fw_ns": [
+13750
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-3b-d6-B",
+"fault": false,
+"fw_ns": [
+13167
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-3b-d6-B",
+"fault": false,
+"fw_ns": [
+13292
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "op-3b-d6-B",
+"fault": false,
+"fw_ns": [
+13208
+],
+"bad_slots": [
+17
+]
+},
+{
+"name": "gran-wait-none-jump",
+"fault": false,
+"fw_ns": [
+12791
+]
+},
+{
+"name": "gran-wait-none-jump",
+"fault": false,
+"fw_ns": [
+11750
+]
+},
+{
+"name": "gran-wait-none-jump",
+"fault": false,
+"fw_ns": [
+12875
+]
+},
+{
+"name": "gran-wait-none-jump",
+"fault": false,
+"fw_ns": [
+12958
+]
+},
+{
+"name": "gran-wait-none-jump",
+"fault": false,
+"fw_ns": [
+11791
+]
+},
+{
+"name": "gran-3d-none-jump",
+"fault": false,
+"fw_ns": [
+12709
+]
+},
+{
+"name": "gran-3d-none-jump",
+"fault": false,
+"fw_ns": [
+12292
+]
+},
+{
+"name": "gran-3d-none-jump",
+"fault": false,
+"fw_ns": [
+12042
+]
+},
+{
+"name": "gran-3d-none-jump",
+"fault": false,
+"fw_ns": [
+12917
+]
+},
+{
+"name": "gran-3d-none-jump",
+"fault": false,
+"fw_ns": [
+13125
+]
+}
+]

@@ -67,20 +67,29 @@ evidence only.
 
 | Class | Opcodes |
 | --- | --- |
-| no-op (33) | every opcode with low bits `0b11` (0x03, 0x07, …, 0x7f), plus 0x18 |
+| no-op (33) | the 31 undecoded opcodes with low bits `0b11` (0x03, 0x07, …, 0x7f; 0x6f is decoded by applegpu and was not scanned), plus 0x18 and 0x78 |
 | ends thread/group (16) | 0x01, 0x0d, 0x1d, 0x2c, 0x2d, 0x3c, 0x3d, 0x4d, 0x50, 0x5d, 0x60, 0x6c, 0x6d, 0x70, 0x7c, 0x7d |
 | fault, recovered (6) | 0x06, 0x24, 0x34, 0x44, 0x46, 0x54 |
 | fault, device wedged until reboot (1) | 0x5c |
 | not run (3) | 0x64, 0x74 (Vulkan-scan faulters, skipped on purpose); 0x6e (excluded, LeftoverLocals class) |
 
 Patterns, observed with this one operand encoding only:
-* All 32 undecoded opcodes with low two bits `0b11` are inert. Of the low-`0b00`
-  opcodes, only 0x18 is.
+* All 31 undecoded opcodes with low two bits `0b11` are inert. Among the other
+  undecoded opcodes, only 0x18 and 0x78 are. (Corrected: an earlier version said
+  32 low-`0b11` opcodes plus 0x18 and missed 0x78. 0x6f is decoded, so it was not in the scan.)
 * The `…1100`/`…1101` opcodes (0x2c/0x2d, 0x3c/0x3d, 0x6c/0x6d, 0x7c/0x7d, and the
   `…1101` members 0x0d/0x1d/0x4d/0x5d) end execution cleanly. 0x5c is the exception
   in that column, and it is the only opcode that wedged the device.
 * Every fault so far has an opcode ≡ 0, 4 or 6 (mod 8) in the 0x04-0x74 range.
   Other operand encodings (wider forms, other Dt values) were not tested.
+
+## Follow-up
+
+Each non-faulting opcode is described in
+[novel-results/2026-10-11-opcode-descriptions](../../novel-results/2026-10-11-opcode-descriptions/README.md).
+The scan's "no-op" class is really two classes: 31 **6-byte** no-ops (this scan's 2-byte
+form swallowed 4 bytes of `wait` padding) and the 2-byte control ops 0x18/0x78. "Ends"
+means the whole SIMD group ends, whatever the exec mask.
 
 ## Status
 

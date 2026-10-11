@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -40,6 +40,9 @@ help:
 	@echo 'make verify-sr-direct   Verify retained direct-DRM SR scan summaries offline'
 	@echo 'make gpu-faults LOG=... Summarize Asahi GPU timeouts/faults in a kernel log'
 	@echo 'make opcode-scan        GPU-FAULTING: undecoded opcode effects (needs CONFIRM_GPU_FAULTS=1)'
+	@echo 'make opcode-describe    Describe the 49 non-faulting undecoded opcodes (needs CONFIRM_GPU_FAULTS=1)'
+	@echo 'make test-opcode-describe  Hardware regression subset for the opcode descriptions'
+	@echo 'make verify-opcode-describe  Verify retained opcode-description evidence offline'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
 	@echo 'Override SCRATCH_ROOT, DEVICE, PYTHON, CC, or PROBE_INCLUDE as needed.'
 
@@ -187,3 +190,16 @@ sr-direct:
 
 verify-sr-direct:
 	$(PYTHON) -B scripts/verify_sr_direct.py
+
+DESCDIR = $(SCRATCH_ROOT)/drm-compute/opcode-describe/make-$$(date -u +%Y%m%dT%H%M%SZ)
+opcode-describe:
+	@test "$(CONFIRM_GPU_FAULTS)" = 1 || { echo 'opcode-describe runs untested operand encodings of non-faulting opcodes; re-run with CONFIRM_GPU_FAULTS=1 on an idle machine.'; exit 1; }
+	$(PYTHON) -B scripts/run_drm_opcode_describe.py --device "$(DEVICE)" --output "$(DESCDIR)-shape"
+	$(PYTHON) -B scripts/run_drm_opcode_describe.py --suite timing --device "$(DEVICE)" --output "$(DESCDIR)-timing"
+
+test-opcode-describe:
+	@test "$(CONFIRM_GPU_FAULTS)" = 1 || { echo 'needs CONFIRM_GPU_FAULTS=1'; exit 1; }
+	$(PYTHON) -B tests/test_opcode_describe.py --hardware
+
+verify-opcode-describe:
+	$(PYTHON) -B scripts/verify_opcode_describe.py
