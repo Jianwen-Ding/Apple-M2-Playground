@@ -86,6 +86,12 @@ GROUP_BLOCKING = {'simd_iadd', 'simd_prefix_iadd', 'simd_fadd', 'simd_min.u', 'q
 UNIT_GROUPS = [['iadd', 'isub', 'iadd_lsl2', 'iadd_imm', 'iadd_cache'], ['imadd', 'imul', 'imadd_cache'],
                ['fadd32', 'fadd32_imm', 'fadd32_cache', 'fadd32_cache2'], ['fmul32', 'fmul32_cache'],
                ['fmadd32', 'fmadd32_imm', 'fmadd32_cache'], ['and', 'xor']]
+# execution units shared by several instruction classes (sfumix.json: different transcendentals contend
+# across SIMD groups like identical ones). One bucket per unit, refilled at 1 unit-cycle per cycle; an
+# instruction consumes 1 / (its measured instructions per cycle per core). Single-class loops are unchanged.
+SHARED_UNITS = {'sfu': ['rcp', 'rsqrt', 'rsqrt_special', 'log2', 'exp2', 'sin_pt_1', 'sin_pt_2', 'floor', 'rint'],
+                'imadbf': ['imadd', 'imul', 'imadd_cache', 'bfi', 'bfeil', 'extr', 'shlhi', 'shrhi', 'asr', 'asrh',
+                           'bitrev', 'popcount', 'ffs', 'intl', 'convert_f2i', 'convert_i2f']}
 TRACE_WARNINGS = []
 
 
@@ -121,6 +127,8 @@ class Params:
                                'ipc': 4.0, 'tmpl': 'get_sr'}
         self.unit_cap = {k: v['ipc'] for k, v in self.rows.items()}
         self.unit_bucket = {k: k for k in self.rows}
+        self.shared_of = {k: u for u, ks in SHARED_UNITS.items() for k in ks}
+        if c.get('merge_sfu_imad'): self.shared_of = {k: 'sfu' for k in self.shared_of}
         for grp in UNIT_GROUPS:
             best = max(self.rows[k]['ipc'] for k in grp if k in self.rows)
             for k in grp:
@@ -325,12 +333,20 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             t0, narrow = wtime[gi][reg]; r = max(r, t0+(W16 if narrow else W))
         return r
 
+    def bucket_of(u):
+        """(bucket, tokens per instruction, bucket rate per cycle) for a benchmark row."""
+        sh = P.shared_of.get(u)
+        if sh: return sh, int(round(T/max(P.unit_cap[u], 1e-3))), 1.0
+        return P.unit_bucket[u], T, P.unit_cap[u]
+
     def refill(dt):
         nonlocal port, issue_tok
         # buckets are kept in units of 1/T instructions (or reads); rates per tick
         port = min(port+READ_PORTS*dt, (READ_PORTS+4)*T)
         issue_tok = min(issue_tok+ISSUE_PER_CORE*dt, ISSUE_PER_CORE*T)
-        for b_ in tok: tok[b_] = min(tok[b_]+P.unit_cap[b_]*dt, (P.unit_cap[b_]+1)*T)
+        for b_ in tok:
+            if b_ in SHARED_UNITS: tok[b_] = min(tok[b_]+dt, 2*T)        # 1 unit-cycle per cycle, small burst
+            else: tok[b_] = min(tok[b_]+P.unit_cap[b_]*dt, (P.unit_cap[b_]+1)*T)
 
     t = 0; done = 0
     while done < groups:
@@ -349,10 +365,10 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             if issue_tok < T: wake.append(t+1); continue
             u = r['unit']
             if u:
-                bk = P.unit_bucket[u]
-                if bk not in tok: tok[bk] = (P.unit_cap[u]+1)*T
+                bk, cost, cap = bucket_of(u)
+                if bk not in tok: tok[bk] = (cap+1)*T
                 need_port = min(r['reads32'], READ_PORTS)*T
-                if tok[bk] < T or port < need_port: wake.append(t+1); continue
+                if tok[bk] < cost or port < need_port: wake.append(t+1); continue
             if r['dst'] and len(r['dst']) in (1, 2):
                 wid = len(r['dst'])
                 blk = [wtime[gi][reg][0]+2*T for reg in {h//2 for h in r['dst']}
@@ -360,7 +376,8 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 if blk: wake.append(max(blk)); continue
             # ---- issue at tick t
             issue_tok -= T
-            if u: tok[P.unit_bucket[u]] -= T; port -= min(r['reads32'], READ_PORTS)*T
+            if u:
+                bk, cost, _ = bucket_of(u); tok[bk] -= cost; port -= min(r['reads32'], READ_PORTS)*T
             kind = r['kind']; row = P.rows.get(u) if u else None; branch = 0
             if kind == 'alu':
                 lat, ii = tk(row['lat']), tk(row['ii'])

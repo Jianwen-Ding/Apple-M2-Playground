@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -155,6 +155,36 @@ def main():
             m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one', extra_env=env)
             res[name] = (m['cycles']-EMPTY_TRIP)/8
             print(f'{name:26s} {res[name]:6.1f} ref units/rep', flush=True)
+    elif a.what == 'sfuswitch':
+        # one SIMD group: independent transcendentals of one function vs mixed functions
+        V = {'log2 x3': ['log2 r6, r6', 'log2 r7, r7', 'log2 r8, r8'], 'floor x3': ['floor r6, r6', 'floor r7, r7', 'floor r8, r8'],
+             'rcp x3': ['rcp r6, r6', 'rcp r7, r7', 'rcp r8, r8'], 'log2, floor, rcp': ['log2 r6, r6', 'floor r7, r7', 'rcp r8, r8'],
+             'log2, exp2, log2, exp2': ['log2 r6, r6', 'exp2 r7, r7', 'log2 r8, r8', 'exp2 r9, r9'],
+             'log2 x4': ['log2 r6, r6', 'log2 r7, r7', 'log2 r8, r8', 'log2 r9, r9'],
+             'floor, rint, floor, rint': ['floor r6, r6', 'rint r7, r7', 'floor r8, r8', 'rint r9, r9']}
+        for name, lines in V.items():
+            body = b''.join(e(x) for x in lines)*8
+            one = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'one')
+            p1 = H.predict(H.counted(body, 100), H.counted(body, 500), 400, 1)
+            res[name] = {'one': one['cycles'], 'pred_one': p1}
+            print(f"{name:26s} 1g {(one['cycles']-35.25)/8:6.2f}/rep (pred {(p1-35.25)/8:6.2f})", flush=True)
+    elif a.what == 'sfumix':
+        # transcendental contention between SIMD groups: 1 group vs ~4 per core, with model predictions
+        V = {'rcp chain + 3 iadd': ['rcp r6, r6', 'iadd r7, r7, 1', 'iadd r8, r8, 1', 'iadd r9, r9, 1'],
+             'log2, floor, rcp (independent)': ['log2 r6, r6', 'floor r7, r7', 'rcp r8, r8'],
+             '4 independent rcp': ['rcp r6, r6', 'rcp r7, r7', 'rcp r8, r8', 'rcp r9, r9'],
+             'rcp + fadd32 + imadd': ['rcp r6, r6', 'fadd32 r7, r7, r24', 'imadd r8, r8, r25, r24'],
+             '8 independent floor': ['floor r%d, r%d' % (r, r) for r in range(5, 13)],
+             'control: 4 iadd chains': ['iadd r6, r6, 1', 'iadd r7, r7, 1', 'iadd r8, r8, 1', 'iadd r9, r9, 1']}
+        for name, lines in V.items():
+            body = b''.join(e(x) for x in lines)*8
+            B.check_body(body, [len(e(x)) for x in lines]*8)
+            one = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'one')
+            four = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'gpu')
+            p1 = H.predict(H.counted(body, 100), H.counted(body, 500), 400, 1)
+            p4 = H.predict(H.counted(body, 100), H.counted(body, 500), 400, 4)
+            res[name] = {'one': one['cycles'], 'four': four['cycles'], 'pred_one': p1, 'pred_four': p4}
+            print(f"{name:32s} 1g {one['cycles']:6.1f} (pred {p1:6.1f})  4/core {four['cycles']:6.1f} (pred {p4:6.1f})  ratio {four['cycles']/one['cycles']:.2f}", flush=True)
     elif a.what == 'spaces':
         # memory-space transitions with no ALU work in the loop body
         from run_drm_tg_layout import tg, shared_word

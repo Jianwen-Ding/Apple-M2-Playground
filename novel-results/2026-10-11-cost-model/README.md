@@ -78,6 +78,13 @@ cost 23.8 cycles before an independent and 25.5 before a dependent successor (bo
 separate 16-bit writeback time (17/22/26 cycles) leaves the random-kernel error unchanged. With 24 kernels
 these correlations may be noise.
 
+**Shared transcendental unit (sfumix.json, sfuswitch.json).** At 4 groups per core, independent `log2`,
+`floor`, `rcp` contend like four `rcp`s do (148 vs 95 units per trip with one group), so the transcendental
+classes share one unit per core. The model draws them from one shared bucket (each instruction costing
+1 / its measured rate), and likewise imad/bitfield/convert. This moves that case from 89 to 110 predicted,
+but hardware is at 148; `rcp`+`fadd32`+`imadd` (109 measured vs 84–87 predicted) is also unexplained. With
+one group there is no function-switch cost (`log2`/`exp2` alternating = 4 × `log2`).
+
 Known gaps: all rules under-predict random kernels (bias −4% with 1 group, −9% with 4), so some
 contention is missing; a multi-cycle instruction followed by independent simple ALU instructions overlaps
 on hardware more than the default rule allows; bfi/imadd followed by 4–8 iadds costs ~1–2 cycles more than

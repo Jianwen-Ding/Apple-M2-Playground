@@ -7,6 +7,8 @@ Datasets and their role (results/2026-10-11-cost-model and the instruction bench
   memory     FIT       load/store probes: the memory parameters were taken from these
   load grid  FIT       30-point ALU-before/after-load grid: the load fast latency / quiet / defer parameters
   memstate   FIT       store, threadgroup and quiet-time probes
+  spaces     FIT       memory-space transitions
+  waits      FIT       idle wait cost and its 512-byte loop-body step
   random     SELECTION 24 random kernels: the issue-interval rule was chosen by its score here
   heldout24  HELD OUT  24 new 24-instruction kernels, measured after the model was frozen
   heldout48  HELD OUT  12 new 48-instruction kernels, same
@@ -92,7 +94,26 @@ for name, parts in MS.items():
     p = (H.predict(H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 1)-EMPTY_MEAS)/8
     merr.append((p-meas_ms[name])/meas_ms[name])
 md, p90, mx, b = stats(merr)
-check(md <= 0.04 and mx <= 0.15, f'memory state probes (FIT, 15 cases; the space-switch case is excluded): median |err| {md:.3f}, max {mx:.3f}')
+check(md <= 0.04 and mx <= 0.15, f'memory state probes (FIT, 15 cases): median |err| {md:.3f}, max {mx:.3f}')
+TL_ = tg(True, 'i32', 7, base=None, index=0)
+SP = {'dev store, dev store': [st_, st_], 'tg store, tg store': [TS_, TS_], 'dev store, tg store': [st_, TS_],
+      'tg store, dev store': [TS_, st_], 'dev load, wait, tg load, wait': [L_, W_, TL_, W_],
+      'dev store, tg load, wait': [st_, TL_, W_], 'tg store, dev load, wait': [TS_, L_, W_]}
+meas_sp = json.loads((R/'spaces.json').read_text()); serr = []
+for name, parts in SP.items():
+    body = b''.join(parts)*8
+    p = (H.predict(H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 1)-EMPTY_MEAS)/8
+    serr.append((p-meas_sp[name])/meas_sp[name])
+md, p90, mx, b = stats(serr)
+check(md <= 0.03 and mx <= 0.05, f'memory-space transitions (FIT, 7 cases): median |err| {md:.3f}, max {mx:.3f}')
+wt = json.loads((R/'waits.json').read_text()); werr = []
+for key, m in wt.items():
+    slot, k = map(int, key.split(','))
+    if k not in (8, 30, 31, 40): continue
+    body = (e(f'wait {slot}')*k)*8
+    werr.append(((H.predict(H.counted(body, 100), H.counted(body, 500), 400, 1)-EMPTY_MEAS)/8-m)/m)
+md, p90, mx, b = stats(werr)
+check(mx <= 0.05, f'idle wait cost incl. the 512-byte step (FIT, 8 cases): median |err| {md:.3f}, max {mx:.3f}')
 for fname, role, lim1, lim4, blim1, blim4 in (('random-kernels.json', 'SELECTION', 0.06, 0.12, 0.08, 0.17),
                                              ('heldout24.json', 'HELD OUT', 0.06, 0.12, 0.09, 0.15),
                                              ('heldout48.json', 'HELD OUT', 0.045, 0.10, 0.05, 0.12)):
