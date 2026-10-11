@@ -86,11 +86,13 @@ SFU_SPACING = 2.0        # cycles between transcendental issues of one SIMD grou
 SFU_GROUP_BLOCK = 2.0    # cycles a transcendental occupies its SIMD group (not the op's full issue interval)
 SFU_WB_GAP = 2.0         # cycles between transcendental writebacks of one SIMD group (in order)
 SFU_SLOW = {'rcp': 3.0, 'rsqrt': 4.0, 'rsqrt_special': 4.0}   # cycles in the slow stage
-# core-level transcendental pipe shared by the SIMD groups of a core (sfupairs.json, sfumix.json, sfurepeat.json;
-# fitted on a 12-point grid): rcp/rsqrt use a slow unit, the others a fast one, writebacks in order 0.5 cycles apart.
-# Replaces the shared 'sfu' token bucket. Not captured: rcp with 8 chains vs 4 (232 vs 197 units, repeatable) and
+# core-level transcendental pipe shared by the SIMD groups of a core (sfupairs.json, sfumix.json, sfurepeat.json):
+# rcp/rsqrt use a slow unit, the others a fast one, at the benchmark's 4-group costs (rcp 1.6, rsqrt 1.02, others
+# 0.92 cycles); writebacks in order 1 cycle apart. Replaces the shared 'sfu' token bucket. A 12-point grid fit
+# (sfu-coregrid.json, rsqrt 2.3) fitted the pair probes better but broke the rsqrt benchmark row (+126%).
+# Not captured: rcp with 8 chains vs 4 (232 vs 197 units, repeatable), rsqrt+rcp (258 vs 191 predicted) and
 # run-to-run variation of mixed-latency pairs (log2+floor 207 vs 232).
-CORE_SFU = {'wb_gap': 0.5, 'slow': {'rcp': 1.75, 'rsqrt': 2.3, 'rsqrt_special': 2.3}, 'fast': 1.0}
+CORE_SFU = {'wb_gap': 1.0, 'slow': {'rcp': 1.6, 'rsqrt': 1.02, 'rsqrt_special': 1.02}, 'fast': 0.92}
 CONTROL = {'if_icmp', 'if_fcmp', 'else_icmp', 'else_fcmp', 'while_icmp', 'while_fcmp', 'pop_exec', 'push_exec',
            'jmp_exec_any', 'jmp_exec_none', 'stop', 'trap', 'TODO.unk51', 'no_var'}
 BARRIERS = {'threadgroup_barrier', 'memory_barrier', 'wait_pix', 'signal_pix', 'TODO.unkE800'}

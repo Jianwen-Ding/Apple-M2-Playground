@@ -27,12 +27,15 @@ unit per core. Hardware does not.
    * `rcp` and `rsqrt` also hold a **slow stage** for 3 and 4 cycles;
    * results are **written back in order, at least 2 cycles apart**. `floor` (latency 3) after `log2` (latency 5)
      waits for its writeback slot, so mixing latencies costs more than either op alone.
-2. **4 groups per core: separate slow and fast units** with in-order writeback 0.5 cycles apart.
+2. **4 groups per core: separate slow and fast units** with in-order writeback 1 cycle apart.
    `log2`+`rcp` costing the same as pure `log2` means `rcp` does not use the unit `log2` saturates.
-   Fitted on a 12-point grid (`sfu-coregrid.json`), this halves the 4-group error on these 14 cases
-   (median ~17% → ~10%) and improves the held-out 24-instruction kernels at 4 groups from 10.4% to 8.5%.
+   Unit costs come from the benchmark's 4-group rows (`rcp` 1.6, `rsqrt` 1.02, others 0.92 cycles), not from
+   these probes; only the writeback gap was chosen on them (0 / 0.5 / 1.0 cycles). On the 14 probe cases the
+   median error goes from ~17% to 7.3% (max 26%, `rsqrt`+`rcp`). Held-out random kernels at 4 groups:
+   24 instructions 10.4% → 7.9%, 48 instructions 9.9% → 9.6%. A grid fit that used the probes for the unit
+   costs (`sfu-coregrid.json`) needed `rsqrt` at 2.3 cycles and broke the `rsqrt` benchmark row (+126%).
 3. **Not understood at 4 groups:** pure `rcp` costs 232 units with 8 chains but 197 with 4 (repeatable,
-   `sfurepeat.json`). `log2`+`floor` measured 207 in one run and 232 twice later. The cost of mixing latencies
+   `sfurepeat.json`); `rsqrt`+`rcp` costs 258 although `rsqrt` alone sustains ~1 per cycle per core. `log2`+`floor` measured 207 in one run and 232 twice later. The cost of mixing latencies
    across groups seems to depend on how the groups interleave.
 
 ## Effect on the cost model
