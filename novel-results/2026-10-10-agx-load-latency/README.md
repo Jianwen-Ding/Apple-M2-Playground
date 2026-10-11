@@ -1,5 +1,9 @@
 # Device-load latency, overlap and read bandwidth on G14C
 
+> **Scope note (2026-10-11).** These latencies were measured with no ALU instruction between a load's `wait`
+> and the next load. A load issued after ALU work costs ~18 units (~19 cycles) more, and ALU work in flight
+> defers completion; see [load after ALU](../2026-10-11-load-after-alu/README.md).
+
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM.
 
 ## Claim and scope

@@ -6,10 +6,11 @@ info rotation (fadd16): median |err| 0.029, max 0.338 (16-bit writeback not mode
 info empty loop trip: measured 35.25, predicted 35.27 (reference units)
 ok   memory (FIT) load line 1 + wait 0: measured 63.9, predicted 64.9
 ok   memory (FIT) 2 loads line 1 + one wait: measured 66.5, predicted 67.5
-FAIL random-kernels.json (SELECTION), 1 group(s)/core: whole trip median 0.051 p90 0.143 max 0.153 bias -0.049 | body only median 0.071 p90 0.208 max 0.228 (limits 0.05/0.08)
-FAIL random-kernels.json (SELECTION), 4 group(s)/core: whole trip median 0.114 p90 0.190 max 0.217 bias -0.109 | body only median 0.154 p90 0.267 max 0.327 (limits 0.11/0.15)
-FAIL heldout24.json (HELD OUT), 1 group(s)/core: whole trip median 0.053 p90 0.109 max 0.123 bias -0.046 | body only median 0.078 p90 0.152 max 0.200 (limits 0.05/0.08)
-ok   heldout24.json (HELD OUT), 4 group(s)/core: whole trip median 0.104 p90 0.162 max 0.230 bias -0.100 | body only median 0.136 p90 0.221 max 0.346 (limits 0.11/0.15)
-ok   heldout48.json (HELD OUT), 1 group(s)/core: whole trip median 0.036 p90 0.072 max 0.084 bias -0.020 | body only median 0.043 p90 0.084 max 0.108 (limits 0.04/0.06)
-ok   heldout48.json (HELD OUT), 4 group(s)/core: whole trip median 0.092 p90 0.147 max 0.188 bias -0.091 | body only median 0.108 p90 0.175 max 0.234 (limits 0.1/0.13)
-3 failures
+ok   load-after-ALU grid (FIT, 30 points): median |err| 0.011, max 0.061
+ok   random-kernels.json (SELECTION), 1 group(s)/core: whole trip median 0.051 p90 0.143 max 0.153 bias -0.049 | body only median 0.071 p90 0.208 max 0.228 (limits 0.06/0.08)
+ok   random-kernels.json (SELECTION), 4 group(s)/core: whole trip median 0.114 p90 0.190 max 0.217 bias -0.109 | body only median 0.154 p90 0.267 max 0.327 (limits 0.12/0.17)
+ok   heldout24.json (HELD OUT), 1 group(s)/core: whole trip median 0.053 p90 0.109 max 0.123 bias -0.046 | body only median 0.078 p90 0.152 max 0.200 (limits 0.06/0.09)
+ok   heldout24.json (HELD OUT), 4 group(s)/core: whole trip median 0.104 p90 0.162 max 0.230 bias -0.100 | body only median 0.136 p90 0.221 max 0.346 (limits 0.12/0.15)
+ok   heldout48.json (HELD OUT), 1 group(s)/core: whole trip median 0.036 p90 0.072 max 0.084 bias -0.020 | body only median 0.043 p90 0.084 max 0.108 (limits 0.045/0.05)
+ok   heldout48.json (HELD OUT), 4 group(s)/core: whole trip median 0.092 p90 0.147 max 0.188 bias -0.091 | body only median 0.108 p90 0.175 max 0.234 (limits 0.1/0.12)
+0 failures

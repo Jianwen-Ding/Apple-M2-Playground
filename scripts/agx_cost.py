@@ -122,7 +122,13 @@ class Params:
             best = max(self.rows[k]['ipc'] for k in grp if k in self.rows)
             for k in grp:
                 if k in self.rows: self.unit_cap[k] = best; self.unit_bucket[k] = grp[0]
-        self.load_latency = load_latency or (c.get('device_load_to_use_ref', 63.0)-1)*K
+        # device load: fast when no ALU instruction issued since the last wait, slow otherwise; ALU
+        # instructions issued while a load is pending defer its completion (load-alu-grid.json)
+        self.load_fast = (c.get('device_load_fast_ref', 41.6))*K
+        self.load_latency = load_latency or (c.get('device_load_slow_ref', 62.0))*K
+        # completion is at least this long after the last ALU instruction issued while the load is pending
+        self.defer_fast = c.get('device_load_defer_fast_ref', 31.0)*K
+        self.defer_slow = c.get('device_load_defer_slow_ref', 56.0)*K
         self.load_ii = max(1.0, c.get('device_load_extra_inflight_ref', 2.6)*K)
         self.store_ii = max(1.0, c.get('device_store_issue_ref', 34.8)*K)
         self.store_done = c.get('device_store_wait_extra_ref', 4.7)*K
@@ -277,6 +283,8 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     slots = [defaultdict(list) for _ in range(groups)]
     rcache = [[] for _ in range(groups)]; wtime = [dict() for _ in range(groups)]; last_w = [dict() for _ in range(groups)]
     tok = {}; port = READ_PORTS*T; issue_tok = ISSUE_PER_CORE*T
+    alu_since_wait = [False]*groups
+    pending = [[] for _ in range(groups)]       # [slot, completion tick, latency ticks, dst halves] of in-flight loads
     last_t = 0
     stats = defaultdict(lambda: {'n': 0, 'stall': 0, 'issue': 0, 'branch': 0})
 
@@ -326,17 +334,26 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             if kind == 'alu':
                 lat, ii = tk(row['lat']), tk(row['ii'])
                 for h in r['dst']: ready[gi][h] = t+lat
+                alu_since_wait[gi] = True
+                for p_ in pending[gi]:          # ALU issue defers in-flight loads
+                    newdone = t+p_[2]
+                    if newdone > p_[1]:
+                        p_[1] = newdone
+                        for h in p_[3]: ready[gi][h] = max(ready[gi][h], newdone)
+                        slots[gi][p_[0]].append(newdone)     # wait drains to the latest completion
             elif kind == 'load':
-                lat, ii = tk(P.load_latency), tk(P.load_ii)
+                lat = tk(P.load_latency if alu_since_wait[gi] else P.load_fast); ii = tk(P.load_ii)
                 for h in r['dst']: ready[gi][h] = t+lat
                 slots[gi][r['slot']].append(t+lat)
+                pending[gi].append([r['slot'], t+lat, tk(P.defer_slow if alu_since_wait[gi] else P.defer_fast), r['dst']])
             elif kind == 'store':
                 ii = tk(P.store_ii); slots[gi][r['slot']].append(t+ii+tk(P.store_done))
             elif kind == 'tg_atomic':
                 ii = T
                 for h in r['dst']: ready[gi][h] = t+tk(P.load_latency)
             elif kind == 'wait':
-                ii = T; slots[gi][r['slot']] = []
+                ii = T; slots[gi][r['slot']] = []; alu_since_wait[gi] = False
+                pending[gi] = [p_ for p_ in pending[gi] if p_[0] != r['slot']]
             elif kind == 'control':
                 ii = CI
                 for h in r['dst']: ready[gi][h] = t+CL

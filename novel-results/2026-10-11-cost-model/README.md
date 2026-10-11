@@ -21,7 +21,8 @@ Model (every parameter measured on this GPU):
 * an issue interval blocks the whole SIMD group (the "group" rule; see accuracy below for alternatives);
 * the 8-entry per-group result cache with ~17-cycle register-file writeback
   ([finding](../2026-10-11-result-cache/README.md)) and a 1-cycle 32-after-16-bit partial write hazard;
-* device loads complete after the measured load-to-use time (about 65 real cycles, see Memory below;
+* device loads complete after the measured fast or slow load-to-use time (47 / 65 real cycles), deferred by
+  ALU work issued while they are pending (see Memory below;
   `--load-latency` overrides) and `wait` drains a scoreboard slot;
 * a taken backward jump costs about 33 extra real cycles, fit so an empty counted-loop trip costs the measured 35.25 units.
 
@@ -61,10 +62,11 @@ depends on uniforms or on instructions the emulator cannot run (their trip count
 Classes without hardware data (texture, iterator, threadgroup and stack memory, tile, barriers,
 threadgroup atomics) reuse device-memory or 1-cycle costs and are reported as `unmeasured`.
 
-Memory parameters come from `cost_probes.py memory` (`memory.json`): device load to use 63 units on a line no
-other agent writes (73 on a line the CPU keeps writing), a second independent load +2.6, stores to one address
-35 units each (+4.7 with a wait; only the repeated-address case was measured). The 2026-10-10 load-latency
-finding reports ~50 cycles for a dependent chase; the gap is unresolved.
+Memory parameters: device loads follow the [load-after-ALU finding](../2026-10-11-load-after-alu/README.md)
+(fast 44.8 units with no ALU work since the last wait, ~63 after ALU work, completion deferred by ALU work in
+flight; fit on the 30-point `load-alu-grid.json`). That also resolves the earlier gap to the 2026-10-10 chase
+(~50 cycles): the chase measured the fast case. A second independent load costs +2.6, stores to one address
+35 units each (+4.7 with a wait; only the repeated-address case was measured).
 
 Residual analysis (24 random kernels, single group): the error correlates weakly with 16-bit writes
 (+1.7 cycles each unexplained, r = 0.35), SIMD reductions (−2.5, r = −0.50) and transcendentals (−1.0, r = −0.24).

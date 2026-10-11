@@ -86,8 +86,14 @@ def measure(R, phase_a, phase_b, units, groups_mode, ref_trips=1000):
     return None
 
 
-def predict(phase_a, phase_b, units, groups):
-    P = C.Params()
+_P = None
+
+
+def predict(phase_a, phase_b, units, groups, P=None):
+    global _P
+    if P is None:
+        if _P is None: _P = C.Params(); C.fit_branch(_P)     # cached per process (branch fit is slow)
+        P = _P
     c = []
     for code in (phase_a, phase_b):
         ins = C.decode(code, P); pcs, _ = C.trace(code); c.append(C.simulate(ins, pcs, P, groups))

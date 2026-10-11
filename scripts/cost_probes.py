@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -108,6 +108,18 @@ def main():
             m = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'one')
             res[name] = (m['cycles']-EMPTY_TRIP)/8
             print(f'{name:34s} cycles/rep {res[name]:7.2f}', flush=True)
+    elif a.what == 'loadgrid':
+        # a ALU instructions before a device load, b after it, then wait 0 (load-after-ALU finding)
+        consts = (1, 0x3f800000, 32, 7)
+        L = 'device_load 0, i32, x, r6, u8_u9, r26, unsigned'     # word 32 (r26 = 32, set before the loop)
+        for a_ in (0, 1, 2, 4, 8):
+            for b_ in (0, 4, 8, 16, 24, 32):
+                pre = ['iadd r%d, r%d, 1' % (14+i % 4, 14+i % 4) for i in range(a_)]
+                post = ['iadd r%d, r%d, 1' % (18+i % 4, 18+i % 4) for i in range(b_)]
+                body = b''.join(e(x) for x in pre+[L]+post+['wait 0'])*8
+                m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one')
+                res[f'{a_},{b_}'] = (m['cycles']-EMPTY_TRIP)/8
+                print(f'a={a_} b={b_:2d}: {res[f"{a_},{b_}"]:.1f}', flush=True)
     elif a.what == 'values2':
         # identical instruction sequences; only the preloaded constants differ (r26/r27 set before the loop)
         one, near1, half, zero = 0x3f800000, 0x3f800347, 0x3f000000, 0

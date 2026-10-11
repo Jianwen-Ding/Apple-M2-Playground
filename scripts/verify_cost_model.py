@@ -5,6 +5,7 @@ Datasets and their role (results/2026-10-11-cost-model and the instruction bench
   bench      FIT       60 single-instruction loops: the model's own parameters (checks rounding only)
   rotation   FIT       72 instructions over D = 4..16 destinations: the result-cache rule was fit here
   memory     FIT       load/store probes: the memory parameters were taken from these
+  load grid  FIT       30-point ALU-before/after-load grid: the load fast/slow/defer parameters
   random     SELECTION 24 random kernels: the issue-interval rule was chosen by its score here
   heldout24  HELD OUT  24 new 24-instruction kernels, measured after the model was frozen
   heldout48  HELD OUT  12 new 48-instruction kernels, same
@@ -63,6 +64,17 @@ for name, lines in MEM.items():
     check(abs(p-mem[name])/mem[name] < 0.05, f'memory (FIT) {name}: measured {mem[name]:.1f}, predicted {p:.1f}')
 # regression guards just above the figures published in the cost-model README (median |err| limits:
 # whole trip 1 group, 4 groups, then loop body only 1 group, 4 groups)
+grid = json.loads((R/'load-alu-grid.json').read_text())
+gerr = []
+Lg = 'device_load 0, i32, x, r6, u8_u9, r26, unsigned'
+for key, m in grid.items():
+    a_, b_ = map(int, key.split(','))
+    pre = ['iadd r%d, r%d, 1' % (14+i % 4, 14+i % 4) for i in range(a_)]; post = ['iadd r%d, r%d, 1' % (18+i % 4, 18+i % 4) for i in range(b_)]
+    body = b''.join(e(x) for x in pre+[Lg]+post+['wait 0'])*8
+    p = (H.predict(H.counted(body, 100, consts=(1, 0x3f800000, 32, 7)), H.counted(body, 500, consts=(1, 0x3f800000, 32, 7)), 400, 1)-EMPTY_MEAS)/8
+    gerr.append((p-m)/m)
+md, p90, mx, b = stats(gerr)
+check(md <= 0.03 and mx <= 0.08, f'load-after-ALU grid (FIT, 30 points): median |err| {md:.3f}, max {mx:.3f}')
 for fname, role, lim1, lim4, blim1, blim4 in (('random-kernels.json', 'SELECTION', 0.06, 0.12, 0.08, 0.17),
                                              ('heldout24.json', 'HELD OUT', 0.06, 0.12, 0.09, 0.15),
                                              ('heldout48.json', 'HELD OUT', 0.045, 0.10, 0.05, 0.12)):

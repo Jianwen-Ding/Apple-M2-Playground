@@ -10,9 +10,13 @@
  },
  "branch_taken_cycles": 31,
  "units": "reference units (dependent 8-byte iadd step = 2); the simulator converts to real cycles (x1.049)",
- "device_load_to_use_ref": 63.0,
  "device_load_extra_inflight_ref": 2.6,
  "device_store_issue_ref": 34.8,
  "device_store_wait_extra_ref": 4.7,
- "memory_note": "cost_probes.py memory (memory.json): load+wait on a quiet line 63.9-0.9 ref; second independent load +2.6; stores to one address 35.8-0.9 ref each (repeat-address case only), +4.7 with wait 0. The 2026-10-10 load finding reported ~50 cycles for a dependent chase: unresolved discrepancy."
+ "memory_note": "cost_probes.py memory (memory.json): load+wait on a quiet line 63.9-0.9 ref; second independent load +2.6; stores to one address 35.8-0.9 ref each (repeat-address case only), +4.7 with wait 0. The 2026-10-10 load finding reported ~50 cycles for a dependent chase: unresolved discrepancy.",
+ "device_load_fast_ref": 41.6,
+ "device_load_slow_ref": 62.0,
+ "device_load_defer_fast_ref": 31.0,
+ "device_load_defer_slow_ref": 56.0,
+ "device_load_note": "load-alu-grid.json: a load issued with no ALU instruction since the last wait completes ~45 units after issue (fast); after ALU work ~63 (slow); ALU instructions issued while it is pending defer completion to >= ALU issue + 31 (fast) / + 56 (slow) units. Fit on the 30-point grid."
 }
