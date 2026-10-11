@@ -64,6 +64,12 @@ waits between an `iadd` and a store the store part falls from 35.9 to ~24 units 
 plain store loop fast. `iadd, store, load, wait` (72.6) is also faster than the model (81.6): the load
 overlaps the delayed store. These are fit-set observations; no held-out memory kernels exist yet.
 
+**Several loads in flight (`multiload.json`).** Back-to-back device loads overlap (two: 46.7, three: 52.4
+units per repetition). But a load issued after ALU work while an earlier load is still pending does not start
+until that load completes, then takes the fast latency: `iadd, load, iadd, load, wait` costs 102.7 (not ~68),
+three such pairs 155.9, `load, 4 iadd, load, 4 iadd, wait` 87.9. Loads writing the same register behave the
+same as different registers (103.0 vs 102.7). Modelled: 5 cases within 6%.
+
 Interpretation (not proven): the memory pipeline needs a quiet period after ALU issue before it accepts a
 request, as if ALU and memory instructions share an issue or operand path that must drain.
 
@@ -82,6 +88,8 @@ non-ALU instruction (control flow, `wait` on another slot) resets the fast state
 
 ## Compiler implications
 
+* Issue a group's loads back to back: interleaving address arithmetic between loads serializes them
+  (each costs a full load latency).
 * Batch a group's memory instructions together and issue them before its ALU work; ALU work can then run
   under the loads (up to ~8 instructions for free). A memory instruction right after ALU work starts ~21
   cycles late (loads, threadgroup ops) or ~35 cycles late (device stores); device stores issued back to

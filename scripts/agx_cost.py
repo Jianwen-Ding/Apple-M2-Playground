@@ -336,6 +336,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     last_alu = [-10**9]*groups               # tick of the group's last ALU issue (quiet-time rule)
     alu_done = [-10**9]*groups               # latest completion tick of the group's ALU results (wait drain)
     last_wait = [-10**9]*groups              # issue tick of the group's previous wait
+    alu_since_mem = [False]*groups           # an ALU instruction issued since the group's last memory instruction
     last_space = [None]*groups
     pending = [[] for _ in range(groups)]       # [slot, completion tick, latency ticks, dst halves] of in-flight loads
     last_t = 0
@@ -397,7 +398,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             if kind == 'alu':
                 lat, ii = tk(row['lat']), tk(row['ii'])
                 for h in r['dst']: ready[gi][h] = t+lat
-                last_alu[gi] = t; alu_done[gi] = max(alu_done[gi], t+lat)
+                last_alu[gi] = t; alu_done[gi] = max(alu_done[gi], t+lat); alu_since_mem[gi] = True
                 for p_ in pending[gi]:          # ALU issue defers in-flight loads
                     newdone = t+p_[2]
                     if newdone > p_[1]:
@@ -410,11 +411,15 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 if tgop:
                     lat, ii = delay+tk(P.mem['threadgroup_load']['lat'][0]), tk(P.mem['threadgroup_load']['issue'][0])
                 else:
+                    # multiload.json: a device load issued after ALU work while another load is pending starts only
+                    # when the pending loads have completed (back-to-back loads still overlap)
+                    if alu_since_mem[gi] and pending[gi]:
+                        delay = max(delay, max(p_[1] for p_ in pending[gi])-t)
                     lat = delay+tk(P.load_fast); ii = tk(P.load_ii)
                 cls_ = 'tg' if tgop else 'device_load'
                 if {cls_, last_space[gi]} == {'tg', 'device_store'}: ii += tk(P.space_switch)
                 last_space[gi] = cls_
-                load_busy[gi] = max(load_busy[gi], t+lat)
+                load_busy[gi] = max(load_busy[gi], t+lat); alu_since_mem[gi] = False
                 for h in r['dst']: ready[gi][h] = t+lat
                 slots[gi][r['slot']].append(t+lat)
                 dfr = tk(P.tg_defer) if tgop else tk(P.defer_fast)+(tk(P.defer_delayed_extra) if delay else 0)
@@ -428,7 +433,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 cls_ = 'tg' if r['name'].startswith('threadgroup') else 'device_store'
                 if {cls_, last_space[gi]} == {'tg', 'device_store'}: ii += tk(P.space_switch)   # spaces.json
                 last_space[gi] = cls_
-                slots[gi][r['slot']].append(st_done)
+                slots[gi][r['slot']].append(st_done); alu_since_mem[gi] = False
             elif kind == 'tg_atomic':
                 ii = T
                 for h in r['dst']: ready[gi][h] = t+tk(P.load_latency)

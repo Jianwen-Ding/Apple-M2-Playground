@@ -48,11 +48,13 @@ waits; whole-trip medians):
 
 | Dataset | Role | 1 group | 4 groups/core |
 | --- | --- | --- | --- |
-| 24 kernels, seeds 7000+ | discovery: revealed the [wait drain](../2026-10-11-wait-drain/README.md) (15.0% → 6.1%) | 6.1% | |
-| **24 kernels, seeds 8000+** | **held out** (measured after the wait-drain rule) | **5.6%** (p90 13.6%, max 28.6%) | **10.1%** (max 28.9%) |
+| 24 kernels, seeds 7000+ | discovery: revealed the [wait drain](../2026-10-11-wait-drain/README.md) (15.0% → 5.6%) | 5.6% | 6.4% |
+| **24 kernels, seeds 8000+** | **held out** (measured after the wait-drain rule) | **4.6%** (p90 8.5%, max 12.1%) | **6.3%** (max 21%) |
 
-The worst held-out memory kernel (−29%) has three device loads in flight, two writing the same register,
-with ALU work between them: multiple pending loads and load write-after-write are not characterised.
+The held-out memory set first scored 5.6% / 10.1% (max 28.6%); its worst kernel had several loads in flight with
+ALU work between them. Separate probes (`multiload.json`) then showed that a load issued after ALU work while
+another load is pending waits for it to complete; with that rule (fitted on the probes only) the held-out set
+scores as above.
 
 Fitting sets (not evidence of accuracy): the 60 benchmark loops reproduce to 0.4% latency / 0.4% issue /
 1.9% per-core throughput; the register rotation used to fit the result cache to 1.7% (32-bit); the memory

@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch', 'review2', 'waitdrain'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces', 'sfumix', 'sfuswitch', 'review2', 'waitdrain', 'multiload'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -155,6 +155,23 @@ def main():
             m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one', extra_env=env)
             res[name] = (m['cycles']-EMPTY_TRIP)/8
             print(f'{name:26s} {res[name]:6.1f} ref units/rep', flush=True)
+    elif a.what == 'multiload':
+        # several device loads in flight, ALU work between them, and loads writing the same register
+        consts = (1, 0x3f800000, 32, 7)
+        L = lambda d, i=26: e(f'device_load 0, i32, x, r{d}, u8_u9, r{i}, unsigned')
+        A = lambda k=1: b''.join(e('iadd r%d, r%d, 1' % (5+i % 8, 5+i % 8)) for i in range(k))
+        W = e('wait 0')
+        M = {'load13, load14, wait': [L(13), L(14), W], 'iadd, load13, iadd, load14, wait': [A(), L(13), A(), L(14), W],
+             'iadd, load13, iadd, load13, wait (WAW)': [A(), L(13), A(), L(13), W], 'iadd, load13, load13, wait (WAW)': [A(), L(13), L(13), W],
+             'load13, 4 iadd, load14, 4 iadd, wait': [L(13), A(4), L(14), A(4), W],
+             'iadd, load13, iadd, load14, iadd, load15, iadd, wait': [A(), L(13), A(), L(14), A(), L(15), A(), W],
+             '3 loads, wait': [L(13), L(14), L(15, 27), W]}
+        for name, parts in M.items():
+            body = b''.join(parts)*8
+            m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one')
+            p_ = (H.predict(H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 1)-EMPTY_TRIP)/8
+            res[name] = {'measured': (m['cycles']-EMPTY_TRIP)/8, 'predicted': p_}
+            print(f"{name:52s} meas {res[name]['measured']:6.1f} pred {p_:6.1f}", flush=True)
     elif a.what == 'waitdrain':
         # does an idle wait drain in-flight ALU results? X alone vs X followed by wait 0 (independent X)
         X = {'iadd': 'iadd r{r}, r{r}, 1', 'imadd': 'imadd r{r}, r{r}, r25, r24', 'rcp': 'rcp r{r}, r{r}',

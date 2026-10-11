@@ -9,14 +9,19 @@ ok   memory (FIT) 2 loads line 1 + one wait: measured 66.5, predicted 64.9
 ok   load-after-ALU grid (FIT, 30 points): median |err| 0.017, max 0.044
 ok   memory state probes (FIT, 15 cases): median |err| 0.025, max 0.120
 ok   memory-space transitions (FIT, 7 cases): median |err| 0.007, max 0.028
-ok   idle wait cost, 1-30 waits per repetition (FIT, 8 cases): median |err| 0.005, max 0.032
+FAIL idle wait cost, 1-30 waits per repetition (FIT, 8 cases): median |err| 0.016, max 0.077
 ok   threadgroup load deferral (FIT, review2 C, 3 cases): median |err| 0.042, max 0.080
-ok   load quiet-time window (iadd, k idle waits, load; 7 cases): median |err| 0.046, max 0.084
-info known residuals (store window / store->load overlap / first store of a trip): B iadd, 4 wait1, store: measured 43.6, predicted 36.7; B iadd, 8 wait1, store: measured 63.1, predicted 43.1; E iadd, store, load, wait: measured 72.6, predicted 81.6; A store, 8 iadd: measured 44.5, predicted 40.0
+ok   load quiet-time window (iadd, k idle waits, load; 7 cases): median |err| 0.028, max 0.044
+info known residuals (store window / store->load overlap / first store of a trip): B iadd, 4 wait1, store: measured 43.6, predicted 36.7; B iadd, 8 wait1, store: measured 63.1, predicted 52.2; E iadd, store, load, wait: measured 72.6, predicted 81.6; A store, 8 iadd: measured 44.5, predicted 40.0
+FAIL wait drain after ALU work (FIT, 4 cases): median |err| 0.054, max 0.094
+ok   heldout-mem24.json memory kernels (DISCOVERY (revealed the wait drain)), 1 group(s)/core: median |err| 0.056 p90 0.113 max 0.167 bias +0.004 (limit 0.08)
+ok   heldout-mem24.json memory kernels (DISCOVERY (revealed the wait drain)), 4 group(s)/core: median |err| 0.064 p90 0.145 max 0.154 bias -0.017 (limit 0.12)
+ok   heldout-mem24b.json memory kernels (HELD OUT), 1 group(s)/core: median |err| 0.046 p90 0.085 max 0.121 bias -0.029 (limit 0.07)
+ok   heldout-mem24b.json memory kernels (HELD OUT), 4 group(s)/core: median |err| 0.063 p90 0.134 max 0.212 bias -0.062 (limit 0.12)
 ok   random-kernels.json (SELECTION), 1 group(s)/core: whole trip median 0.051 p90 0.143 max 0.153 bias -0.049 | body only median 0.071 p90 0.208 max 0.228 (limits 0.06/0.08)
 ok   random-kernels.json (SELECTION), 4 group(s)/core: whole trip median 0.104 p90 0.190 max 0.231 bias -0.100 | body only median 0.143 p90 0.265 max 0.347 (limits 0.12/0.17)
 ok   heldout24.json (HELD OUT), 1 group(s)/core: whole trip median 0.053 p90 0.109 max 0.123 bias -0.046 | body only median 0.078 p90 0.152 max 0.200 (limits 0.06/0.09)
 ok   heldout24.json (HELD OUT), 4 group(s)/core: whole trip median 0.104 p90 0.162 max 0.230 bias -0.091 | body only median 0.131 p90 0.221 max 0.345 (limits 0.12/0.15)
 ok   heldout48.json (HELD OUT), 1 group(s)/core: whole trip median 0.036 p90 0.072 max 0.084 bias -0.020 | body only median 0.043 p90 0.084 max 0.108 (limits 0.045/0.05)
 ok   heldout48.json (HELD OUT), 4 group(s)/core: whole trip median 0.091 p90 0.147 max 0.185 bias -0.090 | body only median 0.108 p90 0.175 max 0.230 (limits 0.1/0.12)
-0 failures
+2 failures
