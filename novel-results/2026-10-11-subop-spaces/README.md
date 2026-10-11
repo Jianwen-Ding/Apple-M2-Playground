@@ -1,4 +1,4 @@
-# funop, iunop, simd_op and shuffle sub-op spaces fully mapped
+# funop, iunop, simd_op, shuffle and convert sub-op spaces fully mapped
 
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, compute.
 
@@ -38,9 +38,25 @@ op1 (bit 47):
 * Quad-divergent shuffle indices: the low two index bits are ORed over the quad (as Mesa's
   `agx_lower_divergent_shuffle.c` describes); measured here on two index patterns.
 
+**convert (0x3e, bit 15 = 1).** What applegpu/Mesa call the 2-bit `round` field (bits 26–27) is
+a **direction** bit plus a hang bit: bit 26 = 0 float→int, 1 int→float; bit 27 set (values 2, 3)
+**hangs the GPU**. The 6-bit mode (bits 16–21): bit 0 signed, bit 1 rounding (0 toward zero,
+1 nearest-even), bits 2–3 width, bits 4–5 ignored. Model check: 7,864 lane results, 0 mismatches.
+* Widths 8 / 16 / 32 saturate float→int; signed 8/16-bit results are **not sign-extended**
+  (−8 → 0xf8). Int→float reads the low 8/16/32 bits, signed per bit 0, rounding per bit 1.
+* **Width code 3** (modes 12–15) is a non-saturating float→int (signed results wrap; with the
+  rounding bit it rounds half up, not to even). Its unsigned form of a negative x returns
+  2^(e+9) − |x| (e = exponent), and |x| ≥ 2^31 gives an unsaturated, unmodelled pattern. In the
+  int→float direction it reads 32 bits, and the "signed" form returns −(unsigned value) when bit 31 is set.
+* Mesa's names line up as: F_TO_U16 = 4 means f→u16 *toward zero* (with bit 26 = 0), U16_TO_F = 6
+  means u16→f *nearest* (with bit 26 = 1); 2/3, 6 (f→), 12–15 and every value ≥ 16 are unnamed.
+* Bits 22–25 are the operand type of the mode slot: **bit 22 or 23 = mode read from a
+  register** (the 6-bit field is then the half-register index), **bit 24 = from a uniform
+  register**. Conversion mode can therefore differ per lane. Bits 38–39 and 42–43 are ignored.
+
 ## Relationship to existing knowledge
 
-Mesa `agx_opcodes.py` names 13 funop values, 3 iunop values, 12 simd_op values and 8 shuffles;
+Mesa `agx_opcodes.py` / `agx_compiler.h` name 13 funop values, 3 iunop values, 12 simd_op values, 8 shuffles and 10 convert modes;
 applegpu adds rotate-up. This sweep accounts for every value of those fields: the hangs, the
 aliases, the Morton spread, the 128-entry simd_op structure and NaN prefix identities are new here.
 Expected values come from Python models of each operation applied to the per-lane inputs read

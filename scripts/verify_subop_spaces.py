@@ -10,6 +10,7 @@ import tempfile
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import identify_funop as F  # noqa: E402
 import identify_simd_op as S  # noqa: E402
+import identify_convert as C  # noqa: E402
 
 D = Path(__file__).resolve().parents[1]/'results/2026-10-11-subop-spaces'
 checks = []
@@ -97,6 +98,19 @@ o, Bv = q[(0, 0, 1)]
 orq = lambda i: Bv[i] & ~3 | (Bv[i & ~3] | Bv[i & ~3 | 1] | Bv[i & ~3 | 2] | Bv[i & ~3 | 3]) & 3
 check('simd_shuffle with quad-divergent index: low 2 bits are the OR over the quad (Mesa agx_lower_divergent_shuffle)',
       [(v-0x5a000606)//16 for v in o] == [orq(i) for i in range(32)])
+
+# convert: bit 26 = direction, mode bits 0 signed / 1 rounding / 2-3 width / 4-5 ignored
+paths = {n: unz(n) for n in ('cvt0-halves', 'cvt0-ints', 'cvt-halves', 'cvt-ints', 'cvt-regmode')}
+ok_n, bad_n, _ = C.check_model([(paths['cvt0-halves'], 0), (paths['cvt0-ints'], 0), (paths['cvt-halves'], 1), (paths['cvt-ints'], 1)])
+check(f'convert: structural model matches {ok_n} lane results, 0 mismatches (all 64 modes, both directions, 2 input sets)', bad_n == 0 and ok_n > 7000)
+faults = sorted((int.from_bytes(bytes.fromhex(r['cand'])[-6:], 'little') >> 26) & 3 for n in ('cvt-halves', 'cvt-ints')
+                for r in load(n)['results'] if r['fault'])
+check('convert: encoding bits 26-27 = 2 or 3 hang the GPU (both input sets)', faults == [2, 2, 3, 3])
+x, o = C.load(paths['cvt-regmode'])
+lab = {n & (7 << 22): v for n, v in o.items()}
+check('convert: mode operand type bit 22/23 = register (r5l = 11 -> s32_to_f), bit 24 = uniform (u5 = 32 -> mode 0, u8_to_f)',
+      all(lab[1 << b] == [C.CANDS['s32_to_f'](u) for u in x] for b in (22, 23)) and lab[1 << 24] == [C.CANDS['u8_to_f'](u) for u in x])
+for f in paths.values(): os.unlink(f)
 
 print(f'{sum(checks)}/{len(checks)} checks passed')
 sys.exit(0 if all(checks) else 1)

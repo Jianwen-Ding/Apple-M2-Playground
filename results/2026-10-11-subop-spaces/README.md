@@ -10,3 +10,7 @@ offline checks `scripts/verify_subop_spaces.py` (16 checks, `make verify-subop-s
 | `iunop` | `bitrev r5, r6`, r6 = preload | op2 × op1 (16), single bits 28–37 |
 | `simdop-ints`, `simdop-flts` | `simd_iadd r5, r6`, r6 = hashed ints / (lane−10)·0.37 | 5-bit Mesa simd_op × 4 kinds (128 each) |
 | `shuf-uni`, `shuf-perm24`, `shuf-perm13` | `quad_shuffle r5, r6, r7l`, A = lane id, B = 3 / (7·lane+3)&31 / (13·lane+6)&31 | op1 × op2 × op3 (32) |
+| `cvt-halves`, `cvt-ints` | `convert u32_to_f, r5, r6, rte` (bit 26 = 1), r6 = (lane−16)·0.5 / hashed ints | all 64 modes, bits 26–27, 22–25, 38–39, 42–43 |
+| `cvt0-halves`, `cvt0-ints` | `convert f_to_u32, r5, r6, rtz` (bit 26 = 0) | all 64 modes |
+| `cvt-f2i` | Mesa forms f_to_u32/f_to_s32 rtz | sanity |
+| `cvt-regmode` | r5 = 11 before the convert | mode operand type bits 22–24 |
