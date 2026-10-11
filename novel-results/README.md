@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-11 fmadd 10-byte form: lane-offset (fused shuffle-up) source A; fmadd32 bit 52; other ALU gap bits inert](2026-10-11-fmadd-lane-offset/README.md)
 - [2026-10-11 In-shader clock: CPU-written timer read via coherent load after device_barrier_1; two Mesa barriers invalidate](2026-10-11-in-shader-clock/README.md)
 - [2026-10-11 Threadgroup memory addressing: byte base + 16-byte (vec4) index slots; declared size exact](2026-10-11-tg-memory-addressing/README.md)
 - [2026-10-11 0x78 = barrier over aligned 4-SIMD-group blocks, 0x68 = whole workgroup](2026-10-11-barrier-0x68-vs-0x78/README.md)

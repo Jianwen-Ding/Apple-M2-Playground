@@ -1,0 +1,2384 @@
+[
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 32
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 33
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 34
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 35
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 36
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 37
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 38
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 39
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 40
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 41
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 42
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 43
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm16",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 48
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 49
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 50
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 51
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 52
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 53
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 54
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 55
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 56
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 57
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 58
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 59
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "mov_imm32",
+  "flip": {
+   "bit": 63
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 48
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 49
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 50
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 51
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 54
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 55
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 56
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 57
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 58
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 59
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 60
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 61
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "iadd",
+  "flip": {
+   "bit": 63
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "imadd",
+  "flip": {
+   "bit": 51
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "imadd",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "imadd",
+  "flip": {
+   "bit": 63
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "convert",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "convert",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bfi",
+  "flip": {
+   "bit": 52
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bfi",
+  "flip": {
+   "bit": 53
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bfi",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bfeil",
+  "flip": {
+   "bit": 52
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bfeil",
+  "flip": {
+   "bit": 53
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bfeil",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "extr",
+  "flip": {
+   "bit": 52
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "extr",
+  "flip": {
+   "bit": 53
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "extr",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "shlhi",
+  "flip": {
+   "bit": 52
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "shlhi",
+  "flip": {
+   "bit": 53
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "shlhi",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "shrhi",
+  "flip": {
+   "bit": 52
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "shrhi",
+  "flip": {
+   "bit": 53
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "shrhi",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 38
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 39
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 40
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 41
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 42
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 43
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 44
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 45
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 48
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 49
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 50
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 51
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 52
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 53
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 54
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 55
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asr",
+  "flip": {
+   "bit": 63
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 38
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 39
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 40
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 41
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 42
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 43
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 44
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 45
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 48
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 49
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 50
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 51
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 52
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 53
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 54
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 55
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "asrh",
+  "flip": {
+   "bit": 63
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bitop",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bitop",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bitrev",
+  "flip": {
+   "bit": 40
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bitrev",
+  "flip": {
+   "bit": 41
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bitrev",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "bitrev",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "popcount",
+  "flip": {
+   "bit": 40
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "popcount",
+  "flip": {
+   "bit": 41
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "popcount",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "popcount",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "intl",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "intl",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "ffs",
+  "flip": {
+   "bit": 40
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "ffs",
+  "flip": {
+   "bit": 41
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "ffs",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "ffs",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmadd32",
+  "flip": {
+   "bit": 52
+  },
+  "class": "dest",
+  "regs": [
+   5
+  ],
+  "base_vs_ref": [
+   5
+  ],
+  "samples": {
+   "r5": [
+    [
+     "0x74800d0d",
+     "0x5a000808"
+    ],
+    [
+     "0x74800ded",
+     "0x5a000878"
+    ]
+   ]
+  }
+ },
+ {
+  "key": "fmadd32",
+  "flip": {
+   "bit": 53
+  },
+  "class": "length",
+  "regs": [
+   5,
+   16
+  ],
+  "base_vs_ref": [
+   5
+  ],
+  "samples": {
+   "r5": [
+    [
+     "0x74800d0d",
+     "0x5a000808"
+    ],
+    [
+     "0x74800ded",
+     "0x5a000878"
+    ]
+   ],
+   "r16": [
+    [
+     "0x5a000038",
+     "0x5a001010"
+    ],
+    [
+     "0x5a000038",
+     "0x5a001010"
+    ]
+   ]
+  }
+ },
+ {
+  "key": "fmadd32",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmadd32",
+  "flip": {
+   "bit": 63
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmadd16",
+  "flip": {
+   "bit": 27
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmadd16",
+  "flip": {
+   "bit": 39
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmadd16",
+  "flip": {
+   "bit": 51
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmadd16",
+  "flip": {
+   "bit": 52
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmadd16",
+  "flip": {
+   "bit": 53
+  },
+  "class": "length",
+  "regs": [
+   16
+  ],
+  "base_vs_ref": [
+   5
+  ],
+  "samples": {
+   "r16": [
+    [
+     "0x5a000038",
+     "0x5a001010"
+    ],
+    [
+     "0x5a000038",
+     "0x5a001010"
+    ]
+   ]
+  }
+ },
+ {
+  "key": "fmadd16",
+  "flip": {
+   "bit": 62
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmadd16",
+  "flip": {
+   "bit": 63
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fadd32",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fadd32",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fadd16",
+  "flip": {
+   "bit": 27
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fadd16",
+  "flip": {
+   "bit": 39
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fadd16",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fadd16",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmul32",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmul32",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmul16",
+  "flip": {
+   "bit": 27
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmul16",
+  "flip": {
+   "bit": 39
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmul16",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fmul16",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "floor",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "floor",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "ceil",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "ceil",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "trunc",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "trunc",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "rint",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "rint",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "rcp",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "rcp",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "rsqrt",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "rsqrt",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "rsqrt_special",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "rsqrt_special",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "sin_pt_1",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "sin_pt_1",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "sin_pt_2",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "sin_pt_2",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "log2",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "log2",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "exp2",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "exp2",
+  "flip": {
+   "bit": 47
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 26
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 27
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 38
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 39
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 49
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 50
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 51
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 64
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 65
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 66
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 67
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 78
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmpsel",
+  "flip": {
+   "bit": 79
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmpsel",
+  "flip": {
+   "bit": 49
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmpsel",
+  "flip": {
+   "bit": 50
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmpsel",
+  "flip": {
+   "bit": 51
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmpsel",
+  "flip": {
+   "bit": 64
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmpsel",
+  "flip": {
+   "bit": 65
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmpsel",
+  "flip": {
+   "bit": 66
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmpsel",
+  "flip": {
+   "bit": 67
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmpsel",
+  "flip": {
+   "bit": 78
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmpsel",
+  "flip": {
+   "bit": 79
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmp_ballot",
+  "flip": {
+   "bit": 15
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmp_ballot",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmp_ballot",
+  "flip": {
+   "bit": 15
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmp_ballot",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmp_quad_ballot",
+  "flip": {
+   "bit": 15
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "icmp_quad_ballot",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmp_quad_ballot",
+  "flip": {
+   "bit": 15
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "fcmp_quad_ballot",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "simd_shuffle",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "simd_shuffle_down",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "simd_shuffle_up",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "simd_shuffle_xor",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "simd_shuffle_rotate_up",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "quad_shuffle",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "simd_iadd",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "simd_prefix_iadd",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "simd_fadd",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "simd_min.u",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "quad_iadd",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "quad_and",
+  "flip": {
+   "bit": 46
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": [
+   5
+  ]
+ },
+ {
+  "key": "wait",
+  "flip": {
+   "bit": 9
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": []
+ },
+ {
+  "key": "wait",
+  "flip": {
+   "bit": 10
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": []
+ },
+ {
+  "key": "wait",
+  "flip": {
+   "bit": 11
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": []
+ },
+ {
+  "key": "wait",
+  "flip": {
+   "bit": 12
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": []
+ },
+ {
+  "key": "wait",
+  "flip": {
+   "bit": 13
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": []
+ },
+ {
+  "key": "wait",
+  "flip": {
+   "bit": 14
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": []
+ },
+ {
+  "key": "wait",
+  "flip": {
+   "bit": 15
+  },
+  "class": "same",
+  "regs": [],
+  "base_vs_ref": []
+ }
+]

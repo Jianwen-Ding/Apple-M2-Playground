@@ -117,6 +117,9 @@ def gap_bits(d):
     return [b for b in range(8*hi) if not cov >> b & 1]
 
 
+HIGH = []   # set by --high-preload: extra registers preloaded with D.pre(r)
+
+
 def build(cand, layout):
     """D.build with lane-varied preloads: r2..r15 += lane*16 after the uniform preload."""
     body, seg = D.build(cand, layout)
@@ -125,6 +128,8 @@ def build(cand, layout):
         out.append((name, b))
         if name == 'preload':
             out.append(('lane-mix', b''.join(lane_mix(r) for r in range(2, 16))))
+            if HIGH:
+                out.append(('high-preload', b''.join(agx_loop.encode(f'mov_imm r{r}, {D.pre(r)}, 0b0') for r in HIGH)))
     return b''.join(b for _, b in out), out
 
 
@@ -134,6 +139,10 @@ def main():
     p.add_argument('--subops', help="instead of gap bits: 'key.field' sweeps every value of that field")
     p.add_argument('--bits', help='comma list of extra bit positions to flip (in addition to gap bits)')
     p.add_argument('--no-gaps', action='store_true')
+    p.add_argument('--baseline', action='append', default=[], help="extra KEY=ASM baseline (repeatable)")
+    p.add_argument('--raw', action='append', default=[], help="KEY:LABEL=HEX raw candidate compared with KEY's baseline (repeatable)")
+    p.add_argument('--high-preload', help='first,last register to also preload with distinct values (needs --gprs > 2*last)')
+    p.add_argument('--masks', help='comma list of hex XOR masks to apply as extra flips (multi-bit)')
     p.add_argument('--device', default='/dev/dri/renderD128')
     p.add_argument('--gprs', type=int, default=64)
     p.add_argument('--timeout', type=int, default=20)
@@ -142,13 +151,19 @@ def main():
     p.add_argument('--cc', default=os.environ.get('CC', 'cc'))
     a = p.parse_args()
     _, g = tools()
+    if a.high_preload:
+        lo_r, hi_r = map(int, a.high_preload.split(','))
+        if a.gprs <= 2*hi_r: sys.exit('--gprs must cover the high preload')
+        HIGH.extend(range(lo_r, hi_r+1))
+    for kv in a.baseline:
+        k, asm = kv.split('=', 1); BASELINES[k] = asm
     keys = a.only.split(',') if a.only else list(BASELINES)
     jobs = []
     def job(name, key, n, size, flip):
         cand = n.to_bytes(size, 'little')
         for layout in 'AB':
             body, seg = build(cand, layout)
-            D.decode_check([s for s in seg if s[0] != 'lane-mix'])
+            D.decode_check([s for s in seg if s[0] not in ('lane-mix', 'high-preload')])
             jobs.append({'name': f'{name}-{layout}', 'key': key, 'flip': flip, 'layout': layout, 'body': body, 'cand': cand.hex()})
     for layout in 'AB':
         body, _ = build(D.WAIT, layout)
@@ -173,6 +188,12 @@ def main():
         job(f'{key}-base', key, n, size, None)
         for b in bits:
             job(f'{key}-b{b}', key, n ^ (1 << b), size, {'bit': b})
+        for m in (a.masks.split(',') if a.masks else []):
+            job(f'{key}-m{m}', key, n ^ int(m, 16), size, {'mask': m})
+    for kv in a.raw:
+        kl, hx = kv.split('='); key, label = kl.split(':')
+        b = bytes.fromhex(hx)
+        job(f'{key}-r{label}', key, int.from_bytes(b, 'little'), len(b), {'raw': label, 'hex': hx})
     print(json.dumps({'jobs': len(jobs), 'plan': plan if a.dry_run else len(plan)}), flush=True)
     if a.dry_run:
         return 0
