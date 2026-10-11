@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-11 SR17 hardware SIMD-group slot, SR32 pipeline offset, preshader-last rule](2026-10-11-sr17-sr32/README.md)
 - [2026-10-10 Device-load latency, overlap and read bandwidth](2026-10-10-agx-load-latency/README.md)
 - [2026-10-10 Counted loops, ALU latency/issue rate, core throughput](2026-10-10-agx-loop-alu-timing/README.md)
 - [2026-10-10 Command timestamps, fetch-bound code, direct DRM compute](2026-10-10-command-timing-direct-drm/README.md)

@@ -1,0 +1,24 @@
+# Direct-DRM differential SR scan evidence — 2026-10-11
+
+Compact summaries (`scripts/extract_sr_scan.py`) of 14 `run_drm_sr_scan.py`
+sessions. The raw records hold every selector for every lane (up to 1.2 GB) and
+remain under `/scratch/apple-m2-playground/drm-compute/sr-scan/<utc>/record.json`.
+Per configuration, a summary keeps the env overrides, lanes, oracle and
+no-execution flags, firmware times, USC words, per-selector distinct values (top 4
+with counts), per-SIMD-group values of SR7/17/19/20/21/32/53/113, and SR17
+per-core slot statistics.
+
+| Sessions (UTC) | Contents |
+| --- | --- |
+| 002042, 002048 | First base scan; 13 single-parameter configs |
+| 002117 | Separation attempt; `words-only` refused by the harness (overlap) |
+| 002132 | SR32 placements, local sizes 96..1024, repeated CDM moves |
+| 002239, 002304 | USC word orders and preshader variants |
+| 002348 | 2-D/3-D workgroup shapes and orders keeping the preshader word last |
+| 002405 ×3 | `order-shru` / base repeats (SR17 and SR113 randomness) |
+| 002422 | 2048 one-SIMD and 512 four-SIMD workgroups (SR17 separates from SR53) |
+| 002449 | Register sweep without residency delay |
+| 002639, 002651 | Register × workgroup-size sweep with a ~1 ms resident delay |
+
+`verification.json` is the output of `make verify-sr-direct`.
+Report: [direct-DRM SR scan](../../experiments/registers/sr-direct-drm.md).

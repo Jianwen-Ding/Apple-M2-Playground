@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -36,6 +36,8 @@ help:
 	@echo 'make agx-memory         Pointer-chase load latency, 2 KiB..256 MiB (~4 min GPU time)'
 	@echo 'make agx-bandwidth      Load overlap (1..16 chains) and streaming read bandwidth (~3 min)'
 	@echo 'make verify-memory      Verify retained load-latency evidence offline'
+	@echo 'make sr-direct          Differential 256-selector SR scan over launch parameters (direct DRM, ~5 min)'
+	@echo 'make verify-sr-direct   Verify retained direct-DRM SR scan summaries offline'
 	@echo 'make gpu-faults LOG=... Summarize Asahi GPU timeouts/faults in a kernel log'
 	@echo 'make opcode-scan        GPU-FAULTING: undecoded opcode effects (needs CONFIRM_GPU_FAULTS=1)'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
@@ -178,3 +180,10 @@ agx-bandwidth:
 	@for c in 1 2 4 8 16; do $(PYTHON) -B scripts/run_drm_compute.py --kind chase --chains $$c --gprs 48 --lengths 4194304,268435456 --steps 8 --trips 500 --count 32 --repeats 16 --timeout 300 --device "$(DEVICE)" --output "$(MEMDIR)-overlap-c$$c" || exit 1; done
 	@for spec in "1216 6898" "4864 1724" "9728 862" "19456 431" "38912 215" "65536 128"; do set -- $$spec; \
 	  $(PYTHON) -B scripts/run_drm_compute.py --kind stream --steps 8 --lengths $$2 --count $$1 --gprs 32 --repeats 12 --timeout 120 --device "$(DEVICE)" --output "$(MEMDIR)-stream-$$1" || exit 1; done
+
+SRDIR = $(SCRATCH_ROOT)/drm-compute/sr-scan/make-$$(date -u +%Y%m%dT%H%M%SZ)
+sr-direct:
+	$(PYTHON) -B scripts/run_drm_sr_scan.py --device "$(DEVICE)" --output "$(SRDIR)" --configs base,base-repeat,lanes-96,local-64,helper-data,helper-cfg,priority-low,usc-moved,cdm-moved,words-only,code-only,words-0x8040,words-0x40,local-96,local-128,local-256,local-1024,shape-16x4,shape-8x8,shape-32x2x2,shape-4x8x4,order-shru,order-rhsu,order-ushnr,preshader-stop,preshader-first,samplers-4,word0-uniform-2,word0-texture-8,word0-preshader-16,occupancy-2048wg,occupancy-512x128
+
+verify-sr-direct:
+	$(PYTHON) -B scripts/verify_sr_direct.py

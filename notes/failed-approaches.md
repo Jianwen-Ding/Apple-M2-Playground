@@ -181,3 +181,18 @@ VkResult error" as "no fault".
 * Elements exactly 16 KiB apart conflict in the first level: 64 such lines
   (4 KiB) miss although 8 KiB of contiguous lines hit. Do not use page-aligned
   strides to measure capacity.
+
+### Direct-DRM SR scan, 2026-10-11
+
+* applegpu cannot assemble `device_store ..., unsigned, 0` (the trailing `0` is the
+  `u6` field, not a shift). `agx_loop.store` edits the control store's R/A/O fields
+  and requires an exact decode round trip instead.
+* "SR17 = SR53" held in every light-load shape and was nearly recorded as a
+  duplicate. Only a high-occupancy dispatch separated them. Test candidate
+  per-group registers under load as well as in isolation.
+* Counting distinct SR17 values per core is not peak occupancy: sequential
+  workgroups reuse different slots (1,024-thread groups at 256 registers used 36 IDs).
+* Putting the preshader word anywhere but last makes the dispatch silently execute
+  nothing. Check the output oracle and execution time; the submit does not fail.
+* The first full-sweep run stored ~1.2 GB of raw JSON. Keep raw records in
+  scratch and commit `extract_sr_scan.py` summaries.

@@ -20,3 +20,6 @@ SR20 = (cluster<<4)|core matching driver core masks; bit-15 `get_sr` writes noth
 
 [Resource registers and widths](sr-resources-width.md): SR18 = threadgroup memory
 bytes, SR19 = register allocation; `get_sr` is 32-bit only (16-bit form = low half).
+
+[Direct-DRM differential scan](sr-direct-drm.md) (2026-10-11): SR17 = hardware SIMD-group
+slot, SR32 = pipeline-word offset, SR113 random, preshader word must be last.

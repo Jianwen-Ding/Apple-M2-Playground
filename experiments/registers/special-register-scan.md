@@ -111,7 +111,8 @@ non-X layouts, fragment/helper lanes and all possible masks remain untested.
 
 ## Other values and the clock search
 
-Thirty selectors returned at least one nonzero value in the initial full sweep:
+Twenty-nine selectors returned at least one nonzero value in the initial full sweep
+(the original text said thirty; the list below has 29):
 `0,4,5,6,7,8,9,10,15,16,19,20,21,24,25,32,48,51,52,56,57,58,59,60,63,80,97,113,114`.
 The other 226 returned zero in that state. Zero does not establish an absent or
 unimplemented register. SR20 matched workgroup numbering in the observed small
@@ -128,7 +129,8 @@ context. The initial paired sweep likewise had no intra-shader change. This
 supports context-related state, consistent with the existing VM-slot label;
 it is not a progressing clock.
 
-SR32 began at `0xfff88000` and decreased by exactly `0x24000` between successive
+*Update 2026-10-11: SR32 is the USC offset of the dispatch's pipeline words; see
+[direct-DRM scan](sr-direct-drm.md).* SR32 began at `0xfff88000` and decreased by exactly `0x24000` between successive
 new command buffers in one context. Follow-ups at counts 1,33,65 and257 all
 showed the same step, so it did not scale with workgroup count. It remained
 unchanged between paired reads. Allocation/address-related state is a hypothesis,

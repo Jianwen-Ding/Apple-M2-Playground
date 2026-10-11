@@ -1,0 +1,246 @@
+{
+ "passed": true,
+ "checks": [
+  {
+   "check": "scans-valid",
+   "passed": true,
+   "executed": 87,
+   "no_execution": 5,
+   "scans": 14,
+   "refused_before_submit": [
+    [
+     "20261011T002117976841Z",
+     "words-only"
+    ]
+   ]
+  },
+  {
+   "check": "baseline-within-vulkan-set",
+   "passed": true,
+   "base_runs": 10,
+   "union": [
+    0,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    15,
+    16,
+    19,
+    20,
+    21,
+    24,
+    25,
+    32,
+    48,
+    51,
+    52,
+    56,
+    57,
+    58,
+    59,
+    60,
+    63,
+    80,
+    97,
+    113,
+    114
+   ]
+  },
+  {
+   "check": "sr32-is-pipeline-offset",
+   "passed": true,
+   "sr32": {
+    "base": [
+     "0x1000"
+    ],
+    "words-only": [
+     "0x4000"
+    ],
+    "words-0x8040": [
+     "0x8040"
+    ],
+    "words-0x40": [
+     "0x40"
+    ],
+    "usc-moved": [
+     "0x3000"
+    ],
+    "code-only": [
+     "0x1000"
+    ]
+   }
+  },
+  {
+   "check": "sr17-uniform-per-simd-group",
+   "passed": true
+  },
+  {
+   "check": "sr17-equals-sr53-light-load",
+   "passed": true,
+   "light_scans": 46,
+   "equal": 45,
+   "shapes": [
+    "local-1024",
+    "local-128",
+    "local-256",
+    "local-64",
+    "local-96",
+    "shape-16x4",
+    "shape-32x2x2",
+    "shape-4x8x4",
+    "shape-8x8"
+   ]
+  },
+  {
+   "check": "sr17-separates-under-load",
+   "passed": true,
+   "sr53_values": [
+    0
+   ],
+   "sr17_per_core": {
+    "max": 40,
+    "min": 30,
+    "cores": 38,
+    "max_value": 39
+   }
+  },
+  {
+   "check": "sr17-range-shrinks-with-registers",
+   "passed": true,
+   "max_distinct_per_core": {
+    "resident-g32-wg1024": 64,
+    "resident-g32-wg128": 60,
+    "resident-g32-wg32": 51,
+    "resident-g64-wg1024": 64,
+    "resident-g64-wg128": 60,
+    "resident-g64-wg32": 48,
+    "resident-g96-wg1024": 48,
+    "resident-g96-wg128": 48,
+    "resident-g96-wg32": 40,
+    "resident-g128-wg1024": 39,
+    "resident-g128-wg128": 40,
+    "resident-g128-wg32": 40,
+    "resident-g160-wg1024": 31,
+    "resident-g160-wg128": 32,
+    "resident-g160-wg32": 32,
+    "resident-g192-wg1024": 38,
+    "resident-g192-wg128": 32,
+    "resident-g192-wg32": 38,
+    "resident-g224-wg1024": 37,
+    "resident-g224-wg128": 32,
+    "resident-g224-wg32": 32,
+    "resident-g256-wg1024": 36,
+    "resident-g256-wg128": 24,
+    "resident-g256-wg32": 32
+   }
+  },
+  {
+   "check": "sr113-random-0-or-8",
+   "passed": true,
+   "order_shru_values": [
+    8,
+    0,
+    0,
+    8
+   ],
+   "base_values": [
+    8,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    8,
+    0,
+    0,
+    8
+   ]
+  },
+  {
+   "check": "preshader-word-last",
+   "passed": true,
+   "no_execution": {
+    "order-ushnr": [
+     [
+      6458
+     ],
+     [
+      5167
+     ]
+    ],
+    "order-usnrh": [
+     [
+      6167
+     ]
+    ],
+    "order-nrhsu": [
+     [
+      6042
+     ]
+    ],
+    "preshader-first": [
+     [
+      6375
+     ]
+    ]
+   },
+   "usc_words": {
+    "order-ushnr": "1d08c000000000114d9000000d0c0020000088008d040001",
+    "order-usnrh": "1d08c000000000114d90000088008d0400010d0c00200000",
+    "order-nrhsu": "88008d0400010d0c002000004d9000001d08c00000000011",
+    "preshader-first": "380080c0001200001d08c000000000114d9000000d0c002000008d040001",
+    "preshader-stop": "1d08c000000000114d9000000d0c002000008d040001380080c000120000"
+   }
+  },
+  {
+   "check": "neutral-parameters",
+   "passed": true,
+   "changed": {
+    "helper-data": [
+     21,
+     113
+    ],
+    "helper-cfg": [
+     21,
+     113
+    ],
+    "priority-low": [
+     21,
+     113
+    ],
+    "samplers-4": [
+     21,
+     113
+    ],
+    "word0-uniform-2": [
+     21,
+     113
+    ],
+    "word0-texture-8": [
+     21,
+     113
+    ],
+    "word0-preshader-16": [
+     21,
+     113
+    ],
+    "preshader-stop": [
+     21,
+     113
+    ]
+   }
+  }
+ ]
+}

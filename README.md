@@ -57,6 +57,7 @@ make drm-compute # Direct DRM dispatches: no Mesa or Vulkan in the path
 make agx-loop-test # Loop emulator gate + small hardware loops
 make verify-loops  # Check loop latency/throughput evidence offline
 make verify-memory # Check pointer-chase load-latency evidence offline
+make verify-sr-direct # Check direct-DRM differential SR scan evidence offline
 make gpu-faults  # Summarize GPU timeouts/faults in a kernel log (LOG=...)
 ```
 
@@ -92,6 +93,7 @@ are documented in [scripts/README.md](scripts/README.md).
 - [Direct DRM compute (no Mesa)](experiments/baseline/direct-drm-compute.md)
 - [Counted loops and ALU timing](experiments/control-flow/loops-and-alu-timing.md)
 - [Device-load latency](experiments/memory/load-latency.md)
+- [Direct-DRM differential SR scan](experiments/registers/sr-direct-drm.md)
 - [Opcode-scan kernel log](results/2026-10-10-opcode-scan-kernel-log/README.md)
 - [Known limitations and failed approaches](notes/failed-approaches.md)
 - [Timing investigation](experiments/timing/README.md)
@@ -160,3 +162,10 @@ rising to ~388 ns at 256 MiB. The TLB adds at most ~32 ns. Every one of 13.2 M h
 matched its host oracle. A SIMD group keeps ≥ 16 loads in flight, and grid-stride
 streaming reaches ~350 GB/s (≈ 89% of the advertised 400 GB/s) from 8 SIMD groups
 per core.
+
+**Special registers, direct DRM (2026-10-11).** A [one-dispatch 256-selector scan](experiments/registers/sr-direct-drm.md)
+over launch parameters Vulkan never exposed identified **SR17** as the per-core
+hardware SIMD-group slot (it equals SR53 only under light load; a `%warpid`
+analogue) and **SR32** as the USC offset of the dispatch's pipeline words. SR113
+is random. It also showed the preshader word must end the USC pipeline words.
+30 of 256 selectors are now identified in compute.

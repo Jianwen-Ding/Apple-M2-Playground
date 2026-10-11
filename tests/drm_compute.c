@@ -12,6 +12,19 @@
  * Optional table file: copied to data BO offset 1 MiB, its VA passed in u8_u9
  * (pointer-chase / load probes). The control main never reads u8 onward.
  *
+ * Probe overrides (environment, all optional; defaults reproduce the base layout):
+ *   AGX_USC_WORDS_OFF, AGX_CODE_OFF   USC offsets (64 B aligned, < 0x10000)
+ *   AGX_CDM_OFF                       CDM stream offset in the data BO (< 0x8000, 8 B aligned)
+ *   AGX_LOCAL_X/Y/Z                   CDM local size (global X stays the rounded count)
+ *   AGX_GLOBAL_Y/Z                    CDM global size in Y/Z (threads; default 1)
+ *   AGX_WORD0_OR                      bits ORed into CDM launch word 0
+ *   AGX_HELPER_DATA, AGX_HELPER_CFG   drm_asahi_helper_program data/cfg (binary stays 0)
+ *   AGX_SAMPLER_COUNT                 sampler_count with sampler_heap = zeroed data page at +0x6000
+ *   AGX_PRIORITY                      queue priority (0 low, 1 medium)
+ *   AGX_USC_ORDER                     order of USC pipeline words (default "ushrn")
+ *   AGX_PRESHADER                     1 = Preshader word with a `stop` preamble instead of No preshader
+ *   AGX_TABLE_OUT                     write the table region back to this path after the last submit
+ *
  * usage: drm_compute node code.bin count readback repeats [gprs [table.bin]]
  * Bounded: count <= 65536, repeats <= 64, table <= 512 MiB, 3 s wait per submit. */
 #define _POSIX_C_SOURCE 200809L
@@ -67,6 +80,11 @@ static struct bo bo_create(uint64_t size, uint32_t vm, uint64_t va, uint32_t bin
 }
 
 static void put32(uint8_t *p, uint32_t v) { memcpy(p, &v, 4); }
+static uint64_t env(const char *name, uint64_t fallback)
+{
+    const char *v = getenv(name); if (!v || !*v) return fallback;
+    char *end; uint64_t x = strtoull(v, &end, 0); require(*end == 0, name); return x;
+}
 static void put64(uint8_t *p, uint64_t v) { memcpy(p, &v, 8); }
 
 int main(int argc, char **argv)
@@ -104,7 +122,13 @@ int main(int argc, char **argv)
     io(DRM_IOCTL_ASAHI_VM_CREATE, &vc, "vm-create");
 
     const uint64_t page = 16384;
-    uint64_t usc_size = (0x2000 + code_size + 64 + page - 1) & ~(page - 1);
+    const uint32_t usc_words = (uint32_t)env("AGX_USC_WORDS_OFF", 0x1000), code_off = (uint32_t)env("AGX_CODE_OFF", 0x2000);
+    const uint32_t cdm_off = (uint32_t)env("AGX_CDM_OFF", 0x4000);
+    require(usc_words % 64 == 0 && code_off % 64 == 0 && usc_words < 0x10000 && code_off < 0x10000 &&
+            (code_off >= usc_words + 64 || code_off + code_size + 64 <= usc_words), "usc-offsets");
+    require(cdm_off % 8 == 0 && cdm_off >= 0x100 && cdm_off + 0x100 <= 0x6000, "cdm-offset");
+    uint64_t usc_end = (usc_words + 64 > code_off + code_size + 64) ? usc_words + 64 : code_off + code_size + 64;
+    uint64_t usc_size = (usc_end + page - 1) & ~(page - 1);
     uint32_t rounded = (uint32_t)((count + 31) / 32 * 32), words = 8 + rounded + 8 + 16;
     const uint64_t table_off = 1u << 20;
     uint64_t table_size = 0;
@@ -129,20 +153,41 @@ int main(int argc, char **argv)
     }
 
     /* USC BO: pipeline words at 0x1000, code at 0x2000 (USC-relative = BO offset). */
-    const uint32_t usc_words = 0x1000, code_off = 0x2000;
     memcpy(usc.map + code_off, code, code_size);
-    const uint64_t unif_va = data.va + 0x0, out_va = data.va + 0x8000, cdm_va = data.va + 0x4000;
+    const uint64_t unif_va = data.va + 0x0, out_va = data.va + 0x8000, cdm_va = data.va + cdm_off;
     uint8_t *w = usc.map + usc_words;
-    /* USC Uniform: tag 0x1d, start halfs 8 (u4), size 12 halfs (u4..u9), buffer >> 2 at bit 26. */
-    put64(w, 0x1dull | (8ull << 8) | (12ull << 20) | ((unif_va >> 2) << 26)); w += 8;
-    /* USC Shared, none: tag 0x4d, layout vertex/compute 0x24 at bit 10, bytes 65536 -> groups(256) of 8 bits = 0 ("all"). */
-    put32(w, 0x4du | (0x24u << 10)); w += 4;
-    /* USC Shader: tag 0x0d, unk_2 = 3 at bit 10 (compute), code address at bit 16 (6 bytes). */
-    uint64_t sh = 0x0dull | (3ull << 10) | ((uint64_t)code_off << 16); memcpy(w, &sh, 6); w += 6;
-    /* USC Registers: tag 0x8d, register count groups(8) at bit 8 (5 bits, 0 = 256), unk_4 = 1 at bit 24. */
-    uint32_t rc = (uint32_t)((gprs + 7) / 8) & 31; put32(w, 0x8du | (rc << 8) | (1u << 24)); w += 4;
-    /* USC No preshader: tag 0x88 (2 bytes). */
-    w[0] = 0x88; w[1] = 0; w += 2;
+    /* Pipeline words are emitted in AGX_USC_ORDER (default "ushrn"): u = Uniform, s = Shared,
+       h = Shader, r = Registers, n = No preshader (or a Preshader word when AGX_PRESHADER=1,
+       pointing at a one-instruction `stop` preamble placed at usc_words + 0x200). */
+    const char *order = getenv("AGX_USC_ORDER"); if (!order || !*order) order = "ushrn";
+    int preshader = (int)env("AGX_PRESHADER", 0);
+    require(strlen(order) == 5 && strchr(order, 'u') && strchr(order, 's') && strchr(order, 'h') && strchr(order, 'r') && strchr(order, 'n'), "usc-order");
+    const uint32_t pre_off = usc_words + 0x200;
+    if (preshader) {
+        require(pre_off + 64 <= usc_size && (pre_off + 64 <= code_off || pre_off >= code_off + code_size + 64), "preshader-placement");
+        usc.map[pre_off] = 0x88; usc.map[pre_off + 1] = 0x00;   /* stop */
+    }
+    for (const char *o = order; *o; o++) {
+        if (*o == 'u') {
+            /* USC Uniform: tag 0x1d, start halfs 8 (u4), size 12 halfs (u4..u9), buffer >> 2 at bit 26. */
+            put64(w, 0x1dull | (8ull << 8) | (12ull << 20) | ((unif_va >> 2) << 26)); w += 8;
+        } else if (*o == 's') {
+            /* USC Shared, none: tag 0x4d, layout vertex/compute 0x24 at bit 10, bytes 65536 -> groups(256) of 8 bits = 0 ("all"). */
+            put32(w, 0x4du | (0x24u << 10)); w += 4;
+        } else if (*o == 'h') {
+            /* USC Shader: tag 0x0d, unk_2 = 3 at bit 10 (compute), code address at bit 16 (6 bytes). */
+            uint64_t sh = 0x0dull | (3ull << 10) | ((uint64_t)code_off << 16); memcpy(w, &sh, 6); w += 6;
+        } else if (*o == 'r') {
+            /* USC Registers: tag 0x8d, register count groups(8) at bit 8 (5 bits, 0 = 256), unk_4 = 1 at bit 24. */
+            uint32_t rc = (uint32_t)((gprs + 7) / 8) & 31; put32(w, 0x8du | (rc << 8) | (1u << 24)); w += 4;
+        } else if (*o == 'n' && !preshader) {
+            /* USC No preshader: tag 0x88 (2 bytes). */
+            w[0] = 0x88; w[1] = 0; w += 2;
+        } else if (*o == 'n') {
+            /* USC Preshader: tag 0x38, unk 0xc08000 (Mesa's exact value), code address at bit 32. */
+            put32(w, 0x38u | (0xc08000u << 8)); put32(w + 4, pre_off); w += 8;
+        } else require(0, "usc-order-letter");
+    }
     printf("{\"usc_words_hex\":\"");
     for (uint8_t *q = usc.map + usc_words; q < w; q++) printf("%02x", *q);
     printf("\"}\n");
@@ -152,20 +197,24 @@ int main(int argc, char **argv)
     put64(data.map + 16, table_size ? data.va + table_off : 0);
 
     /* CDM control stream. */
-    uint8_t *c = data.map + 0x4000;
-    put32(c, 1u << 1); c += 4;                 /* Launch word 0: uniform count groups(64) = 1; direct; block type 0 */
+    uint8_t *c = data.map + cdm_off;
+    put32(c, (1u << 1) | (uint32_t)env("AGX_WORD0_OR", 0)); c += 4;                /* Launch word 0: uniform count groups(64) = 1; direct; block type 0 */
     put32(c, usc_words); c += 4;               /* Launch word 1: pipeline (64 B aligned, USC relative) */
     if (g14x) { put32(c, 0); put32(c + 4, 1u << 30); c += 8; }
-    put32(c, rounded); put32(c + 4, 1); put32(c + 8, 1); c += 12;   /* global size in threads */
-    put32(c, 32); put32(c + 4, 1); put32(c + 8, 1); c += 12;        /* local size */
+    uint32_t gy = (uint32_t)env("AGX_GLOBAL_Y", 1), gz = (uint32_t)env("AGX_GLOBAL_Z", 1);
+    uint32_t lx = (uint32_t)env("AGX_LOCAL_X", 32), ly = (uint32_t)env("AGX_LOCAL_Y", 1), lz = (uint32_t)env("AGX_LOCAL_Z", 1);
+    require(lx >= 1 && ly >= 1 && lz >= 1 && lx * ly * lz <= 1024 && rounded % lx == 0 && gy % ly == 0 && gz % lz == 0 &&
+            (uint64_t)rounded * gy * gz <= 65536, "grid/local size");
+    put32(c, rounded); put32(c + 4, gy); put32(c + 8, gz); c += 12;  /* global size in threads */
+    put32(c, lx); put32(c + 4, ly); put32(c + 8, lz); c += 12;     /* local size */
     put32(c, (3u << 29) | 0xfffffu); c += 4;   /* Barrier: Mesa's unk0..19 incl. USC cache invalidate */
     put32(c, 2u << 29); put32(c + 4, 0); c += 8;  /* Stream terminate */
-    uint64_t cdm_end = cdm_va + (uint64_t)(c - (data.map + 0x4000));
+    uint64_t cdm_end = cdm_va + (uint64_t)(c - (data.map + cdm_off));
     printf("{\"cdm_hex\":\"");
-    for (uint8_t *q = data.map + 0x4000; q < c; q++) printf("%02x", *q);
+    for (uint8_t *q = data.map + cdm_off; q < c; q++) printf("%02x", *q);
     printf("\"}\n");
 
-    struct drm_asahi_queue_create qc = {.vm_id = vc.vm_id, .priority = DRM_ASAHI_PRIORITY_MEDIUM, .usc_exec_base = shader_base};
+    struct drm_asahi_queue_create qc = {.vm_id = vc.vm_id, .priority = (uint32_t)env("AGX_PRIORITY", DRM_ASAHI_PRIORITY_MEDIUM), .usc_exec_base = shader_base};
     io(DRM_IOCTL_ASAHI_QUEUE_CREATE, &qc, "queue-create");
     struct drm_syncobj_create sc = {0};
     io(DRM_IOCTL_SYNCOBJ_CREATE, &sc, "syncobj-create");
@@ -179,7 +228,10 @@ int main(int argc, char **argv)
                   .vdm_barrier = DRM_ASAHI_BARRIER_NONE, .cdm_barrier = 0},
             .c = {.cdm_ctrl_stream_base = cdm_va, .cdm_ctrl_stream_end = cdm_end,
                   .ts = {.start = {.handle = bo_ts.object_handle, .offset = 0},
-                         .end = {.handle = bo_ts.object_handle, .offset = 8}}},
+                         .end = {.handle = bo_ts.object_handle, .offset = 8}},
+                  .helper = {.binary = 0, .cfg = (uint32_t)env("AGX_HELPER_CFG", 0), .data = env("AGX_HELPER_DATA", 0)},
+                  .sampler_count = (uint32_t)env("AGX_SAMPLER_COUNT", 0),
+                  .sampler_heap = env("AGX_SAMPLER_COUNT", 0) ? data.va + 0x6000 : 0},
         };
         struct drm_asahi_sync out_sync = {.sync_type = DRM_ASAHI_SYNC_SYNCOBJ, .handle = sc.handle};
         struct drm_asahi_submit sub = {.syncs = (uint64_t)(uintptr_t)&out_sync, .cmdbuf = (uint64_t)(uintptr_t)&cmd,
@@ -199,6 +251,12 @@ int main(int argc, char **argv)
         require(r == 0, "syncobj-wait");
         struct drm_syncobj_array reset = {.handles = (uint64_t)(uintptr_t)&sc.handle, .count_handles = 1};
         io(DRM_IOCTL_SYNCOBJ_RESET, &reset, "syncobj-reset");
+    }
+    const char *tout = getenv("AGX_TABLE_OUT");
+    if (tout && *tout) {
+        require(table_size > 0, "table-out-needs-table");
+        FILE *t = fopen(tout, "wb"); require(t != NULL, "table-out-open");
+        require(fwrite(data.map + table_off, 1, table_size, t) == table_size && fclose(t) == 0, "table-out-write");
     }
     FILE *o = fopen(argv[4], "wb"); require(o != NULL, "readback-open");
     require(fwrite(out, 4, words, o) == words && fclose(o) == 0, "readback-write");
