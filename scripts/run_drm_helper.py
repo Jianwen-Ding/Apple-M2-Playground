@@ -69,6 +69,39 @@ def helper_program(max_requests=64):
     return p
 
 
+POST_END = (7, 15, 17, 19, 20, 21, 24, 25, 32, 57, 59, 60, 63, 97, 113, 114)
+
+
+def helper_program_mesa_shaped(max_requests=64):
+    """Mesa-shaped helper: only argument/core reads before the first doorbell, r0..r6,
+    request log between doorbells, and a 16-selector scan after END (or the cap).
+    Layout per core: table[core*512 + 3k] = (op, arg_lo, arg_hi) for request k;
+    table[core*512 + 256 + i] = POST_END[i]."""
+    e, mi, gs = agx_loop.encode, agx_loop.chains.mov_imm, scan.get_sr
+    st = lambda reg: agx_loop.store_regbase(reg, 2, 5)+e('iadd r5, 1, r5.sx')
+    p = bytes.fromhex('62000000')                          # mov_imm r0l, 0
+    p += gs(146, 2)+gs(147, 3)                             # r2_r3 = helper.data (Mesa reads it first too)
+    p += gs(20, 4)+mi(6, REGION)+mi(1, 0)+e('imadd r5, r4, r6, r1')+mi(6, 0)
+    p += e('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
+    top = len(p)
+    p += doorbell(DB_NEXT)
+    p += gs(144, 1)+st(1)+gs(146, 4)+st(4)+e('wait 0')+gs(147, 4)+st(4)+e('wait 0')
+    p += e('iadd r6, 1, r6.sx')
+    p += e('while_icmp r0l, nueq, r1, 15, 1')              # END -> inactive
+    p += e(f'while_icmp r0l, ult, r6, {max_requests}, 1')  # cap -> inactive
+    nack = doorbell(DB_NACK)
+    skip = 6+len(nack)+6
+    p += e(f'jmp_exec_none pc+{skip}', f'jmp_exec_none pc+{skip}')
+    p += nack
+    p += e(f'jmp_exec_any pc-{len(p)-top}', f'jmp_exec_any pc-{len(p)-top}')
+    p += e('pop_exec r0l, 1')
+    p += gs(20, 4)+mi(6, REGION)+mi(1, 256)+e('imadd r5, r4, r6, r1')
+    for k, sel in enumerate(POST_END):
+        reg = 1 if k % 2 == 0 else 4
+        p += gs(sel, reg)+st(reg)+e('wait 0')
+    return p+EXIT
+
+
 def disassemble(code):
     _, g = agx_loop._tools()
     out, i = [], 0
@@ -85,11 +118,13 @@ def main():
     p.add_argument('--cfg', default='0')
     p.add_argument('--max-requests', type=int, default=64)
     p.add_argument('--dry-run', action='store_true', help='build and disassemble only')
+    p.add_argument('--shape', choices=('mesa', 'scan-first'), default='mesa',
+                   help="mesa: doorbell first, log, 16 selectors after END; scan-first: the original 2026-10-11 design (hung)")
     p.add_argument('--device', default='/dev/dri/renderD128')
     p.add_argument('--output', type=Path)
     p.add_argument('--cc', default=os.environ.get('CC', 'cc'))
     a = p.parse_args()
-    helper = helper_program(a.max_requests)
+    helper = helper_program_mesa_shaped(a.max_requests) if a.shape == 'mesa' else helper_program(a.max_requests)
     listing = disassemble(helper)
     if a.dry_run:
         for x in listing[:6]+[('...',)]+listing[-24:]: print(*x)
@@ -110,7 +145,7 @@ def main():
     res = subprocess.run([str(exe), a.device, str(out/'main.bin'), str(a.count), str(rb), '1', '32', str(table)],
                          env=env, capture_output=True, timeout=60)
     events = [json.loads(l) for l in res.stdout.decode(errors='replace').splitlines() if l.startswith('{')]
-    rec = {'utc': stamp, 'path': 'direct-drm', 'kind': 'helper', 'count': a.count, 'cfg': a.cfg, 'max_requests': a.max_requests,
+    rec = {'utc': stamp, 'path': 'direct-drm', 'kind': 'helper', 'shape': a.shape, 'count': a.count, 'cfg': a.cfg, 'max_requests': a.max_requests,
            'returncode': res.returncode, 'events': events, 'helper_hex': helper.hex(), 'helper_listing': listing}
     if res.returncode == 0:
         rounded = (a.count+31)//32*32
@@ -123,14 +158,22 @@ def main():
             region = t[c*REGION:(c+1)*REGION]
             if all(v == SENTINEL for v in region): continue
             log = []
-            for k in range(a.max_requests):
-                op = region[256+3*k:259+3*k]
+            base = 0 if a.shape == 'mesa' else 256
+            for k in range(a.max_requests if a.shape == 'mesa' else 0):
+                op = region[base+3*k:base+3+3*k]
                 if op[0] == SENTINEL: break
                 log.append(list(op))
-            cores[c] = {'sr': list(region[:256]), 'log': log}
+            if a.shape == 'mesa':
+                cores[c] = {'log': log, 'post_end': {sel: region[256+i] for i, sel in enumerate(POST_END)}}
+            else:
+                cores[c] = {'sr': list(region[:256]), 'log': log}
         rec['cores'] = cores
     (out/'record.json').write_text(json.dumps(rec)+'\n')
-    summary = {'returncode': res.returncode, 'buffer_ok': rec.get('buffer_ok'), 'cores_with_helper_output': sorted(rec.get('cores', {})),
+    samples = [e for e in events if 'rep' in e]
+    rec['completed_normally'] = bool(samples) and all(x['fw_ts'][0] and x['fw_ts'][1] and x['host_ns'] < 50_000_000 for x in samples)
+    (out/'record.json').write_text(json.dumps(rec)+'\n')
+    summary = {'returncode': res.returncode, 'completed_normally': rec['completed_normally'], 'buffer_ok': rec.get('buffer_ok'),
+               'host_ms': [round(x['host_ns']/1e6, 3) for x in samples], 'cores_with_helper_output': sorted(rec.get('cores', {})),
                'fw_ns': [e['fw_ts'][1]-e['fw_ts'][0] for e in events if 'rep' in e], 'output': str(out),
                'tail': res.stdout.decode(errors='replace')[-300:] if res.returncode else ''}
     print(json.dumps(summary))

@@ -218,6 +218,8 @@ VkResult error" as "no fault".
 * Do not judge success from syncobj wait alone. Check host time and whether the
   firmware timestamps were written (0/0 means the command did not complete
   normally).
-* If retried: ring the first doorbell immediately (as Mesa does), keep the helper
-  to a handful of registers, and do any logging between requests. Run only with
-  the owner watching, ideally with dmesg.
+* Retried Mesa-shaped (doorbell first, r0–r6): the same 0.5 s hang, and the
+  helper never returned from its first doorbell. Helper probing is dropped. A
+  future attempt would first need the conditions under which firmware feeds
+  helper requests/END (cfg, binary tag bits, stack-using main, scratch header),
+  e.g. from a trace of Mesa running a spilling shader.
