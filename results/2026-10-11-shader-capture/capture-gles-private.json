@@ -1,6 +1,6 @@
 {
  "command": [],
- "out": "/scratch/apple-m2-playground/capture/final/private",
+ "out": "/scratch/apple-m2-playground/capture/final2/private",
  "mesa_versions": {
   "gl": "25.1.9",
   "vulkan": "25.3.6"
@@ -112,7 +112,7 @@
      "offset": 128,
      "bytes": 198,
      "padding_instructions": 8,
-     "file": "/scratch/apple-m2-playground/capture/final/private/shader0-main.bin",
+     "file": "/scratch/apple-m2-playground/capture/final2/private/shader0-main.bin",
      "listing": [
       {
        "pc": 0,
@@ -646,11 +646,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 4.9
+         "stall": 0.0
         },
         "4": {
          "n": 4,
-         "stall": 19.6
+         "stall": 0.0
         }
        }
       },
@@ -705,8 +705,8 @@
        "stack_store"
       ],
       "cycles": {
-       "1": 193.1,
-       "4": 196.8
+       "1": 206.1,
+       "4": 209.8
       },
       "loop_back_branches": {
        "88": 1
@@ -719,7 +719,7 @@
      "offset": 384,
      "bytes": 20,
      "padding_instructions": 8,
-     "file": "/scratch/apple-m2-playground/capture/final/private/shader0-preamble.bin",
+     "file": "/scratch/apple-m2-playground/capture/final2/private/shader0-preamble.bin",
      "listing": [
       {
        "pc": 0,
@@ -749,11 +749,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 62.3
+         "stall": 43.4
         },
         "4": {
          "n": 4,
-         "stall": 249.2
+         "stall": 173.6
         }
        }
       },
@@ -800,8 +800,8 @@
       "dynamic_instructions": 4,
       "emulator_skipped": [],
       "cycles": {
-       "1": 103.5,
-       "4": 103.5
+       "1": 51.4,
+       "4": 51.4
       },
       "loop_back_branches": {}
      }
@@ -884,7 +884,7 @@
      "offset": 0,
      "bytes": 24,
      "padding_instructions": 0,
-     "file": "/scratch/apple-m2-playground/capture/final/private/shader1-main.bin",
+     "file": "/scratch/apple-m2-playground/capture/final2/private/shader1-main.bin",
      "listing": [
       {
        "pc": 0,
@@ -976,7 +976,7 @@
      "offset": 128,
      "bytes": 44,
      "padding_instructions": 8,
-     "file": "/scratch/apple-m2-playground/capture/final/private/shader1-preamble.bin",
+     "file": "/scratch/apple-m2-playground/capture/final2/private/shader1-preamble.bin",
      "listing": [
       {
        "pc": 0,
@@ -1006,11 +1006,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 62.3
+         "stall": 43.4
         },
         "4": {
          "n": 4,
-         "stall": 249.2
+         "stall": 173.6
         }
        }
       },
@@ -1111,8 +1111,8 @@
       "dynamic_instructions": 7,
       "emulator_skipped": [],
       "cycles": {
-       "1": 213.0,
-       "4": 213.0
+       "1": 61.3,
+       "4": 61.3
       },
       "loop_back_branches": {}
      }
@@ -1180,7 +1180,7 @@
      "offset": 0,
      "bytes": 146,
      "padding_instructions": 8,
-     "file": "/scratch/apple-m2-playground/capture/final/private/shader2-main.bin",
+     "file": "/scratch/apple-m2-playground/capture/final2/private/shader2-main.bin",
      "listing": [
       {
        "pc": 0,
@@ -1567,8 +1567,8 @@
       "dynamic_instructions": 21,
       "emulator_skipped": [],
       "cycles": {
-       "1": 79.5,
-       "4": 81.5
+       "1": 78.4,
+       "4": 80.4
       },
       "loop_back_branches": {}
      }
@@ -1578,7 +1578,7 @@
      "offset": 256,
      "bytes": 142,
      "padding_instructions": 8,
-     "file": "/scratch/apple-m2-playground/capture/final/private/shader2-preamble.bin",
+     "file": "/scratch/apple-m2-playground/capture/final2/private/shader2-preamble.bin",
      "listing": [
       {
        "pc": 0,
@@ -1608,11 +1608,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 62.3
+         "stall": 43.4
         },
         "4": {
          "n": 4,
-         "stall": 249.2
+         "stall": 173.6
         }
        }
       },
@@ -1680,11 +1680,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 62.3
+         "stall": 43.4
         },
         "4": {
          "n": 4,
-         "stall": 249.2
+         "stall": 173.6
         }
        }
       },
@@ -1752,11 +1752,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 62.3
+         "stall": 43.4
         },
         "4": {
          "n": 4,
-         "stall": 249.2
+         "stall": 173.6
         }
        }
       },
@@ -1824,11 +1824,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 62.3
+         "stall": 43.4
         },
         "4": {
          "n": 4,
-         "stall": 249.2
+         "stall": 173.6
         }
        }
       },
@@ -1896,11 +1896,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 62.3
+         "stall": 43.4
         },
         "4": {
          "n": 4,
-         "stall": 249.2
+         "stall": 173.6
         }
        }
       },
@@ -1950,11 +1950,11 @@
        "sim": {
         "1": {
          "n": 1,
-         "stall": 62.3
+         "stall": 43.4
         },
         "4": {
          "n": 4,
-         "stall": 249.2
+         "stall": 173.6
         }
        }
       },
@@ -2001,8 +2001,8 @@
       "dynamic_instructions": 23,
       "emulator_skipped": [],
       "cycles": {
-       "1": 762.0,
-       "4": 762.0
+       "1": 316.6,
+       "4": 316.6
       },
       "loop_back_branches": {}
      }
