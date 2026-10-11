@@ -63,6 +63,8 @@ make opcode-describe        # GPU: describe the 49 non-faulting undecoded opcode
 make verify-opcode-describe # Check retained opcode-description evidence offline
 make sync-probe             # GPU: 0x18/0x78 barrier/wait and ending-opcode tests (CONFIRM_GPU_FAULTS=1)
 make verify-sync-and-end    # Check retained sync/end evidence offline
+make barrier-stress         # GPU: 0x68 vs 0x78 message-passing stress (CONFIRM_GPU_FAULTS=1)
+make verify-barrier-stress  # Check retained barrier-stress evidence offline
 ```
 
 Run records and binaries go to scratch. Baseline/DRM runs use

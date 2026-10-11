@@ -269,3 +269,14 @@ VkResult error" as "no fault".
 * applegpu's assembler cannot encode `threadgroup_load/store` (no `encode_string` for the base).
   Pack them from Mesa `agx_pack.c:769-792` and require an exact decode.
 
+### Barrier stress, 2026-10-11
+
+* **A light barrier test can hide a scoped barrier.** The delayed-flag test with 2 and 4 SIMD groups
+  passed 0x78, which was then called a whole-workgroup barrier. Only 8+ groups showed that it covers
+  aligned blocks of 4. Test barriers at the largest workgroup sizes, with partners in distant groups.
+* **Declared threadgroup memory is not all usable:** only declared/4 bytes worked. Declaring 8 KiB
+  for 8 KiB of data made 0x68 and 0x78 fail identically, which first looked like a barrier result.
+  Identical failure counts across different barriers point to the harness.
+* With large threadgroup allocations (one workgroup per core), 2-group workgroups ran in lockstep and
+  the `wait` negative control stopped failing. Always keep a control that is shown to fail.
+

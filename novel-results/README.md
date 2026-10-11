@@ -1,6 +1,7 @@
 # New hardware findings
 
-- [2026-10-11 0x78 threadgroup barrier, 0x18 fixed-cost op, ending opcodes indistinguishable; threadgroup memory on direct DRM](2026-10-11-sync-and-end-opcodes/README.md)
+- [2026-10-11 0x78 = barrier over aligned 4-SIMD-group blocks, 0x68 = whole workgroup; usable threadgroup memory = declared/4](2026-10-11-barrier-0x68-vs-0x78/README.md)
+- [2026-10-11 0x78 (4-SIMD-group) barrier, 0x18 fixed-cost op, ending opcodes indistinguishable; threadgroup memory on direct DRM](2026-10-11-sync-and-end-opcodes/README.md)
 - [2026-10-11 Undecoded-opcode descriptions: 6-byte no-ops, 0x18/0x78 control ops, mask-independent SIMD-group end; under-declared registers corrupt](2026-10-11-opcode-descriptions/README.md)
 - [2026-10-11 SR12/SR13 imageblock dimensions, SR15 sample stride](2026-10-11-sr12-sr13-sr15-imageblock/README.md)
 - [2026-10-11 Preshader execution model: once per core, one lane, slot 96; device atomic add](2026-10-11-preshader-execution/README.md)

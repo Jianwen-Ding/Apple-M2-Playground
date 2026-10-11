@@ -141,3 +141,10 @@ reconstructs shader bytes and buffers with the Python standard library;
 * `analyze_sync_probe.py RECORD`: the floor (minimum) estimator for timing suites.
 * `verify_sync_and_end.py`: offline checks of `results/2026-10-11-sync-and-end-opcodes/`.
 
+## Barrier stress (2026-10-11)
+
+* `run_drm_barrier_stress.py [--dist D] [--sizes ...]`: message-passing test of 0x68/0x78/`wait` across
+  memory types, workgroup sizes and pre-sequences; per-SIMD-group error counts.
+* `run_drm_tg_capacity.py`: usable threadgroup memory against the declared USC Shared size.
+* `verify_barrier_stress.py`: offline checks of `results/2026-10-11-barrier-0x68-vs-0x78/`.
+

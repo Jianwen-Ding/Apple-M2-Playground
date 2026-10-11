@@ -1,4 +1,4 @@
-# 0x78 is a threadgroup barrier; 0x18 is a fixed-cost op of unknown target; the ending opcodes are indistinguishable
+# 0x78 is a (4-SIMD-group) barrier; 0x18 is a fixed-cost op of unknown target; the ending opcodes are indistinguishable
 
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, compute stage.
 Builds on the [opcode descriptions](../2026-10-11-opcode-descriptions/README.md). Faulting
@@ -20,8 +20,10 @@ executes the candidate exactly once, so a barrier cannot deadlock.
 | **0x78** (`7809` and `7800`) | **seen** | **seen** |
 | 0x18 (`1809`, `1800`, and after `memory_barrier`) | not seen | not seen |
 
-**0x78 makes every SIMD group of the workgroup wait, as 0x68 does, and earlier device-
-and threadgroup-memory writes are visible after it.** It is cheaper: 2.9 ns per execution
+**Correction (stress test):** 0x78 synchronizes only aligned blocks of 4 SIMD groups (128 lanes),
+while 0x68 synchronizes the whole workgroup. See [0x68 vs 0x78](../2026-10-11-barrier-0x68-vs-0x78/README.md).
+Within up to 4 groups, 0x78 makes every group wait, as 0x68 does, and earlier device-
+and threadgroup-memory writes are visible after it. It is cheaper: 2.9 ns per execution
 for a lone SIMD group, against 9.3 ns for 0x68, in the same state. It completes the
 `xxxx1000` control family next to `threadgroup_barrier` 0x68.
 
@@ -89,9 +91,7 @@ ending opcodes that complete normally.
 
 ## Compiler implications and limitations
 
-* A PTX `bar.sync` can keep using Mesa's 0x68. 0x78 is a cheaper barrier with the same
-  observed semantics, but its differences from 0x68 are unknown (e.g. fragment or imageblock
-  behaviour, or interaction with exited groups). Do not adopt it without more testing.
+* A PTX `bar.sync` must use 0x68: 0x78 covers only 4 SIMD groups (see the stress test).
 * The PTX `exit` in divergent code: `stop` ends only active lanes, while the 18 ending
   opcodes end the whole SIMD group. Keep `stop`.
 * Only one device was tested; G13/G14D may differ.
