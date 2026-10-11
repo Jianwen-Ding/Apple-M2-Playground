@@ -38,8 +38,9 @@ fitted empty-loop cost (35.25 units, predicted 35.27) from both sides, which is 
 | Dataset | Role | 1 group: whole trip | 1 group: body | 4 groups/core: whole trip | 4 groups/core: body |
 | --- | --- | --- | --- | --- | --- |
 | 24 random 24-instr kernels | selection (issue rule chosen here) | 5.1% (max 15%) | 7.2% (max 24%) | 6.3% (max 19%) | 9.4% |
-| **24 new 24-instr kernels** | **held out** | **5.7%** (max 13%) | **8.8%** (max 19%) | **8.3%** (max 21%) | **11.3%** |
-| **12 new 48-instr kernels** | **held out** | **3.8%** (max 8.0%) | **4.5%** (max 10%) | **4.3%** (max 9.5%) | **5.1%** |
+| 24 new 24-instr kernels | held out, then used to choose transcendental blocking | 5.7% (max 13%) | 8.8% (max 19%) | 8.3% (max 21%) | 11.3% |
+| 12 new 48-instr kernels | held out, then used to choose transcendental blocking | 3.8% (max 8.0%) | 4.5% (max 10%) | 4.3% (max 9.5%) | 5.1% |
+| **24 fresh 32-instr kernels** (seeds 9000+) | **held out: measured after every current rule** | **3.7%** (p90 9.6%, max 16%) | | **3.3%** (p90 9.4%, max 13%) | |
 
 Latest verifier run (`results/2026-10-11-cost-model/verify-output.txt`), after the
 [exec-control](../2026-10-11-exec-control-cost/README.md), [transcendental pipe](../2026-10-11-transcendental-pipe/README.md)

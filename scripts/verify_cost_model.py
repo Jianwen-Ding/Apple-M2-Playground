@@ -24,6 +24,7 @@ Datasets and their role (results/2026-10-11-cost-model and the instruction bench
   heldout24  HELD OUT  24 new 24-instruction kernels, measured once the issue rule was chosen; later
                        ALU-side changes (operand decode, shared units, token scaling) were re-scored on
                        them, so they are now regression guards rather than pristine held-out data
+  heldout32c HELD OUT  24 kernels of 32 instructions, seeds 9000+, measured after every current rule (pristine)
   heldout48  HELD OUT  12 new 48-instruction kernels, same
 Kernel errors are reported per whole loop trip and per loop body (the fitted empty-trip cost
 removed from both measurement and prediction). Thresholds sit just above the README figures.
@@ -208,8 +209,9 @@ for fname, role in (('heldout-mem24.json', 'DISCOVERY (revealed the wait drain)'
         md, p90, mx, b = stats(errs)
         check(md <= lim, f'{fname} memory kernels ({role}), {groups} group(s)/core: median |err| {md:.3f} p90 {p90:.3f} max {mx:.3f} bias {b:+.3f} (limit {lim})')
 for fname, role, lim1, lim4, blim1, blim4 in (('random-kernels.json', 'SELECTION', 0.07, 0.12, 0.10, 0.17),
-                                             ('heldout24.json', 'HELD OUT', 0.06, 0.12, 0.09, 0.15),
-                                             ('heldout48.json', 'HELD OUT', 0.045, 0.10, 0.05, 0.12)):
+                                             ('heldout24.json', 'HELD OUT (used to choose transcendental blocking)', 0.06, 0.12, 0.09, 0.15),
+                                             ('heldout48.json', 'HELD OUT (used to choose transcendental blocking)', 0.045, 0.10, 0.05, 0.12),
+                                             ('heldout32c.json', 'HELD OUT (measured after all current rules)', 0.05, 0.05, 0.07, 0.07)):
   rk = json.loads((R/fname).read_text())
   for gm, groups, lim, blim in (('one', 1, lim1, blim1), ('gpu', 4, lim4, blim4)):
     errs, berrs = [], []
