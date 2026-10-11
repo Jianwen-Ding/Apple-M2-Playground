@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate', 'waits', 'spaces'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -155,6 +155,23 @@ def main():
             m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one', extra_env=env)
             res[name] = (m['cycles']-EMPTY_TRIP)/8
             print(f'{name:26s} {res[name]:6.1f} ref units/rep', flush=True)
+    elif a.what == 'spaces':
+        # memory-space transitions with no ALU work in the loop body
+        from run_drm_tg_layout import tg, shared_word
+        env = {'AGX_SHARED_WORD': str(shared_word(2048))}
+        consts = (1, 0x3f800000, 32, 7)
+        DS = agx_loop.store(5, 8, 26); DL = e('device_load 0, i32, x, r6, u8_u9, r26, unsigned')
+        TS = tg(False, 'i32', 5, base=None, index=1); TL = tg(True, 'i32', 7, base=None, index=0); W = e('wait 0')
+        M = {'dev store, dev store': [DS, DS], 'tg store, tg store': [TS, TS], 'dev store, tg store': [DS, TS],
+             'tg store, dev store': [TS, DS], 'dev load, wait, dev load, wait': [DL, W, DL, W],
+             'tg load, wait, tg load, wait': [TL, W, TL, W], 'dev load, wait, tg load, wait': [DL, W, TL, W],
+             'tg load, wait, dev load, wait': [TL, W, DL, W], 'dev store, tg load, wait': [DS, TL, W],
+             'tg store, dev load, wait': [TS, DL, W]}
+        for name, parts in M.items():
+            body = b''.join(parts)*8
+            m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one', extra_env=env)
+            res[name] = (m['cycles']-EMPTY_TRIP)/8
+            print(f'{name:34s} {res[name]:6.1f} units/rep', flush=True)
     elif a.what == 'waits':
         # cost of wait instructions whose slot has nothing pending (no memory instructions in the loop)
         for slot in (0, 1):

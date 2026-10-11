@@ -31,15 +31,16 @@ is at least ~31 units (a = 0) or ~56 units (a ≥ 1) after the last ALU instruct
 | 4 | 67.6 | 71.5 | 73.9 | 80.6 | 88.8 | 95.9 |
 | 8 | 75.5 | 75.8 | 76.8 | 84.6 | 92.0 | 100.7 |
 
-**Rule (fits the 30-point grid at 1.7% median, worst 4.4%, and 15 of 16 memory-state probes at 2.8% median; the memory-space switch case is 27% off).** A memory instruction cannot start earlier than a fixed quiet time after the
+**Rule (fits the 30-point grid at 1.7% median, worst 4.4%, 15 memory-state probes at 2.5% median and 7 memory-space transitions within ~1 unit).** A memory instruction cannot start earlier than a fixed quiet time after the
 group's last ALU issue: **~20 units for device loads and threadgroup loads/stores, ~34 units for device
 stores** (`memstate.json`, `tgmem.json`). It is not the `wait`, nor whether the pipe was idle: `iadd, wait,
 load, wait` is slow (64.8) because the `wait` costs only ~1 unit, while `load, iadd, wait` is fast (44.7)
 because the next load issues ~40 units after that `iadd`; a loop's own counter `iadd` (33+ units before the
 next iteration's first store, across the taken branch) does not slow the store. Stores then issue in 3.1
 units (device) or 17.1 (threadgroup); a device store completes ~18 units after an on-time issue. Two
-threadgroup loads serialize (~23 units each). A device store right after a threadgroup store cost +16.5
-units in the one case measured (a memory-space switch?); a `wait` whose slot has nothing pending costs ~4.9
+threadgroup loads serialize (~23 units each). Transitions between a device store and a threadgroup access
+(either order) cost ~6.7 units each; device↔threadgroup loads and a threadgroup store followed by a device
+load cost nothing extra (`spaces.json`); a `wait` whose slot has nothing pending costs ~4.9
 units, and 32 of them per repetition blew up to 424 units (unexplained).
 
 | Body per repetition (units) | measured |

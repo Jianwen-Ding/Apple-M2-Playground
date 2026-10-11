@@ -379,9 +379,9 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                     lat, ii = delay+tk(P.mem['threadgroup_load']['lat'][0]), tk(P.mem['threadgroup_load']['issue'][0])
                 else:
                     lat = delay+tk(P.load_fast); ii = tk(P.load_ii)
-                sp = SPACE.get(r['name'])
-                if last_space[gi] and sp and sp != last_space[gi]: ii += tk(P.space_switch)
-                last_space[gi] = sp or last_space[gi]
+                cls_ = 'tg' if tgop else 'device_load'
+                if {cls_, last_space[gi]} == {'tg', 'device_store'}: ii += tk(P.space_switch)
+                last_space[gi] = cls_
                 alu_since_wait[gi] = False; load_busy[gi] = max(load_busy[gi], t+lat)
                 for h in r['dst']: ready[gi][h] = t+lat
                 slots[gi][r['slot']].append(t+lat)
@@ -392,9 +392,9 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                 delay = max(0, last_alu[gi]+tk(q)-t)
                 ii = delay+tk(m_['issue'][0]); slow = 0
                 st_done = max(t+ii+tk(m_['done'][1]), t+tk(m_['issue'][0])+tk(m_['done'][0]))   # completion overlaps the quiet delay
-                sp = SPACE.get(r['name'])
-                if last_space[gi] and sp and sp != last_space[gi]: ii += tk(P.space_switch)
-                last_space[gi] = sp or last_space[gi]
+                cls_ = 'tg' if r['name'].startswith('threadgroup') else 'device_store'
+                if {cls_, last_space[gi]} == {'tg', 'device_store'}: ii += tk(P.space_switch)   # spaces.json
+                last_space[gi] = cls_
                 slots[gi][r['slot']].append(st_done)
                 alu_since_wait[gi] = False
             elif kind == 'tg_atomic':

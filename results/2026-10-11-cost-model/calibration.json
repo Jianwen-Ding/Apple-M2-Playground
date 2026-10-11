@@ -26,7 +26,7 @@
  "tg_load_issue_ref": 21.0,
  "tg_store_fast_issue_ref": 17.1,
  "tg_store_slow_issue_ref": 36.2,
- "mem_space_switch_ref": 13.3,
+ "mem_space_switch_ref": 6.7,
  "memstate_note": "memstate.json / tgmem.json: a memory instruction is slow when the group issued an ALU instruction while no load was outstanding since its previous memory instruction (stores release the pipe after issue). Slow device loads +~19 latency, threadgroup loads/stores +~19, device stores +~32 group-blocking issue. A device store right after a threadgroup store costs +16.5 (space switch; one measured combination).",
  "mem_quiet_load_ref": 20.0,
  "mem_quiet_tg_ref": 20.0,
@@ -36,5 +36,6 @@
  "device_load_defer_delayed_extra_ref": 5.0,
  "wait_idle_big_ref": 10.9,
  "loop_buffer_bytes": 512,
- "wait_note": "waits.json: a wait with nothing pending costs 4.89 units inside a loop body of <= 512 bytes and ~10.9 when the body is larger (31+ two-byte waits x 8 reps + 18 B loop control). Independent iadd bodies up to 2 KiB show no such limit, so the effect is specific to wait. Straight-line (non-loop) code is assumed to behave like a large loop."
+ "wait_note": "waits.json: a wait with nothing pending costs 4.89 units inside a loop body of <= 512 bytes and ~10.9 when the body is larger (31+ two-byte waits x 8 reps + 18 B loop control). Independent iadd bodies up to 2 KiB show no such limit, so the effect is specific to wait. Straight-line (non-loop) code is assumed to behave like a large loop.",
+ "space_note": "spaces.json: only transitions between a device store and a threadgroup access (either order) cost extra, ~6.7 units each; device<->threadgroup loads and threadgroup store -> device load cost nothing extra."
 }
