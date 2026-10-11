@@ -6,7 +6,7 @@ shader 0: compute main  [gl (Mesa 25.1 layout)]  application shader
   Mesa IR: AGX_MESA_DEBUG=shaders section #0 (283 lines, in JSON); matched on stage, workgroup size, preamble present, instruction count, stack size, preamble stack size, shaderdb stats, main disassembly length, preamble disassembly length
   !!! WARNING (main): loop trip count unknown: costs assume 1 trip(s) for 1 loop(s) (pc 34..88; path emulate, the emulator sees zero uniforms and memory); pass --loop-trips N
   --- main @128  198 B  32 instructions (+8 padding)
-      predicted cycles (LOOP TRIPS UNKNOWN, see warning): 1 group/core = 249.8  4 groups/core = 253.5   (path emulate, 32 dynamic instrs, emulator skipped stack_load,stack_store)
+      predicted cycles (LOOP TRIPS UNKNOWN, see warning): 1 group/core = 250.8  4 groups/core = 254.5   (path emulate, 32 dynamic instrs, emulator skipped stack_load,stack_store)
          pc  hex                      class            n@1  stall@1   n@4  stall@4  disassembly
           0  b500c10520800004         stack_adjust       1      0.0     4      0.0  stack_adjust #1036 (words; applegpu: stack_store i8, 1, 2, 0, 1036, 0)
           8  72051004                 get_sr             1      0.0     4      0.0  get_sr r1, sr80 (thread_position_in_grid.x)
@@ -23,7 +23,7 @@ shader 0: compute main  [gl (Mesa 25.1 layout)]  application shader
          80  3800                     wait               1      3.8     4     15.2  wait 0
          82  522c44a21800             control            1      0.0     4      0.0  while_icmp r0l, ult, r2, u5, 1
          88  00c0caffffff             control            1      0.0     4      0.0  jmp_exec_any pc-54
-         94  520e00000000             control            1      0.0     4      0.0  pop_exec r0l, 1
+         94  520e00000000             control            1      1.0     4      4.0  pop_exec r0l, 1
         100  1e09427600000000         imadd              1      0.0     4      0.0  imadd r2, r1.sx, 7, 0
         108  7e0944c29800             and                1      1.0     4      4.0  and r2, r2, u6
         114  0e09004064001000         iadd_imm           1      1.0     4      4.0  iadd r2, 0, r2.sx, lsl 2

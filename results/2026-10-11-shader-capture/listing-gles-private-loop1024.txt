@@ -4,7 +4,7 @@ shader 0: compute main  [gl (Mesa 25.1 layout)]
   gprs(16-bit) main 10 preamble 2  push uniforms 16  stack 1036/0 words  local 0 B  wg [32, 1, 1]
   Mesa stats: instrs 32  alu 17  fscib 17  ic 16  threads 1024  loops 1  spills 1  fills 2
   --- main @128  198 B  32 instructions (+8 padding)
-      predicted cycles: 1 group/core = 102140.6  4 groups/core = 102146.2   (path static, 1 loop(s) x1024, 9239 dynamic instrs)
+      predicted cycles: 1 group/core = 102141.6  4 groups/core = 102147.2   (path static, 1 loop(s) x1024, 9239 dynamic instrs)
          pc  hex                      class            n@1  stall@1   n@4  stall@4  disassembly
           0  b500c10520800004         stack_adjust       1      0.0     4      0.0  stack_adjust #1036 (words; applegpu: stack_store i8, 1, 2, 0, 1036, 0)
           8  72051004                 get_sr             1      0.0     4      0.0  get_sr r1, sr80 (thread_position_in_grid.x)
@@ -21,7 +21,7 @@ shader 0: compute main  [gl (Mesa 25.1 layout)]
          80  3800                     wait            1024   3891.2  4096  15564.8  wait 0
          82  522c44a21800             control         1024      0.0  4096      0.0  while_icmp r0l, ult, r2, u5, 1
          88  00c0caffffff             control         1024      0.0  4096      0.0  jmp_exec_any pc-54
-         94  520e00000000             control            1      0.0     4      0.0  pop_exec r0l, 1
+         94  520e00000000             control            1      1.0     4      4.0  pop_exec r0l, 1
         100  1e09427600000000         imadd              1      0.0     4      0.0  imadd r2, r1.sx, 7, 0
         108  7e0944c29800             and                1      1.0     4      4.0  and r2, r2, u6
         114  0e09004064001000         iadd_imm           1      1.0     4      4.0  iadd r2, 0, r2.sx, lsl 2
