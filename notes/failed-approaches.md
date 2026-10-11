@@ -350,3 +350,8 @@ VkResult error" as "no fault".
 * **Issue-interval rules.** Letting a multi-cycle instruction block only its own unit family matches
   "leader + k independent iadds" tests (3.9%) but triples the random-kernel error (4.3% → 14.8%); one shared
   pipe for all multi-cycle classes is in between. The default blocks the whole group. The true rule is open.
+* **Shared execution-unit buckets did not explain the 4-group slowdown.** Measured 4-group / 1-group body
+  time is 1.07 (median, 0.97–1.34) over 60 kernels and correlates with the transcendental share (+0.44) and
+  inversely with SIMD reductions (−0.49). Making transcendentals (and imad/bitfield/convert) draw on one
+  shared bucket per unit, weighted by each op's measured rate, left every prediction unchanged: the
+  model's units never saturate in these latency-bound kernels. Reverted; the cause is open.
