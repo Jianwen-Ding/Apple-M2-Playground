@@ -5,7 +5,8 @@ Datasets and their role (results/2026-10-11-cost-model and the instruction bench
   bench      FIT       60 single-instruction loops: the model's own parameters (checks rounding only)
   rotation   FIT       72 instructions over D = 4..16 destinations: the result-cache rule was fit here
   memory     FIT       load/store probes: the memory parameters were taken from these
-  load grid  FIT       30-point ALU-before/after-load grid: the load fast/slow/defer parameters
+  load grid  FIT       30-point ALU-before/after-load grid: the load fast latency / quiet / defer parameters
+  memstate   FIT       store, threadgroup and quiet-time probes
   random     SELECTION 24 random kernels: the issue-interval rule was chosen by its score here
   heldout24  HELD OUT  24 new 24-instruction kernels, measured after the model was frozen
   heldout48  HELD OUT  12 new 48-instruction kernels, same
@@ -75,6 +76,23 @@ for key, m in grid.items():
     gerr.append((p-m)/m)
 md, p90, mx, b = stats(gerr)
 check(md <= 0.03 and mx <= 0.08, f'load-after-ALU grid (FIT, 30 points): median |err| {md:.3f}, max {mx:.3f}')
+from run_drm_tg_layout import tg
+consts = (1, 0x3f800000, 32, 7)
+st_ = agx_loop.store(5, 8, 26); L_ = e('device_load 0, i32, x, r6, u8_u9, r26, unsigned')
+A_ = e('iadd r14, r14, 1'); W_ = e('wait 0'); TS_ = tg(False, 'i32', 5, base=None, index=1); LD_ = tg(True, 'i32', 6, base=None, index=0)
+I8_ = b''.join(e('iadd r%d, r%d, 1' % (r, r)) for r in range(15, 23))
+MS = {'store': [st_], 'store, wait': [st_, W_], 'iadd, store': [A_, st_], 'iadd, store, wait': [A_, st_, W_], 'store, store': [st_, st_],
+      'store, 8 iadd': [st_, I8_], 'iadd, wait, store': [A_, W_, st_], 'iadd, store, store': [A_, st_, st_], 'tg store': [TS_],
+      'iadd, tg store': [A_, TS_], 'load, wait': [L_, W_], 'load, iadd, wait': [L_, A_, W_], 'iadd, load, wait': [A_, L_, W_],
+      'iadd, wait, load, wait': [A_, W_, L_, W_], 'iadd, store, load, wait': [A_, st_, L_, W_]}
+meas_ms = json.loads((R/'memstate.json').read_text())
+merr = []
+for name, parts in MS.items():
+    body = b''.join(parts)*8
+    p = (H.predict(H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 1)-EMPTY_MEAS)/8
+    merr.append((p-meas_ms[name])/meas_ms[name])
+md, p90, mx, b = stats(merr)
+check(md <= 0.04 and mx <= 0.15, f'memory state probes (FIT, 15 cases; the space-switch case is excluded): median |err| {md:.3f}, max {mx:.3f}')
 for fname, role, lim1, lim4, blim1, blim4 in (('random-kernels.json', 'SELECTION', 0.06, 0.12, 0.08, 0.17),
                                              ('heldout24.json', 'HELD OUT', 0.06, 0.12, 0.09, 0.15),
                                              ('heldout48.json', 'HELD OUT', 0.045, 0.10, 0.05, 0.12)):

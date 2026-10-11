@@ -54,7 +54,7 @@ HALF = {'f32 write r6 then independent f16 write r6l': ['fadd32 r6, r8, r24', 'f
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid'])
+    ap.add_argument('what', choices=['lead', 'rotation', 'pairs', 'half', 'values', 'values2', 'groups', 'memory', 'loadgrid', 'tgmem', 'memstate'])
     ap.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/cost/probes'))
     a = ap.parse_args()
     gpu_safety.require_budget(1)
@@ -120,6 +120,41 @@ def main():
                 m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one')
                 res[f'{a_},{b_}'] = (m['cycles']-EMPTY_TRIP)/8
                 print(f'a={a_} b={b_:2d}: {res[f"{a_},{b_}"]:.1f}', flush=True)
+    elif a.what == 'tgmem':
+        # threadgroup memory (2 KiB declared; encodings from the threadgroup-addressing finding).
+        from run_drm_tg_layout import tg, shared_word
+        env = {'AGX_SHARED_WORD': str(shared_word(2048))}
+        LD = tg(True, 'i32', 6, base=None, index=0); ST = tg(False, 'i32', 5, base=None, index=1)
+        M = {'tg load, wait': [LD, e('wait 0')],
+             'iadd, tg load, wait': [e('iadd r14, r14, 1'), LD, e('wait 0')],
+             'tg load, wait, dependent iadd': [LD, e('wait 0'), e('iadd r6, r6, r24')],
+             '2 tg loads, wait': [LD, tg(True, 'i32', 7, base=None, index=2), e('wait 0')],
+             'tg store': [ST],
+             'tg store, wait': [ST, e('wait 0')],
+             'tg store, tg load (other slot), wait': [ST, LD, e('wait 0')]}
+        for name, parts in M.items():
+            body = b''.join(parts)*8
+            m = H.measure(R, H.counted(body, 100), H.counted(body, 500), 400, 'one', extra_env=env)
+            res[name] = (m['cycles']-EMPTY_TRIP)/8
+            print(f'{name:38s} {res[name]:6.1f} ref units/rep', flush=True)
+    elif a.what == 'memstate':
+        # what makes a memory instruction slow: ALU work issued while no memory instruction is outstanding
+        from run_drm_tg_layout import tg, shared_word
+        env = {'AGX_SHARED_WORD': str(shared_word(2048))}
+        consts = (1, 0x3f800000, 32, 7)
+        st = agx_loop.store(5, 8, 26); L = e('device_load 0, i32, x, r6, u8_u9, r26, unsigned')
+        A = e('iadd r14, r14, 1'); W = e('wait 0'); TS = tg(False, 'i32', 5, base=None, index=1)
+        I8 = b''.join(e('iadd r%d, r%d, 1' % (r, r)) for r in range(15, 23))
+        M = {'store': [st], 'store, wait': [st, W], 'iadd, store': [A, st], 'iadd, store, wait': [A, st, W],
+             'store, store': [st, st], 'store, 8 iadd': [st, I8], 'iadd, wait, store': [A, W, st],
+             'iadd, store, store': [A, st, st], 'tg store': [TS], 'iadd, tg store': [A, TS],
+             'iadd, tg store, store': [A, TS, st], 'load, wait': [L, W], 'load, iadd, wait': [L, A, W],
+             'iadd, load, wait': [A, L, W], 'iadd, wait, load, wait': [A, W, L, W], 'iadd, store, load, wait': [A, st, L, W]}
+        for name, parts in M.items():
+            body = b''.join(parts)*8
+            m = H.measure(R, H.counted(body, 100, consts=consts), H.counted(body, 500, consts=consts), 400, 'one', extra_env=env)
+            res[name] = (m['cycles']-EMPTY_TRIP)/8
+            print(f'{name:26s} {res[name]:6.1f} ref units/rep', flush=True)
     elif a.what == 'values2':
         # identical instruction sequences; only the preloaded constants differ (r26/r27 set before the loop)
         one, near1, half, zero = 0x3f800000, 0x3f800347, 0x3f000000, 0

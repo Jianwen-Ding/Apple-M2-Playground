@@ -1,4 +1,4 @@
-# Device loads are slower after ALU work, and ALU work in flight defers them
+# Memory instructions issued soon after ALU work start late; ALU work in flight defers loads
 
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, one SIMD group, warm L1
 (the same word every repetition). Known-safe encodings only; reference units (× 1.049 = real cycles).
@@ -31,8 +31,27 @@ is at least ~31 units (a = 0) or ~56 units (a ≥ 1) after the last ALU instruct
 | 4 | 67.6 | 71.5 | 73.9 | 80.6 | 88.8 | 95.9 |
 | 8 | 75.5 | 75.8 | 76.8 | 84.6 | 92.0 | 100.7 |
 
-Interpretation (not proven): the group's memory request is not dispatched while the group keeps issuing ALU
-instructions, and a load following ALU work pays an extra ~18 units of pipeline transition.
+**Rule (fits the 30-point grid at 1.7% median, worst 4.4%, and 15 of 16 memory-state probes at 2.8% median; the memory-space switch case is 27% off).** A memory instruction cannot start earlier than a fixed quiet time after the
+group's last ALU issue: **~20 units for device loads and threadgroup loads/stores, ~34 units for device
+stores** (`memstate.json`, `tgmem.json`). It is not the `wait`, nor whether the pipe was idle: `iadd, wait,
+load, wait` is slow (64.8) because the `wait` costs only ~1 unit, while `load, iadd, wait` is fast (44.7)
+because the next load issues ~40 units after that `iadd`; a loop's own counter `iadd` (33+ units before the
+next iteration's first store, across the taken branch) does not slow the store. Stores then issue in 3.1
+units (device) or 17.1 (threadgroup); a device store completes ~18 units after an on-time issue. Two
+threadgroup loads serialize (~23 units each). A device store right after a threadgroup store cost +16.5
+units in the one case measured (a memory-space switch?); a `wait` whose slot has nothing pending costs ~4.9
+units, and 32 of them per repetition blew up to 424 units (unexplained).
+
+| Body per repetition (units) | measured |
+| --- | --- |
+| device store / store, store / store, wait | 3.2 / 6.2 / 21.5 |
+| iadd, store / iadd, wait, store / iadd, store, store | 35.8 / 35.8 / 37.1 |
+| store, 8 independent iadds (next store follows them) | 44.5 |
+| threadgroup store / iadd, threadgroup store | 17.2 / 36.3 |
+| threadgroup load, wait / iadd, threadgroup load, wait / 2 threadgroup loads, wait | 22.9 / 41.9 / 45.8 |
+
+Interpretation (not proven): the memory pipeline needs a quiet period after ALU issue before it accepts a
+request, as if ALU and memory instructions share an issue or operand path that must drain.
 
 This resolves the discrepancy with the [load-latency finding](../2026-10-10-agx-load-latency/README.md): its
 pointer chase alternates load and wait with no ALU work between, so it measured the fast case (36 ns at
@@ -45,11 +64,13 @@ non-ALU instruction (control flow, `wait` on another slot) resets the fast state
 ## Reproducer and evidence
 
 `results/2026-10-11-cost-model/load-alu-grid.json` (grid), `memory.json`; reproduce with
-`python3 scripts/cost_probes.py loadgrid` (grid) and `memory`. The rule is part of `scripts/agx_cost.py`.
+`python3 scripts/cost_probes.py loadgrid` (grid), `memstate`, `tgmem` and `memory`. The rule is part of `scripts/agx_cost.py`.
 
 ## Compiler implications
 
-* Issue a group's loads back to back before ALU work, and put ALU work between the loads and their `wait`
-  only up to ~8 instructions; a load after ALU work costs ~19 extra cycles.
+* Batch a group's memory instructions together and issue them before its ALU work; ALU work can then run
+  under the loads (up to ~8 instructions for free). A memory instruction right after ALU work starts ~21
+  cycles late (loads, threadgroup ops) or ~35 cycles late (device stores); device stores issued back to
+  back cost ~3 cycles each.
 * Pointer chasing and gather loops pay ~66 cycles per load in practice (address arithmetic precedes each load),
   not the ~50 of a pure chase.

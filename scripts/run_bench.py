@@ -130,9 +130,9 @@ class Runner:
         subprocess.run(['cc', '-std=c11', '-O2', str(REPO/'tests/drm_compute.c'), '-o', str(self.exe)], check=True)
         self.n = 0
 
-    def run(self, body, count, repeats=1, local_x=32, gprs=64, clock=False):
+    def run(self, body, count, repeats=1, local_x=32, gprs=64, clock=False, extra_env=None):
         (self.out/'c.bin').write_bytes(drm.build_main(body)+bytes(16))
-        env = {'PATH': '/usr/bin', 'AGX_LOCAL_X': str(local_x)}
+        env = {'PATH': '/usr/bin', 'AGX_LOCAL_X': str(local_x), **(extra_env or {})}
         argv = [str(self.exe), '/dev/dri/renderD128', str(self.out/'c.bin'), str(count), str(self.out/'rb'), str(repeats), str(gprs)]
         if clock:
             words = TS_BASE+7*count

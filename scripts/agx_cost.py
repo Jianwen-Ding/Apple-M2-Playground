@@ -75,7 +75,10 @@ LOADS = {'device_load', 'device_load.TODO', 'threadgroup_load', 'stack_load', 'a
          'texture_load', 'iter', 'iterproj', 'TODO.ldcf', 'TODO.ld/st_tile'}
 STORES = {'device_store', 'device_store.TODO', 'threadgroup_store', 'stack_store', 'uniform_store', 'image_write',
           'image_write_block', 'async_store', 'st_var', 'st_var_final', 'tex_state_store', 'sampler_state_store'}
-MEASURED_MEMORY = {'device_load', 'device_store'}
+MEASURED_MEMORY = {'device_load', 'device_store', 'threadgroup_load', 'threadgroup_store'}
+SPACE = {'device_load': 'device', 'device_load.TODO': 'device', 'device_store': 'device', 'device_store.TODO': 'device',
+         'atomic': 'device', 'threadgroup_load': 'tg', 'threadgroup_store': 'tg', 'threadgroup_atomic': 'tg',
+         'stack_load': 'stack', 'stack_store': 'stack'}
 CONTROL = {'if_icmp', 'if_fcmp', 'else_icmp', 'else_fcmp', 'while_icmp', 'while_fcmp', 'pop_exec', 'push_exec',
            'jmp_exec_any', 'jmp_exec_none', 'stop', 'trap', 'TODO.unk51', 'no_var'}
 BARRIERS = {'threadgroup_barrier', 'memory_barrier', 'wait_pix', 'signal_pix', 'TODO.unkE800'}
@@ -129,9 +132,17 @@ class Params:
         # completion is at least this long after the last ALU instruction issued while the load is pending
         self.defer_fast = c.get('device_load_defer_fast_ref', 31.0)*K
         self.defer_slow = c.get('device_load_defer_slow_ref', 56.0)*K
+        self.defer_delayed_extra = c.get('device_load_defer_delayed_extra_ref', 5.0)*K
         self.load_ii = max(1.0, c.get('device_load_extra_inflight_ref', 2.6)*K)
-        self.store_ii = max(1.0, c.get('device_store_issue_ref', 34.8)*K)
-        self.store_done = c.get('device_store_wait_extra_ref', 4.7)*K
+        g = lambda k, d: c.get(k, d)*K
+        self.mem = {   # per memory class: (fast, slow) issue occupancy, latency / completion, in real cycles
+            'device_store': {'issue': (g('device_store_fast_issue_ref', 3.1), g('device_store_slow_issue_ref', 35.7)),
+                             'done': (g('device_store_done_fast_ref', 18.3), g('device_store_done_slow_ref', 4.7))},
+            'threadgroup_load': {'lat': (g('tg_load_fast_ref', 19.4), g('tg_load_slow_ref', 38.4)), 'issue': (g('tg_load_issue_ref', 21.0),)*2},
+            'threadgroup_store': {'issue': (g('tg_store_fast_issue_ref', 17.1), g('tg_store_slow_issue_ref', 36.2)), 'done': (0.0, 0.0)}}
+        self.space_switch = g('mem_space_switch_ref', 13.3)
+        self.quiet = {'load': g('mem_quiet_load_ref', 20.0), 'tg': g('mem_quiet_tg_ref', 20.0), 'device_store': g('mem_quiet_device_store_ref', 33.6)}
+        self.wait_idle = g('wait_idle_ref', 4.85)
         self.branch = c.get('branch_taken_real')        # set by fit_branch() if missing
         self.allow_unknown = False
 
@@ -283,7 +294,10 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
     slots = [defaultdict(list) for _ in range(groups)]
     rcache = [[] for _ in range(groups)]; wtime = [dict() for _ in range(groups)]; last_w = [dict() for _ in range(groups)]
     tok = {}; port = READ_PORTS*T; issue_tok = ISSUE_PER_CORE*T
-    alu_since_wait = [False]*groups
+    alu_since_wait = [False]*groups          # slow state: ALU issued while no load outstanding since the last memory op
+    load_busy = [0]*groups                   # tick until which a load of this group is outstanding
+    last_alu = [-10**9]*groups               # tick of the group's last ALU issue (quiet-time rule)
+    last_space = [None]*groups
     pending = [[] for _ in range(groups)]       # [slot, completion tick, latency ticks, dst halves] of in-flight loads
     last_t = 0
     stats = defaultdict(lambda: {'n': 0, 'stall': 0, 'issue': 0, 'branch': 0})
@@ -334,7 +348,7 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             if kind == 'alu':
                 lat, ii = tk(row['lat']), tk(row['ii'])
                 for h in r['dst']: ready[gi][h] = t+lat
-                alu_since_wait[gi] = True
+                last_alu[gi] = t
                 for p_ in pending[gi]:          # ALU issue defers in-flight loads
                     newdone = t+p_[2]
                     if newdone > p_[1]:
@@ -342,17 +356,35 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
                         for h in p_[3]: ready[gi][h] = max(ready[gi][h], newdone)
                         slots[gi][p_[0]].append(newdone)     # wait drains to the latest completion
             elif kind == 'load':
-                lat = tk(P.load_latency if alu_since_wait[gi] else P.load_fast); ii = tk(P.load_ii)
+                tgop = r['name'] == 'threadgroup_load'
+                delay = max(0, last_alu[gi]+tk(P.quiet['tg' if tgop else 'load'])-t)     # quiet-time rule
+                if tgop:
+                    lat, ii = delay+tk(P.mem['threadgroup_load']['lat'][0]), tk(P.mem['threadgroup_load']['issue'][0])
+                else:
+                    lat = delay+tk(P.load_fast); ii = tk(P.load_ii)
+                sp = SPACE.get(r['name'])
+                if last_space[gi] and sp and sp != last_space[gi]: ii += tk(P.space_switch)
+                last_space[gi] = sp or last_space[gi]
+                alu_since_wait[gi] = False; load_busy[gi] = max(load_busy[gi], t+lat)
                 for h in r['dst']: ready[gi][h] = t+lat
                 slots[gi][r['slot']].append(t+lat)
-                pending[gi].append([r['slot'], t+lat, tk(P.defer_slow if alu_since_wait[gi] else P.defer_fast), r['dst']])
+                pending[gi].append([r['slot'], t+lat, delay+tk(P.defer_fast)+(tk(P.defer_delayed_extra) if delay else 0), r['dst']])
             elif kind == 'store':
-                ii = tk(P.store_ii); slots[gi][r['slot']].append(t+ii+tk(P.store_done))
+                m_ = P.mem.get(r['name'], P.mem['device_store'])
+                q = P.quiet['tg' if r['name'].startswith('threadgroup') else 'device_store']
+                delay = max(0, last_alu[gi]+tk(q)-t)
+                ii = delay+tk(m_['issue'][0]); slow = 0
+                st_done = max(t+ii+tk(m_['done'][1]), t+tk(m_['issue'][0])+tk(m_['done'][0]))   # completion overlaps the quiet delay
+                sp = SPACE.get(r['name'])
+                if last_space[gi] and sp and sp != last_space[gi]: ii += tk(P.space_switch)
+                last_space[gi] = sp or last_space[gi]
+                slots[gi][r['slot']].append(st_done)
+                alu_since_wait[gi] = False
             elif kind == 'tg_atomic':
                 ii = T
                 for h in r['dst']: ready[gi][h] = t+tk(P.load_latency)
             elif kind == 'wait':
-                ii = T; slots[gi][r['slot']] = []; alu_since_wait[gi] = False
+                ii = T if slots[gi][r['slot']] else tk(P.wait_idle); slots[gi][r['slot']] = []
                 pending[gi] = [p_ for p_ in pending[gi] if p_[0] != r['slot']]
             elif kind == 'control':
                 ii = CI

@@ -58,12 +58,12 @@ def program(phase_a, phase_b, count, ref_trips=1000, warm=20000):
     return b
 
 
-def measure(R, phase_a, phase_b, units, groups_mode, ref_trips=1000):
+def measure(R, phase_a, phase_b, units, groups_mode, ref_trips=1000, extra_env=None):
     """Cycles per unit of (phase_b - phase_a). groups_mode 'one' (32 lanes) or 'gpu' (4/core)."""
     count = 32 if groups_mode == 'one' else B.CORES*4*32
     body = program(phase_a, phase_b, count, ref_trips)
     for attempt in range(1, 9):
-        fw, ts = R.run(body, count, 2+attempt, 32, clock=True)
+        fw, ts = R.run(body, count, 2+attempt, 32, clock=True, extra_env=extra_env)
         if groups_mode == 'one':
             t = ts[0]; d = [((t[k+1]-t[k]) & 0xffffffff)*B.TICK_NS for k in range(5)]
             npc = (d[1]-d[0])/(ref_trips*48)/2
