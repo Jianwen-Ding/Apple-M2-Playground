@@ -102,6 +102,20 @@ CONFIGS = {
     'resident-g256-wg32': ({'GPRS': '256', 'AGX_LOCAL_X': '32', 'DELAY': '4000'}, 65536),
     'resident-g256-wg128': ({'GPRS': '256', 'AGX_LOCAL_X': '128', 'DELAY': '4000'}, 65536),
     'resident-g256-wg1024': ({'GPRS': '256', 'AGX_LOCAL_X': '1024', 'DELAY': '4000'}, 65536),
+    'pre-control': ({'PRE_CHUNK': '0', 'PRE_CONST': '0x5a000000'}, 64),
+    'pre-chunk0': ({'PRE_CHUNK': '0'}, 64),
+    'pre-chunk1': ({'PRE_CHUNK': '1'}, 64),
+    'pre-chunk0-local128': ({'PRE_CHUNK': '0', 'AGX_LOCAL_X': '128'}, 512),
+    'pre-chunk0-2048wg': ({'PRE_CHUNK': '0'}, 65536),
+    'atomic-64': ({'ATOMIC_TEST': '1'}, 64),
+    'atomic-33': ({'ATOMIC_TEST': '1'}, 33),
+    'atomic-65536': ({'ATOMIC_TEST': '1'}, 65536),
+    'pre-atomic-2wg': ({'PRE_CHUNK': '0', 'PRE_COUNT': 'atomic'}, 64),
+    'pre-atomic-512x128': ({'PRE_CHUNK': '0', 'PRE_COUNT': 'atomic', 'AGX_LOCAL_X': '128'}, 65536),
+    'pre-atomic-2048wg': ({'PRE_CHUNK': '0', 'PRE_COUNT': 'atomic'}, 65536),
+    'pre-count-2wg': ({'PRE_CHUNK': '0', 'PRE_COUNT': '1'}, 64),
+    'pre-count-512x128': ({'PRE_CHUNK': '0', 'PRE_COUNT': '1', 'AGX_LOCAL_X': '128'}, 65536),
+    'pre-count-2048wg': ({'PRE_CHUNK': '0', 'PRE_COUNT': '1'}, 65536),
     'samplers-4': ({'AGX_SAMPLER_COUNT': '4'}, 64),
     'word0-uniform-2': ({'AGX_WORD0_OR': str(2 << 1)}, 64),      # uniform register count field 1 -> 3 groups
     'word0-texture-8': ({'AGX_WORD0_OR': str(1 << 4)}, 64),      # texture state register count 1 group
@@ -146,6 +160,55 @@ def scan_body(selectors, stride_words, gx=None, gy=1, delay=0):
     return out
 
 
+MAIN_EXTRA = {250: 20, 251: 17, 252: 0, 253: 24}   # table slot: main-shader selector, for pairing with preshader copies
+
+
+COUNTER_SLOT = 255   # table[255*S + SR20] counts preamble executions per core (non-atomic load/add/store)
+
+
+def preshader_scan(selectors, stride_words, constant=None, count_runs=False):
+    """Preamble: get_sr each selector into r1..r4 and uniform_store it at halfs 32+2k
+    (constant: write `constant` instead, as a delivery control). Main: copy u(16+k)
+    to table[s*S + lane]. Returns (preamble bytes, main body bytes)."""
+    pre = b''
+    if count_runs:
+        pre += get_sr(20, 1)+agx_loop.chains.mov_imm(3, COUNTER_SLOT*stride_words)+agx_loop.encode('iadd r1, r1, r3')
+        if count_runs == 'atomic':
+            pre += agx_loop.chains.mov_imm(2, 1)+agx_loop.atomic_add(8, 1, 2)+agx_loop.encode('wait 0')
+        else:
+            pre += agx_loop.encode('device_load 0, i32, x, r2, u8_u9, r1, unsigned')+agx_loop.encode('wait 0')
+            pre += agx_loop.encode('iadd r2, 1, r2.sx')+agx_loop.store(2, 8, 1)+agx_loop.encode('wait 0')
+    for k, s in enumerate(selectors):
+        reg = 1+k % 4
+        pre += (agx_loop.chains.mov_imm(reg, constant+k) if constant is not None else get_sr(s, reg))
+        pre += agx_loop.uniform_store(reg, 32+2*k)
+    pre += bytes.fromhex('8800')  # stop
+    body = agx_loop.chains.mov_imm(14, stride_words)
+    for k, s in enumerate(selectors):
+        reg = 6+k % 8
+        body += agx_loop.chains.mov_imm(5, 0)+agx_loop.encode('iadd r5, r1, 0')
+        body += agx_loop.chains.mov_imm(15, s*stride_words)+agx_loop.encode('iadd r5, r5, r15')
+        body += agx_loop.encode(f'iadd r{reg}, u{16+k}, 0')+agx_loop.store(reg, 8, 5)
+        if k % 8 == 7: body += agx_loop.encode('wait 0')
+    for k, (slot, sel) in enumerate(MAIN_EXTRA.items()):
+        if slot in selectors: continue
+        reg = 6+k
+        body += agx_loop.encode('iadd r5, r1, 0')+agx_loop.chains.mov_imm(15, slot*stride_words)+agx_loop.encode('iadd r5, r5, r15')
+        body += get_sr(sel, reg)+agx_loop.store(reg, 8, 5)
+    body += agx_loop.encode('wait 0')+bytes.fromhex('620978563412')
+    return pre, body
+
+
+ATOMIC_SLOT = 254
+
+
+def atomic_test_body(stride_words):
+    """Every active lane atomically adds 1 to table[254*S]; the result must equal the lane count."""
+    body = agx_loop.chains.mov_imm(5, ATOMIC_SLOT*stride_words)+agx_loop.chains.mov_imm(6, 1)
+    body += agx_loop.atomic_add(8, 5, 6)+agx_loop.encode('wait 0')+bytes.fromhex('620978563412')
+    return body
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--configs', default=','.join(CONFIGS))
@@ -169,13 +232,28 @@ def main():
             gy, gz = int(envs.get('AGX_GLOBAL_Y', 1)), int(envs.get('AGX_GLOBAL_Z', 1))
             rounded = (lanes+31)//32*32*gy*gz        # total threads (lanes = global X)
             if gy*gz > 1 and lanes % 32: raise ValueError('multi-dimensional configs need lanes multiple of 32')
-            body = scan_body(range(256), rounded, lanes, gy, int(envs.get('DELAY', 0)))
+            written = list(range(256))
+            extra_env = {}
+            if 'ATOMIC_TEST' in envs:
+                written = []
+                body = atomic_test_body(rounded)
+            elif 'PRE_CHUNK' in envs:
+                c = int(envs['PRE_CHUNK']); scanned = list(range(128*c, 128*c+128))
+                const = int(envs['PRE_CONST'], 0) if 'PRE_CONST' in envs else None
+                pre, body = preshader_scan(scanned, rounded, const, envs.get('PRE_COUNT', False))
+                written = scanned+[slot for slot in MAIN_EXTRA if slot not in scanned]
+                (out/'preamble.bin').write_bytes(pre)
+                extra_env = {'AGX_PRESHADER': '1', 'AGX_PRESHADER_CODE': str(out/'preamble.bin'),
+                             'AGX_WORD0_OR': str((5 << 1) | (1 << 12))}   # 5 x 64 uniform halfs, 16 preshader halfs
+            else:
+                body = scan_body(range(256), rounded, lanes, gy, int(envs.get('DELAY', 0)))
             code = drm.build_main(body)
             (out/'scan.bin').write_bytes(code+bytes(16))
             table = out/'table.bin'; table.write_bytes(struct.pack('<I', SENTINEL)*(256*rounded))
             dump = out/f'{name}.table'; rb = out/'readback'
             gprs = envs.get('GPRS', '32')
-            env = dict(os.environ, **{k: v for k, v in envs.items() if k not in ('GPRS', 'DELAY')}, AGX_TABLE_OUT=str(dump))
+            env = dict(os.environ, **{k: v for k, v in envs.items() if k not in ('GPRS', 'DELAY', 'PRE_CHUNK', 'PRE_CONST', 'PRE_COUNT', 'ATOMIC_TEST')},
+                       **extra_env, AGX_TABLE_OUT=str(dump))
             res = subprocess.run([str(exe), a.device, str(out/'scan.bin'), str(lanes), str(rb), str(a.repeats), gprs, str(table)],
                                  env=env, capture_output=True, timeout=60)
             events = [json.loads(l) for l in res.stdout.decode(errors='replace').splitlines() if l.startswith('{')]
@@ -194,9 +272,16 @@ def main():
             rec['inactive_untouched'] = all(t[s*rounded+i] == SENTINEL for s in range(256) for i in range(active, rounded))
             rec['values'] = {s: list(t[s*rounded:s*rounded+active]) for s in range(256)}
             rec['unwritten'] = [s for s in range(256) if any(v == SENTINEL for v in rec['values'][s])]
+            rec['written_selectors'] = written
+            if 'ATOMIC_TEST' in envs:
+                rec['atomic_counter'] = t[ATOMIC_SLOT*rounded]-SENTINEL
+                rec['atomic_neighbours_untouched'] = all(t[ATOMIC_SLOT*rounded+i] == SENTINEL for i in range(1, rounded))
+            if 'PRE_COUNT' in envs:
+                rec['preamble_runs_by_core'] = {i: t[COUNTER_SLOT*rounded+i]-SENTINEL for i in range(rounded) if t[COUNTER_SLOT*rounded+i] != SENTINEL}
+            rec['unwritten'] = [s for s in rec['unwritten'] if s in written]   # only the scanned selectors must be written
             # A configuration may legitimately execute nothing (e.g. pipeline words ignored). Accept that
             # only when output and table are completely untouched; any partial write is a failure.
-            rec['executed_nothing'] = w == untouched and len(rec['unwritten']) == 256
+            rec['executed_nothing'] = w == untouched and len(rec['unwritten']) == len(written)
             dump.unlink(); table.unlink(); rb.unlink(); save()
             print(json.dumps({'config': name, 'ok': rec['buffer_ok'] and rec['inactive_untouched'], 'executed_nothing': rec['executed_nothing'],
                               'nonzero': [s for s in range(256) if any(v not in (0, SENTINEL) for v in rec['values'][s])],

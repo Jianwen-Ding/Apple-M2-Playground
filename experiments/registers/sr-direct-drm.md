@@ -8,9 +8,9 @@ configuration changes one launch parameter through `drm_compute`'s `AGX_*`
 overrides, which Vulkan never exposed. Raw records are up to 1.2 GB and stay in
 scratch. `scripts/extract_sr_scan.py` keeps compact summaries in
 [results/2026-10-11-sr-direct-drm](../../results/2026-10-11-sr-direct-drm/), which
-`make verify-sr-direct` checks (10 checks).
+`make verify-sr-direct` checks (14 checks).
 
-92 scan dispatches ran across 14 sessions with no fault or timeout. One layout was
+112 scan dispatches ran across 21 retained sessions with no fault or timeout. One layout was
 refused by the harness before submission, because the code and pipeline words
 would have overlapped.
 
@@ -60,7 +60,33 @@ clock provides yet.
 Only ever 0 or 8, and identical configurations disagree (`order-shru`: 8, 0, 0, 8;
 base, base-repeat and order-shru together: 3 of 18 runs gave 8). It is not tied to any parameter varied here.
 
-## Pipeline-word rule found along the way
+## Inside the preshader (preamble)
+
+A Preshader word points at a preamble that reads selectors with `get_sr` and
+writes each to uniform halfs 32 and up with `uniform_store`. The main shader copies
+those uniforms to the table and also stores its own SR20/17/0/24 beside them.
+Uniform register count 5 × 64 halfs, preshader register count 16 halfs.
+A constant-writing preamble first proves delivery: all 128 values arrive in every
+lane.
+
+| selector | preamble | main shader | reading |
+| --- | --- | --- | --- |
+| SR57, SR59 | 1, 1 | 4, 32 | the preamble runs with **one active lane** |
+| SR0 | 0 | workgroup id | no workgroup context |
+| SR17 | **96** on every core | 0–63 | a **dedicated SIMD-group slot** beyond the normal range |
+| SR24 | **5** | 2 | first movement of this constant: a **program-kind code** (2 = compute main, 5 = compute preamble) |
+| SR20 | equals the main shader's SR20 in **every lane** (66,112 lanes, 3 shapes) | | **uniforms written by a preamble are per core** |
+| SR15, 25, 97, 114, 60, 63, 32, 19, 7 | same as main | | |
+| 128–255 | all 0 | | including Mesa's helper SR144/146/147 |
+
+**The preamble runs exactly once per core per dispatch, only on cores that receive
+work.** A per-core counter incremented with a device `atomic add` reads 1 on every
+core: 2 runs for 2 workgroups on 2 cores, and 38 for 512 or 2,048 workgroups
+(12–60 per core). The atomic itself (new here, no return value) was validated
+first: 33, 64 and 65,536 lanes each adding 1 to one word give exactly those
+counts.
+
+
 
 **The No preshader / Preshader word must be the last USC pipeline word.** Four
 layouts violated it: Registers after it, Shader after it, fully reversed, and
@@ -82,15 +108,15 @@ even with helper data set.
 | Category | Count | Registers |
 | --- | --- | --- |
 | Identified | **30** | previous 28 + **SR17** (hardware SIMD-group slot) + **SR32** (pipeline-word offset) |
-| Nonzero, unexplained | 7 | SR15 = 16, SR24 = SR25 = 2, SR97 = 2048, SR114 = 136 (constant under every parameter tried); SR60 = 15; SR63 (Mesa: is_active_thread, untested) |
-| Behaviour known, meaning not | 1 | SR113 (random 0/8) |
+| Nonzero, unexplained | 6 | SR15 = 16, SR25 = 2, SR97 = 2048, SR114 = 136 (constant in main and preamble); SR60 = 15; SR63 (Mesa: is_active_thread, untested) |
+| Behaviour known, meaning partial | 2 | SR24 (program kind: 2 main compute, 5 preamble); SR113 (random 0/8) |
 | Mesa-named, not testable from compute | 6 | SR14, 62, 124, 144, 146, 147 |
 | Always zero | 212 | — |
 
 ## Reproduce
 
 ```sh
-make sr-direct          # base + all single-parameter configurations (~5 min)
+make sr-direct          # base, single-parameter, preshader and atomic configurations (~6 min)
 make verify-sr-direct   # offline checks of every claim above
 python3 -B scripts/run_drm_sr_scan.py --configs base,occupancy-2048wg
 ```

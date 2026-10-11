@@ -13,11 +13,13 @@ import json
 from pathlib import Path
 import sys
 
-KEEP = (7, 17, 19, 20, 21, 32, 53, 113)
+KEEP = (0, 7, 17, 19, 20, 21, 24, 32, 53, 57, 59, 113)
+PAIRS = (250, 251, 252, 253)   # main-shader SR20/17/0/24 stored beside preshader copies
 
 
 def summarize(rec):
-    out = {k: rec.get(k) for k in ('env', 'lanes', 'returncode', 'buffer_ok', 'inactive_untouched', 'executed_nothing', 'unwritten')}
+    out = {k: rec.get(k) for k in ('env', 'lanes', 'returncode', 'buffer_ok', 'inactive_untouched', 'executed_nothing', 'unwritten',
+                                    'written_selectors', 'preamble_runs_by_core', 'atomic_counter', 'atomic_neighbours_untouched')}
     out['fw_ns'] = [s['fw_ts'][1]-s['fw_ts'][0] for s in rec.get('samples', [])]
     out['usc_words_hex'] = next((e['usc_words_hex'] for e in rec.get('setup', []) if 'usc_words_hex' in e), None)
     if 'values' not in rec or rec.get('executed_nothing'):
@@ -28,7 +30,10 @@ def summarize(rec):
         c = collections.Counter(v)
         out['selectors'][s] = {'distinct': len(c), 'top': [[x, n] for x, n in c.most_common(4)]}
     groups = range(0, len(vals[0]), 32)
-    out['per_simd_group'] = {s: [vals[s][i] for i in groups] for s in KEEP}
+    keep = KEEP+tuple(x for x in PAIRS if x in (rec.get('written_selectors') or []))
+    out['per_simd_group'] = {s: [vals[s][i] for i in groups] for s in keep}
+    if 250 in keep:
+        out['preshader_sr20_equals_main_sr20_all_lanes'] = vals[20] == vals[250]
     out['uniform_within_simd_group'] = {s: all(len(set(vals[s][i:i+32])) == 1 for i in groups) for s in KEEP}
     out['sr17_equals_sr53_all_lanes'] = vals[17] == vals[53]
     by_core = collections.defaultdict(set)

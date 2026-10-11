@@ -183,7 +183,7 @@ agx-bandwidth:
 
 SRDIR = $(SCRATCH_ROOT)/drm-compute/sr-scan/make-$$(date -u +%Y%m%dT%H%M%SZ)
 sr-direct:
-	$(PYTHON) -B scripts/run_drm_sr_scan.py --device "$(DEVICE)" --output "$(SRDIR)" --configs base,base-repeat,lanes-96,local-64,helper-data,helper-cfg,priority-low,usc-moved,cdm-moved,words-only,code-only,words-0x8040,words-0x40,local-96,local-128,local-256,local-1024,shape-16x4,shape-8x8,shape-32x2x2,shape-4x8x4,order-shru,order-rhsu,order-ushnr,preshader-stop,preshader-first,samplers-4,word0-uniform-2,word0-texture-8,word0-preshader-16,occupancy-2048wg,occupancy-512x128
+	$(PYTHON) -B scripts/run_drm_sr_scan.py --device "$(DEVICE)" --output "$(SRDIR)" --configs base,base-repeat,lanes-96,local-64,helper-data,helper-cfg,priority-low,usc-moved,cdm-moved,words-only,code-only,words-0x8040,words-0x40,local-96,local-128,local-256,local-1024,shape-16x4,shape-8x8,shape-32x2x2,shape-4x8x4,order-shru,order-rhsu,order-ushnr,preshader-stop,preshader-first,samplers-4,word0-uniform-2,word0-texture-8,word0-preshader-16,occupancy-2048wg,occupancy-512x128,pre-control,pre-chunk0,pre-chunk1,pre-chunk0-local128,pre-chunk0-2048wg,atomic-33,atomic-64,atomic-65536,pre-atomic-2wg,pre-atomic-512x128,pre-atomic-2048wg
 
 verify-sr-direct:
 	$(PYTHON) -B scripts/verify_sr_direct.py

@@ -168,4 +168,7 @@ over launch parameters Vulkan never exposed identified **SR17** as the per-core
 hardware SIMD-group slot (it equals SR53 only under light load; a `%warpid`
 analogue) and **SR32** as the USC offset of the dispatch's pipeline words. SR113
 is random. It also showed the preshader word must end the USC pipeline words.
-30 of 256 selectors are now identified in compute.
+30 of 256 selectors are now identified in compute. Reading registers from inside
+the preshader showed the preamble runs **once per core per dispatch** with one
+lane, in slot 96, with SR24 = 5 (main: 2); its uniforms are per core. A device
+atomic add was validated on the way.

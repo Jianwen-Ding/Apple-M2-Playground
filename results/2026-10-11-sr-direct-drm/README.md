@@ -1,6 +1,6 @@
 # Direct-DRM differential SR scan evidence — 2026-10-11
 
-Compact summaries (`scripts/extract_sr_scan.py`) of 14 `run_drm_sr_scan.py`
+Compact summaries (`scripts/extract_sr_scan.py`) of 21 `run_drm_sr_scan.py`
 sessions. The raw records hold every selector for every lane (up to 1.2 GB) and
 remain under `/scratch/apple-m2-playground/drm-compute/sr-scan/<utc>/record.json`.
 Per configuration, a summary keeps the env overrides, lanes, oracle and
@@ -20,5 +20,14 @@ per-core slot statistics.
 | 002449 | Register sweep without residency delay |
 | 002639, 002651 | Register × workgroup-size sweep with a ~1 ms resident delay |
 
+| 004603, 004701 | Preamble delivery control (constants via uniform_store) |
+| 004612 | Preamble scans: selectors 0..127 and 128..255, 4-SIMD and 2048-workgroup shapes |
+| 004715 | Preamble scans paired with main-shader SR20/17/0/24 (slots 250..253) |
+| 004747 | Preamble run counter, non-atomic |
+| 004911 | Device atomic add validation (33 / 64 / 65,536 lanes) |
+| 004923 | Preamble run counter with atomic add |
+
+Session 004642 is omitted: a runner bug made the preamble scan the pairing slots
+themselves (see notes/failed-approaches.md); its raw record stays in scratch.
 `verification.json` is the output of `make verify-sr-direct`.
 Report: [direct-DRM SR scan](../../experiments/registers/sr-direct-drm.md).

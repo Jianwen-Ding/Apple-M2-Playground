@@ -91,6 +91,39 @@ def store(reg, base_uniform, index_reg):
     return x.to_bytes(8, 'little')
 
 
+def uniform_store(reg, half_offset):
+    """uniform_store 2, i16, xy, 0, r<reg> (as r<reg>l_r<reg>h), <half_offset>: 32 bits into two uniform halfs.
+
+    Field-edited from the Vulkan control preamble's own uniform_store (c500803d00803000)
+    with an exact decode round trip, like store()."""
+    _, g = _tools()
+    ref = bytes.fromhex('c500803d00803000')
+    n = g.opcode_to_number(ref); d = g.get_instruction_descriptor(n)
+    f = dict(d.decode_fields(n)); f.update(R=2*reg, O=half_offset)
+    x = d.encode_fields(f); m = g.get_instruction_descriptor(x)
+    size = m.decode_size(x) if m is d else None
+    if m is not d or dict(m.decode_fields(x)) != f:
+        raise ValueError(f'uniform_store encoding mismatch for offset {half_offset}')
+    return x.to_bytes(size, 'little')
+
+
+def atomic_add(base_uniform, index_reg, src_reg):
+    """atomic add, no return: [u<base>_u<base+1> + r<index>*4] += r<src> (32-bit).
+
+    Built from applegpu's atomic field list with its observed constants
+    (u1=1, u2=0, u3=1, u4=4, u5=2), which also satisfy Mesa AGX2.xml's fixed bits
+    0:5=0x15 and 26/31/46=1; decode must round-trip exactly."""
+    _, g = _tools()
+    d = next(x for x in g.instruction_descriptors if x.name == 'atomic')
+    f = {'op': 0, 'g': 0, 'Rt': 0, 'R': 0, 'At': 1, 'A': 2*base_uniform, 'Ot': 0, 'O': 2*index_reg, 'Ou': 1,
+         'S': 2*src_reg, 'u1': 1, 'u2': 0, 'u3': 1, 'u4': 4, 'u5': 2}
+    x = d.encode_fields(f); b = x.to_bytes(8, 'little')
+    n = g.opcode_to_number(b); m = g.get_instruction_descriptor(n)
+    if m is not d or dict(m.decode_fields(n)) != f or x & 63 != 0x15 or not ((x >> 26) & (x >> 31) & (x >> 46) & 1):
+        raise ValueError('atomic encoding mismatch')
+    return b
+
+
 CHASE_LOAD = 'device_load 0, i32, x, r2, u8_u9, r2, unsigned'  # r2 = table[r2] (element-scaled index)
 TABLE_VA = 0x1100100000  # data BO + 1 MiB in tests/drm_compute.c
 

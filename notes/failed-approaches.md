@@ -196,3 +196,14 @@ VkResult error" as "no fault".
   nothing. Check the output oracle and execution time; the submit does not fail.
 * The first full-sweep run stored ~1.2 GB of raw JSON. Keep raw records in
   scratch and commit `extract_sr_scan.py` summaries.
+
+### Preshader scan, 2026-10-11
+
+* A runner bug passed the pairing slots (250..253) to the preamble as selectors, so
+  the "main-shader" values read 0 everywhere, including SR24, which must be 2. A
+  constant-writing preamble exposed it: the pairing slots held preamble constants.
+  That session is omitted from retained evidence. Run a constant delivery control
+  for every new data path.
+* A non-atomic per-core counter (load/add/store) read 1, but overlapping runs could
+  have produced the same result. The device atomic add was validated (65,536
+  exact) and the count repeated with it.

@@ -22,7 +22,8 @@
  *   AGX_SAMPLER_COUNT                 sampler_count with sampler_heap = zeroed data page at +0x6000
  *   AGX_PRIORITY                      queue priority (0 low, 1 medium)
  *   AGX_USC_ORDER                     order of USC pipeline words (default "ushrn")
- *   AGX_PRESHADER                     1 = Preshader word with a `stop` preamble instead of No preshader
+ *   AGX_PRESHADER                     1 = Preshader word (preamble at usc_words + 0x200) instead of No preshader
+ *   AGX_PRESHADER_CODE                preamble file for AGX_PRESHADER (default: a single `stop`)
  *   AGX_TABLE_OUT                     write the table region back to this path after the last submit
  *
  * usage: drm_compute node code.bin count readback repeats [gprs [table.bin]]
@@ -164,8 +165,16 @@ int main(int argc, char **argv)
     require(strlen(order) == 5 && strchr(order, 'u') && strchr(order, 's') && strchr(order, 'h') && strchr(order, 'r') && strchr(order, 'n'), "usc-order");
     const uint32_t pre_off = usc_words + 0x200;
     if (preshader) {
-        require(pre_off + 64 <= usc_size && (pre_off + 64 <= code_off || pre_off >= code_off + code_size + 64), "preshader-placement");
-        usc.map[pre_off] = 0x88; usc.map[pre_off + 1] = 0x00;   /* stop */
+        /* Preamble: AGX_PRESHADER_CODE file if given, else a single `stop`. */
+        static uint8_t pre[0x2000]; size_t pre_size = 2; pre[0] = 0x88; pre[1] = 0x00;
+        const char *pc = getenv("AGX_PRESHADER_CODE");
+        if (pc && *pc) {
+            FILE *pf = fopen(pc, "rb"); require(pf != NULL, "preshader-code-open");
+            pre_size = fread(pre, 1, sizeof pre, pf); require(pre_size > 0 && pre_size < sizeof pre && feof(pf), "preshader-code-read"); fclose(pf);
+        }
+        require(pre_off + pre_size + 64 <= usc_size && (pre_off + pre_size + 64 <= code_off || pre_off >= code_off + code_size + 64) &&
+                pre_off + pre_size + 64 <= (usc_words > pre_off ? usc_words : usc_size), "preshader-placement");
+        memcpy(usc.map + pre_off, pre, pre_size);
     }
     for (const char *o = order; *o; o++) {
         if (*o == 'u') {

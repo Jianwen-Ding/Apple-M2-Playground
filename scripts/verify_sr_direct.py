@@ -20,9 +20,17 @@ summaries of run_drm_sr_scan.py records). Claims checked:
      violating that executed nothing (output and table untouched); orders
      keeping it last, and a real Preshader with a `stop` preamble, executed;
   8. helper data/cfg, queue priority, sampler heap and launch word-0 counts
-     change no selector beyond the known varying ones (SR17, SR21, SR113).
+     change no selector beyond the known varying ones (SR17, SR21, SR113);
+  9. a preamble's uniform_store values reach every main-shader lane (constant control);
+ 10. in the preamble: one active lane (SR57 = SR59 = 1), SR0 = 0, SR17 = 96 and
+     SR24 = 5 (main: 2), selectors 128..255 all zero; its SR20 equals the main
+     shader's own SR20 in every lane (uniforms are per core);
+ 11. the device atomic add (no return) counts exactly 33 / 64 / 65,536 lanes;
+ 12. the preamble runs exactly once per core per dispatch on cores with work
+     (atomic per-core counters all 1 with 1..60 workgroups per core).
 """
 import argparse
+import collections
 import json
 from pathlib import Path
 import sys
@@ -49,6 +57,8 @@ def main():
     def check(name, ok, **detail):
         checks.append({'check': name, 'passed': bool(ok), **detail})
     executed = [c for _, _, c in runs if not c.get('executed_nothing')]
+    special = ('pre-', 'atomic-')   # table slots hold preamble copies or nothing: excluded from main-shader checks
+    main_exec = [c for _, n, c in runs if not c.get('executed_nothing') and not n.startswith(special)]
     nonzero = lambda c: {int(s) for s, v in c['selectors'].items() if any(x not in (0,) for x, _ in v['top'])}
     val = lambda c, s: c['selectors'][str(s)]['top'][0][0]
 
@@ -63,9 +73,9 @@ def main():
           all(c['selectors']['32']['distinct'] == 1 for n in place for c in by[n]),
           sr32={n: [hex(x) for x in v] for n, v in got.items()})
 
-    light = [c for _, n, c in runs if not c.get('executed_nothing') and not n.startswith(('occupancy', 'slots', 'resident'))]
+    light = [c for _, n, c in runs if not c.get('executed_nothing') and not n.startswith(('occupancy', 'slots', 'resident')+special)]
     heavy = by['occupancy-2048wg'][0]
-    check('sr17-uniform-per-simd-group', all(c['uniform_within_simd_group']['17'] for c in executed))
+    check('sr17-uniform-per-simd-group', all(c['uniform_within_simd_group']['17'] for c in main_exec), scans=len(main_exec))
     shapes = [n for n in by if n.startswith(('shape-', 'local-'))]
     check('sr17-equals-sr53-light-load', sum(c['sr17_equals_sr53_all_lanes'] for c in light) >= len(light)-1 and
           all(c['sr17_equals_sr53_all_lanes'] for n in shapes for c in by[n]),
@@ -77,7 +87,7 @@ def main():
           all(res[f'resident-g256-wg{w}'] <= 40 for w in (32, 128, 1024)) and res['resident-g256-wg128'] < res['resident-g32-wg128'],
           max_distinct_per_core=dict(sorted(res.items(), key=lambda kv: (int(kv[0].split('-g')[1].split('-')[0]), kv[0]))))
 
-    s113 = [set(c['per_simd_group']['113']) for c in executed]
+    s113 = [set(c['per_simd_group']['113']) for c in main_exec]
     base113 = [val(c, 113) for c in by['base']+by.get('base-repeat', [])+by.get('order-shru', [])]
     check('sr113-random-0-or-8', set().union(*s113) <= {0, 8} and len({c['selectors']['113']['top'][0][0] for c in by['order-shru']}) == 2,
           order_shru_values=[val(c, 113) for c in by['order-shru']], base_values=base113)
@@ -97,6 +107,29 @@ def main():
         vs = lambda r, s: sorted(x for x, _ in r['selectors'][s]['top'])
         diffs[n] = sorted(int(s) for s in c['selectors'] if vs(c, s) != vs(base, s))
     check('neutral-parameters', all(set(d) <= NOISY for d in diffs.values()), changed=diffs)
+
+    # 9-12: preshader context and atomics.
+    ctl = by['pre-control'][-1]
+    check('preamble-delivery', all(ctl['selectors'][str(k)]['top'] == [[0x5a000000+k, ctl['lanes']]] for k in range(128)))
+    pre = [c for n in ('pre-chunk0', 'pre-chunk0-local128', 'pre-chunk0-2048wg') for c in by[n] if 'preshader_sr20_equals_main_sr20_all_lanes' in c]
+    ctxt = {s_: sorted({x for c in pre for x in c['per_simd_group'][str(s_)]}) for s_ in (0, 17, 24, 57, 59)}
+    main24 = sorted({x for c in pre for x in c['per_simd_group']['253']})
+    hi = by['pre-chunk1'][-1]
+    check('preamble-context', ctxt == {0: [0], 17: [96], 24: [5], 57: [1], 59: [1]} and main24 == [2] and
+          all(c['preshader_sr20_equals_main_sr20_all_lanes'] for c in pre) and
+          all(hi['selectors'][str(k)]['top'] == [[0, hi['lanes']]] for k in range(128, 256)),
+          preamble_values=ctxt, main_sr24=main24, paired_scans=len(pre), lanes_paired=sum(c['lanes'] if c['lanes'] < 65536 else 65536 for c in pre))
+    at = {n: by[n][-1]['atomic_counter'] for n in ('atomic-33', 'atomic-64', 'atomic-65536')}
+    check('atomic-add', at == {'atomic-33': 33, 'atomic-64': 64, 'atomic-65536': 65536} and
+          all(by[n][-1]['atomic_neighbours_untouched'] for n in at), counters=at)
+    once = {}
+    for n in ('pre-atomic-2wg', 'pre-atomic-512x128', 'pre-atomic-2048wg'):
+        c = by[n][-1]; runs_ = {int(k): v for k, v in c['preamble_runs_by_core'].items()}
+        cores = set(c['per_simd_group']['250']); wgs = collections.defaultdict(set)
+        for core, wg in zip(c['per_simd_group']['250'], c['per_simd_group']['252']): wgs[core].add(wg)
+        once[n] = {'runs': sorted(set(runs_.values())), 'cores_with_runs': len(runs_), 'cores_with_work': len(cores),
+                   'workgroups_per_core': [min(len(x) for x in wgs.values()), max(len(x) for x in wgs.values())]}
+    check('preamble-once-per-core', all(v['runs'] == [1] and v['cores_with_runs'] == v['cores_with_work'] for v in once.values()), runs=once)
 
     passed = all(c['passed'] for c in checks)
     (a.evidence/'verification.json').write_text(json.dumps({'passed': passed, 'checks': checks}, indent=1)+'\n')
