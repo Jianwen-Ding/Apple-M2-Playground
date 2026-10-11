@@ -11,6 +11,7 @@ Datasets and their role (results/2026-10-11-cost-model and the instruction bench
   waits      FIT       idle wait cost (1-30 per repetition; the long-run mode is excluded)
   review2    FIT/INFO  threadgroup deferral and load window are checked; store-window cases are reported
   waitdrain  FIT       wait after ALU work
+  ctlspacer  FIT       exec push/pop chains alone and before wait / load / store
   mem24      DISCOVERY random memory kernels that revealed the wait drain
   mem24b     HELD OUT  fresh random memory kernels measured after the wait-drain rule
   random     SELECTION 24 random kernels: the issue-interval rule was chosen by its score here
@@ -144,6 +145,17 @@ for n, t_ in {'iadd': 'iadd r{r}, r{r}, 1', 'rcp': 'rcp r{r}, r{r}', 'fadd32': '
     derr.append(((H.predict(H.counted(b_, 100), H.counted(b_, 500), 400, 1)-EMPTY_MEAS)/8-wd[f'{n}|True'])/wd[f'{n}|True'])
 md, p90, mx, b = stats(derr)
 check(mx <= 0.10, f'wait drain after ALU work (FIT, 4 cases): median |err| {md:.3f}, max {mx:.3f}')   # imadd case 9.4%
+cs = json.loads((R/'ctlspacer.json').read_text()); cerr = []
+PU = e('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1'); PO = e('pop_exec r0l, 1'); W0 = e('wait 0')
+IA = lambda r: e(f'iadd r{r}, r{r}, 1'); LD = e('device_load 0, i32, x, r6, u8_u9, r26, unsigned'); ST = agx_loop.store(5, 8, 26)
+CM = {'pair x1': PU+PO, 'pair x4': (PU+PO)*4, 'pair x16': (PU+PO)*16, 'push, iadd, pop, iadd': PU+IA(5)+PO+IA(6),
+      '4 pairs, wait': (PU+PO)*4+W0, 'iadd, 4 pairs, wait': IA(5)+(PU+PO)*4+W0}
+for k in (1, 2, 4, 8): CM[f'load,{k}'] = IA(14)+(PU+PO)*k+LD+W0; CM[f'store,{k}'] = IA(14)+(PU+PO)*k+ST
+for n, b_ in CM.items():
+    b_ = b_*8; mm = cs[n]['measured'] if isinstance(cs[n], dict) else cs[n]
+    cerr.append(((H.predict(H.counted(b_, 100, consts=H.MEM_CONSTS), H.counted(b_, 500, consts=H.MEM_CONSTS), 400, 1)-EMPTY_MEAS)/8-mm)/mm)
+md, p90, mx, b = stats(cerr)
+check(mx <= 0.10, f'exec push/pop chains, before wait / load / store (FIT, {len(cerr)} cases): median |err| {md:.3f}, max {mx:.3f}')
 for fname, role in (('heldout-mem24.json', 'DISCOVERY (revealed the wait drain)'), ('heldout-mem24b.json', 'HELD OUT')):
     rk = json.loads((R/fname).read_text())
     for gm, groups, lim in (('one', 1, 0.07 if 'b.json' in fname else 0.08), ('gpu', 4, 0.12)):

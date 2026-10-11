@@ -79,6 +79,7 @@ MEASURED_MEMORY = {'device_load', 'device_store', 'threadgroup_load', 'threadgro
 SPACE = {'device_load': 'device', 'device_load.TODO': 'device', 'device_store': 'device', 'device_store.TODO': 'device',
          'atomic': 'device', 'threadgroup_load': 'tg', 'threadgroup_store': 'tg', 'threadgroup_atomic': 'tg',
          'stack_load': 'stack', 'stack_store': 'stack'}
+CTL_AS_ALU = True
 CONTROL = {'if_icmp', 'if_fcmp', 'else_icmp', 'else_fcmp', 'while_icmp', 'while_fcmp', 'pop_exec', 'push_exec',
            'jmp_exec_any', 'jmp_exec_none', 'stop', 'trap', 'TODO.unk51', 'no_var'}
 BARRIERS = {'threadgroup_barrier', 'memory_barrier', 'wait_pix', 'signal_pix', 'TODO.unkE800'}
@@ -200,6 +201,9 @@ def decode(code, P):
         elif name in CONTROL:
             rec['kind'] = 'control'
             rec['src'] = set().union(set(), *[r for o, r in regops if not (type(o).__name__ == 'Reg16' and o.n == 0)])
+            # exec-stack instructions read and write the r0l nesting counter: back-to-back push/pop form a dependency
+            # chain of control_latency (ctlspacer.json: 1.9 units per instruction alone, hidden by interleaved ALU work)
+            if name not in ('jmp_exec_any', 'jmp_exec_none', 'stop', 'trap'): rec['src'] |= {0}
             rec['dst'] = {0} if name not in ('stop', 'trap') else set()
             rec['uniform_src'] = any(type(o).__name__.startswith('UReg') for o in ops)
         elif name in BARRIERS:
@@ -447,6 +451,9 @@ def simulate(instrs, pcs, P, groups=1, detail=False):
             elif kind == 'control':
                 ii = CI
                 for h in r['dst']: ready[gi][h] = t+CL
+                # ctlspacer.json: control instructions count as ALU work for the wait drain and the memory quiet time
+                if CTL_AS_ALU:
+                    last_alu[gi] = t; alu_done[gi] = max(alu_done[gi], t+CL)
                 if r['name'] == 'jmp_exec_any' and nxt[gi]+1 < len(pcs) and pcs[nxt[gi]+1] < r['pc']:
                     branch = BR
             else:
