@@ -16,7 +16,7 @@ barrier cannot deadlock. The negative control uses `wait 0` as the "barrier" and
 mismatches; the Mesa sequence with 0x68 must show none. Each lane reports its mismatch
 count and the OR of all (read XOR expected).
 
-Memory: `tg` = threadgroup memory (USC Shared declares 32 KiB; 8 KiB used, see SHARED_32K), `dev` = device memory (table).
+Memory: `tg` = threadgroup memory, index-addressed (16-byte slots; see SHARED_32K), `dev` = device memory (table).
 Refuses the faulting opcodes; stops at the first fault; CONFIRM_GPU_FAULTS=1.
 """
 import argparse
@@ -40,7 +40,8 @@ SENT = 0xcdcdcdcd
 mov, enc, H = agx_loop.chains.mov_imm, agx_loop.encode, bytes.fromhex
 BARRIERS = {'68': H('6800'), '78': H('7809'), 'wait': WAIT}
 PRE = {'none': b'', 'wait': WAIT, 'mb': H('f596'), 'wait+mb': WAIT+H('f596')}
-# Usable threadgroup memory measured at 1/4 of the declared bytes (8 KiB -> 2 KiB), so declare 32 KiB for 8 KiB used.
+# The index operand steps 16 bytes per i32 element (vec4 slots; see run_drm_tg_layout.py): 256 lanes x 8 values
+# touch 32 KiB, so declare 32 KiB.
 SHARED_32K = 0x4d | 1 << 8 | 0x24 << 10 | (32768 // 256) << 24
 SHARED_64K = 0x4d | 1 << 8 | 0x24 << 10                          # bytes field 0 = 65536 (Mesa agx_usc_shared_none)
 GPRS = 80   # 16-bit halves; the body uses r0..r31
@@ -132,7 +133,7 @@ def main():
                 for pre in (('none',) if bar == 'wait' else ('none', 'wait', 'mb', 'wait+mb')):
                     name = f'{mem}-n{n}-{bar}-{pre}'
                     if not re.fullmatch(a.names, name): continue
-                    if mem == 'tg' and n > 512: continue   # 8 KiB used per 256 lanes; 4x declared would exceed the field
+                    if mem == 'tg' and n > 512: continue   # 32 KiB touched per 256 lanes; 1,024 lanes would exceed 64 KiB
                     bb = body(mem, bar, pre, n, a.trips, a.total, a.dist)
                     decodes(bb, {BARRIERS['78']})
                     env = {'AGX_LOCAL_X': str(n)}

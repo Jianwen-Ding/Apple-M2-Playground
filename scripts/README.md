@@ -147,4 +147,6 @@ reconstructs shader bytes and buffers with the Python standard library;
   memory types, workgroup sizes and pre-sequences; per-SIMD-group error counts.
 * `run_drm_tg_capacity.py`: usable threadgroup memory against the declared USC Shared size.
 * `verify_barrier_stress.py`: offline checks of `results/2026-10-11-barrier-0x68-vs-0x78/`.
+* `run_drm_tg_layout.py`: threadgroup memory addressing (index stride per format, component mask,
+  base+index, base-addressed capacity). `verify_tg_addressing.py [DIR]` checks its output.
 

@@ -49,16 +49,14 @@ four sub-schedulers, and 0x78 synchronizes only within one. For workgroups of 12
 0x78 gave identical results to 0x68 in every test. At kernel level the saving was small: the
 128-lane threadgroup-memory runs took 6.80–7.10 ms with 0x78 and 6.46–7.10 ms with 0x68.
 
-### Side finding: usable threadgroup memory = declared bytes ÷ 4
+### Side finding (resolved): the "declared/4" threadgroup memory
 
-With the USC Shared word `0x4d | 1<<8 | 0x24<<10 | (bytes/256)<<24` and i32
-`threadgroup_load/store` packed as in Mesa, a 64-lane exchange is exact **iff every touched
-byte is below declared/4**: 2,048 of 8 KiB, 4,096 of 16 KiB, 8,192 of 32 KiB (23/23 cases).
-Beyond that, loads return 0. Either the size field counts 64-byte units, not Mesa's 256, or
-each i32 element occupies 16 bytes. This experiment cannot tell which. Until that is resolved,
-declare 4× the shared memory a kernel touches. The first stress run declared 8 KiB for
-8 KiB of data, and 0x68 and 0x78 failed *identically* at 128/256 lanes. That was this artifact,
-not a barrier effect (kept as `matrix-shared8k.json`).
+The first stress run declared 8 KiB and failed identically for 0x68 and 0x78 at 128/256 lanes.
+The cause was addressing, not capacity. The harness indexes per-lane i32 elements through the
+`threadgroup_*` **index** operand, which steps 16 bytes (one 4-component slot), so its data
+really occupied 4× the bytes assumed. See
+[threadgroup memory addressing](../2026-10-11-tg-memory-addressing/README.md). The rerun's
+32 KiB declaration exactly covers the touched bytes, so the barrier results stand.
 
 ## Reproducer and evidence
 
@@ -71,9 +69,8 @@ not a barrier effect (kept as `matrix-shared8k.json`).
 
 Mesa emits only 0x68 for workgroup barriers (`agx_compile.c:1544-1549`, via Copilot's
 analysis), and nothing for SIMD-group scope. Neither Mesa nor applegpu names 0x78. Mesa
-packs the shared size as `groups(256)` (`cmdbuf.xml:696`). The ÷4 capacity result therefore
-disagrees with Mesa's apparent units, or with this harness's element addressing. It needs
-a Mesa-compiled shader for comparison.
+packs the shared size as `groups(256)` (`cmdbuf.xml:696`). The ÷4 capacity result was later traced to the
+index operand's 16-byte stride ([addressing finding](../2026-10-11-tg-memory-addressing/README.md)).
 
 ## Compiler implications and limitations
 
@@ -83,7 +80,6 @@ a Mesa-compiled shader for comparison.
 * 0x78 could implement a cheaper barrier for cooperative groups of 128 threads (4 warps).
   There is no direct PTX equivalent: `bar.sync` with a thread count uses named barriers,
   which are not mapped yet.
-* Size threadgroup memory as 4× the bytes used until the ÷4 question is resolved, and check
-  how Mesa's own compute kernels address shared memory.
+* Threadgroup memory: address it with the byte base register as Mesa does (see the addressing finding).
 * Not tested: barrier counts that differ between groups (deadlock risk), fragment shaders,
   workgroup shapes other than 1-D.

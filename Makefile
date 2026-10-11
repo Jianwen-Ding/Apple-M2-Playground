@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -49,6 +49,8 @@ help:
 	@echo 'make barrier-stress     0x68 vs 0x78 message-passing stress test (needs CONFIRM_GPU_FAULTS=1)'
 	@echo 'make test-barrier-stress  Hardware regression subset for 0x68 vs 0x78'
 	@echo 'make verify-barrier-stress  Verify retained barrier-stress evidence offline'
+	@echo 'make test-tg-addressing  Hardware: rerun the threadgroup-memory addressing probe and check it'
+	@echo 'make verify-tg-addressing  Verify retained threadgroup addressing evidence offline'
 	@echo 'Candidate references: APPLEGPU_ROOT and MESA_ROOT.'
 	@echo 'Override SCRATCH_ROOT, DEVICE, PYTHON, CC, or PROBE_INCLUDE as needed.'
 
@@ -238,3 +240,9 @@ test-barrier-stress:
 
 verify-barrier-stress:
 	$(PYTHON) -B scripts/verify_barrier_stress.py
+
+test-tg-addressing:
+	$(PYTHON) -B tests/test_tg_addressing.py --hardware
+
+verify-tg-addressing:
+	$(PYTHON) -B scripts/verify_tg_addressing.py

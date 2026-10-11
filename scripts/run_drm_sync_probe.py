@@ -83,7 +83,8 @@ SHARED_4K = 0x4d | 1 << 8 | 0x24 << 10 | (4096 // 256) << 24   # USC Shared: use
 
 def tg_mem(load, reg, idx_reg):
     """threadgroup_load/store i32, x, r<reg>, base 0, index r<idx_reg>l, packed as Mesa agx_pack.c:769-792
-    (8-byte form); decode must round-trip to the expected text."""
+    (8-byte form); decode must round-trip to the expected text. The index steps one 16-byte
+    4-component slot (byte = 16*index for i32; see run_drm_tg_layout.py)."""
     _, g = agx_loop._tools()
     idx16 = 2*idx_reg
     raw = ((0x69 if load else 0x29) | 1 << 8 | ((2*reg) & 63) << 9 | 1 << 15 | 0b10 << 22 | 2 << 24
