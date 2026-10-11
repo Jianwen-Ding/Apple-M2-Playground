@@ -171,4 +171,7 @@ is random. It also showed the preshader word must end the USC pipeline words.
 30 of 256 selectors are now identified in compute. Reading registers from inside
 the preshader showed the preamble runs **once per core per dispatch** with one
 lane, in slot 96, with SR24 = 5 (main: 2); its uniforms are per core. A device
-atomic add was validated on the way.
+atomic add was validated on the way. Imageblock layouts in the USC Shared word
+identified **SR12/SR13** (imageblock width/height) and **SR15** (sample stride;
+its old "constant" 16 is the default field 0): **33 of 256** are now identified.
+Two custom helper-program attempts each stalled ~0.5 s and were stopped.

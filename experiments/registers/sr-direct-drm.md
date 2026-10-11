@@ -8,9 +8,10 @@ configuration changes one launch parameter through `drm_compute`'s `AGX_*`
 overrides, which Vulkan never exposed. Raw records are up to 1.2 GB and stay in
 scratch. `scripts/extract_sr_scan.py` keeps compact summaries in
 [results/2026-10-11-sr-direct-drm](../../results/2026-10-11-sr-direct-drm/), which
-`make verify-sr-direct` checks (14 checks).
+`make verify-sr-direct` checks (17 checks).
 
-112 scan dispatches ran across 21 retained sessions with no fault or timeout. One layout was
+126 scan dispatches ran across 35 retained sessions with no fault or timeout. The two helper
+attempts, kept separately, each stalled once. One layout was
 refused by the harness before submission, because the code and pipeline words
 would have overlapped.
 
@@ -107,11 +108,11 @@ even with helper data set.
 
 | Category | Count | Registers |
 | --- | --- | --- |
-| Identified | **30** | previous 28 + **SR17** (hardware SIMD-group slot) + **SR32** (pipeline-word offset) |
-| Nonzero, unexplained | 6 | SR15 = 16, SR25 = 2, SR97 = 2048, SR114 = 136 (constant in main and preamble); SR60 = 15; SR63 (Mesa: is_active_thread, untested) |
+| Identified | **33** | previous 28 + **SR17** (hardware SIMD-group slot), **SR32** (pipeline-word offset), **SR12/SR13** (imageblock width/height), **SR15** (imageblock sample stride) |
+| Nonzero, unexplained | 5 | SR25 = 2, SR97 = 2048, SR114 = 136 (constant in main and preamble, under every layout); SR60 = 15; SR63 (Mesa: is_active_thread, untested) |
 | Behaviour known, meaning partial | 2 | SR24 (program kind: 2 main compute, 5 preamble); SR113 (random 0/8) |
 | Mesa-named, not testable from compute | 6 | SR14, 62, 124, 144, 146, 147 |
-| Always zero | 212 | — |
+| Always zero | 210 | — |
 
 ## Reproduce
 

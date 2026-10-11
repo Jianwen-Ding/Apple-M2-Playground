@@ -27,7 +27,14 @@ summaries of run_drm_sr_scan.py records). Claims checked:
      shader's own SR20 in every lane (uniforms are per core);
  11. the device atomic add (no return) counts exactly 33 / 64 / 65,536 lanes;
  12. the preamble runs exactly once per core per dispatch on cores with work
-     (atomic per-core counters all 1 with 1..60 workgroups per core).
+     (atomic per-core counters all 1 with 1..60 workgroups per core);
+ 13. SR12 / SR13 = imageblock width / height of the USC Shared layout
+     (32x32, 32x16, 16x16; 0 for the vertex/compute layout);
+ 14. SR15 = the Shared word's sample-stride field (8-byte units), with 0 read
+     as 16 (the old "constant" 16); SR18 = its bytes field x 256;
+ 15. Shader unk_2 = 2 and the Shared sample-count field change no selector
+     (SR24 does not follow unk_2; SR14 stays 0 in compute), and every
+     strict-checked probe completed normally (firmware timestamps, < 50 ms).
 """
 import argparse
 import collections
@@ -130,6 +137,27 @@ def main():
         once[n] = {'runs': sorted(set(runs_.values())), 'cores_with_runs': len(runs_), 'cores_with_work': len(cores),
                    'workgroups_per_core': [min(len(x) for x in wgs.values()), max(len(x) for x in wgs.values())]}
     check('preamble-once-per-core', all(v['runs'] == [1] and v['cores_with_runs'] == v['cores_with_work'] for v in once.values()), runs=once)
+
+    # 13-15: imageblock layouts (USC Shared word) and Shader unk_2.
+    v1 = lambda n, sel: sorted({x for x, _ in by[n][-1]['selectors'][str(sel)]['top']})
+    dims = {n: (v1(n, 12), v1(n, 13)) for n in ('shared-32x32-s8', 'shared-32x16-s8', 'shared-16x16-s8', 'base')}
+    check('sr12-sr13-imageblock-dims', dims == {'shared-32x32-s8': ([32], [32]), 'shared-32x16-s8': ([32], [16]),
+                                                 'shared-16x16-s8': ([16], [16]), 'base': ([0], [0])}, dims=dims)
+    stride = {'shared-32x32-s8': 1, 'shared-32x32-st2': 2, 'shared-32x32-st3': 3, 'shared-32x32-s32': 4,
+              'shared-32x32-st7': 7, 'shared-32x32-st15': 15, 'shared-32x32-st0': 16, 'base': 16}
+    words = {n: int(by[n][-1]['env'].get('AGX_SHARED_WORD', '0'), 16) for n in stride if n != 'base'}
+    sr18 = {n: v1(n, 18) for n in words}
+    check('sr15-sample-stride-sr18-bytes', all(v1(n, 15) == [w] for n, w in stride.items()) and
+          all(sr18[n] == [((w >> 24) & 0xff)*256] for n, w in words.items()),
+          sr15={n: v1(n, 15)[0] for n in stride}, sr18={n: x[0] for n, x in sr18.items()})
+    strict = [n for n in by if n.startswith(('shared-', 'shader-unk2'))]
+    neutral2 = {}
+    for n in ('shader-unk2-2', 'shared-32x32-samples2', 'shared-32x32-samples4'):
+        c = by[n][-1]; ref = by['shared-32x32-s8'][-1] if n.startswith('shared') else base
+        neutral2[n] = sorted(int(s_) for s_ in c['selectors'] if sorted(x for x, _ in c['selectors'][s_]['top']) !=
+                             sorted(x for x, _ in ref['selectors'][s_]['top']) and int(s_) not in (18,))
+    check('unk2-and-sample-count-neutral', all(set(d) <= NOISY for d in neutral2.values()) and
+          all(by[n][-1].get('completed_normally') for n in strict), changed=neutral2, strict_probes=len(strict))
 
     passed = all(c['passed'] for c in checks)
     (a.evidence/'verification.json').write_text(json.dumps({'passed': passed, 'checks': checks}, indent=1)+'\n')

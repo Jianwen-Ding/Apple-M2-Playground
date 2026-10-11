@@ -18,7 +18,7 @@ PAIRS = (250, 251, 252, 253)   # main-shader SR20/17/0/24 stored beside preshade
 
 
 def summarize(rec):
-    out = {k: rec.get(k) for k in ('env', 'lanes', 'returncode', 'buffer_ok', 'inactive_untouched', 'executed_nothing', 'unwritten',
+    out = {k: rec.get(k) for k in ('env', 'lanes', 'returncode', 'buffer_ok', 'inactive_untouched', 'executed_nothing', 'unwritten', 'completed_normally',
                                     'written_selectors', 'preamble_runs_by_core', 'atomic_counter', 'atomic_neighbours_untouched')}
     out['fw_ns'] = [s['fw_ts'][1]-s['fw_ts'][0] for s in rec.get('samples', [])]
     out['usc_words_hex'] = next((e['usc_words_hex'] for e in rec.get('setup', []) if 'usc_words_hex' in e), None)

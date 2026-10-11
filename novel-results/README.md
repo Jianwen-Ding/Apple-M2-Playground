@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-11 SR12/SR13 imageblock dimensions, SR15 sample stride](2026-10-11-sr12-sr13-sr15-imageblock/README.md)
 - [2026-10-11 Preshader execution model: once per core, one lane, slot 96; device atomic add](2026-10-11-preshader-execution/README.md)
 - [2026-10-11 SR17 hardware SIMD-group slot, SR32 pipeline offset, preshader-last rule](2026-10-11-sr17-sr32/README.md)
 - [2026-10-10 Device-load latency, overlap and read bandwidth](2026-10-10-agx-load-latency/README.md)

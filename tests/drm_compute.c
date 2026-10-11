@@ -25,6 +25,8 @@
  *   AGX_USC_ORDER                     order of USC pipeline words (default "ushrn")
  *   AGX_PRESHADER                     1 = Preshader word (preamble at usc_words + 0x200) instead of No preshader
  *   AGX_PRESHADER_CODE                preamble file for AGX_PRESHADER (default: a single `stop`)
+ *   AGX_SHARED_WORD                   full 32-bit USC Shared word (tag 0x4d must be kept by the caller)
+ *   AGX_SHADER_UNK2                   USC Shader word unk_2 field (default 3, Mesa's compute value)
  *   AGX_TABLE_OUT                     write the table region back to this path after the last submit
  *
  * usage: drm_compute node code.bin count readback repeats [gprs [table.bin]]
@@ -199,10 +201,10 @@ int main(int argc, char **argv)
             put64(w, 0x1dull | (8ull << 8) | (12ull << 20) | ((unif_va >> 2) << 26)); w += 8;
         } else if (*o == 's') {
             /* USC Shared, none: tag 0x4d, layout vertex/compute 0x24 at bit 10, bytes 65536 -> groups(256) of 8 bits = 0 ("all"). */
-            put32(w, 0x4du | (0x24u << 10)); w += 4;
+            put32(w, (uint32_t)env("AGX_SHARED_WORD", 0x4du | (0x24u << 10))); w += 4;
         } else if (*o == 'h') {
             /* USC Shader: tag 0x0d, unk_2 = 3 at bit 10 (compute), code address at bit 16 (6 bytes). */
-            uint64_t sh = 0x0dull | (3ull << 10) | ((uint64_t)code_off << 16); memcpy(w, &sh, 6); w += 6;
+            uint64_t sh = 0x0dull | ((env("AGX_SHADER_UNK2", 3) & 63) << 10) | ((uint64_t)code_off << 16); memcpy(w, &sh, 6); w += 6;
         } else if (*o == 'r') {
             /* USC Registers: tag 0x8d, register count groups(8) at bit 8 (5 bits, 0 = 256), unk_4 = 1 at bit 24. */
             uint32_t rc = (uint32_t)((gprs + 7) / 8) & 31; put32(w, 0x8du | (rc << 8) | (1u << 24)); w += 4;

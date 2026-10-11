@@ -116,6 +116,19 @@ CONFIGS = {
     'pre-count-2wg': ({'PRE_CHUNK': '0', 'PRE_COUNT': '1'}, 64),
     'pre-count-512x128': ({'PRE_CHUNK': '0', 'PRE_COUNT': '1', 'AGX_LOCAL_X': '128'}, 65536),
     'pre-count-2048wg': ({'PRE_CHUNK': '0', 'PRE_COUNT': '1'}, 65536),
+    'shader-unk2-2': ({'AGX_SHADER_UNK2': '2'}, 64),
+    'shared-32x32-s8': ({'AGX_SHARED_WORD': '0x2010bd4d'}, 64),
+    'shared-32x16-s8': ({'AGX_SHARED_WORD': '0x2010fd4d'}, 64),
+    'shared-16x16-s8': ({'AGX_SHARED_WORD': '0x2010d94d'}, 64),
+    'shared-32x32-s32': ({'AGX_SHARED_WORD': '0x8040bd4d'}, 64),
+    'shared-32x32-st2': ({'AGX_SHARED_WORD': '0x4020bd4d'}, 64),
+    'shared-32x32-st3': ({'AGX_SHARED_WORD': '0x6030bd4d'}, 64),
+    'shared-32x32-st7': ({'AGX_SHARED_WORD': '0xe070bd4d'}, 64),
+    'shared-32x32-st15': ({'AGX_SHARED_WORD': '0xe0f0bd4d'}, 64),
+    'shared-32x32-st0': ({'AGX_SHARED_WORD': '0x8000bd4d'}, 64),
+    'shared-32x32-samples2': ({'AGX_SHARED_WORD': '0x4011bd4d'}, 64),
+    'shared-32x32-samples4': ({'AGX_SHARED_WORD': '0x8012bd4d'}, 64),
+    'shared-16x16-samples4': ({'AGX_SHARED_WORD': '0x22d94d'}, 64),
     'samplers-4': ({'AGX_SAMPLER_COUNT': '4'}, 64),
     'word0-uniform-2': ({'AGX_WORD0_OR': str(2 << 1)}, 64),      # uniform register count field 1 -> 3 groups
     'word0-texture-8': ({'AGX_WORD0_OR': str(1 << 4)}, 64),      # texture state register count 1 group
@@ -262,6 +275,9 @@ def main():
                    'samples': [e for e in events if 'rep' in e]}
             state['configs'][name] = rec
             if res.returncode: rec['stdout_tail'] = res.stdout.decode(errors='replace')[-600:]; save(); raise RuntimeError('submit failed: '+name)
+            rec['completed_normally'] = bool(rec['samples']) and all(x['fw_ts'][0] and x['fw_ts'][1] and x['host_ns'] < 50_000_000 for x in rec['samples'])
+            if not rec['completed_normally']:
+                save(); raise RuntimeError('hang signature (no firmware timestamps or host time >= 50 ms): '+name)
             xr = (lanes+31)//32*32   # output buffer is sized by global X only
             w = list(struct.unpack(f'<{xr+32}I', rb.read_bytes()))
             expected = [SENTINEL]*(xr+16)+[0xa5a50000+j for j in range(16)]; expected[8:8+lanes] = [0x12345678]*lanes

@@ -1,6 +1,6 @@
 # Direct-DRM differential SR scan evidence — 2026-10-11
 
-Compact summaries (`scripts/extract_sr_scan.py`) of 21 `run_drm_sr_scan.py`
+Compact summaries (`scripts/extract_sr_scan.py`) of 35 `run_drm_sr_scan.py`
 sessions. The raw records hold every selector for every lane (up to 1.2 GB) and
 remain under `/scratch/apple-m2-playground/drm-compute/sr-scan/<utc>/record.json`.
 Per configuration, a summary keeps the env overrides, lanes, oracle and
@@ -26,6 +26,9 @@ per-core slot statistics.
 | 004747 | Preamble run counter, non-atomic |
 | 004911 | Device atomic add validation (33 / 64 / 65,536 lanes) |
 | 004923 | Preamble run counter with atomic add |
+
+| 011124..011125 (×6) | Strict-checked: base, Shader unk_2 = 2, imageblock 32×32 / 32×16 / 16×16 |
+| 0111xx..0112xx (×8) | Strict-checked: sample stride 0..15, sample count 2 / 4 |
 
 Session 004642 is omitted: a runner bug made the preamble scan the pairing slots
 themselves (see notes/failed-approaches.md); its raw record stays in scratch.

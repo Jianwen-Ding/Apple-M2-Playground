@@ -4,9 +4,9 @@
   {
    "check": "scans-valid",
    "passed": true,
-   "executed": 107,
+   "executed": 121,
    "no_execution": 5,
-   "scans": 21,
+   "scans": 35,
    "refused_before_submit": [
     [
      "20261011T002117976841Z",
@@ -17,7 +17,7 @@
   {
    "check": "baseline-within-vulkan-set",
    "passed": true,
-   "base_runs": 11,
+   "base_runs": 12,
    "union": [
     0,
     4,
@@ -77,13 +77,13 @@
   {
    "check": "sr17-uniform-per-simd-group",
    "passed": true,
-   "scans": 88
+   "scans": 102
   },
   {
    "check": "sr17-equals-sr53-light-load",
    "passed": true,
-   "light_scans": 47,
-   "equal": 46,
+   "light_scans": 61,
+   "equal": 60,
    "shapes": [
     "local-1024",
     "local-128",
@@ -150,6 +150,7 @@
    ],
    "base_values": [
     8,
+    0,
     0,
     0,
     0,
@@ -321,6 +322,84 @@
      ]
     }
    }
+  },
+  {
+   "check": "sr12-sr13-imageblock-dims",
+   "passed": true,
+   "dims": {
+    "shared-32x32-s8": [
+     [
+      32
+     ],
+     [
+      32
+     ]
+    ],
+    "shared-32x16-s8": [
+     [
+      32
+     ],
+     [
+      16
+     ]
+    ],
+    "shared-16x16-s8": [
+     [
+      16
+     ],
+     [
+      16
+     ]
+    ],
+    "base": [
+     [
+      0
+     ],
+     [
+      0
+     ]
+    ]
+   }
+  },
+  {
+   "check": "sr15-sample-stride-sr18-bytes",
+   "passed": true,
+   "sr15": {
+    "shared-32x32-s8": 1,
+    "shared-32x32-st2": 2,
+    "shared-32x32-st3": 3,
+    "shared-32x32-s32": 4,
+    "shared-32x32-st7": 7,
+    "shared-32x32-st15": 15,
+    "shared-32x32-st0": 16,
+    "base": 16
+   },
+   "sr18": {
+    "shared-32x32-s8": 8192,
+    "shared-32x32-st2": 16384,
+    "shared-32x32-st3": 24576,
+    "shared-32x32-s32": 32768,
+    "shared-32x32-st7": 57344,
+    "shared-32x32-st15": 57344,
+    "shared-32x32-st0": 32768
+   }
+  },
+  {
+   "check": "unk2-and-sample-count-neutral",
+   "passed": true,
+   "changed": {
+    "shader-unk2-2": [
+     21,
+     113
+    ],
+    "shared-32x32-samples2": [
+     21
+    ],
+    "shared-32x32-samples4": [
+     21
+    ]
+   },
+   "strict_probes": 13
   }
  ]
 }
