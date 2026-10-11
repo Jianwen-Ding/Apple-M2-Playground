@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-11 Core structure from 1-32 SIMD groups per core: 4 schedulers (1 issue/cycle, 4.0/cycle per core), two halves each with one transcendental/imad/bit-field/convert/64-bit unit and 2 register reads/cycle; reduction rates; 4-group bench throughput was 2x optimistic for shared units](2026-10-11-core-scaling/README.md)
 - [2026-10-11 transcendentals and imad/bit-field/convert share one in-order writeback pipe: latency mismatches cost up to 50% (1 group) and 2.3x (4 groups); 4-group model bias -9% -> -4%](2026-10-11-transcendental-pipe/README.md)
 - [2026-10-11 exec-stack instructions chain through r0l and count as ALU work for wait and memory (cost model had them at an assumed 1 cycle)](2026-10-11-exec-control-cost/README.md)
 - [2026-10-11 wait drains ALU work: completes ~17 units after the latest ALU result, on any slot (found via held-out memory kernels)](2026-10-11-wait-drain/README.md)

@@ -1,5 +1,11 @@
 # Instruction benchmark suite: latency, issue rate and per-core throughput for 60 instruction forms
 
+> **Correction (2026-10-11, [core scaling](../2026-10-11-core-scaling/README.md)).** The per-core throughput
+> column (4 SIMD groups, 16/64-step bodies) understates contention for the shared transcendental /
+> integer-multiply / bit-field / convert units by up to 2× (`rsqrt`: 33 lanes/cycle here, 16.6 with 32/128-step
+> bodies). Those units are two per core (one per half), with core rates of 1.0 (`imad`, `log2`, …), 0.68 (`rcp`)
+> and 0.51 (`rsqrt`, 64-bit add) instructions per cycle.
+
 > **Corrections (2026-10-11, after an independent review).** (1) Cycle figures are in *reference units*:
 > the 8-byte `iadd x, x, 1` reference step really takes 2.098 cycles, not 2. Every clock inferred from it is
 > one of the GPU's DVFS levels (444, 612, 808, 968, 1,110, 1,236, 1,338, 1,398 MHz, Asahi `t602x-common.dtsi`)

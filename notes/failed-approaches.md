@@ -355,3 +355,18 @@ VkResult error" as "no fault".
   inversely with SIMD reductions (−0.49). Making transcendentals (and imad/bitfield/convert) draw on one
   shared bucket per unit, weighted by each op's measured rate, left every prediction unchanged: the
   model's units never saturate in these latency-bound kernels. Reverted; the cause is open.
+
+### Core scaling beyond 4 SIMD groups, 2026-10-11
+
+* **Short loop bodies give impossible core throughput with many groups.** 8/32-step bodies gave 5.3
+  instructions per cycle at 16 groups and *less* at 8 than at 4. With 32/128 steps the core saturates at
+  exactly 4.0. The same bias hides in the instruction bench's 4-group column (16/64 steps): shared-unit ops
+  look up to 2× faster there than with 32/128 steps, in either timing method.
+* **Selecting "group 0" with `r1 & (32*G - 1)` only works for power-of-two workgroups.** For G = 12, 15, 24
+  several groups ran the reference and the inferred clock was wrong (one run gave 50 cycles per step).
+  Use SR53 (SIMD-group index in the workgroup).
+* **A probe's own bookkeeping can clobber its parameters**: the per-group OP trip count first lived in r29,
+  which the SR17 recording also wrote, and every OP loop ran one trip (~0.04 cycles per step). Check that
+  each phase register is written after every other setup block.
+* **Removing the barriers** to test lockstep effects breaks the one-group reference (group 0's timestamps no
+  longer bracket the others' work).
