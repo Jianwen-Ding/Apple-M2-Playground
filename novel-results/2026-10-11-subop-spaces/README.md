@@ -1,0 +1,59 @@
+# funop, iunop, simd_op and shuffle sub-op spaces fully mapped
+
+Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, compute.
+
+## Claim
+
+**funop (opcode 0x0a, op bits 28–33).** The 6-bit op is a 4-bit function (bits 28–31) and a
+2-bit rounding mode (bits 32–33) that only function 0 uses (floor / ceil / trunc / round-even).
+* Functions 0, 1 (srsqrt), 4 (dfdx), 6 (dfdy), 8 (rcp), 9 (rsqrt), 10 (sin_pt_1), 12 (log2),
+  13 (exp2), 14 (sin_pt_2) run. For all but 0, bits 32–33 are ignored: the 27 unnamed values
+  `xx0001`, `xx0100`, … are bit-identical aliases.
+* **Functions 2, 3, 5, 7, 11, 15 (any rounding bits, 24 encodings) hang the GPU** (~502 ms
+  firmware timeout, recovered; the kernel log shows the asahi "GPU timeout" recovery).
+* Constant bits 34–41 are ignored.
+* dfdx / dfdy work in compute shaders: exact `x[lane|1] − x[lane&~1]` and `x[lane|2] − x[lane&~2]`.
+
+**iunop (0x3e with bits 28–37 zero).** op2 (bits 26–27): **00 = Morton bit spread** (bit i of the
+low 16 bits → bit 2i; unnamed in applegpu and Mesa), 01 bitrev, 10 popcount, 11 index of the highest
+set bit (applegpu/Mesa call it `ffs`). op1 (bits 38–39) and bits 28–37 are ignored.
+
+**simd_op (0x6f, bit 15 = 1).** Mesa's 5-bit op (bit 28, bits 38–40, bit 47) × kind (bits 29–30:
+quad reduce, simd reduce, quad exclusive prefix, simd exclusive prefix). All 128 combinations run.
+* bit 0 = float: bits 1–2 = fadd, fmul, fmin, fmax (bits 3–4 ignored).
+* integer, bit 4 = 0: bits 1–2 = and, or, xor, and; but `x0110` in the prefix kinds returns 0.
+* integer, bit 4 = 1: bit 2 = 0 → iadd (bit 1 = 0) or or (bit 1 = 1); bit 2 = 1 → min/max
+  (bit 1), signed/unsigned (bit 3).
+* Exclusive prefix identities: 0 for add/or/xor, all-ones for and, 1.0 for fmul,
+  **NaN for fmin/fmax** (not ±inf).
+* The other op2 bits (26, 27, 31–37, 41) are ignored.
+
+**Shuffles (0x6f, bit 15 = 0, bit 27 = 0).** op2 (bits 38–39) × window (bit 26: quad / simd) ×
+op1 (bit 47):
+* op1 = 0: shuffle, xor, up, down (Mesa). Up/down out-of-range lanes keep their own value.
+* op1 = 1, op2 = 2: rotate up (applegpu). op2 = 3: quad = down, simd = reads (i + B) & ~3.
+  op2 = 0, 1: rotate-like up/down with some lanes undefined; not usable.
+* **Bit 27 set is not a shuffle**: the encoding becomes the 8-byte `simd_matrix_fmadd16` /
+  `simd_matrix_fmadd32` (applegpu), which swallows the next two bytes.
+* Quad-divergent shuffle indices: the low two index bits are ORed over the quad (as Mesa's
+  `agx_lower_divergent_shuffle.c` describes); measured here on two index patterns.
+
+## Relationship to existing knowledge
+
+Mesa `agx_opcodes.py` names 13 funop values, 3 iunop values, 12 simd_op values and 8 shuffles;
+applegpu adds rotate-up. This sweep accounts for every value of those fields: the hangs, the
+aliases, the Morton spread, the 128-entry simd_op structure and NaN prefix identities are new here.
+Expected values come from Python models of each operation applied to the per-lane inputs read
+back from the same dispatch.
+
+## Compiler implications
+
+* PTX `brev`, `popc`, `bfind` map to iunop 01/10/11; iunop 00 gives a one-instruction Morton
+  spread for 2D tiling.
+* Never emit funop functions 2/3/5/7/11/15: they hang the GPU.
+* `__shfl_*_sync` with lane-divergent indices must use Mesa's quad-uniform lowering.
+* `__reduce_*_sync` and warp scans map directly onto simd_op; seed exclusive fmin/fmax scans
+  explicitly (lane 0 gets NaN).
+
+Reproduce: commands in [the evidence README](../../results/2026-10-11-subop-spaces/README.md);
+verify offline with `make verify-subop-spaces`.

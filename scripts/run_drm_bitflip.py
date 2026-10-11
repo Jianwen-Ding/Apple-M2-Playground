@@ -145,6 +145,7 @@ def main():
     p.add_argument('--sweep', action='append', default=[], help='KEY:start:size sweeps every value of that bit range (repeatable)')
     p.add_argument('--prefix', default='', help='hex bytes placed before every candidate (and the reference), e.g. input setup')
     p.add_argument('--max-faults', type=int, default=1, help='stop after this many faults (each must be followed by a passing control)')
+    p.add_argument('--names', help='regex: only run jobs whose name matches (search)')
     p.add_argument('--masks', help='comma list of hex XOR masks to apply as extra flips (multi-bit)')
     p.add_argument('--device', default='/dev/dri/renderD128')
     p.add_argument('--gprs', type=int, default=64)
@@ -205,6 +206,9 @@ def main():
         kl, hx = kv.split('='); key, label = kl.split(':')
         b = bytes.fromhex(hx)
         job(f'{key}-r{label}', key, int.from_bytes(b, 'little'), len(b), {'raw': label, 'hex': hx})
+    if a.names:
+        import re
+        jobs = [j for j in jobs if j['key'] == 'ref' or re.search(a.names, j['name'])]
     print(json.dumps({'jobs': len(jobs), 'plan': plan if a.dry_run else len(plan)}), flush=True)
     if a.dry_run:
         return 0
@@ -249,8 +253,12 @@ def main():
 
     ctrl_body = bytes.fromhex('620978563412')
     try:
+        faulted = set()
         for jb in jobs:
+            if jb['name'][:-2] in faulted:
+                continue   # layout B of an encoding that already faulted in layout A: one recovery is enough
             rec = run(jb); state['results'].append(rec)
+            if rec['fault']: faulted.add(jb['name'][:-2])
             print(json.dumps({'name': rec['name'], 'fault': rec['fault']}), flush=True)
             if rec['fault']:
                 import time

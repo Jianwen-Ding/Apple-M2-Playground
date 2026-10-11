@@ -41,3 +41,5 @@ No novel ISA finding is implied by a successful environment or DRM access test.
   cost tracks workgroup count (~2.7 ns/workgroup).
 - [2026-10-11 ALU bit flips](2026-10-11-alu-bitflip/README.md):
   213 applegpu gap bits on 53 instructions; fmadd 10-byte lane-offset form; fmadd32 bit 52.
+- [2026-10-11 sub-op spaces](2026-10-11-subop-spaces/README.md):
+  every value of funop / iunop / simd_op / shuffle op fields.
