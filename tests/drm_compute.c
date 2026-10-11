@@ -16,6 +16,7 @@
  *   AGX_USC_WORDS_OFF, AGX_CODE_OFF   USC offsets (64 B aligned, < 0x10000)
  *   AGX_CDM_OFF                       CDM stream offset in the data BO (< 0x8000, 8 B aligned)
  *   AGX_LOCAL_X/Y/Z                   CDM local size (global X stays the rounded count)
+ *   AGX_GLOBAL_X                      CDM global size in X (threads; default the rounded count)
  *   AGX_GLOBAL_Y/Z                    CDM global size in Y/Z (threads; default 1)
  *   AGX_WORD0_OR                      bits ORed into CDM launch word 0
  *   AGX_HELPER_DATA, AGX_HELPER_CFG   drm_asahi_helper_program data/cfg ("table" = table VA)
@@ -259,11 +260,11 @@ int main(int argc, char **argv)
     put32(c, (1u << 1) | (uint32_t)env("AGX_WORD0_OR", 0)); c += 4;                /* Launch word 0: uniform count groups(64) = 1; direct; block type 0 */
     put32(c, usc_words); c += 4;               /* Launch word 1: pipeline (64 B aligned, USC relative) */
     if (g14x) { put32(c, 0); put32(c + 4, 1u << 30); c += 8; }
-    uint32_t gy = (uint32_t)env("AGX_GLOBAL_Y", 1), gz = (uint32_t)env("AGX_GLOBAL_Z", 1);
+    uint32_t gx = (uint32_t)env("AGX_GLOBAL_X", rounded), gy = (uint32_t)env("AGX_GLOBAL_Y", 1), gz = (uint32_t)env("AGX_GLOBAL_Z", 1);
     uint32_t lx = (uint32_t)env("AGX_LOCAL_X", 32), ly = (uint32_t)env("AGX_LOCAL_Y", 1), lz = (uint32_t)env("AGX_LOCAL_Z", 1);
-    require(lx >= 1 && ly >= 1 && lz >= 1 && lx * ly * lz <= 1024 && rounded % lx == 0 && gy % ly == 0 && gz % lz == 0 &&
-            (uint64_t)rounded * gy * gz <= (1ull << 30), "grid/local size");
-    put32(c, rounded); put32(c + 4, gy); put32(c + 8, gz); c += 12;  /* global size in threads */
+    require(lx >= 1 && ly >= 1 && lz >= 1 && lx * ly * lz <= 1024 && gx >= 1 && gx % lx == 0 && gy % ly == 0 && gz % lz == 0 &&
+            (uint64_t)gx * gy * gz <= (1ull << 30), "grid/local size");
+    put32(c, gx); put32(c + 4, gy); put32(c + 8, gz); c += 12;  /* global size in threads */
     put32(c, lx); put32(c + 4, ly); put32(c + 8, lz); c += 12;     /* local size */
     put32(c, (3u << 29) | 0xfffffu); c += 4;   /* Barrier: Mesa's unk0..19 incl. USC cache invalidate */
     put32(c, 2u << 29); put32(c + 4, 0); c += 8;  /* Stream terminate */

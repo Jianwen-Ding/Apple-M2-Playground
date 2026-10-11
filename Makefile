@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock
+.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -30,6 +30,7 @@ help:
 	@echo 'make timestamps         Hardware regression: Vulkan timestamp placement (~10 ms shader time)'
 	@echo 'make verify-timestamps  Verify retained timestamp/fetch/direct-DRM evidence offline'
 	@echo 'make grid-cap           Control dispatch at 2^16..2^24 threads, X and Y forms (direct DRM)'
+	@echo 'make grid-coverage      Check every sampled row of 2^16..2^30-thread grids executes (direct DRM)'
 	@echo 'make drm-compute        Direct DRM (no Mesa) control + fadd4/iadd8 chain dispatches'
 	@echo 'make agx-loop-test      Loop emulator gate tests + 3 small hardware loops (direct DRM)'
 	@echo 'make verify-loops       Verify retained loop latency/throughput evidence offline'
@@ -170,6 +171,9 @@ grid-cap:
 	  AGX_GLOBAL_Y=$$(( (1 << k) / 32 )) $(PYTHON) -B scripts/run_drm_compute.py --kind control --count 32 --repeats 2 --device "$(DEVICE)" --output "$(DRMDIR)-grid-y$$k" || exit 1; \
 	  $(PYTHON) -B scripts/run_drm_compute.py --kind control --count $$((1 << k)) --repeats 2 --device "$(DEVICE)" --output "$(DRMDIR)-grid-x$$k" || exit 1; \
 	done
+
+grid-coverage:
+	$(PYTHON) -B scripts/run_drm_grid_coverage.py --log2 16,18,20,22,24,26,28,30 --device "$(DEVICE)"
 
 gpu-faults:
 	$(PYTHON) -B scripts/summarize_gpu_faults.py "$(LOG)"

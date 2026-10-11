@@ -37,4 +37,5 @@ No novel ISA finding is implied by a successful environment or DRM access test.
 - [2026-10-10 SR resources/widths](2026-10-10-sr-resources/README.md):
   shared-memory and metadata-edit sweeps for SR18/SR19; 64/16-bit get_sr destinations.
 - [2026-10-11 grid-size cap](2026-10-11-grid-size-cap/README.md):
-  control dispatch exact at 2^16..2^24 threads (X and Y grids); ~89-92 ps/thread at scale.
+  control dispatch exact at 2^16..2^24 threads (X, Y, Z); sampled-row coverage exact to 2^30;
+  cost tracks workgroup count (~2.7 ns/workgroup).

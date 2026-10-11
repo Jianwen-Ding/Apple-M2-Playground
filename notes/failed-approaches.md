@@ -306,3 +306,8 @@ VkResult error" as "no fault".
   buffers ([runs](../results/2026-10-11-grid-size-cap/README.md)). The crash was in that session's
   uncommitted harness edit (most likely the output/table/BO sizing), not in the grid size. When raising a
   bound, keep every derived size (output words, BO size, table offset) consistent and step up gradually.
+* **`count` sets global X in `tests/drm_compute.c`.** The first coverage kernel passed `count` (= output
+  lanes) and got a count×gy grid instead of 32×gy. Threads then wrote other rows' slots with their own y,
+  which looked like `sr81` saturating at 1, and a 2^16 run stored past the end of the output with no bounds
+  check (no fault or kernel message seen). Use `AGX_GLOBAL_X` to decouple the grid from the output size,
+  and keep an `index < count` check in any probe that computes store indices from SRs.
