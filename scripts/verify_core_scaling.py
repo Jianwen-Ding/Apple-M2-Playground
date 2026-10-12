@@ -60,4 +60,8 @@ check(len(c) >= 130, f'chains: {len(c)} stable rows (5 forms x chains 2,3,4,6 x 
 lat16 = T('iadd_imm', 1, 16)
 check(lat16 > 1.25*T('iadd_imm', 8, 16), f'open: one dependent iadd chain per group at 16 groups costs {lat16:.2f} vs {T("iadd_imm", 8, 16):.2f} with 8 chains')
 
+dd = {(r['op'], r['chains'], r['groups']): r['core_cycles_per_step'] for r in json.loads((R/'dests.json').read_text())['rows']}
+ipc = {D: 32/dd[('fadd32_imm', D, 32)] for D in (8, 9, 10, 12, 16)}
+check(ipc[8] > 3.9 and near(ipc[16], 2.0, 0.05) and ipc[9] > ipc[12] > ipc[16],
+      'distinct destination registers at 32 groups (writeback ~2/cycle): ' + ', '.join(f'D={D}: {v:.2f}' for D, v in ipc.items()))
 print(f'{fails} failures'); sys.exit(1 if fails else 0)

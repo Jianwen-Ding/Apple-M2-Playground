@@ -36,4 +36,12 @@ check(near(a[(1, 32)]/32, 6.9, 0.05) and near(a[(8, 32)]/32, 54.4, 0.05) and nea
 c = tab('atomic.json')
 check(c[(0, 1)] > 500 and near(c[(0, 32)]/32, c[(0, 1)], 0.05),
       f'one word for every lane of every core: {c[(0, 1)]:.0f} core cycles per instruction (32 x 38 ops: ~2 per cycle GPU-wide)')
+bf = {(r['filler_iadds'], r['groups']): r['core_cycles_per_step'] for r in json.loads((R/'barrier-fill.json').read_text())['rows']}
+check(bf[(16, 32)] > 1.6*bf[(8, 32)]*0.9 and bf[(8, 32)] > 1.5*bf[(4, 32)]*0.9 if (4, 32) in bf else bf[(16, 32)] > 250,
+      'barrier cost at 32 groups grows with the registers written before it: ' + ', '.join(f'F={f}: {bf[(f, 32)]:.0f}' for f in (1, 2, 8, 16)))
+ta = {(r['kind'], r['stride'], r['groups']): r['core_cycles_per_step'] for r in json.loads((R/'tgatomic.json').read_text())['rows'] if r.get('core_cycles_per_step')}
+check(near(ta[('tgatomic', 1, 32)]/32, 1.0, 0.05) and near(ta[('tgatomic', 0, 32)]/32, 31.4, 0.05),
+      f"threadgroup atomic add: distinct words {ta[('tgatomic', 1, 32)]/32:.2f}, one word {ta[('tgatomic', 0, 32)]/32:.1f} core cycles per instruction")
+ar = {(r['stride'], r['groups']): r['core_cycles_per_step'] for r in json.loads((R/'atomic-ret.json').read_text())['rows']}
+check(near(ar[(1, 32)]/32, 7.5, 0.05) and ar[(1, 1)] > 20, f"device atomic with return: {ar[(1, 32)]/32:.1f} per instruction at 32 groups, {ar[(1, 1)]:.1f} for one group")
 print(f'{fails} failures'); sys.exit(1 if fails else 0)

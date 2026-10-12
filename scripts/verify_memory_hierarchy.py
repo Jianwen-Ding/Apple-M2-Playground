@@ -53,4 +53,12 @@ idle = {(r['window_bytes'], r['groups']): r['core_cycles_per_step'] for r in row
 load = {(r['window_bytes'], r['groups']): r['core_cycles_per_step'] for r in rows('noise-cpuload.json')}
 check(all(near(load[k], idle[k], 0.02) for k in ((4096, 1), (4096, 32), (4194304, 32))),
       'CPU load (10 busy cores) does not change L1 or DRAM-bandwidth rows (< 2%): ' + ', '.join(f'{k}: {idle[k]:.1f}/{load[k]:.1f}' for k in idle))
+vs = json.loads((R/'vec-semantics.json').read_text())
+check(vs['i32.xyzw/r13'][:4] == [0, 1, 2, 3] and vs['i32.xyzw/r16'][:4] == [3, 4, 5, 6] and vs['i16.x/r13'][:3] == [0xdead0000, 0xdead0000, 0xdead0001],
+      'vector loads: index counts elements, xyzw = elements i..i+3; i16 writes the low half only')
+v = {(r['kind'], r['stride'], r['groups']): r['core_cycles_per_step'] for r in json.loads((R/'vec.json').read_text())['rows']}
+check(near(v[('load_v4', 4, 32)]/32, 4.0, 0.05) and near(v[('load_v2', 2, 32)]/32, 2.0, 0.05) and v[('load_i8', 4, 32)]/32 < 1.3,
+      f"coalesced vec4 {v[('load_v4', 4, 32)]/32:.2f}, vec2 {v[('load_v2', 2, 32)]/32:.2f}, i8 {v[('load_i8', 4, 32)]/32:.2f} core cycles per instruction (64-byte segments)")
+sw = {(r['window_bytes'], r['groups']): r['core_cycles_per_step'] for r in rows('stream.json')}
+check(sw[(4194304, 32)] < 100 and pw[1048576] > 400, f'a 4 MiB window shared by all cores runs at L2 rate ({sw[(4194304, 32)]:.0f}); 1 MiB private per core is DRAM-bound ({pw[1048576]:.0f})')
 print(f'{fails} failures'); sys.exit(1 if fails else 0)
