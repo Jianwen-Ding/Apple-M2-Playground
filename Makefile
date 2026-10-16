@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
+.PHONY: help verify-special-registers sr-vm-slot sr-divergence sr113-reps verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -34,6 +34,10 @@ help:
 	@echo 'make verify-alu-bitflip  Verify retained ALU bit-flip / fmadd lane-offset evidence offline'
 	@echo 'make verify-subop-spaces Verify funop/iunop/simd_op/shuffle sub-op sweeps offline'
 	@echo 'make verify-battery-clock-states Verify the on-battery clock-state / llvmpipe-fallback evidence offline'
+	@echo 'make verify-special-registers Verify SR21 VM slot / SR113 / divergence evidence offline'
+	@echo 'make sr-vm-slot      GPU: SR21 across 16 concurrent + 70 sequential VMs (direct DRM)'
+	@echo 'make sr-divergence   GPU: all 256 SRs inside nested ifs (direct DRM)'
+	@echo 'make sr113-reps      GPU: SR113 per submission, one process at a time (direct DRM)'
 	@echo 'make verify-cross-lane-width Verify 16/64-bit cross-lane ops and the Sklansky SIMD scan offline'
 	@echo 'make verify-mem-control-bitflip Verify memory/control/SR gap-bit evidence offline'
 	@echo 'make drm-compute        Direct DRM (no Mesa) control + fadd4/iadd8 chain dispatches'
@@ -355,3 +359,15 @@ capture-demo:
 	mkdir -p "$(SCRATCH_ROOT)/capture/demo"
 	$(CC) -std=c11 -O2 -I"$(PROBE_INCLUDE)" tests/gles_compute.c -o "$(SCRATCH_ROOT)/capture/demo/gles_compute" -ldl
 	$(PYTHON) -B scripts/agx_capture.py --ir --out "$(SCRATCH_ROOT)/capture/demo" -- "$(SCRATCH_ROOT)/capture/demo/gles_compute" private 64 $(DEVICE)
+
+verify-special-registers:
+	$(PYTHON) -B scripts/verify_special_registers.py
+
+sr-vm-slot:
+	$(PYTHON) -B scripts/run_sr_vm_slot.py --concurrent 16 --sequential 70 --repeats 10
+
+sr-divergence:
+	$(PYTHON) -B scripts/run_sr_divergence.py
+
+sr113-reps:
+	$(PYTHON) -B scripts/run_sr113_reps.py

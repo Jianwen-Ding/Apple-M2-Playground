@@ -195,3 +195,9 @@ a clock ~2.1x slower, and short gaps keep it fast. Vulkan device 0 was briefly l
 [Finding](novel-results/2026-10-16-battery-clock-states/README.md), `make verify-battery-clock-states`. Simulator
 side: every SPIR-V workload re-timed with the two-timestamps-before pattern (AGX-Performance-Simulator
 `results/2026-10-16-asahi-retime`).
+
+**Special registers completed for compute (2026-10-16).** SR21 is the hardware **VM slot** (1..63, distinct
+between live VMs, least-recently-used cycling). Under divergence only SR56-59 change (active rank / count in the quad and SIMD group).
+SR16 = lane & 3, and SR60 / SR63 are constants. Every other selector reads 0, except the still-unexplained
+per-dispatch bit SR113. The finding includes a map of all 256 selectors with PTX equivalents:
+[finding](novel-results/2026-10-16-special-registers/README.md), `make verify-special-registers`.

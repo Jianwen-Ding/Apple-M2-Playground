@@ -394,3 +394,13 @@ VkResult error" as "no fault".
 * **Fitting fp16 scan order:** "fp32 intermediates, one fp16 rounding at the end" fits much worse (11 cases fail)
   than per-step fp16 rounding. Flushing fp16 denormals fits worse too. Among tree orders, only Sklansky fits
   every word.
+
+### SR113 hypotheses ruled out, 2026-10-16
+
+SR113 (0 / 8, one value per dispatch) is **not** the submission index in the process, a per-process constant, the
+lane, core or hardware slot, the VM slot (SR21), the clock state, or "another dispatch overlapped this one" (96
+single-submission processes in bursts, some overlapping, all read 0). It is also not monotonic in the number of
+concurrently submitting queues: 1-24 queues gave 0, 0, 6, 0, 0, 47 eights. It appears mostly when several processes
+submit long kernels continuously. The next step would need firmware-side visibility (the asahi kernel's queue and
+event-slot assignment).
+[Finding](../novel-results/2026-10-16-special-registers/README.md).
