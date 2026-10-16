@@ -1,0 +1,1052 @@
+{
+ "utc": "20261016T184036854880Z",
+ "delay": 4000,
+ "count": 64,
+ "repeats": 16,
+ "code_hex": "f20510040e05c2865800000062000000522842a21800620d000000006211a00f00006209000000004208000000002a0944822a0944822a0944822a0944820e0d016064000000522c4682240000c0e2ffffff520e000000006209785634120e0508206400000045112c0e00c012003800520e000000008800",
+ "simulator": {
+  "oracle_ok": true,
+  "stats": {
+   "instructions": 56030,
+   "groups": 2,
+   "preamble_uniforms": {}
+  }
+ },
+ "runs": [
+  {
+   "mode": 0,
+   "returncode": 0,
+   "oracle_ok": true,
+   "pairs": [
+    {
+     "pair": 0,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351510175041,
+      1351510579541
+     ],
+     "b": [
+      1351510200291,
+      1351510602333
+     ],
+     "host_submit_ns": [
+      112417,
+      7709
+     ],
+     "host_total_ns": 833379,
+     "b_start_minus_a_end_ns": -379250,
+     "overlap": true
+    },
+    {
+     "pair": 1,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351510741333,
+      1351511143708
+     ],
+     "b": [
+      1351510758500,
+      1351511160708
+     ],
+     "host_submit_ns": [
+      14166,
+      12500
+     ],
+     "host_total_ns": 542877,
+     "b_start_minus_a_end_ns": -385208,
+     "overlap": true
+    },
+    {
+     "pair": 2,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351511286250,
+      1351511688458
+     ],
+     "b": [
+      1351511302375,
+      1351511704458
+     ],
+     "host_submit_ns": [
+      14750,
+      10084
+     ],
+     "host_total_ns": 537211,
+     "b_start_minus_a_end_ns": -386083,
+     "overlap": true
+    },
+    {
+     "pair": 3,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351512289916,
+      1351512694000
+     ],
+     "b": [
+      1351512303083,
+      1351512705250
+     ],
+     "host_submit_ns": [
+      12291,
+      8959
+     ],
+     "host_total_ns": 1006837,
+     "b_start_minus_a_end_ns": -390917,
+     "overlap": true
+    },
+    {
+     "pair": 4,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351513311791,
+      1351513715416
+     ],
+     "b": [
+      1351513325875,
+      1351513727958
+     ],
+     "host_submit_ns": [
+      12417,
+      9333
+     ],
+     "host_total_ns": 1019213,
+     "b_start_minus_a_end_ns": -389541,
+     "overlap": true
+    },
+    {
+     "pair": 5,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351514359291,
+      1351514762833
+     ],
+     "b": [
+      1351514372500,
+      1351514774625
+     ],
+     "host_submit_ns": [
+      11625,
+      7917
+     ],
+     "host_total_ns": 1045546,
+     "b_start_minus_a_end_ns": -390333,
+     "overlap": true
+    },
+    {
+     "pair": 6,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351514902791,
+      1351515305291
+     ],
+     "b": [
+      1351514920458,
+      1351515322875
+     ],
+     "host_submit_ns": [
+      11708,
+      7792
+     ],
+     "host_total_ns": 558127,
+     "b_start_minus_a_end_ns": -384833,
+     "overlap": true
+    },
+    {
+     "pair": 7,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351515465458,
+      1351515867750
+     ],
+     "b": [
+      1351515481375,
+      1351515883583
+     ],
+     "host_submit_ns": [
+      11334,
+      7791
+     ],
+     "host_total_ns": 532836,
+     "b_start_minus_a_end_ns": -386375,
+     "overlap": true
+    },
+    {
+     "pair": 8,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351516467000,
+      1351516870791
+     ],
+     "b": [
+      1351516480166,
+      1351516882375
+     ],
+     "host_submit_ns": [
+      11626,
+      7875
+     ],
+     "host_total_ns": 1007296,
+     "b_start_minus_a_end_ns": -390625,
+     "overlap": true
+    },
+    {
+     "pair": 9,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351517013500,
+      1351517416000
+     ],
+     "b": [
+      1351517030083,
+      1351517432500
+     ],
+     "host_submit_ns": [
+      11000,
+      7542
+     ],
+     "host_total_ns": 548877,
+     "b_start_minus_a_end_ns": -385917,
+     "overlap": true
+    },
+    {
+     "pair": 10,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351517563750,
+      1351517966041
+     ],
+     "b": [
+      1351517580208,
+      1351517982333
+     ],
+     "host_submit_ns": [
+      11500,
+      7917
+     ],
+     "host_total_ns": 535419,
+     "b_start_minus_a_end_ns": -385833,
+     "overlap": true
+    },
+    {
+     "pair": 11,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351518095166,
+      1351518497625
+     ],
+     "b": [
+      1351518110333,
+      1351518512708
+     ],
+     "host_submit_ns": [
+      10917,
+      8625
+     ],
+     "host_total_ns": 532544,
+     "b_start_minus_a_end_ns": -387292,
+     "overlap": true
+    },
+    {
+     "pair": 12,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351518631291,
+      1351519033416
+     ],
+     "b": [
+      1351518648375,
+      1351519050541
+     ],
+     "host_submit_ns": [
+      10959,
+      8833
+     ],
+     "host_total_ns": 525711,
+     "b_start_minus_a_end_ns": -385041,
+     "overlap": true
+    },
+    {
+     "pair": 13,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351519165791,
+      1351519568250
+     ],
+     "b": [
+      1351519181541,
+      1351519583916
+     ],
+     "host_submit_ns": [
+      13292,
+      7833
+     ],
+     "host_total_ns": 532711,
+     "b_start_minus_a_end_ns": -386709,
+     "overlap": true
+    },
+    {
+     "pair": 14,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351520169500,
+      1351520573083
+     ],
+     "b": [
+      1351520183125,
+      1351520585250
+     ],
+     "host_submit_ns": [
+      12458,
+      7750
+     ],
+     "host_total_ns": 1007587,
+     "b_start_minus_a_end_ns": -389958,
+     "overlap": true
+    },
+    {
+     "pair": 15,
+     "mode": 0,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351521180125,
+      1351521583791
+     ],
+     "b": [
+      1351521192708,
+      1351521594958
+     ],
+     "host_submit_ns": [
+      12083,
+      7750
+     ],
+     "host_total_ns": 1009088,
+     "b_start_minus_a_end_ns": -391083,
+     "overlap": true
+    }
+   ],
+   "stderr": "",
+   "failure": []
+  },
+  {
+   "mode": 1,
+   "returncode": 0,
+   "oracle_ok": true,
+   "pairs": [
+    {
+     "pair": 0,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351526183375,
+      1351526586916
+     ],
+     "b": [
+      1351526718958,
+      1351527121166
+     ],
+     "host_submit_ns": [
+      81042,
+      11459
+     ],
+     "host_total_ns": 1450173,
+     "b_start_minus_a_end_ns": 132042,
+     "overlap": false
+    },
+    {
+     "pair": 1,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351527274125,
+      1351527676625
+     ],
+     "b": [
+      1351527794333,
+      1351528196750
+     ],
+     "host_submit_ns": [
+      24083,
+      11125
+     ],
+     "host_total_ns": 1067713,
+     "b_start_minus_a_end_ns": 117708,
+     "overlap": false
+    },
+    {
+     "pair": 2,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351528335791,
+      1351528738166
+     ],
+     "b": [
+      1351528846208,
+      1351529248291
+     ],
+     "host_submit_ns": [
+      15584,
+      10833
+     ],
+     "host_total_ns": 1038547,
+     "b_start_minus_a_end_ns": 108042,
+     "overlap": false
+    },
+    {
+     "pair": 3,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351529378458,
+      1351529780958
+     ],
+     "b": [
+      1351529888958,
+      1351530291291
+     ],
+     "host_submit_ns": [
+      15458,
+      9375
+     ],
+     "host_total_ns": 1037004,
+     "b_start_minus_a_end_ns": 108000,
+     "overlap": false
+    },
+    {
+     "pair": 4,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351530418541,
+      1351530820875
+     ],
+     "b": [
+      1351530940708,
+      1351531342875
+     ],
+     "host_submit_ns": [
+      14834,
+      9708
+     ],
+     "host_total_ns": 1056588,
+     "b_start_minus_a_end_ns": 119833,
+     "overlap": false
+    },
+    {
+     "pair": 5,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351531482000,
+      1351531884500
+     ],
+     "b": [
+      1351531994125,
+      1351532396500
+     ],
+     "host_submit_ns": [
+      15917,
+      10083
+     ],
+     "host_total_ns": 1046338,
+     "b_start_minus_a_end_ns": 109625,
+     "overlap": false
+    },
+    {
+     "pair": 6,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351532532125,
+      1351532934500
+     ],
+     "b": [
+      1351533043041,
+      1351533445083
+     ],
+     "host_submit_ns": [
+      16042,
+      9667
+     ],
+     "host_total_ns": 1038255,
+     "b_start_minus_a_end_ns": 108541,
+     "overlap": false
+    },
+    {
+     "pair": 7,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351533573125,
+      1351533975625
+     ],
+     "b": [
+      1351534083583,
+      1351534485958
+     ],
+     "host_submit_ns": [
+      15167,
+      10750
+     ],
+     "host_total_ns": 1038505,
+     "b_start_minus_a_end_ns": 107958,
+     "overlap": false
+    },
+    {
+     "pair": 8,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351534617750,
+      1351535020041
+     ],
+     "b": [
+      1351535136958,
+      1351535539083
+     ],
+     "host_submit_ns": [
+      15625,
+      10417
+     ],
+     "host_total_ns": 1054963,
+     "b_start_minus_a_end_ns": 116917,
+     "overlap": false
+    },
+    {
+     "pair": 9,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351535678500,
+      1351536080916
+     ],
+     "b": [
+      1351536197166,
+      1351536599541
+     ],
+     "host_submit_ns": [
+      16916,
+      10167
+     ],
+     "host_total_ns": 1049421,
+     "b_start_minus_a_end_ns": 116250,
+     "overlap": false
+    },
+    {
+     "pair": 10,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351536730041,
+      1351537132375
+     ],
+     "b": [
+      1351537263625,
+      1351537665666
+     ],
+     "host_submit_ns": [
+      15958,
+      9834
+     ],
+     "host_total_ns": 1068463,
+     "b_start_minus_a_end_ns": 131250,
+     "overlap": false
+    },
+    {
+     "pair": 11,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351537802458,
+      1351538204958
+     ],
+     "b": [
+      1351538326583,
+      1351538728958
+     ],
+     "host_submit_ns": [
+      15125,
+      10167
+     ],
+     "host_total_ns": 1050505,
+     "b_start_minus_a_end_ns": 121625,
+     "overlap": false
+    },
+    {
+     "pair": 12,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351538856541,
+      1351539258833
+     ],
+     "b": [
+      1351539378000,
+      1351539780166
+     ],
+     "host_submit_ns": [
+      15250,
+      10000
+     ],
+     "host_total_ns": 1047212,
+     "b_start_minus_a_end_ns": 119167,
+     "overlap": false
+    },
+    {
+     "pair": 13,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351539910125,
+      1351540312583
+     ],
+     "b": [
+      1351540434375,
+      1351540836750
+     ],
+     "host_submit_ns": [
+      16084,
+      10541
+     ],
+     "host_total_ns": 1059297,
+     "b_start_minus_a_end_ns": 121792,
+     "overlap": false
+    },
+    {
+     "pair": 14,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351540979250,
+      1351541381500
+     ],
+     "b": [
+      1351541499750,
+      1351541901958
+     ],
+     "host_submit_ns": [
+      21417,
+      10917
+     ],
+     "host_total_ns": 1061171,
+     "b_start_minus_a_end_ns": 118250,
+     "overlap": false
+    },
+    {
+     "pair": 15,
+     "mode": 1,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351542043250,
+      1351542445708
+     ],
+     "b": [
+      1351542568333,
+      1351542970666
+     ],
+     "host_submit_ns": [
+      19042,
+      11875
+     ],
+     "host_total_ns": 1062588,
+     "b_start_minus_a_end_ns": 122625,
+     "overlap": false
+    }
+   ],
+   "stderr": "",
+   "failure": []
+  },
+  {
+   "mode": 2,
+   "returncode": 0,
+   "oracle_ok": true,
+   "pairs": [
+    {
+     "pair": 0,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351547342041,
+      1351547746166
+     ],
+     "b": [
+      1351547868208,
+      1351548270791
+     ],
+     "host_submit_ns": [
+      75333,
+      20417
+     ],
+     "host_total_ns": 1590506,
+     "b_start_minus_a_end_ns": 122042,
+     "overlap": false
+    },
+    {
+     "pair": 1,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351548859583,
+      1351549263458
+     ],
+     "b": [
+      1351549369041,
+      1351549771250
+     ],
+     "host_submit_ns": [
+      11584,
+      9167
+     ],
+     "host_total_ns": 1493674,
+     "b_start_minus_a_end_ns": 105583,
+     "overlap": false
+    },
+    {
+     "pair": 2,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351549886125,
+      1351550288625
+     ],
+     "b": [
+      1351550393708,
+      1351550796125
+     ],
+     "host_submit_ns": [
+      11334,
+      8625
+     ],
+     "host_total_ns": 1028588,
+     "b_start_minus_a_end_ns": 105083,
+     "overlap": false
+    },
+    {
+     "pair": 3,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351550917000,
+      1351551319291
+     ],
+     "b": [
+      1351551417958,
+      1351551820166
+     ],
+     "host_submit_ns": [
+      12209,
+      9583
+     ],
+     "host_total_ns": 1025421,
+     "b_start_minus_a_end_ns": 98667,
+     "overlap": false
+    },
+    {
+     "pair": 4,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351551948500,
+      1351552350916
+     ],
+     "b": [
+      1351552443166,
+      1351552845500
+     ],
+     "host_submit_ns": [
+      10917,
+      9000
+     ],
+     "host_total_ns": 1009588,
+     "b_start_minus_a_end_ns": 92250,
+     "overlap": false
+    },
+    {
+     "pair": 5,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351552966791,
+      1351553369083
+     ],
+     "b": [
+      1351553461208,
+      1351553863375
+     ],
+     "host_submit_ns": [
+      14417,
+      9750
+     ],
+     "host_total_ns": 1014255,
+     "b_start_minus_a_end_ns": 92125,
+     "overlap": false
+    },
+    {
+     "pair": 6,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351553980500,
+      1351554383000
+     ],
+     "b": [
+      1351554474083,
+      1351554819375
+     ],
+     "host_submit_ns": [
+      11625,
+      9667
+     ],
+     "host_total_ns": 969963,
+     "b_start_minus_a_end_ns": 91083,
+     "overlap": false
+    },
+    {
+     "pair": 7,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351554973833,
+      1351555266125
+     ],
+     "b": [
+      1351555369083,
+      1351555669625
+     ],
+     "host_submit_ns": [
+      11917,
+      12125
+     ],
+     "host_total_ns": 851462,
+     "b_start_minus_a_end_ns": 102958,
+     "overlap": false
+    },
+    {
+     "pair": 8,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351555816125,
+      1351556218583
+     ],
+     "b": [
+      1351556311750,
+      1351556714000
+     ],
+     "host_submit_ns": [
+      11666,
+      9750
+     ],
+     "host_total_ns": 1013379,
+     "b_start_minus_a_end_ns": 93167,
+     "overlap": false
+    },
+    {
+     "pair": 9,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351556830000,
+      1351557232291
+     ],
+     "b": [
+      1351557327166,
+      1351557729333
+     ],
+     "host_submit_ns": [
+      11667,
+      9416
+     ],
+     "host_total_ns": 1010088,
+     "b_start_minus_a_end_ns": 94875,
+     "overlap": false
+    },
+    {
+     "pair": 10,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351557843958,
+      1351558246416
+     ],
+     "b": [
+      1351558338291,
+      1351558740666
+     ],
+     "host_submit_ns": [
+      11542,
+      9458
+     ],
+     "host_total_ns": 1006588,
+     "b_start_minus_a_end_ns": 91875,
+     "overlap": false
+    },
+    {
+     "pair": 11,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351558882416,
+      1351559284791
+     ],
+     "b": [
+      1351559379416,
+      1351559781541
+     ],
+     "host_submit_ns": [
+      12625,
+      10084
+     ],
+     "host_total_ns": 1065422,
+     "b_start_minus_a_end_ns": 94625,
+     "overlap": false
+    },
+    {
+     "pair": 12,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351559953708,
+      1351560356125
+     ],
+     "b": [
+      1351560462000,
+      1351560864416
+     ],
+     "host_submit_ns": [
+      35000,
+      23583
+     ],
+     "host_total_ns": 1061088,
+     "b_start_minus_a_end_ns": 105875,
+     "overlap": false
+    },
+    {
+     "pair": 13,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351561011000,
+      1351561413166
+     ],
+     "b": [
+      1351561511375,
+      1351561913541
+     ],
+     "host_submit_ns": [
+      21750,
+      13083
+     ],
+     "host_total_ns": 1033796,
+     "b_start_minus_a_end_ns": 98209,
+     "overlap": false
+    },
+    {
+     "pair": 14,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351562047416,
+      1351562449958
+     ],
+     "b": [
+      1351562567250,
+      1351562859583
+     ],
+     "host_submit_ns": [
+      20333,
+      12875
+     ],
+     "host_total_ns": 948545,
+     "b_start_minus_a_end_ns": 117292,
+     "overlap": false
+    },
+    {
+     "pair": 15,
+     "mode": 2,
+     "wait": 0,
+     "errno": 0,
+     "a": [
+      1351562998166,
+      1351563290458
+     ],
+     "b": [
+      1351563387541,
+      1351563679750
+     ],
+     "host_submit_ns": [
+      16958,
+      13250
+     ],
+     "host_total_ns": 798587,
+     "b_start_minus_a_end_ns": 97083,
+     "overlap": false
+    }
+   ],
+   "stderr": "",
+   "failure": []
+  }
+ ]
+}

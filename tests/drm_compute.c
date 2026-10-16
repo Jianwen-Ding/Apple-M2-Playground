@@ -22,6 +22,7 @@
  *   AGX_HELPER_DATA, AGX_HELPER_CFG   drm_asahi_helper_program data/cfg ("table" = table VA)
  *   AGX_HELPER_CODE, AGX_HELPER_OFF   helper program file at USC offset AGX_HELPER_OFF (default 0x4000); binary = offset | 1
  *   AGX_SAMPLER_COUNT                 sampler_count with sampler_heap = zeroed data page at +0x6000
+ *   AGX_SYNC_MODE                     0|1|2 two-queue ordering test: B no wait / waits binary syncobj / timeline point
  *   AGX_PRIORITY                      queue priority (0 low, 1 medium)
  *   AGX_USC_ORDER                     order of USC pipeline words (default "ushrn")
  *   AGX_PRESHADER                     1 = Preshader word (preamble at usc_words + 0x200) instead of No preshader
@@ -290,6 +291,59 @@ int main(int argc, char **argv)
         atomic_store(&clock_run, 1);
         require(pthread_create(&clock_tid, NULL, clock_thread, NULL) == 0, "cpu-clock-thread");
         while (clock_words[0] == 0) ;   /* running before the first submit */
+    }
+    /* AGX_SYNC_MODE=0|1|2: two-queue ordering test (simulator task safe-12 step 4). Each repeat submits the same
+       command on queue A, then on a second queue B: 0 = B has no wait, 1 = B waits on A's binary syncobj,
+       2 = B waits on timeline point rep+1 that A signals. Both are waited for; firmware timestamps of both are printed. */
+    const char *sm = getenv("AGX_SYNC_MODE");
+    if (sm && *sm) {
+        int mode = (int)strtol(sm, NULL, 0); require(mode >= 0 && mode <= 2, "sync-mode");
+        struct drm_asahi_queue_create qb = {.vm_id = vc.vm_id, .priority = qc.priority, .usc_exec_base = shader_base};
+        io(DRM_IOCTL_ASAHI_QUEUE_CREATE, &qb, "queue-create-b");
+        struct drm_syncobj_create sb = {0}, tl = {0};
+        io(DRM_IOCTL_SYNCOBJ_CREATE, &sb, "syncobj-create-b"); io(DRM_IOCTL_SYNCOBJ_CREATE, &tl, "syncobj-create-tl");
+        for (unsigned long rep = 0; rep < reps; rep++) {
+            for (uint32_t j = 0; j < words; j++) out[j] = j < words - 16 ? 0xcdcdcdcdu : 0xa5a50000u + j - (words - 16);
+            memset(tsb.map, 0, 32);
+            struct { struct drm_asahi_cmd_header h; struct drm_asahi_cmd_compute c; } cmd[2];
+            for (int k = 0; k < 2; k++) {
+                memset(&cmd[k], 0, sizeof cmd[k]);
+                cmd[k].h.cmd_type = DRM_ASAHI_CMD_COMPUTE; cmd[k].h.size = sizeof(struct drm_asahi_cmd_compute);
+                cmd[k].h.vdm_barrier = DRM_ASAHI_BARRIER_NONE; cmd[k].h.cdm_barrier = 0;
+                cmd[k].c.cdm_ctrl_stream_base = cdm_va; cmd[k].c.cdm_ctrl_stream_end = cdm_end;
+                cmd[k].c.ts.start.handle = bo_ts.object_handle; cmd[k].c.ts.start.offset = 16 * k;
+                cmd[k].c.ts.end.handle = bo_ts.object_handle; cmd[k].c.ts.end.offset = 16 * k + 8;
+            }
+            struct drm_asahi_sync sa[2] = {{.sync_type = DRM_ASAHI_SYNC_SYNCOBJ, .handle = sc.handle},
+                                           {.sync_type = DRM_ASAHI_SYNC_TIMELINE_SYNCOBJ, .handle = tl.handle, .timeline_value = rep + 1}};
+            struct drm_asahi_submit suba = {.syncs = (uint64_t)(uintptr_t)sa, .cmdbuf = (uint64_t)(uintptr_t)&cmd[0],
+                                            .queue_id = qc.queue_id, .out_sync_count = mode == 2 ? 2 : 1, .cmdbuf_size = sizeof cmd[0]};
+            struct drm_asahi_sync sbs[2] = {{.sync_type = mode == 2 ? DRM_ASAHI_SYNC_TIMELINE_SYNCOBJ : DRM_ASAHI_SYNC_SYNCOBJ,
+                                             .handle = mode == 2 ? tl.handle : sc.handle, .timeline_value = mode == 2 ? rep + 1 : 0},
+                                            {.sync_type = DRM_ASAHI_SYNC_SYNCOBJ, .handle = sb.handle}};
+            struct drm_asahi_submit subb = {.syncs = (uint64_t)(uintptr_t)(mode ? &sbs[0] : &sbs[1]), .cmdbuf = (uint64_t)(uintptr_t)&cmd[1],
+                                            .queue_id = qb.queue_id, .in_sync_count = mode ? 1 : 0, .out_sync_count = 1, .cmdbuf_size = sizeof cmd[1]};
+            uint64_t h0 = now_ns();
+            io(DRM_IOCTL_ASAHI_SUBMIT, &suba, "submit-a");
+            uint64_t h1 = now_ns();
+            io(DRM_IOCTL_ASAHI_SUBMIT, &subb, "submit-b");
+            uint64_t h2 = now_ns();
+            uint32_t hs[2] = {sc.handle, sb.handle};
+            struct drm_syncobj_wait sw = {.handles = (uint64_t)(uintptr_t)hs, .count_handles = 2, .flags = DRM_SYNCOBJ_WAIT_FLAGS_WAIT_ALL,
+                                          .timeout_nsec = (int64_t)(h0 + 3000000000ull)};
+            int r = ioctl(fd, DRM_IOCTL_SYNCOBJ_WAIT, &sw); int werr = r ? errno : 0;
+            uint64_t h3 = now_ns();
+            uint64_t ts[4]; memcpy(ts, tsb.map, 32);
+            printf("{\"pair\":%lu,\"mode\":%d,\"wait\":%d,\"errno\":%d,\"a\":[%" PRIu64 ",%" PRIu64 "],\"b\":[%" PRIu64 ",%" PRIu64 "],"
+                   "\"host_submit_ns\":[%" PRIu64 ",%" PRIu64 "],\"host_total_ns\":%" PRIu64 "}\n",
+                   rep, mode, r, werr, ts[0], ts[1], ts[2], ts[3], h1 - h0, h2 - h1, h3 - h0);
+            require(r == 0, "syncobj-wait-pair");
+            struct drm_syncobj_array reset = {.handles = (uint64_t)(uintptr_t)hs, .count_handles = 2};
+            io(DRM_IOCTL_SYNCOBJ_RESET, &reset, "syncobj-reset-pair");
+        }
+        struct drm_asahi_queue_destroy qdb = {.queue_id = qb.queue_id};
+        io(DRM_IOCTL_ASAHI_QUEUE_DESTROY, &qdb, "queue-destroy-b");
+        reps = 0;   /* skip the single-queue loop; readback and cleanup follow */
     }
     for (unsigned long rep = 0; rep < reps; rep++) {
         for (uint32_t j = 0; j < words; j++) out[j] = j < words - 16 ? 0xcdcdcdcdu : 0xa5a50000u + j - (words - 16);

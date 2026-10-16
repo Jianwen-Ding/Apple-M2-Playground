@@ -128,16 +128,43 @@ Soft faults matter for CUDA:
 
 Helper programs stalled the GPU twice (`notes/failed-approaches.md`). Do not use them.
 
-## 4. Open (simulator task safe-12)
+## 4. Cross-queue ordering with syncobjs (CUDA events / `cudaStreamWaitEvent`)
 
-- **Sync primitives:** a second submission that waits (`in_sync`) on the first's syncobj, with the control kernel
-  only, to confirm ordering from firmware timestamps. Also timeline syncobjs. This is how CUDA events and
-  `cudaStreamWaitEvent` would map.
+**Test:** `scripts/run_drm_sync.py` with `tests/drm_compute.c` `AGX_SYNC_MODE`.
+- Two queues on one VM each run the same 64-lane kernel: a 4,000-trip delay loop, about 0.40 ms, ending in the exact
+  control store.
+- Before the GPU run, the kernel passed the simulator's `agx_run` oracle and ends with `stop`.
+- 16 pairs per mode; every output word matched.
+- Evidence: `results/2026-10-16-drm-sync/`.
+
+| B's dependency on A | B start − A end (16 pairs) | Meaning |
+|---|---|---|
+| none | −379 .. −391 µs (B starts ~16 µs after A starts) | separate queues run concurrently, with no slowdown for two small kernels |
+| binary syncobj `in_sync` | **+108 .. +132 µs** | the GPU-side wait works; the dependency costs ~0.1 ms |
+| timeline syncobj point `in_sync` | **+91 .. +122 µs** | same, slightly cheaper |
+
+Other observations:
+- A `SUBMIT` ioctl takes 8-16 µs on the host.
+- A cross-queue dependency costs ~100-130 µs, which is about 10x the ~7-10 µs per-dispatch firmware overhead
+  measured within one queue (`novel-results/2026-10-11-dispatch-launch`).
+- The ~100 µs probably includes the fence signal → kernel scheduler → firmware round trip. Not established:
+  whether a dependency within the same queue (`cdm_barrier`) avoids it.
+
+**For a CUDA runtime:**
+- streams map to queues;
+- `cudaEventRecord` maps to an out-sync (timeline points are a natural fit);
+- `cudaStreamWaitEvent` maps to an in-sync on the next submission.
+Cross-stream dependencies should be batched, because each one costs ~0.1 ms.
+
+## 5. Still open (simulator task safe-12)
+
 - **Several dispatches per command / commands per SUBMIT:** ≤ 64 commands (safe-04 §4).
 - **Userptr import:** the UAPI has no userptr ioctl. CPU memory must come from a GEM BO mapped into the process, so
   CUDA "unified memory" maps to WRITEBACK BOs (see safe-03 §4 for visibility).
 
 ## Reproduce
 
-`make drm-limits` (ioctls only; no SUBMIT is issued) and `make verify-drm-interface` (offline, 24 checks against
-`results/2026-10-16-drm-interface/drm-limits.jsonl`).
+- `make drm-limits`: ioctls only; no SUBMIT is issued.
+- `make drm-sync`: GPU, 3 modes × 16 pairs.
+- `make verify-drm-interface`: offline, 33 checks against `results/2026-10-16-drm-interface` and
+  `results/2026-10-16-drm-sync`.

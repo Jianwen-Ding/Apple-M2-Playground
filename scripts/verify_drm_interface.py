@@ -55,6 +55,25 @@ def main():
     check('queue priority 0/1 ok, 2/3/4 EINVAL (not EPERM)', q['priority_errno'] == [0, 0, EINVAL, EINVAL, EINVAL])
     check('queue flags rejected, unknown VM / queue -> ENOENT', q['flags1'] == EINVAL and q['bad_vm'] == ENOENT and q['destroy_unknown'] == ENOENT)
     check('at least 64 queues on one VM', rows['queue_count']['created'] == 64)
+    # Cross-queue syncobj ordering (results/2026-10-16-drm-sync, scripts/run_drm_sync.py)
+    S = ROOT/'results/2026-10-16-drm-sync'
+    d = json.loads((S/'record.json').read_text())
+    for line in (S/'sources.sha256').read_text().splitlines():
+        h, f = line.split()
+        check(f'sync: {f} matches the recorded hash', hashlib.sha256((ROOT/f).read_bytes()).hexdigest() == h)
+    check('sync: kernel ends with stop and passed the agx_run oracle before GPU use',
+          d['code_hex'].endswith('8800') and d['simulator']['oracle_ok'] is True)
+    runs = {r['mode']: r for r in d['runs']}
+    check('sync: three modes x 16 pairs, all completed with the exact oracle',
+          sorted(runs) == [0, 1, 2] and all(r['oracle_ok'] and r['returncode'] == 0 and len(r['pairs']) == 16
+                                            and all(q['wait'] == 0 for q in r['pairs']) for r in runs.values()))
+    gap = lambda m: [q['b'][0]-q['a'][1] for q in runs[m]['pairs']]
+    check('sync mode 0 (no wait): B overlaps A in every pair', all(g < 0 and q['a'][0] < q['b'][1] for g, q in zip(gap(0), runs[0]['pairs'])))
+    check('sync mode 1 (binary in_sync): B starts 100-140 us after A ends in every pair', all(100_000 <= g <= 140_000 for g in gap(1)))
+    check('sync mode 2 (timeline in_sync): B starts 85-125 us after A ends in every pair', all(85_000 <= g <= 125_000 for g in gap(2)))
+    durs = sorted(q[k][1]-q[k][0] for r in runs.values() for q in r['pairs'] for k in 'ab')
+    check('sync: kernel time ~0.40 ms (median) whether or not they overlap; all 0.28-0.41 ms (clock-state spread)',
+          395_000 <= durs[len(durs)//2] <= 410_000 and 280_000 <= durs[0] and durs[-1] <= 410_000)
     print(f'{len(fails)} failures')
     return 1 if fails else 0
 
