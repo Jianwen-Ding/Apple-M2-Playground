@@ -24,6 +24,7 @@
  *   AGX_SAMPLER_COUNT                 sampler_count with sampler_heap = zeroed data page at +0x6000
  *   AGX_CMDS, AGX_CMD_BARRIER         N (1-64) compute commands per SUBMIT; barrier "chain" (default) or "none"
  *   AGX_QUEUES                        N (2-32) queues each submit the command once per repeat (concurrency test)
+ *   AGX_CLEAN_EXIT                    default 1 = munmap + GEM_CLOSE at exit (0 leaks every BO in the kernel), 2 = also unbind
  *   AGX_SYNC_MODE                     0|1|2 two-queue ordering test: B no wait / waits binary syncobj / timeline point
  *   AGX_PRIORITY                      queue priority (0 low, 1 medium)
  *   AGX_USC_ORDER                     order of USC pipeline words (default "ushrn")
@@ -514,6 +515,29 @@ int main(int argc, char **argv)
 
     struct drm_asahi_queue_destroy qd = {.queue_id = qc.queue_id};
     io(DRM_IOCTL_ASAHI_QUEUE_DESTROY, &qd, "queue-destroy");
+    /* AGX_CLEAN_EXIT: release every object explicitly instead of relying on process exit (which was found to leak
+       the buffer objects' shmem in the kernel, 2026-10-16). 1 = munmap + GEM_CLOSE; 2 = also unbind first. */
+    const int clean = (int)env("AGX_CLEAN_EXIT", 1);   /* default on: exit without it leaks every BO (shmem) */
+    if (clean >= 2) {
+        struct drm_asahi_gem_bind_object ub = {.op = DRM_ASAHI_BIND_OBJECT_OP_UNBIND, .object_handle = bo_ts.object_handle};
+        io(DRM_IOCTL_ASAHI_GEM_BIND_OBJECT, &ub, "unbind-timestamps");
+        struct bo *bs[2] = {&usc, &data};
+        for (int i = 0; i < 2; i++) {
+            struct drm_asahi_gem_bind_op op = {.flags = DRM_ASAHI_BIND_UNBIND, .range = bs[i]->size, .addr = bs[i]->va};
+            struct drm_asahi_vm_bind vb = {.vm_id = vc.vm_id, .num_binds = 1, .stride = sizeof op, .userptr = (uint64_t)(uintptr_t)&op};
+            io(DRM_IOCTL_ASAHI_VM_BIND, &vb, "vm-unbind");
+        }
+    }
+    if (clean >= 1) {
+        struct bo *bs[3] = {&usc, &data, &tsb};
+        for (int i = 0; i < 3; i++) {
+            require(munmap(bs[i]->map, bs[i]->size) == 0, "munmap");
+            struct drm_gem_close gcl = {.handle = bs[i]->handle};
+            io(DRM_IOCTL_GEM_CLOSE, &gcl, "gem-close");
+        }
+        struct drm_syncobj_destroy sd = {.handle = sc.handle};
+        io(DRM_IOCTL_SYNCOBJ_DESTROY, &sd, "syncobj-destroy");
+    }
     struct drm_asahi_vm_destroy vd = {.vm_id = vc.vm_id};
     io(DRM_IOCTL_ASAHI_VM_DESTROY, &vd, "vm-destroy");
     close(fd);

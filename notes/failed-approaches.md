@@ -449,3 +449,27 @@ roughly double up to 64 B (consistent with a 64-byte line). But:
 The cause is not known (possibly an interaction of sequential addresses with the cache's set mapping or a
 prefetcher). The random "neighbour" test (`novel-results/2026-10-16-cache-line`) is clean. Evidence:
 `results/2026-10-16-cache-line/sequential-chase-*.json.gz`.
+
+### The direct-DRM harness leaked every buffer object at exit: ~55 GB of kernel shmem, 2026-10-16
+
+**Symptom:**
+- The host ran out of memory (11 OOM kills, including the user's Chrome, during an offline `mem_check` run), and
+  free memory stayed near 0 GB with nothing running.
+- `/sys/fs/cgroup/memory.stat` for this container showed `shmem 57.6 GB`, with no process holding a DRM fd and no
+  tmpfs in use.
+
+**Cause:**
+- `tests/drm_compute.c` (both repositories) destroyed its queue and VM, but left its mmapped buffer objects to
+  process exit.
+- On kernel 6.19.14-400.asahi that leaks each BO's shmem.
+- Measured: one run with a 64 MiB table added 65.0 MiB of container shmem, which stayed after exit.
+- About 20,000 harness processes today did the damage, mostly the convert / float-edge recordings (2-3 MB tables)
+  and the TLB / memory sweeps (128-512 MiB tables).
+
+**Fix:**
+- At exit the harness now unmaps and `GEM_CLOSE`s every BO and destroys its syncobj (`AGX_CLEAN_EXIT`, default 1;
+  measured leak 0.0 MiB).
+- The memory already leaked is not returned without a reboot.
+
+**Rule:** any new direct-DRM program must munmap + GEM_CLOSE its BOs before exit. Check with
+`grep shmem /sys/fs/cgroup/memory.stat` before and after one run.
