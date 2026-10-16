@@ -111,6 +111,10 @@ ending opcodes that complete normally.
 | `device_barrier_1` (f59d, the acquire / invalidate) | 1.4 ns | **4.3-4.4 ns** |
 | device store, then f533 | 3.5 ns | **5.0-5.1 ns** |
 
+*Caveat (found later the same day):* the keeper used here (64 × 0.13 ms commands) evicts the L2 at every command
+boundary (`2026-10-16-l2-command-boundary`). The 0x18 and `wait` costs after the barriers are ALU-side and
+unaffected. The 67 ns `wait` after an atomic with return may include L2 refills.
+
 0x18 still costs a fixed ~4.4 ns (≈ 6 cycles at 1,398 MHz), whatever precedes it. It does not wait for returned
 atomics or for either invalidating barrier. What it synchronizes remains unknown. The remaining candidates need
 texture / sampler, stack, uniform-store or fragment-stage paths.

@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Clock keeper: hold the GPU at its top clock state while another process measures timing.
 
-Runs back-to-back SUBMITs of 64 commands of a 64-lane delay kernel (2 SIMD groups, at most 2 of 38 cores; ~8 ms per
-SUBMIT at the top clock) until the stop file exists or --seconds pass. The kernel passes the simulator's agx_run
+Runs back-to-back long commands (~6.3 ms each at the top clock) of a 64-lane delay kernel (2 SIMD groups, at most 2 of
+38 cores) until the stop file exists or --seconds pass. Long commands matter: every compute command boundary, in any
+queue or process, evicts the GPU-wide L2 (novel-results/2026-10-16-l2-command-boundary). The first version (64 x
+0.13 ms commands per SUBMIT, one boundary every ~0.13 ms) roughly tripled L2-resident load latency in the measured
+process; with 6.3 ms commands the effect is within ~3%. The kernel passes the simulator's agx_run
 oracle (sim_gate) before any GPU use. Without it, sub-ms dispatches separated by host waits run in a mix of clock
 states (references jump by > 30 ns per loop trip; results/2026-10-16-fixed18-waits); with it they are stable to
 < 1 ns per trip. Usage: clock_keeper.py --seconds 120 &  ... measure ...  ; touch <stop file>
@@ -30,7 +33,7 @@ def main():
         sys.exit('refusing: 1..3600 s')
     DIR.mkdir(parents=True, exist_ok=True)
     a.stop_file.unlink(missing_ok=True)
-    k = drm.build_main(scan.delay_loop(4000)+bytes.fromhex('620978563412'))
+    k = drm.build_main(scan.delay_loop(20000)*10+bytes.fromhex('620978563412'))
     sim_gate.require(k, 64, 0x12345678)
     (DIR/'k.bin').write_bytes(k+bytes(16))
     exe = DIR/'drm_compute'
@@ -42,8 +45,7 @@ def main():
     while time.monotonic() < end and not a.stop_file.exists():
         gpu_safety.require_budget(1)
         try:
-            res = subprocess.run([str(exe), a.device, str(DIR/'k.bin'), '64', str(DIR/'rb'), '32', '16'], capture_output=True, timeout=30,
-                                 env=dict(os.environ, AGX_CMDS='64', AGX_CMD_BARRIER='none'))
+            res = subprocess.run([str(exe), a.device, str(DIR/'k.bin'), '64', str(DIR/'rb'), '64', '16'], capture_output=True, timeout=60)
             ok = res.returncode == 0 and b'"completed":true' in res.stdout
         except subprocess.TimeoutExpired:
             gpu_safety.record('clock_keeper: harness timeout'); ok = False

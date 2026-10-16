@@ -8,22 +8,26 @@ its top state (`scripts/clock_keeper.py`). Simulator task safe-03 step 1.
 **Test ("is the neighbour free?"):**
 - Elements 1 KiB apart are visited in a random single cycle. Each hop makes two dependent loads: the word at the
   element start, then the word at offset d, which holds the next element's index.
-- When d is inside the line the first load fetched, the second load hits; otherwise it pays a full access.
-- 3 element counts × 14 offsets, 200,000 hops per dispatch, 4 repeats. Every kernel and table first passed the
-  simulator's `agx_run` oracle, and every readback was exact.
+- When d is inside the line the first load fetched, the second load hits that level; otherwise it misses it.
+- 3 element counts × 14 offsets, 200,000 hops per dispatch, 4 repeats, with the long-command clock keeper (v2).
+  Every kernel and table first passed the simulator's `agx_run` oracle, and every readback was exact.
 
-| elements (level the second load reaches) | ns per hop, d = 4-60 B | d = 64-192 B | step |
+| elements (where the line lives) | d = 4-60 B | d = 64-192 B | step |
 |---|---|---|---|
-| 64 (L1-resident) | 123-127 | 135-143 | ~+16 ns |
-| 1,024 (L2) | 342-372 | 538-591 | ~+190 ns |
-| 65,536 (64 MiB span: SLC / DRAM) | 449-520 | 643-830 | ~+200-250 ns |
+| 64 (both lines stay in L1) | 110.6 | 110.9-111.0 | none: both hit L1 |
+| 1,024 (L2-resident: second load misses L1) | 170.4-171.6 | 232.4-232.8 | **+62 ns at 64 B** |
+| 65,536 (64 MiB span: second load misses L2) | 447-449 | 672-788 | **+224 ns at 64 B** |
 
-- The step is at **exactly 64 bytes** at all three levels: 60 B is free, 64 B is not.
+- **L1 lines and L2 lines are both 64 bytes:** 60 B is free and 64 B is not.
 - There is **no second step at 128 B**, so there is no 128-byte line with 64-byte sectors.
-- A small rise at 512 B with 64 elements is unexplained (possibly L1 set mapping).
+- A +5 ns rise at 512 B (1,024 elements) is unexplained.
 
 This contradicts the published "global cache line 128 B" (philipturner/metal-benchmarks, Apple 7 / 8, through
 Metal). See `docs/external-knowledge.md`.
+
+**Correction:** the first run of this test used the first clock keeper, which evicts L2 at every one of its command
+boundaries (`2026-10-16-l2-command-boundary`). It showed the same 64 B step, but with inflated L2-level costs. It is
+kept as `neighbour-old-keeper.json.gz`.
 
 ## A failed first approach
 
@@ -37,7 +41,7 @@ It is kept as `sequential-chase-*.json.gz`, but it is unexplained and not used f
 ## Reproducer and evidence
 
 - `make cache-line`: GPU, with the clock keeper.
-- `make verify-cache-line`: offline, 9 checks.
+- `make verify-cache-line`: offline, 11 checks.
 - Runner: `scripts/run_drm_neighbour.py`.
 - [Evidence](../../results/2026-10-16-cache-line/), with harness snapshots.
 

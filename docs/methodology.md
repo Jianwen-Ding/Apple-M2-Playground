@@ -30,8 +30,10 @@ the top state only after ~15 ms of continuous load (`novel-results/2026-10-16-co
 ~1 ms of idle. Sub-millisecond dispatches separated by host waits therefore land in mixed states, and "minimum over
 repeats" does not fix this.
 
-For cycle-level comparisons, run `scripts/clock_keeper.py` in the background. It submits a 64-lane delay stream that
-holds the top state, and it costs at most 2 of 38 cores. Bracket every candidate with references, and report the
+For cycle-level comparisons, run `scripts/clock_keeper.py` in the background. It submits back-to-back 6.3 ms commands
+of a 64-lane delay kernel that hold the top state, and it costs at most 2 of 38 cores. Keep its commands long: every
+compute command boundary in any process evicts the GPU-wide L2 (`novel-results/2026-10-16-l2-command-boundary`), and
+the first keeper (0.13 ms commands) tripled L2-resident latency. Bracket every candidate with references, and report the
 power source.
 
 ## Run records
