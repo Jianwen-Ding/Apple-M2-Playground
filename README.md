@@ -184,3 +184,14 @@ atomic add was validated on the way. Imageblock layouts in the USC Shared word
 identified **SR12/SR13** (imageblock width/height) and **SR15** (sample stride;
 its old "constant" 16 is the default field 0): **33 of 256** are now identified.
 Two custom helper-program attempts each stalled ~0.5 s and were stopped.
+
+**Cross-lane width and scan order (2026-10-16).** From recorded hardware words (no new encodings):
+16-bit `simd_*` / `quad_*` reductions and scans combine at 16 bits (fp16, denormals kept), and **64-bit sources are
+read as their low 32 bits: there is no 64-bit warp reduction**. SIMD prefix scans are a 32-lane **Sklansky**
+network. [Finding](novel-results/2026-10-16-cross-lane-width/README.md), `make verify-cross-lane-width`.
+
+**Clock states on battery and a silent llvmpipe fallback (2026-10-16).** On battery, sustained load drops the GPU to
+a clock ~2.1x slower, and short gaps keep it fast. Vulkan device 0 was briefly llvmpipe, with correct-looking results.
+[Finding](novel-results/2026-10-16-battery-clock-states/README.md), `make verify-battery-clock-states`. Simulator
+side: every SPIR-V workload re-timed with the two-timestamps-before pattern (AGX-Performance-Simulator
+`results/2026-10-16-asahi-retime`).

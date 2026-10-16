@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
+.PHONY: help verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -33,6 +33,8 @@ help:
 	@echo 'make grid-coverage      Check every sampled row of 2^16..2^30-thread grids executes (direct DRM)'
 	@echo 'make verify-alu-bitflip  Verify retained ALU bit-flip / fmadd lane-offset evidence offline'
 	@echo 'make verify-subop-spaces Verify funop/iunop/simd_op/shuffle sub-op sweeps offline'
+	@echo 'make verify-battery-clock-states Verify the on-battery clock-state / llvmpipe-fallback evidence offline'
+	@echo 'make verify-cross-lane-width Verify 16/64-bit cross-lane ops and the Sklansky SIMD scan offline'
 	@echo 'make verify-mem-control-bitflip Verify memory/control/SR gap-bit evidence offline'
 	@echo 'make drm-compute        Direct DRM (no Mesa) control + fadd4/iadd8 chain dispatches'
 	@echo 'make agx-loop-test      Loop emulator gate tests + 3 small hardware loops (direct DRM)'
@@ -199,6 +201,12 @@ verify-alu-bitflip:
 
 verify-subop-spaces:
 	$(PYTHON) -B scripts/verify_subop_spaces.py
+
+verify-cross-lane-width:
+	$(PYTHON) -B scripts/verify_cross_lane_width.py
+
+verify-battery-clock-states:
+	$(PYTHON) -B scripts/verify_battery_clock_states.py
 
 verify-mem-control-bitflip:
 	$(PYTHON) -B scripts/verify_mem_control_bitflip.py

@@ -1,0 +1,199 @@
+{
+ "device": "Apple M2 Max (G14C B1), Mesa 25.3.6 Honeykrisp, kernel 6.19.14-400.asahi.fc42",
+ "power": {
+  "ac_online": 0,
+  "battery_status": "Discharging",
+  "battery_capacity_pct": 57,
+  "source": "/sys/class/power_supply/macsmc-*"
+ },
+ "kernel": "AGX-Performance-Simulator spirv/shaders/sgemm.comp, large size: 1024x1024x1024 fp32 (2.147 GFLOP), one dispatch, 16x16 workgroups of 256",
+ "timing": "vk_run two-timestamps-before pattern; total_ns per submission, 24 MHz ticks; buffers re-initialised by the host before every submission",
+ "utc": "2026-10-16T16:05Z",
+ "sequence": [
+  {
+   "run": "cold0",
+   "warmup_ms": 0,
+   "idle_before_s": 3,
+   "us": [
+    1744,
+    1718,
+    1882,
+    1721,
+    1719,
+    1796,
+    1722,
+    1722,
+    1721,
+    1922
+   ]
+  },
+  {
+   "run": "cold1",
+   "warmup_ms": 0,
+   "idle_before_s": 3,
+   "us": [
+    3644,
+    3483,
+    1733,
+    1715,
+    1720,
+    1881,
+    1719,
+    1719,
+    1832,
+    1722
+   ]
+  },
+  {
+   "run": "cold2",
+   "warmup_ms": 0,
+   "idle_before_s": 3,
+   "us": [
+    3644,
+    2896,
+    3642,
+    2906,
+    3646,
+    2727,
+    3635,
+    2725,
+    3534,
+    2744
+   ]
+  },
+  {
+   "run": "cold3",
+   "warmup_ms": 0,
+   "idle_before_s": 3,
+   "us": [
+    1738,
+    1719,
+    1761,
+    1713,
+    1719,
+    1883,
+    1719,
+    1716,
+    1782,
+    1774
+   ]
+  },
+  {
+   "run": "warm1000",
+   "warmup_ms": 1000,
+   "idle_before_s": 3,
+   "us": [
+    3640,
+    3641,
+    3643,
+    3644,
+    3643,
+    3641,
+    3640,
+    3643,
+    3642,
+    3647
+   ]
+  },
+  {
+   "run": "cold-after0",
+   "warmup_ms": 0,
+   "idle_before_s": 3,
+   "us": [
+    3646,
+    3645,
+    3646,
+    3639,
+    3639,
+    3636,
+    3642,
+    3641,
+    3636,
+    3644
+   ]
+  },
+  {
+   "run": "cold-after1",
+   "warmup_ms": 0,
+   "idle_before_s": 3,
+   "us": [
+    3638,
+    3640,
+    1752,
+    1720,
+    1719,
+    1883,
+    1720,
+    1717,
+    1887,
+    1720
+   ]
+  }
+ ],
+ "earlier_same_session": [
+  {
+   "run": "warmup300",
+   "warmup_ms": 300,
+   "us": [
+    3646,
+    3639,
+    3640,
+    3642,
+    3641,
+    3645,
+    3638,
+    3644,
+    3638,
+    3644
+   ]
+  },
+  {
+   "run": "warmup0",
+   "warmup_ms": 0,
+   "us": [
+    1747,
+    1720,
+    1764,
+    1711,
+    1711,
+    1885,
+    1716,
+    1718,
+    1757,
+    1805
+   ]
+  },
+  {
+   "run": "run40",
+   "warmup_ms": 0,
+   "us_first_and_last": [
+    3648,
+    3648
+   ],
+   "us_min": 3635,
+   "us_max": 3672,
+   "reps": 40
+  }
+ ],
+ "model_top_clock_prediction_us": 2069.5,
+ "llvmpipe_fallback": {
+  "what": "vk_run with no VK_RUN_DEVICE picked physical device 0; for a few minutes that was llvmpipe (the GPU missing from the enumeration), around a display power-off logged by apple-dcp",
+  "observed": {
+   "host_ns_per_submit": [
+    62163448,
+    59065638,
+    66827642
+   ],
+   "total_ns": [
+    250,
+    167,
+    166
+   ],
+   "system_power_w_peak": 42.7
+  },
+  "output_sha256_fallback_run": "fe043dccf2333b76ad7e01e1e0fd35b8d940fe3c11ed953f6c6ed6f43c8ef398",
+  "output_sha256_forced_lavapipe": "fe043dccf2333b76ad7e01e1e0fd35b8d940fe3c11ed953f6c6ed6f43c8ef398",
+  "output_sha256_gpu": "97391f2faf17ee3374e87780a406ffe4b8ff15bbc11676afffcb80416fe376cd",
+  "fallback_rel_error_vs_fp64_reference": 5.75e-07
+ }
+}

@@ -382,3 +382,15 @@ VkResult error" as "no fault".
   validation dispatches to several ms, warm up first, take the minimum.
 * **Workgroups are not placed round-robin**: 38 workgroups on 38 cores leave 4 cores idle and 4 with two, which
   doubled a predicted time. Measure placement (SR20 + SR0) before modelling dispatch time.
+
+### Re-timing session, 2026-10-16
+
+* **Vulkan device 0 is not always the GPU.** For a few minutes (around a display power-off), vk_run's default device
+  was llvmpipe. Results were correct and looked plausible: 60 ms per submit, sub-µs "GPU" timestamps, 42 W CPU power.
+  Select the device by type or name and print it in every record.
+  [Finding](../novel-results/2026-10-16-battery-clock-states/README.md).
+* **Warming up on battery lowers the clock.** ≥ 0.3 s of back-to-back submissions put sgemm at 3.64 ms instead of
+  1.72 ms. Use the fast cluster of runs instead of a warm-up loop.
+* **Fitting fp16 scan order:** "fp32 intermediates, one fp16 rounding at the end" fits much worse (11 cases fail)
+  than per-step fp16 rounding. Flushing fp16 denormals fits worse too. Among tree orders, only Sklansky fits
+  every word.
