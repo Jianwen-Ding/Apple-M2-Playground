@@ -318,11 +318,29 @@ int main(int argc, char **argv)
         uint64_t h1 = now_ns();
         io(DRM_IOCTL_ASAHI_GET_TIME, &t1, "get-time");
         uint64_t ts[2]; memcpy(ts, tsb.map, 16);
-        printf("{\"rep\":%lu,\"wait\":%d,\"errno\":%d,\"host_ns\":%" PRIu64 ",\"fw_ts\":[%" PRIu64 ",%" PRIu64 "],\"drm_time\":[%" PRIu64 ",%" PRIu64 "]}\n",
+        printf("{\"rep\":%lu,\"wait\":%d,\"errno\":%d,\"host_ns\":%" PRIu64 ",\"fw_ts\":[%" PRIu64 ",%" PRIu64 "],\"drm_time\":[%" PRIu64 ",%" PRIu64 "]",
                rep, r, r ? errno : 0, h1 - h0, ts[0], ts[1], (uint64_t)t0.gpu_timestamp, (uint64_t)t1.gpu_timestamp);
+        /* AGX_TABLE_PEEK=i,j,...: table words i, j, ... after this submission (e.g. counters a kernel accumulates) */
+        const char *peek = getenv("AGX_TABLE_PEEK");
+        if (peek && *peek && r == 0 && table_size) {
+            printf(",\"peek\":[");
+            for (const char *q = peek; *q;) {
+                char *e; unsigned long wi = strtoul(q, &e, 0);
+                require(e != q && (wi + 1) * 4 <= table_size, "table-peek-index");
+                uint32_t v; memcpy(&v, data.map + table_off + wi * 4, 4);
+                printf("%s%u", q == peek ? "" : ",", v);
+                q = *e == ',' ? e + 1 : e;
+                if (*e && *e != ',') require(0, "table-peek-syntax");
+            }
+            printf("]");
+        }
+        printf("}\n");
         require(r == 0, "syncobj-wait");
         struct drm_syncobj_array reset = {.handles = (uint64_t)(uintptr_t)&sc.handle, .count_handles = 1};
         io(DRM_IOCTL_SYNCOBJ_RESET, &reset, "syncobj-reset");
+        /* AGX_REP_SLEEP_US: host pause between submissions (GPU idle time between them) */
+        uint64_t pause = env("AGX_REP_SLEEP_US", 0);
+        if (pause) { require(pause <= 1000000, "rep-sleep"); struct timespec q = {.tv_sec = (time_t)(pause / 1000000), .tv_nsec = (long)(pause % 1000000) * 1000}; nanosleep(&q, NULL); }
     }
     if (cw && *cw) {
         atomic_store(&clock_run, 0); pthread_join(clock_tid, NULL);

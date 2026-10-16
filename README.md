@@ -198,6 +198,6 @@ side: every SPIR-V workload re-timed with the two-timestamps-before pattern (AGX
 
 **Special registers completed for compute (2026-10-16).** SR21 is the hardware **VM slot** (1..63, distinct
 between live VMs, least-recently-used cycling). Under divergence only SR56-59 change (active rank / count in the quad and SIMD group).
-SR16 = lane & 3, and SR60 / SR63 are constants. Every other selector reads 0, except the still-unexplained
-per-dispatch bit SR113. The finding includes a map of all 256 selectors with PTX equivalents:
+SR16 = lane & 3, and SR60 / SR63 are constants. Every other selector reads 0. SR113 is a global firmware power-state bit: set on a 56 ms
+cycle (7 x the 8 ms power-sample period) while the GPU is busy, and cleared after about 2 ms of idle. The finding includes a map of all 256 selectors with PTX equivalents:
 [finding](novel-results/2026-10-16-special-registers/README.md), `make verify-special-registers`.

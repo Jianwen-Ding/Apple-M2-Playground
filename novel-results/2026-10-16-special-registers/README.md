@@ -14,14 +14,31 @@ they ran. 131 + 232 + 6 + 2 processes ran, with no fault, timeout or failed orac
      repeats. The allocator is least-recently-used: the same order recurs across runs, and slots in use elsewhere
      (the desktop's own VMs) are skipped.
    - So it is the 64-entry UAT context table with slot 0 reserved, not a per-process or per-device counter.
-2. **SR113 is a single bit (0 or 8) per dispatch, still unexplained, but now narrowed down.**
-   - It is uniform over a whole 65,536-lane dispatch on all 38 cores and every hardware slot.
-   - Alone, 0 of 112 submissions read 8, with short and long kernels and 1-20 submissions per process. 96
-     single-submission processes, some overlapping another process's dispatch, all read 0.
-   - With 12 processes submitting long kernels together, 33 of 240 read 8. Over everything, 86 of 2,648 did.
-   - It changes between submissions of one process (4 processes saw both values).
-   - It is not the submission index, lane, core, slot, VM slot or clock state: fast and slow (~757 / 1640 µs)
-     dispatches both read 0.
+2. **SR113 (0 / 8) is a global GPU power-management state bit, set by a ~56 ms firmware cycle while the GPU is busy
+   and cleared when the GPU idles for ~1-2 ms.** This is from 41,696 timed submissions, each reading SR113 before and
+   after its work (`run_sr113_reps.py --timeline`, per-submission counters via `AGX_TABLE_PEEK`).
+   - **One global state.** 17,332 pairs of submissions from different processes ran at the same moment; their values
+     never disagreed. The value changes *during* dispatches: 159 64-lane submissions read 0 at the start and 8 at the
+     end, on all lanes. In 11 large dispatches (65,536 lanes on 38 cores) it changed on only part of the lanes,
+     because lanes read it at different moments of one change.
+   - **Set on a 56.0 ms grid.** The 0 -> 8 entries phase-lock to a 56.0005 ms period over an 80 s span (concentration
+     0.81; shuffled controls at most 0.57). That is 7 x the 8 ms `apple,power-sample-period` the driver passes to the
+     GPU firmware (M2 Max device tree). Entries land with about ±8 ms jitter within the period, and only while work is
+     running. A process that is busy for 29 ms catches one about half the time (15 of 30 did).
+   - **Cleared by idle.** The bit survived every GPU idle gap under 1.0 ms (64 / 64) and none over 1.8 ms (0 / 52).
+     This sits just under the firmware's 2 ms idle-off delay (`idle_off_delay_ms`, driver default). With 2 ms pauses
+     between submissions it only ever lasts one submission.
+   - **No measurable effect on speed.** The same ALU loop takes 507.5 / 507.4 µs and the same DRAM-latency-bound
+     pointer chase 429.6 / 429.5 µs with SR113 = 0 / 8. It is also independent of the GPU clock state, lane, core,
+     slot and VM slot.
+   - So it is most likely a flag of the firmware's power controller (for example "active / boosted" versus
+     "idle-entry"), readable from shaders. Its exact meaning needs firmware documentation.
+   - The fraction of time at 8 varies a lot between sessions under similar load (16-82 %), as you would expect from
+     a controller state.
+   - **Open anomaly:** 3 submissions (in one run of 3,840) read **60002 (0xEA62)** at the end, on all 64 lanes. None of
+     19,200 later submissions reproduced it, with or without preloading the destination register. So it is still
+     unknown whether this is a real SR113 value or a missed `get_sr` write.
+
 3. **Under divergence only SR56-59 change.** All 256 selectors were read inside 1-3 nested `if`s with 32 / 16 / 8 /
    4 of 32 lanes active, and with one lane per quad.
    - SR56 / SR57 are the lane's rank among the active lanes of its quad and the quad's active count. SR58 / SR59 are
@@ -60,11 +77,11 @@ they ran. 131 + 232 + 6 + 2 processes ran, with no fault, timeout or failed orac
 | 63 | 1 (`is_active_thread`) | - |
 | 80-82 | global thread position x, y, z | `%ctaid * %ntid + %tid` |
 | 97 | 2048 | - |
-| 113 | 0 or 8 per dispatch (claim 2) | - |
+| 113 | 0 / 8: global power-management state bit (claim 2) | - |
 | 114 | 136 | - |
 | all others | 0 | - |
 
-Still without a meaning: SR25 = 2, SR97 = 2048, SR114 = 136, SR113. No selector is a clock (2026-10-04 scan), so
+Still without a meaning: SR25 = 2, SR97 = 2048, SR114 = 136. SR113 has a mechanism (claim 2) but no exact name. No selector is a clock (2026-10-04 scan), so
 `%clock` / `%globaltimer` remain unavailable in-shader.
 
 The simulator (AGX-Performance-Simulator `rust/src/cost.rs` `GroupCtx::sr`, `func.rs` get_sr) now models every
@@ -79,6 +96,7 @@ make verify-special-registers   # offline, the retained evidence
 make sr-vm-slot                 # GPU: 16 concurrent + 70 sequential VMs (~10 s)
 make sr-divergence              # GPU: 6 divergence patterns x 256 selectors (~2 s)
 make sr113-reps                 # GPU: SR113 per submission, alone (~1 s)
+make sr113-timeline             # GPU: SR113 before / after the work, sustained and with idle gaps (~1 min)
 ```
 
 Evidence: [results/2026-10-16-special-registers](../../results/2026-10-16-special-registers/).

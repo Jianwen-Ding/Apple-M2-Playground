@@ -397,10 +397,16 @@ VkResult error" as "no fault".
 
 ### SR113 hypotheses ruled out, 2026-10-16
 
-SR113 (0 / 8, one value per dispatch) is **not** the submission index in the process, a per-process constant, the
-lane, core or hardware slot, the VM slot (SR21), the clock state, or "another dispatch overlapped this one" (96
-single-submission processes in bursts, some overlapping, all read 0). It is also not monotonic in the number of
-concurrently submitting queues: 1-24 queues gave 0, 0, 6, 0, 0, 47 eights. It appears mostly when several processes
-submit long kernels continuously. The next step would need firmware-side visibility (the asahi kernel's queue and
-event-slot assignment).
+Ruled out before the per-submission timeline:
+- the submission index in the process, the lane, the core, the hardware slot or the VM slot (SR21);
+- the clock state;
+- "another dispatch overlapped this one";
+- the number of queues submitting at once;
+- "set when preempted" (flipped submissions took no longer);
+- memory or fabric state (a DRAM-latency-bound chase runs at the same speed in both states).
+
+Per-process summaries misled at first: the bit looked sticky per process and tied to concurrency. It is one global
+state set on a 56 ms firmware cycle and cleared by about 2 ms of idle. Processes that happened to run during a busy
+stretch saw 8 throughout. Reading SR113 before *and* after each submission, with per-submission counters
+(`AGX_TABLE_PEEK`) and firmware timestamps, was what resolved it.
 [Finding](../novel-results/2026-10-16-special-registers/README.md).
