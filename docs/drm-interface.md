@@ -145,8 +145,8 @@ Helper programs stalled the GPU twice (`notes/failed-approaches.md`). Do not use
 
 Other observations:
 - A `SUBMIT` ioctl takes 8-16 µs on the host.
-- A cross-queue dependency costs ~100-130 µs, which is about 10x the ~7-10 µs per-dispatch firmware overhead
-  measured within one queue (`novel-results/2026-10-11-dispatch-launch`).
+- A cross-queue dependency costs ~100-130 µs, which is about 20x the ~5.6-5.7 µs fixed cost per dispatch or empty command
+  (`novel-results/2026-10-11-dispatch-launch`, `2026-10-10-command-timing-direct-drm`).
 - The ~100 µs probably includes the fence signal → kernel scheduler → firmware round trip. Not established:
   whether a dependency within the same queue (`cdm_barrier`) avoids it.
 
