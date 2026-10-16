@@ -23,6 +23,17 @@ Do not infer instruction cycles from a host round trip or assume that a maximum
 core frequency is the current frequency. Characterize timer-read overhead
 before comparing short instruction sequences.
 
+### Clock state (2026-10-16)
+
+The GPU clock moves between discrete states, from about 446 MHz up to 1,398 MHz, set by the firmware. It reaches
+the top state only after ~15 ms of continuous load (`novel-results/2026-10-16-commands-per-submit`) and drops within
+~1 ms of idle. Sub-millisecond dispatches separated by host waits therefore land in mixed states, and "minimum over
+repeats" does not fix this.
+
+For cycle-level comparisons, run `scripts/clock_keeper.py` in the background. It submits a 64-lane delay stream that
+holds the top state, and it costs at most 2 of 38 cores. Bracket every candidate with references, and report the
+power source.
+
 ## Run records
 
 Each run should contain `environment.json`, command arguments and return codes,

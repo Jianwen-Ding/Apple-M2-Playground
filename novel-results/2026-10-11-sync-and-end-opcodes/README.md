@@ -95,3 +95,28 @@ ending opcodes that complete normally.
 * The PTX `exit` in divergent code: `stop` ends only active lanes, while the 18 ending
   opcodes end the whole SIMD group. Keep `stop`.
 * Only one device was tested; G13/G14D may differ.
+
+## Update 2026-10-16: 0x18 after an atomic with return and after the invalidating barriers
+
+**Test:** simulator task safe-08 step 3, `run_drm_sync_probe.py --suite wait18`.
+- Every job first ran to completion in the simulator's `agx_run`.
+- The GPU clock was held at its top state by a background stream of 64-lane delay commands (the "clock keeper",
+  `results/2026-10-16-fixed18-waits/keeper.sh.snapshot`). Each reference then stayed within 1 ns per trip across
+  its six placements. Without the keeper the reference minimum jumped between clock states by > 30 ns per trip.
+
+| After… | `wait 0` | **0x18** |
+| --- | --- | --- |
+| device atomic add **with return** | **67 ns** (waits for the returned value) | **4.4 ns** |
+| `unknown_barrier_1` (f533, the cross-core release) | 1.5 ns | **4.3-4.5 ns** |
+| `device_barrier_1` (f59d, the acquire / invalidate) | 1.4 ns | **4.3-4.4 ns** |
+| device store, then f533 | 3.5 ns | **5.0-5.1 ns** |
+
+0x18 still costs a fixed ~4.4 ns (≈ 6 cycles at 1,398 MHz), whatever precedes it. It does not wait for returned
+atomics or for either invalidating barrier. What it synchronizes remains unknown. The remaining candidates need
+texture / sampler, stack, uniform-store or fragment-stage paths.
+
+The 403 undecoded-opcode cases (all eight operand encodings, plus the ends opcodes inside a branch) are now part of
+the simulator's coverage suite (`coverage/expected/undecoded`). All are deterministic and match the simulator
+exactly.
+
+Reproduce: `make fixed18-waits` (GPU, with the keeper) and `make verify-fixed18-waits` (offline, 10 checks).

@@ -122,7 +122,10 @@ def memwait_body(mem, cand, trips, chain=64):
     memop = {'load': enc('device_load 0, i32, x, r5, u8_u9, r24, unsigned'),
              'store': agx_loop.store(6, 8, 24), 'none': b'',
              'atomic': agx_loop.atomic_add(8, 24, 6) if mem == 'atomic' else b'',
-             'tgload': tg_mem(True, 5, 24) if mem == 'tgload' else b'', 'tgstore': tg_mem(False, 6, 24) if mem == 'tgstore' else b''}[mem]
+             'tgload': tg_mem(True, 5, 24) if mem == 'tgload' else b'', 'tgstore': tg_mem(False, 6, 24) if mem == 'tgstore' else b'',
+             # safe-08 step 3: an atomic with return (Mesa form), the two invalidating barriers, a store then the release
+             'atomic_ret': __import__('run_drm_atomic').atomic(0, 5, 24, 6, True) if mem == 'atomic_ret' else b'',
+             'f533': H('f533'), 'f59d': H('f59d'), 'store_f533': agx_loop.store(6, 8, 24)+H('f533')}[mem]
     head = get_sr(80, 24)+mov(3, 0)+mov(4, trips)+mov(6, 0)+enc('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
     loop = memop+cand+b''.join(agx_loop.chains.encode_step('iadd8', 6, gpu) for _ in range(chain))+WAIT
     loop += enc('iadd r3, 1, r3.sx')+enc('while_icmp r0l, ult, r3, r4, 1')
@@ -228,6 +231,13 @@ def jobs_for(suite, a):
             for name, c in [('wait', WAIT), ('tg_barrier', REFS['tg_barrier']), ('mem_barrier', REFS['mem_barrier']),
                             ('18', CANDS['18']), ('78', CANDS['78'])]:
                 add(f'memwait-{mem}-{name}', memwait_body(mem, c, a.trips), 32, env, a.repeats, 512)
+    elif suite == 'wait18':
+        # simulator task safe-08 step 3: does 0x18 wait for anything the 2026-10-11 runs did not test?
+        for mem in ('atomic_ret', 'f533', 'f59d', 'store_f533'):
+            for name, c in [('wait', WAIT), ('18', CANDS['18'])]:
+                add(f'memwait-{mem}-ref', memwait_body(mem, b'', a.trips), 32, None, a.repeats, 512)
+                add(f'memwait-{mem}-{name}', memwait_body(mem, c, a.trips), 32, None, a.repeats, 512)
+            add(f'memwait-{mem}-ref', memwait_body(mem, b'', a.trips), 32, None, a.repeats, 512)
     elif suite == 'endcost':
         add('endcost-suffix', b'', 65536, None, a.repeats)
         for name, c in ENDERS.items():
@@ -243,7 +253,7 @@ def jobs_for(suite, a):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--suite', choices=['barrier', 'memwait', 'scope', 'tgcheck', 'tgwait', 'endcost', 'endpend', 'endfollow'], required=True)
+    p.add_argument('--suite', choices=['barrier', 'memwait', 'scope', 'tgcheck', 'tgwait', 'wait18', 'endcost', 'endpend', 'endfollow'], required=True)
     p.add_argument('--names', help='regex (fullmatch) to select jobs')
     p.add_argument('--k', type=int, default=20000, help='barrier: delay trips per SIMD-group index')
     p.add_argument('--trips', type=int, default=2000)
@@ -275,7 +285,20 @@ def main():
     state = {'utc': stamp, 'suite': a.suite, 'k': a.k, 'trips': a.trips, 'gprs': GPRS, 'results': [], 'complete': False}
     save = lambda: (out/'record.json').write_text(json.dumps(state)+'\n')
 
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('sim_coverage', Path(os.environ.get('AGX_SIM', REPO.parent/'AGX-Performance-Simulator'))/'scripts/coverage.py')
+    simcov = importlib.util.module_from_spec(spec); spec.loader.exec_module(simcov)
+
+    def sim_check(jb):
+        """Pre-GPU gate: the exact program must run to completion in the simulator's agx_run."""
+        code = drm.build_main(jb['body'])
+        if code[-2:] != STOP: raise RuntimeError(f"{jb['name']}: program does not end with stop")
+        lx = int(jb['env'].get('AGX_LOCAL_X', 32))
+        shared = 4096 if 'AGX_SHARED_WORD' in jb['env'] else 0
+        simcov.simulate(code, jb['count'], lx, GPRS, shared, [SENTINEL]*max(jb['table_words'], 1))
+
     def run(jb):
+        sim_check(jb)
         count = jb['count']; rounded = (count+31)//32*32
         (out/'code.bin').write_bytes(drm.build_main(jb['body'])+bytes(16))
         args = [str(exe), a.device, str(out/'code.bin'), str(count), str(out/'rb'), str(jb['repeats']), str(GPRS)]

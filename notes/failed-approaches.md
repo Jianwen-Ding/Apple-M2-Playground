@@ -428,3 +428,13 @@ not simulated in `agx_run` first, which the task rules require.
 
 **Prevention:** `record_suite.run()` now refuses any program that does not end with `stop`. Always build with
 `build_main()`, and always run a new kernel through `agx_run` before the GPU.
+
+### Bracketing references alone does not remove clock-state noise, 2026-10-16
+
+The `wait18` sync-probe suite, run without a background load, gave 0x18 "costs" of 5-131 ns per use. The reason:
+- each ~0.5-1 ms dispatch was followed by a host wait, so the GPU never reached its top clock;
+- the job and its references landed in different discrete states (e.g. 209 / 250 / 455 ns per trip).
+Neither 40 repeats nor taking the minimum fixed it.
+
+`scripts/clock_keeper.py`, run in the background, made every reference stable to < 1 ns per trip, and 0x18 came out at
+4.3-5.1 ns in both trials. Evidence: `results/2026-10-16-fixed18-waits/no-keeper-run*.json.gz`.
