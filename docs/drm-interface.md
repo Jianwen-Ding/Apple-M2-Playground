@@ -131,8 +131,8 @@ Helper programs stalled the GPU twice (`notes/failed-approaches.md`). Do not use
 ## 4. Cross-queue ordering with syncobjs (CUDA events / `cudaStreamWaitEvent`)
 
 **Test:** `scripts/run_drm_sync.py` with `tests/drm_compute.c` `AGX_SYNC_MODE`.
-- Two queues on one VM each run the same 64-lane kernel: a 4,000-trip delay loop, about 0.40 ms, ending in the exact
-  control store.
+- Two queues on one VM each run the same 64-lane kernel: a 4,000-trip delay loop, about 0.40 ms in the lowest clock
+  state (0.13 ms at the top clock; `2026-10-16-commands-per-submit`), ending in the exact control store.
 - Before the GPU run, the kernel passed the simulator's `agx_run` oracle and ends with `stop`.
 - 16 pairs per mode; every output word matched.
 - Evidence: `results/2026-10-16-drm-sync/`.
@@ -158,7 +158,11 @@ Cross-stream dependencies should be batched, because each one costs ~0.1 ms.
 
 ## 5. Still open (simulator task safe-12)
 
-- **Several dispatches per command / commands per SUBMIT:** ≤ 64 commands (safe-04 §4).
+- **Commands per SUBMIT** are done (`novel-results/2026-10-16-commands-per-submit`):
+  - 64 commands per SUBMIT work;
+  - commands always run in order;
+  - the gap between commands is 0.4-2.5 µs with no barrier and ~11-23 µs with a chained barrier.
+  Still open: several *dispatches* inside one command's CDM stream.
 - **Userptr import:** the UAPI has no userptr ioctl. CPU memory must come from a GEM BO mapped into the process, so
   CUDA "unified memory" maps to WRITEBACK BOs (see safe-03 §4 for visibility).
 

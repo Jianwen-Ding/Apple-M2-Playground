@@ -22,6 +22,7 @@
  *   AGX_HELPER_DATA, AGX_HELPER_CFG   drm_asahi_helper_program data/cfg ("table" = table VA)
  *   AGX_HELPER_CODE, AGX_HELPER_OFF   helper program file at USC offset AGX_HELPER_OFF (default 0x4000); binary = offset | 1
  *   AGX_SAMPLER_COUNT                 sampler_count with sampler_heap = zeroed data page at +0x6000
+ *   AGX_CMDS, AGX_CMD_BARRIER         N (1-64) compute commands per SUBMIT; barrier "chain" (default) or "none"
  *   AGX_SYNC_MODE                     0|1|2 two-queue ordering test: B no wait / waits binary syncobj / timeline point
  *   AGX_PRIORITY                      queue priority (0 low, 1 medium)
  *   AGX_USC_ORDER                     order of USC pipeline words (default "ushrn")
@@ -347,21 +348,31 @@ int main(int argc, char **argv)
     }
     for (unsigned long rep = 0; rep < reps; rep++) {
         for (uint32_t j = 0; j < words; j++) out[j] = j < words - 16 ? 0xcdcdcdcdu : 0xa5a50000u + j - (words - 16);
-        memset(tsb.map, 0, 32);
-        struct { struct drm_asahi_cmd_header h; struct drm_asahi_cmd_compute c; } cmd = {
-            .h = {.cmd_type = DRM_ASAHI_CMD_COMPUTE, .size = sizeof(struct drm_asahi_cmd_compute),
-                  .vdm_barrier = DRM_ASAHI_BARRIER_NONE, .cdm_barrier = 0},
-            .c = {.cdm_ctrl_stream_base = cdm_va, .cdm_ctrl_stream_end = cdm_end,
-                  .ts = {.start = {.handle = bo_ts.object_handle, .offset = 0},
-                         .end = {.handle = bo_ts.object_handle, .offset = 8}},
-                  .helper = {.binary = helper_binary, .cfg = (uint32_t)env("AGX_HELPER_CFG", 0),
-                             .data = (getenv("AGX_HELPER_DATA") && !strcmp(getenv("AGX_HELPER_DATA"), "table")) ? data.va + table_off : env("AGX_HELPER_DATA", 0)},
-                  .sampler_count = (uint32_t)env("AGX_SAMPLER_COUNT", 0),
-                  .sampler_heap = env("AGX_SAMPLER_COUNT", 0) ? data.va + 0x6000 : 0},
-        };
+        /* AGX_CMDS=N (1-64): N compute commands in this one SUBMIT, command k timestamped at 16k / 16k+8.
+           AGX_CMD_BARRIER: "chain" (default; command k waits on the k commands before it in this submit) or
+           "none" (commands after the first wait on nothing). */
+        static struct { struct drm_asahi_cmd_header h; struct drm_asahi_cmd_compute c; } cmd[64];
+        const unsigned ncmd = (unsigned)env("AGX_CMDS", 1);
+        require(ncmd >= 1 && ncmd <= 64 && ncmd <= p.max_commands_per_submission, "cmds");
+        const char *cb = getenv("AGX_CMD_BARRIER"); int chain = !(cb && !strcmp(cb, "none"));
+        require(!cb || !*cb || !strcmp(cb, "none") || !strcmp(cb, "chain"), "cmd-barrier");
+        memset(tsb.map, 0, 16 * ncmd);
+        for (unsigned k = 0; k < ncmd; k++) {
+            memset(&cmd[k], 0, sizeof cmd[k]);
+            cmd[k].h.cmd_type = DRM_ASAHI_CMD_COMPUTE; cmd[k].h.size = sizeof(struct drm_asahi_cmd_compute);
+            cmd[k].h.vdm_barrier = DRM_ASAHI_BARRIER_NONE;
+            cmd[k].h.cdm_barrier = k == 0 ? 0 : (chain ? (uint16_t)k : DRM_ASAHI_BARRIER_NONE);
+            cmd[k].c.cdm_ctrl_stream_base = cdm_va; cmd[k].c.cdm_ctrl_stream_end = cdm_end;
+            cmd[k].c.ts.start.handle = bo_ts.object_handle; cmd[k].c.ts.start.offset = 16 * k;
+            cmd[k].c.ts.end.handle = bo_ts.object_handle; cmd[k].c.ts.end.offset = 16 * k + 8;
+            cmd[k].c.helper.binary = helper_binary; cmd[k].c.helper.cfg = (uint32_t)env("AGX_HELPER_CFG", 0);
+            cmd[k].c.helper.data = (getenv("AGX_HELPER_DATA") && !strcmp(getenv("AGX_HELPER_DATA"), "table")) ? data.va + table_off : env("AGX_HELPER_DATA", 0);
+            cmd[k].c.sampler_count = (uint32_t)env("AGX_SAMPLER_COUNT", 0);
+            cmd[k].c.sampler_heap = env("AGX_SAMPLER_COUNT", 0) ? data.va + 0x6000 : 0;
+        }
         struct drm_asahi_sync out_sync = {.sync_type = DRM_ASAHI_SYNC_SYNCOBJ, .handle = sc.handle};
-        struct drm_asahi_submit sub = {.syncs = (uint64_t)(uintptr_t)&out_sync, .cmdbuf = (uint64_t)(uintptr_t)&cmd,
-                                       .queue_id = qc.queue_id, .out_sync_count = 1, .cmdbuf_size = sizeof cmd};
+        struct drm_asahi_submit sub = {.syncs = (uint64_t)(uintptr_t)&out_sync, .cmdbuf = (uint64_t)(uintptr_t)cmd,
+                                       .queue_id = qc.queue_id, .out_sync_count = 1, .cmdbuf_size = (uint32_t)(sizeof cmd[0] * ncmd)};
         struct drm_asahi_get_time t0 = {0}, t1 = {0};
         io(DRM_IOCTL_ASAHI_GET_TIME, &t0, "get-time");
         uint64_t h0 = now_ns();
@@ -374,6 +385,11 @@ int main(int argc, char **argv)
         uint64_t ts[2]; memcpy(ts, tsb.map, 16);
         printf("{\"rep\":%lu,\"wait\":%d,\"errno\":%d,\"host_ns\":%" PRIu64 ",\"fw_ts\":[%" PRIu64 ",%" PRIu64 "],\"drm_time\":[%" PRIu64 ",%" PRIu64 "]",
                rep, r, r ? errno : 0, h1 - h0, ts[0], ts[1], (uint64_t)t0.gpu_timestamp, (uint64_t)t1.gpu_timestamp);
+        if (ncmd > 1) {
+            printf(",\"cmd_ts\":[");
+            for (unsigned k = 0; k < ncmd; k++) { uint64_t tk[2]; memcpy(tk, tsb.map + 16 * k, 16); printf("%s[%" PRIu64 ",%" PRIu64 "]", k ? "," : "", tk[0], tk[1]); }
+            printf("]");
+        }
         /* AGX_TABLE_PEEK=i,j,...: table words i, j, ... after this submission (e.g. counters a kernel accumulates) */
         const char *peek = getenv("AGX_TABLE_PEEK");
         if (peek && *peek && r == 0 && table_size) {

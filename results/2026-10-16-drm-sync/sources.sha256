@@ -1,2 +1,2 @@
-909d1157b4e138bbcf60852ac1652b113f922852ee7cb70b391897cfd469a119  tests/drm_compute.c
+909d1157b4e138bbcf60852ac1652b113f922852ee7cb70b391897cfd469a119  results/2026-10-16-drm-sync/drm_compute.c.snapshot
 52acd1baccfea5639ea10b0195523ae0fbebb582966923989a5c7bb7f1f757db  scripts/run_drm_sync.py
