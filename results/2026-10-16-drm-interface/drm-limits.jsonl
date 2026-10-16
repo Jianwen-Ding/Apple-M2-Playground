@@ -1,0 +1,13 @@
+{"params":{"sizeof":592,"features":1,"gpu_generation":14,"gpu_variant":"C","gpu_revision":17,"chip_id":"6021","num_dies":1,"num_clusters_total":4,"num_cores_per_cluster":10,"max_frequency_khz":1398000,"vm_start":16384,"vm_end":549755781120,"vm_kernel_min_size":536870912,"max_commands_per_submission":64,"max_attachments":16,"command_timestamp_frequency_hz":1000000000,"core_masks":[1023,511,511,1023]}}
+{"get_params":{"group1_errno":22,"size8_errno":0,"size8_wrote_only_8":1,"size4096_errno":0}}
+{"get_time":{"errno":0,"ts":1116409242875,"flags1_errno":22}}
+{"vm_create_bad":{"kernel_one_page_errno":22,"kernel_outside_errno":22,"kernel_flipped_errno":22}}
+{"vm_count":{"created":256,"cap":256,"stop_errno":0}}
+{"gem_flags":{"none":0,"writeback":0,"vm_private":0,"bit2":22,"bit31":22,"vm_id_without_private":22,"size0":28,"size_unaligned_20k":0}}
+{"gem_size":{"largest_ok":68719476736,"cap":68719476736,"stop_errno":0}}
+{"vm_bind":{"rw":0,"read_only":0,"write_only":0,"no_perm":22,"va_unaligned_4k":22,"offset_unaligned_4k":22,"range_past_bo":22,"below_vm_start":22,"top_page_of_vm":22,"at_vm_end":22,"at_vm_start":0,"first_bind":0,"overlapping_rebind":0,"unbind_unmapped":0,"flag_bit4":22,"single_page_16MiB":0}}
+{"single_page_range":{"largest_ok":68719476736,"cap":68719476736,"stop_errno":0}}
+{"regular_bind":{"largest_ok":4294967296,"cap":4294967296,"stop_errno":0}}
+{"queue_create":{"priority_errno":[0,0,22,22,22],"flags1":22,"bad_vm":2,"destroy_unknown":2}}
+{"queue_count":{"created":64,"cap":64,"stop_errno":0}}
+{"done":true,"submits":0}

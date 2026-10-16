@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help verify-transcendentals sr113-timeline verify-special-registers sr-vm-slot sr-divergence sr113-reps verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
+.PHONY: help drm-limits verify-drm-interface verify-transcendentals sr113-timeline verify-special-registers sr-vm-slot sr-divergence sr113-reps verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -33,6 +33,8 @@ help:
 	@echo 'make grid-coverage      Check every sampled row of 2^16..2^30-thread grids executes (direct DRM)'
 	@echo 'make verify-alu-bitflip  Verify retained ALU bit-flip / fmadd lane-offset evidence offline'
 	@echo 'make verify-subop-spaces Verify funop/iunop/simd_op/shuffle sub-op sweeps offline'
+	@echo 'make drm-limits    Host-side Asahi DRM interface limits (ioctls only, no GPU work submitted)'
+	@echo 'make verify-drm-interface Verify the recorded DRM interface limits offline'
 	@echo 'make verify-battery-clock-states Verify the on-battery clock-state / llvmpipe-fallback evidence offline'
 	@echo 'make verify-transcendentals Verify the exp2 / sin_pt_2 algorithms and PTX accuracy evidence offline'
 	@echo 'make verify-special-registers Verify SR21 VM slot / SR113 / divergence evidence offline'
@@ -207,6 +209,14 @@ verify-alu-bitflip:
 
 verify-subop-spaces:
 	$(PYTHON) -B scripts/verify_subop_spaces.py
+
+drm-limits:
+	mkdir -p "$(SCRATCH_ROOT)/drm-limits"
+	$(CC) -std=c11 -O2 -Wall -Wextra -Werror tests/drm_limits.c -o "$(SCRATCH_ROOT)/drm-limits/drm_limits"
+	"$(SCRATCH_ROOT)/drm-limits/drm_limits" "$(DEVICE)" | tee "$(SCRATCH_ROOT)/drm-limits/out.jsonl"
+
+verify-drm-interface:
+	$(PYTHON) -B scripts/verify_drm_interface.py
 
 verify-cross-lane-width:
 	$(PYTHON) -B scripts/verify_cross_lane_width.py
