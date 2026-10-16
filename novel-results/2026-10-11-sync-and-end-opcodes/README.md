@@ -119,4 +119,10 @@ The 403 undecoded-opcode cases (all eight operand encodings, plus the ends opcod
 the simulator's coverage suite (`coverage/expected/undecoded`). All are deterministic and match the simulator
 exactly.
 
-Reproduce: `make fixed18-waits` (GPU, with the keeper) and `make verify-fixed18-waits` (offline, 10 checks).
+Reproduce: `make fixed18-waits` (GPU, with the keeper) and `make verify-fixed18-waits` (offline, 12 checks).
+
+**Ending opcodes at scale (2026-10-16, safe-08 step 4).** With the clock keeper running, 2^20 lanes (32,768
+one-SIMD-group workgroups) whose body is only the ending instruction:
+- `stop`: 84.4-86.7 µs;
+- each of the 16 ends opcodes, 0x98 and 0xf8: 85.7-87.0 µs (fastest of 16 repeats, two trials).
+They are still indistinguishable: there is no slow exit path, and SIMD-group slots are freed equally fast.

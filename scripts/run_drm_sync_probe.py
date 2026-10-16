@@ -239,9 +239,10 @@ def jobs_for(suite, a):
                 add(f'memwait-{mem}-{name}', memwait_body(mem, c, a.trips), 32, None, a.repeats, 512)
             add(f'memwait-{mem}-ref', memwait_body(mem, b'', a.trips), 32, None, a.repeats, 512)
     elif suite == 'endcost':
-        add('endcost-suffix', b'', 65536, None, a.repeats)
+        add('endcost-suffix', b'', a.end_count, None, a.repeats)
         for name, c in ENDERS.items():
-            add(f'endcost-{name}', c, 65536, None, a.repeats)
+            add(f'endcost-{name}', c, a.end_count, None, a.repeats)
+        add('endcost-suffix', b'', a.end_count, None, a.repeats)
     elif suite == 'endpend':
         for name, c in {'wait': WAIT, **ENDERS}.items():
             add(f'endpend-{name}', endpend_body(c), 32, None, 1, 17*32)
@@ -257,6 +258,7 @@ def main():
     p.add_argument('--names', help='regex (fullmatch) to select jobs')
     p.add_argument('--k', type=int, default=20000, help='barrier: delay trips per SIMD-group index')
     p.add_argument('--trips', type=int, default=2000)
+    p.add_argument('--end-count', type=int, default=65536, help='endcost: threads (one-SIMD-group workgroups)')
     p.add_argument('--repeats', type=int, default=8)
     p.add_argument('--times', type=int, default=1, help='run each selected job this many times (separate processes)')
     p.add_argument('--device', default='/dev/dri/renderD128')

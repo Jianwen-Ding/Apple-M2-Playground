@@ -52,6 +52,14 @@ def main():
         spread += [max(v)-min(v) for v in rr.values()]
     check('without the keeper the reference minimum jumps between clock states (> 30 ns per trip for some reference)',
           len(noisy) == 2 and max(spread) > 30)
+    ec = json.load(gzip.open(R/'endcost-1m-keeper.json.gz', 'rt'))
+    by = collections.defaultdict(list)
+    for r in ec['results']: by[r['name']].append(min(r['fw_ns']))
+    enders = {k: v for k, v in by.items() if k != 'endcost-suffix'}
+    check('endcost: 2^20 lanes (32,768 one-group workgroups), stop + 16 ends opcodes + 98 / f8, two trials, no fault',
+          ec['complete'] and len(enders) == 19 and all(len(v) == 2 for v in enders.values()) and not any(r['fault'] for r in ec['results']))
+    lo, hi = min(min(v) for v in enders.values()), max(max(v) for v in enders.values())
+    check('every ending opcode ends 32,768 workgroups in 84-88 us, within 4% of each other and of stop', 84e3 <= lo and hi <= 88e3 and hi/lo < 1.04)
     print(f'{len(fails)} failures')
     return 1 if fails else 0
 
