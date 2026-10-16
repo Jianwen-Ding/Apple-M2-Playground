@@ -1,0 +1,8 @@
+cntfrq 24000000 gpu_ns 4839884664375 cnt_ns_mid 4839884663896 diff 479 bracket_ns 1208
+cntfrq 24000000 gpu_ns 4839884674333 cnt_ns_mid 4839884674250 diff 83 bracket_ns 333
+cntfrq 24000000 gpu_ns 4839884675666 cnt_ns_mid 4839884675583 diff 83 bracket_ns 250
+cntfrq 24000000 gpu_ns 4839884676583 cnt_ns_mid 4839884676542 diff 41 bracket_ns 250
+cntfrq 24000000 gpu_ns 4839884677500 cnt_ns_mid 4839884677458 diff 42 bracket_ns 250
+cntfrq 24000000 gpu_ns 4839884678375 cnt_ns_mid 4839884678333 diff 42 bracket_ns 250
+cntfrq 24000000 gpu_ns 4839884679250 cnt_ns_mid 4839884679188 diff 62 bracket_ns 208
+cntfrq 24000000 gpu_ns 4839884680208 cnt_ns_mid 4839884680146 diff 62 bracket_ns 208

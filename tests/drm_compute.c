@@ -36,6 +36,7 @@
  *                                     submits run, word[i] = spin counter and word[i+1] = low 32 bits
  *                                     of CNTVCT_EL0 (the ARM generic timer). Calibration is printed.
  *   AGX_CPU_CLOCK_FLUSH               1 = clean each write to the point of coherency (dc cvac)
+ *   AGX_CPU_ECHO, AGX_CPU_ECHO_OUT     T,E,C words: CPU thread echoes token word T into E and writes CNTVCT to C (safe-03 step 4)
  *   AGX_CPU_CLOCK_LINES               write the pair to this many copies, 32 words (128 B) apart (default 1)
  *
  * usage: drm_compute node code.bin count readback repeats [gprs [table.bin]]
@@ -121,6 +122,30 @@ static void *clock_thread(void *arg)
         }
     }
     clock_t1 = cntvct(); clock_iters = n;
+    return NULL;
+}
+
+/* AGX_CPU_ECHO=T,E,C (table word indices; simulator task safe-03 step 4): a CPU thread polls word T (a token the
+   shader stores); on every new value it records (token, CNTVCT when first seen), then writes word E = token. It
+   keeps writing word C = low 32 bits of CNTVCT on every poll. Observations go to AGX_CPU_ECHO_OUT (binary pairs of
+   uint64). The thread never waits on the GPU: it only reacts to what it sees, until the submits are done. */
+static volatile uint32_t *echo_t, *echo_e, *echo_c;
+static atomic_int echo_run;
+static uint64_t echo_log[2 * 65536];
+static uint32_t echo_n;
+static void *echo_thread(void *arg)
+{
+    (void)arg;
+    uint32_t last = echo_t[0];
+    while (atomic_load_explicit(&echo_run, memory_order_relaxed)) {
+        uint32_t t = echo_t[0];
+        uint64_t now = cntvct();
+        if (t != last) {
+            if (echo_n < 65536) { echo_log[2 * echo_n] = t; echo_log[2 * echo_n + 1] = now; echo_n++; }
+            echo_e[0] = t; last = t;
+        }
+        echo_c[0] = (uint32_t)now;
+    }
     return NULL;
 }
 
@@ -294,6 +319,17 @@ int main(int argc, char **argv)
         require(pthread_create(&clock_tid, NULL, clock_thread, NULL) == 0, "cpu-clock-thread");
         while (clock_words[0] == 0) ;   /* running before the first submit */
     }
+    pthread_t echo_tid;
+    const char *ce = getenv("AGX_CPU_ECHO");
+    if (ce && *ce) {
+        unsigned long ti, ei, ci; require(sscanf(ce, "%lu,%lu,%lu", &ti, &ei, &ci) == 3, "cpu-echo-syntax");
+        require(table_size > 0 && ti * 4 < table_size && ei * 4 < table_size && ci * 4 < table_size, "cpu-echo-words");
+        uint32_t *tw = (uint32_t *)(data.map + table_off);
+        echo_t = tw + ti; echo_e = tw + ei; echo_c = tw + ci;
+        atomic_store(&echo_run, 1);
+        require(pthread_create(&echo_tid, NULL, echo_thread, NULL) == 0, "cpu-echo-thread");
+        while (echo_c[0] == 0) ;          /* running before the first submit */
+    }
     /* AGX_QUEUES=N (2-32): N queues on this VM each submit the same command once per repeat, no dependencies; all are
        waited for, and the firmware start / end of each is printed (simulator task safe-04 step 2). */
     const unsigned nq = (unsigned)env("AGX_QUEUES", 0);
@@ -453,6 +489,12 @@ int main(int argc, char **argv)
         /* AGX_REP_SLEEP_US: host pause between submissions (GPU idle time between them) */
         uint64_t pause = env("AGX_REP_SLEEP_US", 0);
         if (pause) { require(pause <= 1000000, "rep-sleep"); struct timespec q = {.tv_sec = (time_t)(pause / 1000000), .tv_nsec = (long)(pause % 1000000) * 1000}; nanosleep(&q, NULL); }
+    }
+    if (ce && *ce) {
+        atomic_store(&echo_run, 0); pthread_join(echo_tid, NULL);
+        const char *eo = getenv("AGX_CPU_ECHO_OUT");
+        if (eo && *eo) { FILE *ef = fopen(eo, "wb"); require(ef != NULL && fwrite(echo_log, 16, echo_n, ef) == echo_n && fclose(ef) == 0, "cpu-echo-out"); }
+        printf("{\"cpu_echo\":{\"observations\":%u}}\n", echo_n);
     }
     if (cw && *cw) {
         atomic_store(&clock_run, 0); pthread_join(clock_tid, NULL);
