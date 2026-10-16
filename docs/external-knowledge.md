@@ -42,8 +42,8 @@ measured on other chips (M1, M2 Pro) or through Metal.
 | Threadgroup memory | ~60 KB per core (metal-benchmarks); 32 KB per allocation (Metal / OpenCL limit) | 64 KiB per core, 256-byte allocation granule (occupancy finding) | **differs**: published figures are API limits; ours is the hardware |
 | L1 data cache | 8 KB (both sources) | not measured directly | safe-03 |
 | Global cache line | 128 B (metal-benchmarks) | **64 B at L1, L2 and SLC / DRAM fill** (`novel-results/2026-10-16-cache-line`) | **differs** |
-| L2 | ~1 MB for M2 Max (metal-benchmarks); 3 MB on M2 Pro (Chips and Cheese, probably GPU-visible L2 + something else) | gradual spill after ~128 KiB, plateau to MiB range (`experiments/memory/load-latency.md`) | sources disagree; safe-03 |
-| SLC | 48 MB on M2 Max | not measured | **safe-03 §3** |
+| L2 | ~1 MB for M2 Max (metal-benchmarks); 3 MB on M2 Pro (Chips and Cheese, probably GPU-visible L2 + something else) | L2 93-123 ns to 256 KiB, spilled by 1-2 MiB (`novel-results/2026-10-16-memory-parameters`) | **agrees with ~1 MB** |
+| SLC | 48 MB on M2 Max | latency rises only ~12% from 16 to 96 MiB, so capacity is not readable from latency (`2026-10-16-memory-parameters`) | open: needs a bandwidth probe |
 | Latencies | SLC 234 ns, DRAM 342 ns (128 MB), > 400 ns beyond (TLB?) (M2 Pro) | DRAM ~378 ns at 128 MiB; TLB adds ≤ 32 ns over 256 MiB | close; TLB reach still open |
 | Global atomics | 58.6 ns latency (M2 Pro); only 32-bit atomics; **M2 adds a non-returning u64 min/max** | atomics with and without return measured; device atomic ops 11-15 are on the do-not-run list | the u64 min/max is probably among ops 11-15: **find its encoding in Mesa before ever running it** |
 | Clock | 1.398 GHz M2 Max | GET_PARAMS max_frequency 1,398 MHz; battery clock states | agrees |
