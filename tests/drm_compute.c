@@ -23,6 +23,7 @@
  *   AGX_HELPER_CODE, AGX_HELPER_OFF   helper program file at USC offset AGX_HELPER_OFF (default 0x4000); binary = offset | 1
  *   AGX_SAMPLER_COUNT                 sampler_count with sampler_heap = zeroed data page at +0x6000
  *   AGX_CMDS, AGX_CMD_BARRIER         N (1-64) compute commands per SUBMIT; barrier "chain" (default) or "none"
+ *   AGX_QUEUES                        N (2-32) queues each submit the command once per repeat (concurrency test)
  *   AGX_SYNC_MODE                     0|1|2 two-queue ordering test: B no wait / waits binary syncobj / timeline point
  *   AGX_PRIORITY                      queue priority (0 low, 1 medium)
  *   AGX_USC_ORDER                     order of USC pipeline words (default "ushrn")
@@ -292,6 +293,47 @@ int main(int argc, char **argv)
         atomic_store(&clock_run, 1);
         require(pthread_create(&clock_tid, NULL, clock_thread, NULL) == 0, "cpu-clock-thread");
         while (clock_words[0] == 0) ;   /* running before the first submit */
+    }
+    /* AGX_QUEUES=N (2-32): N queues on this VM each submit the same command once per repeat, no dependencies; all are
+       waited for, and the firmware start / end of each is printed (simulator task safe-04 step 2). */
+    const unsigned nq = (unsigned)env("AGX_QUEUES", 0);
+    if (nq) {
+        require(nq >= 2 && nq <= 32 && 16 * nq <= page, "queues");
+        uint32_t qid[32], sh[32];
+        for (unsigned k = 0; k < nq; k++) {
+            struct drm_asahi_queue_create qk = {.vm_id = vc.vm_id, .priority = qc.priority, .usc_exec_base = shader_base};
+            io(DRM_IOCTL_ASAHI_QUEUE_CREATE, &qk, "queue-create-n"); qid[k] = qk.queue_id;
+            struct drm_syncobj_create sk = {0}; io(DRM_IOCTL_SYNCOBJ_CREATE, &sk, "syncobj-create-n"); sh[k] = sk.handle;
+        }
+        for (unsigned long rep = 0; rep < reps; rep++) {
+            for (uint32_t j = 0; j < words; j++) out[j] = j < words - 16 ? 0xcdcdcdcdu : 0xa5a50000u + j - (words - 16);
+            memset(tsb.map, 0, 16 * nq);
+            static struct { struct drm_asahi_cmd_header h; struct drm_asahi_cmd_compute c; } qcmd[32];
+            uint64_t hs[33]; hs[0] = now_ns();
+            for (unsigned k = 0; k < nq; k++) {
+                memset(&qcmd[k], 0, sizeof qcmd[k]);
+                qcmd[k].h.cmd_type = DRM_ASAHI_CMD_COMPUTE; qcmd[k].h.size = sizeof(struct drm_asahi_cmd_compute);
+                qcmd[k].h.vdm_barrier = DRM_ASAHI_BARRIER_NONE; qcmd[k].h.cdm_barrier = 0;
+                qcmd[k].c.cdm_ctrl_stream_base = cdm_va; qcmd[k].c.cdm_ctrl_stream_end = cdm_end;
+                qcmd[k].c.ts.start.handle = bo_ts.object_handle; qcmd[k].c.ts.start.offset = 16 * k;
+                qcmd[k].c.ts.end.handle = bo_ts.object_handle; qcmd[k].c.ts.end.offset = 16 * k + 8;
+                struct drm_asahi_sync os = {.sync_type = DRM_ASAHI_SYNC_SYNCOBJ, .handle = sh[k]};
+                struct drm_asahi_submit sk = {.syncs = (uint64_t)(uintptr_t)&os, .cmdbuf = (uint64_t)(uintptr_t)&qcmd[k],
+                                              .queue_id = qid[k], .out_sync_count = 1, .cmdbuf_size = sizeof qcmd[k]};
+                io(DRM_IOCTL_ASAHI_SUBMIT, &sk, "submit-n"); hs[k + 1] = now_ns();
+            }
+            struct drm_syncobj_wait sw = {.handles = (uint64_t)(uintptr_t)sh, .count_handles = nq, .flags = DRM_SYNCOBJ_WAIT_FLAGS_WAIT_ALL,
+                                          .timeout_nsec = (int64_t)(hs[0] + 3000000000ull)};
+            int r = ioctl(fd, DRM_IOCTL_SYNCOBJ_WAIT, &sw); int werr = r ? errno : 0;
+            printf("{\"multi\":%lu,\"queues\":%u,\"wait\":%d,\"errno\":%d,\"submit_ns\":%" PRIu64 ",\"ts\":[", rep, nq, r, werr, hs[nq] - hs[0]);
+            for (unsigned k = 0; k < nq; k++) { uint64_t tk[2]; memcpy(tk, tsb.map + 16 * k, 16); printf("%s[%" PRIu64 ",%" PRIu64 "]", k ? "," : "", tk[0], tk[1]); }
+            printf("]}\n");
+            require(r == 0, "syncobj-wait-n");
+            struct drm_syncobj_array reset = {.handles = (uint64_t)(uintptr_t)sh, .count_handles = nq};
+            io(DRM_IOCTL_SYNCOBJ_RESET, &reset, "syncobj-reset-n");
+        }
+        for (unsigned k = 0; k < nq; k++) { struct drm_asahi_queue_destroy qd = {.queue_id = qid[k]}; io(DRM_IOCTL_ASAHI_QUEUE_DESTROY, &qd, "queue-destroy-n"); }
+        reps = 0;
     }
     /* AGX_SYNC_MODE=0|1|2: two-queue ordering test (simulator task safe-12 step 4). Each repeat submits the same
        command on queue A, then on a second queue B: 0 = B has no wait, 1 = B waits on A's binary syncobj,
