@@ -41,7 +41,7 @@ measured on other chips (M1, M2 Pro) or through Metal.
 | Uniform registers | 256 × 32-bit (u0-u255) (applegpu) | not swept | **safe-09 should sweep u0-u255 only** |
 | Threadgroup memory | ~60 KB per core (metal-benchmarks); 32 KB per allocation (Metal / OpenCL limit) | 64 KiB per core, 256-byte allocation granule (occupancy finding) | **differs**: published figures are API limits; ours is the hardware |
 | L1 data cache | 8 KB (both sources) | not measured directly | safe-03 |
-| Global cache line | 128 B (metal-benchmarks) | not measured | **safe-03 §1 should confirm 128 B** |
+| Global cache line | 128 B (metal-benchmarks) | **64 B at L1, L2 and SLC / DRAM fill** (`novel-results/2026-10-16-cache-line`) | **differs** |
 | L2 | ~1 MB for M2 Max (metal-benchmarks); 3 MB on M2 Pro (Chips and Cheese, probably GPU-visible L2 + something else) | gradual spill after ~128 KiB, plateau to MiB range (`experiments/memory/load-latency.md`) | sources disagree; safe-03 |
 | SLC | 48 MB on M2 Max | not measured | **safe-03 §3** |
 | Latencies | SLC 234 ns, DRAM 342 ns (128 MB), > 400 ns beyond (TLB?) (M2 Pro) | DRAM ~378 ns at 128 MiB; TLB adds ≤ 32 ns over 256 MiB | close; TLB reach still open |

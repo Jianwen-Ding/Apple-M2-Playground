@@ -133,6 +133,10 @@ def main():
             if a.kind == 'stream': rec.update({'bytes_loaded': words*4, 'loads_per_lane': n*a.steps, 'stride_words': S})
             if a.kind == 'chase': rec.update({'footprint': n, 'stride': a.stride, 'hops': a.trips*a.steps, 'chains': a.chains, 'loads': a.trips*a.steps*a.chains, 'seed': a.seed})
             state['variants'].append(rec)
+            # pre-GPU gate: the exact program and table run in the simulator's agx_run and must produce the oracle
+            import sim_gate
+            rec['simulator'] = sim_gate.require(code, a.count, want, regs=a.gprs,
+                                                table=tpath if a.kind in ('chase', 'stream') else None)
             argv = [str(exe), a.device, str(path), str(a.count), str(rb), str(a.repeats), str(a.gprs)]
             if a.kind in ('chase', 'stream'): argv.append(str(tpath))
             try:

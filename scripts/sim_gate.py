@@ -14,8 +14,9 @@ def layout(count):
     return rounded, 8+rounded+8+16
 
 
-def simulate(code, count, wg=32, regs=16, max_steps=400_000_000):
-    """Return (output words, agx_run stats) for one dispatch of `count` lanes (grid rounded to 32)."""
+def simulate(code, count, wg=32, regs=16, max_steps=400_000_000, table=None):
+    """Return (output words, agx_run stats) for one dispatch of `count` lanes (grid rounded to 32). `table`: a table
+    file (the harness's argv[7]) mapped at u8_u9, as tests/drm_compute.c passes it."""
     rounded, words = layout(count)
     with tempfile.TemporaryDirectory() as t:
         t = Path(t)
@@ -25,6 +26,7 @@ def simulate(code, count, wg=32, regs=16, max_steps=400_000_000):
         r = subprocess.run([str(SIM/'rust/target/release/agx_run'), str(t/'k.bin'), '--grid', str(rounded), '--wg', str(wg),
                             '--regs', str(regs), '--uniform', '4=0', '--uniform', f'5={count}', '--uniform', '6=0x100000',
                             '--uniform', '7=0x11', '--map', f'0x1100100000={t/"o.bin"}',
+                            *(['--uniform', '8=0', '--uniform', '9=0x12', '--map', f'0x1200000000={table}'] if table else []),
                             '--dump', f'0x1100100000={4*words}:{t/"r.bin"}', '--max-steps', str(max_steps)],
                            capture_output=True, text=True, timeout=1800)
         if r.returncode:
@@ -42,6 +44,7 @@ def oracle_ok(out, count, want):
 def require(code, count, want, **kw):
     if code[-2:] != b'\x88\x00':
         raise RuntimeError('refusing: program does not end with stop')
+    kw = {k: (str(v) if k == 'table' and v is not None else v) for k, v in kw.items()}
     out, stats = simulate(code, count, **kw)
     if not oracle_ok(out, count, want):
         raise RuntimeError('refusing: simulator output does not match the oracle')

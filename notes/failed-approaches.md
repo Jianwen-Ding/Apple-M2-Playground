@@ -438,3 +438,14 @@ Neither 40 repeats nor taking the minimum fixed it.
 
 `scripts/clock_keeper.py`, run in the background, made every reference stable to < 1 ns per trip, and 0x18 came out at
 4.3-5.1 ns in both trials. Evidence: `results/2026-10-16-fixed18-waits/no-keeper-run*.json.gz`.
+
+### A sequential pointer chase does not measure the line size cleanly, 2026-10-16
+
+`scripts/run_drm_linesize.py`, a sequential chase over a footprint at strides 4-512 B, gave per-hop costs that
+roughly double up to 64 B (consistent with a 64-byte line). But:
+- a 64 KiB table cost SLC latency (~292 ns) even with 8 passes per dispatch;
+- an 8 KiB table cost 120 ns at stride 64 B, against 36 ns for a random chase (`experiments/memory/load-latency.md`);
+- repeats jumped between ~174 and ~300 ns.
+The cause is not known (possibly an interaction of sequential addresses with the cache's set mapping or a
+prefetcher). The random "neighbour" test (`novel-results/2026-10-16-cache-line`) is clean. Evidence:
+`results/2026-10-16-cache-line/sequential-chase-*.json.gz`.
