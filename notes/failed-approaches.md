@@ -410,3 +410,21 @@ state set on a 56 ms firmware cycle and cleared by about 2 ms of idle. Processes
 stretch saw 8 throughout. Reading SR113 before *and* after each submission, with per-submission counters
 (`AGX_TABLE_PEEK`) and firmware timestamps, was what resolved it.
 [Finding](../novel-results/2026-10-16-special-registers/README.md).
+
+### GPU stopped executing work after a bare-body submission, 2026-10-16 18:09 UTC
+
+**Cause: a harness error on my side, not a hardware finding.** A new recorder (`record_float_edges.py`) passed
+`record_suite.alu_body(...)` straight to `record_suite.run()` instead of `run_drm_compute.build_main(body)`. A bare
+body has no harness prologue and **no final `stop` (0x8800)**, so the GPU ran past the end of the code. The decode
+gate passed because it only checks that each instruction decodes, not that the program ends. The kernel was also
+not simulated in `agx_run` first, which the task rules require.
+
+**What happened:**
+- That dispatch and a concurrent, correctly wrapped `convert` dispatch both stayed queued and never started
+  (`fw_ts [0, 0]`, `ETIME` after 3 s).
+- The kernel log shows only "Job canceled on DRM scheduler teardown", with no firmware timeout message.
+- A health-check control dispatch 50 s later also never started.
+- The hang budget recorded 1 event.
+
+**Prevention:** `record_suite.run()` now refuses any program that does not end with `stop`. Always build with
+`build_main()`, and always run a new kernel through `agx_run` before the GPU.
