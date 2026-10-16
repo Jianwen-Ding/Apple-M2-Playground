@@ -69,3 +69,17 @@ found no justified shader timer selector. Its source offset/disjoint concerns
 require separate command-timing validation; no shader counter or ISA latency is claimed. The move field observation supports an existing encoding on G14C,
 not a new opcode or architecture discovery. Selected backend/counter evidence is
 versioned rather than depending only on scratch.
+
+## Open safe probes (2026-10-16)
+
+The next hang-free probes are written up as self-contained tasks in AGX-Performance-Simulator
+[`tasks/safe-probes.md`](https://github.com/Jianwen-Ding/AGX-Performance-Simulator/blob/main/tasks/safe-probes.md):
+
+- safe-01: exact `convert`, fp16 transcendental and subnormal semantics against PTX;
+- safe-02: the largest cost-model gaps (atomic contention, strided access, barriers, write-back, the sin / cos cost);
+- safe-03: memory-system parameters (line and page size, TLB reach, SLC capacity, CPU <-> GPU visibility latency);
+- safe-04: driver and submission behaviour (priorities, concurrent queues, launch latency, multi-dispatch commands);
+- safe-05: texture and image instructions through Mesa-compiled shaders;
+- safe-06: recording the 214 coverage "may fault" special-register cases (each selector already read without fault).
+
+Its "Not safe" list is the current do-not-run list.
