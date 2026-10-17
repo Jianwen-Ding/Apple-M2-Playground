@@ -44,7 +44,38 @@ REGS = 64
 LANDING_B_OFF = 1536
 
 
-def build_bodies():
+MASKS = {
+    # name: (description, active lanes predicate description, setup fragment builder key)
+    'odd': 'odd lanes (gid & 1 == 1)',
+    'single0': 'lane 0 only (gid == 0)',
+    'contig16': 'lanes 0-15 (gid < 16)',
+    'lanes31': 'lanes 0-30 (gid < 31)',
+}
+
+
+def mask_setup(mask, e, mov):
+    """Per-mask condition code; r29 holds the gid. Returns (bytes, active set)."""
+    if mask == 'odd':
+        b = mov(27, 1)
+        b += e('and r24, r29, r27')
+        b += e('if_icmp r0l, ueq, r24, r27, 1')
+        return b, set(range(1, N, 2))
+    if mask == 'single0':
+        b = mov(27, 0)
+        b += e('if_icmp r0l, seq, r29, r27, 1')
+        return b, {0}
+    if mask == 'contig16':
+        b = mov(27, 16)
+        b += e('if_icmp r0l, ult, r29, r27, 1')
+        return b, set(range(16))
+    if mask == 'lanes31':
+        b = mov(27, 31)
+        b += e('if_icmp r0l, ult, r29, r27, 1')
+        return b, set(range(31))
+    raise ValueError(mask)
+
+
+def build_bodies(mask='odd'):
     e, mov, st = RS.e, RS.mov, RS.agx_loop.store
     stop, wait = e('stop'), e('wait 0')
 
@@ -58,10 +89,8 @@ def build_bodies():
     setup += wait
     setup += mov(30, 0x2000 + LANDING_B_OFF)  # uniform ret target
     setup += mov(1, 0xDEADBEEF)        # clobber r1 (not needed afterwards)
-    # odd lanes active
-    setup += mov(27, 1)
-    setup += e('and r24, r29, r27')
-    setup += e('if_icmp r0l, ueq, r24, r27, 1')
+    cond, active = mask_setup(mask, e, mov)
+    setup += cond
 
     site = drm.control_main()[1]
     # jnone over the ret island when no lane is active (safety gate)
@@ -122,9 +151,10 @@ def build_bodies():
     return code, surrogate_jump, surrogate_wait, ctrl_code, ret_pc
 
 
-def build_probe():
+def build_probe(mask='odd'):
     cov.install()
-    code, surrogate_jump, surrogate_wait, control, ret_pc = build_bodies()
+    code, surrogate_jump, surrogate_wait, control, ret_pc = build_bodies(mask)
+    _, active = mask_setup(mask, RS.e, RS.mov)
     table = [0] * 128
     expected_out = [0xcdcdcdcd] * 48 + [0xa5a50000 + i for i in range(16)]
     # Jump surrogate: whole group lands at B -> all MARKER_B.
@@ -133,6 +163,10 @@ def build_probe():
     expected_wait = ([MARKER_PRE] * N + [MARKER_FALL] * N + [0] * (128 - 2 * N))
     # All-active control: all lanes MARKER_B.
     expected_ctrl = [MARKER_PRE] * N + [MARKER_B] * N + [0] * (128 - 2 * N)
+    # Variant: active lanes B, inactive lanes 0 (no fallthrough, per finding).
+    expected_var = ([MARKER_PRE] * N
+                    + [MARKER_B if i in active else 0 for i in range(N)]
+                    + [0] * (128 - 2 * N))
 
     os.environ['AGX_EXPERIMENTAL_RET'] = 'buffer-pop2'
     try:
@@ -166,6 +200,7 @@ def build_probe():
 
     print(f"  Jump surrogate: all MARKER_B validated.")
     print(f"  Wait surrogate: all MARKER_FALL validated.")
+    print(f"  Mask '{mask}': active lanes = {sorted(active)}")
     return dict(
         code=code,
         surrogate=surrogate_jump,
@@ -174,10 +209,14 @@ def build_probe():
         n=N,
         wg=WG,
         regs=REGS,
+        mask=mask,
+        active=sorted(active),
         expected=(expected_out, expected_ctrl),
         expected_sur=(expected_out, expected_jump),
+        expected_var=(expected_out, expected_var),
         gate={'ret_pc': ret_pc, 'landing_b': LANDING_B_OFF,
               'marker_b': MARKER_B, 'marker_fall': MARKER_FALL,
+              'mask': mask, 'active': sorted(active),
               'variant_rejected_partial_mask': True,
               'jump_surrogate_matches_oracle': True,
               'wait_surrogate_matches_oracle': True,
@@ -254,8 +293,8 @@ def matches(r, expected):
     return r['ok'] and (r.get('out'), r.get('table_after')) == expected
 
 
-def hardware(p):
-    name = 'partial-mask-ret'
+def hardware(p, name=None):
+    name = name or f"partial-mask-ret-{p.get('mask', 'odd')}"
     path = DATA / f'{name}.json.gz'
     if path.exists():
         raise SystemExit(f'refusing to overwrite {path}')
@@ -310,13 +349,18 @@ def hardware(p):
         tab = rec['variant']['table_after']
         b_lanes = [i for i in range(N) if i < len(tab) - 32 and tab[32 + i] == MARKER_B]
         f_lanes = [i for i in range(N) if i < len(tab) - 32 and tab[32 + i] == MARKER_FALL]
-        rec['analysis'] = {'marker_b_lanes': b_lanes, 'marker_fall_lanes': f_lanes}
-        if set(b_lanes) == set(range(1, N, 2)) and set(f_lanes) == set(range(0, N, 2)):
-            rec['interpretation'] = 'mask_honored_odd_B_even_FALL'
+        z_lanes = [i for i in range(N) if i < len(tab) - 32 and tab[32 + i] == 0]
+        rec['analysis'] = {'marker_b_lanes': b_lanes, 'marker_fall_lanes': f_lanes,
+                           'zero_lanes': z_lanes, 'expected_active': p.get('active')}
+        exp = set(p.get('active', []))
+        if set(b_lanes) == exp and not f_lanes and set(z_lanes) == set(range(N)) - exp:
+            rec['interpretation'] = 'mask_honored_active_B_inactive_dropped'
         elif len(b_lanes) == N and not f_lanes:
             rec['interpretation'] = 'mask_ignored_all_B'
+        elif set(b_lanes) == exp and set(f_lanes) == set(range(N)) - exp:
+            rec['interpretation'] = 'mask_honored_active_B_inactive_FALL'
         else:
-            rec['interpretation'] = f'unexpected_B{len(b_lanes)}_FALL{len(f_lanes)}'
+            rec['interpretation'] = f'unexpected_B{len(b_lanes)}_FALL{len(f_lanes)}_Z{len(z_lanes)}'
     elif not rec['variant'].get('ok'):
         rec['interpretation'] = 'variant_failed'
     save()
@@ -326,23 +370,38 @@ def hardware(p):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('mode', choices=['offline', 'hardware'], default='offline', nargs='?')
+    ap.add_argument('--mask', choices=sorted(MASKS) + ['all'],
+                    default='all', help='which mask(s) to build/submit (default: all new + odd check)')
     args = ap.parse_args()
-    print('=== Building and validating probe ===')
-    probe = build_probe()
-    print(f"  ret_pc={probe['gate']['ret_pc']}")
-    print(f"  landing_b={probe['gate']['landing_b']:#x}")
+    masks = ['single0', 'contig16', 'lanes31'] if args.mask == 'all' else [args.mask]
     if args.mode == 'offline':
+        print('=== Building and validating probes ===')
+        for m in masks:
+            print(f'--- mask {m} ({MASKS[m]}) ---')
+            probe = build_probe(m)
+            print(f"  ret_pc={probe['gate']['ret_pc']}")
+            print(f"  landing_b={probe['gate']['landing_b']:#x}")
+        # also revalidate the recorded odd mask without resubmitting it
+        print('--- mask odd (recorded; revalidating offline only) ---')
+        probe = build_probe('odd')
         print('Simulator/surrogate validation done. Use hardware mode to submit.')
         return
     print('=== Submitting to hardware ===')
-    rec = hardware(probe)
-    print(f"  Variant ok: {rec['variant'].get('ok')}")
-    print(f"  Recovery control: {rec.get('recovery_control_passed')}")
-    if 'analysis' in rec:
-        print(f"  B lanes: {rec['analysis']['marker_b_lanes']}")
-        print(f"  FALL lanes: {rec['analysis']['marker_fall_lanes']}")
-    print(f"  Interpretation: {rec.get('interpretation')}")
-    print(f"  Saved to: {DATA / 'partial-mask-ret.json.gz'}")
+    for m in masks:
+        gpu_safety.require_budget(1)
+        print(f'--- mask {m} ({MASKS[m]}) ---')
+        probe = build_probe(m)
+        rec = hardware(probe, f'partial-mask-ret-{m}')
+        print(f"  Variant ok: {rec['variant'].get('ok')}")
+        print(f"  Recovery control: {rec.get('recovery_control_passed')}")
+        if 'analysis' in rec:
+            print(f"  B lanes: {rec['analysis']['marker_b_lanes']}")
+            print(f"  FALL lanes: {rec['analysis']['marker_fall_lanes']}")
+        print(f"  Interpretation: {rec.get('interpretation')}")
+        print(f"  Saved to: {DATA / ('partial-mask-ret-' + m + '.json.gz')}")
+        if rec.get('halted'):
+            print(f"  HALTED: {rec['halted']}; stopping batch.")
+            return
 
 
 if __name__ == '__main__':

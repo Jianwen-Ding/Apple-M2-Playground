@@ -200,13 +200,17 @@ itself as unmodelled, as required.
 Interpretation: `ret` under a partial mask is not a per-lane branch. Active
 lanes transfer to the target; inactive lanes do not continue past the ret to
 the fallthrough — they are dropped (at least observably: no stores). This is
-consistent with ret being a group-level reconvergence operation. One
-odd/even split only; single-lane, contiguous-block, and 31-lane cases, and
-the combined partial call/return sequence, remain open.
+consistent with ret being a group-level reconvergence operation. Confirmed
+across four masks 2026-10-17 (odd 16 lanes, single lane 0, contiguous 0-15,
+lanes 0-30): active lanes store MARKER_B, inactive lanes store nothing, no
+FALL marker anywhere, all dispatches complete normally with passing controls.
 
-Evidence: [partial-mask-ret.json.gz](../../results/2026-10-17-call-ret/partial-mask-ret.json.gz).
+Evidence: [partial-mask-ret.json.gz](../../results/2026-10-17-call-ret/partial-mask-ret.json.gz),
+[partial-mask-ret-single0.json.gz](../../results/2026-10-17-call-ret/partial-mask-ret-single0.json.gz),
+[partial-mask-ret-contig16.json.gz](../../results/2026-10-17-call-ret/partial-mask-ret-contig16.json.gz),
+[partial-mask-ret-lanes31.json.gz](../../results/2026-10-17-call-ret/partial-mask-ret-lanes31.json.gz).
 Reproducer: `scripts/probe_partial_ret.py offline` (simulator/surrogates) or
-`hardware` (GPU submission).
+`hardware [--mask odd|single0|contig16|lanes31|all]` (GPU submission).
 
 The first successful round trip took 5,208 ns, indirect 5,750 ns, nested 9,500 ns.
 These isolated firmware times are observations, not a calibrated instruction
