@@ -1,7 +1,7 @@
 # Device atomics: bit 45 turns `sub` into a float32 add and `cmpxchg` into 64-bit unsigned min / max; ops 11-15 end the SIMD group
 
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, compute, AC power, 2026-10-17.
-Owner-approved probes of encodings Mesa never emits: 54 dispatch pairs, **0 faults, 0 hang-budget events**, kernel log
+Owner-approved probes of encodings Mesa never emits: 74 dispatch pairs, **0 faults, 0 hang-budget events**, kernel log
 clean, a control dispatch passed after every step.
 
 ## Method: the surroundings are simulated, the variant is not
@@ -77,11 +77,24 @@ Bit 46 alone changes nothing (all 11 ops, 33 variants).
 - This is the behaviour of the 16 "ends" opcodes (`2026-10-11-opcode-descriptions`). None of ops 11-15 is a float
   min / max, inc / dec or any other atomic.
 
+### Threadgroup atomic (`local_atomic`, 0x19): no float add among its gap bits
+
+- **Scan:** Mesa's threadgroup `sub` with one currently-zero gap bit set at a time: bits 6-7, 35, 37, 40-46, 72-79,
+  19 variants.
+- **18 of the 19 bits are inert:** integer sub, old value returned.
+- **Bit 6 suppresses the access:** it returns 0, and a dump of all 2 KiB of threadgroup memory, pre-filled with a
+  pattern, shows no changed word.
+- This parallels device load / store bit 31 (`2026-10-11-mem-control-gap-bits`).
+- **Not tested:** combinations of bits, and Mesa's constant bits (15, 34, 36, 47).
+- So **shared-memory `atomicAdd(float)` has no single-bit encoding**. It still needs a CAS loop, or a device-memory
+  float atomic.
+
 ## Compiler implications (PTX → AGX)
 
 | PTX | AGX |
 |---|---|
 | `atom.global.add.f32` | one `atomic` op 1 + bit 45, Rt = 1. **No CAS loop needed** (the 2026-10-11 finding assumed one) |
+| `atom.shared.add.f32` | no form found (19 gap bits of `local_atomic` scanned): 32-bit CAS loop |
 | `red.global.add.f32` | op 1 + bit 45 with Rt = 0: **not yet run**, expected to work like the integer ops |
 | `red.global.min/max.u64` | op 3 + bit 45 (+ bit 46 for max), Rt = 0, index = 2 × element |
 | `atom.global.min/max.u64` (returns old) | **no direct form**: Rt = 1 returns only a "changed" flag |
@@ -111,13 +124,13 @@ Bit 46 alone changes nothing (all 11 ops, 33 variants).
   lane-operation, `2026-10-16-atomic-contention`).
 - The "changed" flag of umin64 / umax64 when the source equals memory (no tested lane had equal values).
 - 64-bit min / max under contention, and with a register base.
-- The threadgroup atomic (`local_atomic`, 0x19) has its own unexplained bits (u1, u3, u4, u5). A float add there is
-  untested.
+- Threadgroup atomic: bit combinations and Mesa's constant bits. A threadgroup float add may still exist outside the
+  single-bit scan.
 - The remaining gap bits u1-u4 (bits 26, 28-29, 31, 42-44) of the device atomic.
 
 ## Reproducer and evidence
 
-- `make verify-atomic-variants` (offline): 22 checks, with the models re-implemented independently of the probe.
+- `make verify-atomic-variants` (offline): 24 checks, with the models re-implemented independently of the probe.
 - `make atomic-variants CONFIRM_GPU_FAULTS=1` (hardware): every family, each probe gated in `agx_run` first.
-- Evidence is in [results/2026-10-17-atomic-variants](../../results/2026-10-17-atomic-variants): all 54 records, with
+- Evidence is in [results/2026-10-17-atomic-variants](../../results/2026-10-17-atomic-variants): all 74 records, with
   code, input and output tables, and snapshots of the probe and harness.

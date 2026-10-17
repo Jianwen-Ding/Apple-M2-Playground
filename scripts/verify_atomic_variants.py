@@ -18,6 +18,12 @@ def mesa_atomic(op, R_, A, O, S, Rt):
     return raw | ((O >> 4) & 15) << 32 | ((A >> 4) & 15) << 36 | (R_ >> 6) << 40 | (1 << 47 if Rt else 0) | S << 48
 
 
+def mesa_local_atomic(op, R_, A, S, ret):
+    """agx_pack.c AGX_OPCODE_LOCAL_ATOMIC: register base, immediate index 0, 10-byte form"""
+    raw = 0x19 | 1 << 15 | 1 << 36 | 1 << 47 | (1 << 8 if ret else 0) | (R_ & 63) << 9 | (A & 63) << 16
+    return raw | op << 24 | 1 << 34 | (1 << 38 if ret else 0) | (A >> 6) << 58 | (R_ >> 6) << 60 | S << 64
+
+
 def u2f(x): return struct.unpack('<f', struct.pack('<I', x))[0]
 
 
@@ -69,7 +75,7 @@ def main():
         h, f = line.split()
         check(f'{f} matches the recorded hash', hashlib.sha256((ROOT/f).read_bytes()).hexdigest() == h)
     recs = {r['name']: r for r in json.load(gzip.open(R/'records.json.gz', 'rt'))['records']}
-    check('54 recorded dispatch pairs, none faulted', len(recs) == 54 and not any('fault' in r for r in recs.values()))
+    check('74 recorded dispatch pairs, none faulted', len(recs) == 74 and not any('fault' in r for r in recs.values()))
     check('every pair deterministic except the two contention runs',
           {k for k, r in recs.items() if not r['deterministic']} == {'H_fadd_contend_ones', 'H_fadd_contend_mixed'})
 
@@ -77,6 +83,10 @@ def main():
     enc_ok = True
     for k, r in recs.items():
         v, s = int.from_bytes(bytes.fromhex(r['variant_hex']), 'little'), int.from_bytes(bytes.fromhex(r['surrogate_hex']), 'little')
+        if k[0] == 'T':     # threadgroup atomic: Mesa's local_atomic formula plus one gap bit
+            enc_ok &= (bin(v ^ s).count('1') == 1 and s == mesa_local_atomic(1, 10, 44, 12, True)
+                       and bytes.fromhex(r['code']).find(bytes.fromhex(r['variant_hex'])) >= 0 and r['code'].endswith('8800'))
+            continue
         mask = 0xf << 6 if k[0] in 'BDE' else 3 << 45
         f = dict(op=s >> 6 & 15, R_=(s >> 10 & 63) | (s >> 40 & 3) << 6, A=(s >> 16 & 15) | (s >> 36 & 15) << 4,
                  O=(s >> 20 & 15) | (s >> 32 & 15) << 4 | (s >> 56) << 8, S=s >> 48 & 255, Rt=s >> 47 & 1)
@@ -175,6 +185,19 @@ def main():
           all(not a for a, _ in e0.values()) and all(not a for a, _ in e1.values()))
     check("op 11 inside Mesa's if (jmp_exec_none): groups with no active lane finish; the issuing groups end, inactive lanes included",
           all(e2[(w, 0)][0] and not e2[(w, 1)][1] for w in (0, 1)) and all(t1b[3300 + i] == 0x11110000 + i for i in range(128)))
+    # Family T: threadgroup atomic sub with one gap bit set
+    inert, bit6 = [], None
+    for b in [6, 7, 35, 37, 40, 41, 42, 43, 44, 45, 46] + list(range(72, 80)):
+        r = recs[f'T_sub_bit{b}']; t0, t1, lanes = r['table_in'], r['table_after'], r['out'][8:8 + N]
+        sub = [t1[192 + i] == (t0[i] - t0[64 + i]) & 0xffffffff for i in range(N)]
+        if all(sub) and lanes == t0[:N]: inert.append(b)
+        if b == 6: bit6 = (t1[192:192 + N] == t0[:N], lanes == [0] * N)
+    check(f'threadgroup atomic sub: 18 single gap bits (6-7, 35, 37, 40-46, 72-79 except 6) leave the integer sub and its '
+          f'return unchanged: no threadgroup float add among them', inert == [7, 35, 37, 40, 41, 42, 43, 44, 45, 46] + list(range(72, 80)))
+    r = recs['T2_sub_bit6_tgdump']; dump = r['table_after'][256:768]; t0 = r['table_in']
+    want = [t0[w] if w < N else 0x5a5a0000 + w for w in range(512)]
+    check('threadgroup atomic bit 6: returns 0 and no word of the 2 KiB threadgroup memory changes (the access is suppressed)',
+          bit6 == (True, True) and dump == want and r['out'][8:8 + N] == [0] * N)
     print(f'{len(fails)} failures')
     return 1 if fails else 0
 
