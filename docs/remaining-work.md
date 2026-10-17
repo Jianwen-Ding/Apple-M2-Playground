@@ -113,22 +113,17 @@ built through Mesa.
 6. Unsafe: only atomic ops 11-15 (if Mesa capture does not resolve 64-bit atomics) and the register-base atomics,
    each after owner approval and a reboot.
 
-## Function calls (`call`, `ret`): offline study, 2026-10-17
+## Function calls (`call`, `ret`): status at 2026-10-17 (paused)
 
-Nothing was run on the GPU. Findings from sources and the simulator:
-
-- **Forms:** applegpu lists `call reg32` (2 bytes, opcode 0x04, register in bits 9-15), `ret reg32` (2 bytes, 0x14) and
-  `call off` (6 bytes, 0xC010, signed 32-bit pc-relative offset). The pseudocode says the 6-byte form writes `pc + 6`
-  into r1 of every active thread and jumps. The register form is a theory only: a `push_exec` / `call` / branch /
-  `pop_exec` loop that masks execution to threads sharing one target value.
-- **Mesa never emits them.** `agx_pack.c` has no call or ret, and its jump packer states "We don't implement indirect
-  branches". Every Mesa-compiled shader has all functions inlined, so there is no captured binary to learn from.
-- **The simulator cannot run them.** The assembler and decoder accept `call r15` and `ret r15`, but `agx_run` stops with
-  "no exec" on both. The safe-probe method (a surrogate instruction passes `agx_run` first) therefore cannot apply: the
-  instruction itself transfers control, so there is no surrogate that exercises it, and nothing is known to model.
-- **Why it matters little for CUDA:** NVCC-style device functions can be inlined by the translator, as Mesa does for
-  every shader. Only recursion and indirect calls (`call.uni` through a register, function pointers) need real calls.
-
-If this is ever pursued, it needs an owner decision, not just a gate. A candidate design would be a 6-byte `call` whose
-target is the next instruction (`off` = 6) followed by a register read of r1, so the control flow cannot leave the
-program. That has not been designed further or run.
+- **`call` (6-byte, pc-relative): confirmed on hardware.** With a target inside the program it jumps, and writes
+  r1 = 0x2000 + (byte offset of the next instruction). 0x2000 is the code's offset in the harness buffer. The link
+  moves exactly with the call's position. 3 dispatches, 0 faults. The simulator's model matches the output exactly.
+- **`ret`: unresolved.** One probe faulted (unmapped instruction fetch, recovered, 1 of 30 hang-budget events). Two
+  later probes ran without a fault but did not reach the code after the return. No simulator model matches yet.
+- **Not tried:** the 2-byte `call reg`, lane-divergent targets, and nested calls.
+- **Mesa never emits either instruction**, so there is no captured binary to learn from. A translator can inline
+  device functions; only recursion and function pointers need real calls.
+- **Code and records:** AGX-Performance-Simulator `scripts/probe_calls.py`, commit 3fb851e; raw records in
+  `/scratch/apple-m2-playground/call-probes`. No playground finding or verifier has been written.
+- **Why it is paused:** several assistant responses about the `ret` investigation were stopped by a safety classifier.
+  Continuing needs the owner's decision on who runs it.
