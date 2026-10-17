@@ -29,7 +29,7 @@ N = 32
 TABLE = [0] * 128
 
 
-def build():
+def build(reenable=None):
     cov.install()
     e, mov, store = RS.e, RS.mov, RS.agx_loop.store
     stop, wait = e('stop'), e('wait 0')
@@ -45,7 +45,8 @@ def build():
     body += e('ret r30') + wait * 2
 
     def marker(value):
-        return mov(23, value) + store(23, 8, 21) + e('wait 0') + stop
+        prefix = e(f'pop_exec r0l, {reenable}') if reenable is not None else b''
+        return prefix + mov(23, value) + store(23, 8, 21) + e('wait 0') + stop
 
     body += marker(1)  # Fallthrough observed independently of any return hypothesis.
     for pc in LANDINGS:

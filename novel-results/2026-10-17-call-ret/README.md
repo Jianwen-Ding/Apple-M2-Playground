@@ -82,3 +82,21 @@ call/return timing were not attempted. Continue to inline PTX device functions.
 Offline verification: `make verify-call-ret` rebuilds both exact probe binaries,
 checks all simulator landing paths and default return rejection, replays all
 three old direct calls, and checks the retained quiet/fault outcomes.
+
+## Resumed investigation: recovered faults are logged and probing continues
+
+The owner clarified that recovered faults should not end the investigation;
+a failed known-good recovery control should. The earlier R1-halfword fault's
+recovery was verified by an exact, simulator-checked control (14,250 ns).
+`scripts/probe_control_followup.py` retains full stdout/stderr, readback,
+kernel-log deltas and a post-dispatch recovery control for each new case.
+
+Initial follow-up: `ret-pop1` and `ret-r1-pop1` with operand 1024 reached no
+marker. With operand 0x2400 and pop_exec 1 at each landing, marker 1536 was
+stored. Moving ret from byte 512 to 768 still stored 1536; changing the operand
+to 0x2500 still stored 1536. These are observations, not a target formula.
+Removing pop_exec (`ret-byte-nopop`) faulted at unmapped UL1C 0x1000008100.
+Its post-control passed after two seconds; boot budget became 2/30.
+All fallthrough and candidate landing paths passed simulator/oracle checks
+before hardware; actual ret was rejected as unresolved. The follow-up records
+are under `results/2026-10-17-call-ret/followup/`.
