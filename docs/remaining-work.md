@@ -116,6 +116,10 @@ built through Mesa.
 
 ## Function calls (`call`, `ret`): uniform round trips measured, 2026-10-17
 
+For remaining probes and independent simulator work, use the current
+[call/return agent handoff](../notes/call-return-handoff.md). It specifies
+dependencies, target/path gates, hardware ownership and fault/hang handling.
+
 - Direct six-byte and register-indirect two-byte calls use buffer-relative byte
   links. The link points just after the instruction (+6 or +2).
 - `ret` consumes that buffer-relative link and leaves active lanes at mask depth

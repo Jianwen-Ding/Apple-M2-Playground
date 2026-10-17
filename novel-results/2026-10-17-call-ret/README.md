@@ -5,6 +5,10 @@ section for the measured target and mask rule. Earlier diagnostic records and
 failures below are retained as historical evidence. Partial/divergent lanes
 and out-of-program behavior remain unresolved.
 
+The current [agent handoff](../../notes/call-return-handoff.md) lists remaining
+cases, dependencies, simulator gates and the owner's updated fault/hang policy.
+Use it instead of the historical next-work suggestions below.
+
 ## Earlier evidence, now preserved
 
 Six previous scratch records are bundled in
