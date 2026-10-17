@@ -118,3 +118,25 @@ previous performance regressions are not declared resolved.
 
 Next: lower-level geometry/resource replay and controlled workload profiling.
 New hardware timing remains blocked on M2 access.
+
+## 2026-10-17: complete simulator special-register replay gate
+
+Added `make replay-simulator-sr`, using the adjacent simulator's retained six
+divergence programs/readback and current agx_run. All 1,518 selector/pattern
+vectors pass, checking every active lane and inactive table write. SR17/SR20
+placement and time-varying SR113 remain excluded from equality checks.
+
+The simulator caches immutable get_sr operands and separates uniform, lane and
+mask-dependent values; execution values/masks are never retained across calls.
+It removes duplicate decoded operands without changing instruction semantics.
+The replay gate now rejects missing patterns/selectors and truncated lane data;
+three failure-injection tests pass with normal and optimized Python.
+
+All 36 Rust tests, 363 exact recordings, 74 atomic replays, the launch gate and
+cost verifier pass; all 36 complete prediction reports retain their hash. Focused
+uniform SR reads improve 1.95-3.36x, but control regressions remain open in the
+simulator's `results/2026-10-17-special-register-cache/`. No overall speedup,
+new M2 observation, retained-evidence change or calibration change is claimed.
+
+Next: resource-width replay, lower-level geometry guards and controlled profiling.
+New hardware timing remains blocked on M2 access.
