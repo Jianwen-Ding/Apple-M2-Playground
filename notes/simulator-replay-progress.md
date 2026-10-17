@@ -33,3 +33,20 @@ uniforms and valid/skipped loads. No new hardware runs were performed.
 
 Next: cross-lane replay entry points and data-dependent performance-trace
 limitations. Hardware-only timing work remains blocked on an M2 device.
+
+## 2026-10-17: established cross-lane families
+
+Added `make replay-cross-lane-suite` using `suite_check --case-prefix`. All 130
+retained full/masked SIMD and quad reductions, scans, shuffles and quad ballots
+pass exact functional comparison. `CROSS_LANE_SUITE` selects a local suite;
+missing families fail rather than silently passing an empty selection.
+
+This supplements the 23 control, 102 memory and 74 atomic-variant replay checks.
+The 16/64-bit width evidence remains a separate `verify-cross-lane-width` check;
+these 130 standard testsuite recordings are not a new width/hardware result.
+No retained evidence or timing calibration was changed. The simulator's new
+memory-capture optimization is checked against the original address helpers
+and all 36 complete prediction reports remain identical to their reference hash.
+
+Next: resource/geometry replay coverage and bounded real-memory workload profiles.
+New hardware timing remains blocked on access to an M2 device.

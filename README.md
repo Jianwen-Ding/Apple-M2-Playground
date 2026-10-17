@@ -139,6 +139,12 @@ tracer now shares lazy decoding across groups while keeping execution state
 independent; this target uses the real-memory functional executor for exact
 hardware-output replay, not the performance tracer's approximate memory model.
 
+`make replay-cross-lane-suite` checks the simulator's retained SIMD/quad
+reductions, scans, shuffles and quad ballots, both full and masked (130 cases as
+of 2026-10-17). Override `CROSS_LANE_SUITE` for another local suite. This uses the
+current checker's `--case-prefix` selection and fails if any family is absent.
+The separate 16/64-bit width evidence remains checked by `make verify-cross-lane-width`.
+
 Current priority is **actual AGX instruction execution**. The first pinned
 move-immediate experiment passed: toggling immediate bit 0 changed active uint32
 results from `0x12345678` to `0x12345679` at counts 33 and 257, preserving guards,
