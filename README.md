@@ -125,6 +125,13 @@ Use `python3 scripts/replay_atomic_variants.py --only REGEX --run PATH` to narro
 a regression. This supplements `make verify-atomic-variants`, which independently
 checks the retained hardware evidence and its source hashes.
 
+`make replay-memory-suite` replays the simulator repository's retained device
+loads, device stores and threadgroup layout cases (102 recordings as of
+2026-10-17). Override `MEMORY_SUITE` to use another local suite directory.
+Build the current simulator first: its `suite_check` now returns failure for
+mismatches, unsupported cases or an empty selection, and rejects incomplete
+deterministic expected buffers. These are offline replays, not new hardware runs.
+
 Current priority is **actual AGX instruction execution**. The first pinned
 move-immediate experiment passed: toggling immediate bit 0 changed active uint32
 results from `0x12345678` to `0x12345679` at counts 33 and 257, preserving guards,

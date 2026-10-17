@@ -309,6 +309,14 @@ verify-atomic-variants:
 replay-atomic-variants:
 	$(PYTHON) -B scripts/replay_atomic_variants.py --run "$(SIMREPO)/rust/target/release/agx_run"
 
+# Retained device loads/stores and threadgroup layout cases live in the simulator.
+MEMORY_SUITE ?= $(SIMREPO)/testsuite
+.PHONY: replay-memory-suite
+replay-memory-suite:
+	"$(SIMREPO)/rust/target/release/suite_check" "$(MEMORY_SUITE)" --only mem_load -v
+	"$(SIMREPO)/rust/target/release/suite_check" "$(MEMORY_SUITE)" --only mem_store -v
+	"$(SIMREPO)/rust/target/release/suite_check" "$(MEMORY_SUITE)" --only threadgroup -v
+
 atomic-contention:
 	$(PYTHON) -B scripts/clock_keeper.py --seconds 3000 --device "$(DEVICE)" & sleep 3; \
 	$(PYTHON) -B scripts/run_drm_atomic_contend.py --device "$(DEVICE)"; \
