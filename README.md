@@ -140,6 +140,10 @@ batch isolation against the adjacent simulator's `agx_dispatch`. It uses a
 synthetic stop-only shader, checks serial/parallel batch order and unchanged
 valid controls, and requires no GPU or new hardware evidence.
 
+`make verify-simulator-geometry` checks functional empty grids (all three axes),
+partial workgroups and explicit writer-index capacity errors, with unchanged
+mapped memory. These are synthetic input-domain checks, not hardware evidence.
+
 `make replay-simulator-sr` compares all six retained divergence programs against
 the functional simulator: 1,518 selector/pattern comparisons with lane values
 and inactive writes checked. SR17/SR20 placement and time-varying SR113 remain

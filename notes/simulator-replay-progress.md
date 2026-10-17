@@ -119,6 +119,30 @@ previous performance regressions are not declared resolved.
 Next: lower-level geometry/resource replay and controlled workload profiling.
 New hardware timing remains blocked on M2 access.
 
+## 2026-10-17: functional geometry domain and setup controls
+
+Add `make verify-simulator-geometry`: three empty-grid axes, two oversized-grid
+capacity errors and three partial-grid controls, with mapped memory unchanged.
+Passes with normal/optimized Python; the old binary fails the capacity gate
+(timeout, not a validation success). These are synthetic checks, not recordings.
+
+Simulator caches geometry/writer setup and separates the interpreter loop;
+uniform SR/SIMD-count broadcasts avoid per-lane selector classification. Rust
+regressions cover invalid trace coordinates, the 48-bit index boundary, 3-D
+edges and distinct race-log writers across barrier resumes. The capacity is an
+executor tag-format limit, not a new AGX hardware restriction.
+
+41 Rust tests, 363 exact cases with pinned hashes, 1,518 SR comparisons, 74
+atomic replays, independent evidence/schema checks, launch/geometry gates and
+cost verifier pass; 36 complete predictions retain their hash. Focused setup
+1.215-2.036x and uniform SR reads 1.482-2.182x faster; scattered functional tracing
+4.4% slower and ALU CLI 1.1% slower. Intermediate regressions/A/A variability
+remain recorded in simulator `results/2026-10-17-functional-geometry/`.
+No overall speedup, new hardware validation or reference timing change claimed.
+
+Next: resource-width replay, cost-context guards/lazy coordinates and controlled
+profiling of partial-mask/data-dependent controls. M2 hardware remains unavailable.
+
 ## 2026-10-17: complete simulator special-register replay gate
 
 Added `make replay-simulator-sr`, using the adjacent simulator's retained six

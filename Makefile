@@ -324,6 +324,10 @@ replay-geometry-suite:
 verify-simulator-launch:
 	$(PYTHON) -B scripts/check_simulator_launch.py --run "$(SIMREPO)/rust/target/release/agx_dispatch"
 
+.PHONY: verify-simulator-geometry
+verify-simulator-geometry:
+	$(PYTHON) -B scripts/check_simulator_geometry.py --run "$(SIMREPO)/rust/target/release/agx_run"
+
 .PHONY: replay-simulator-sr
 replay-simulator-sr:
 	AGX_RUN="$(SIMREPO)/rust/target/release/agx_run" $(PYTHON) -B "$(SIMREPO)/scripts/sr_check.py"
