@@ -305,6 +305,10 @@ atomic-variants:
 verify-atomic-variants:
 	$(PYTHON) -B scripts/verify_atomic_variants.py
 
+.PHONY: replay-atomic-variants
+replay-atomic-variants:
+	$(PYTHON) -B scripts/replay_atomic_variants.py --run "$(SIMREPO)/rust/target/release/agx_run"
+
 atomic-contention:
 	$(PYTHON) -B scripts/clock_keeper.py --seconds 3000 --device "$(DEVICE)" & sleep 3; \
 	$(PYTHON) -B scripts/run_drm_atomic_contend.py --device "$(DEVICE)"; \
@@ -488,3 +492,4 @@ sr113-timeline:
 
 verify-transcendentals:
 	$(PYTHON) -B scripts/verify_transcendentals.py
+

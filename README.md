@@ -114,6 +114,17 @@ query proves device access; it does not prove shader execution.
 
 The initial `test.txt` is the repository push smoke-test artifact.
 
+### Offline simulator replay
+
+`make replay-atomic-variants` executes all 74 retained atomic-variant programs in
+the Rust simulator from the adjacent `AGX-Performance-Simulator` checkout
+(override `SIMREPO`). Build that simulator with `make rust` first. No GPU is used.
+Every deterministic output/table word is compared; contended float adds are
+checked for a valid serialization using the independent rational float model.
+Use `python3 scripts/replay_atomic_variants.py --only REGEX --run PATH` to narrow
+a regression. This supplements `make verify-atomic-variants`, which independently
+checks the retained hardware evidence and its source hashes.
+
 Current priority is **actual AGX instruction execution**. The first pinned
 move-immediate experiment passed: toggling immediate bit 0 changed active uint32
 results from `0x12345678` to `0x12345679` at counts 33 and 257, preserving guards,
@@ -218,3 +229,4 @@ ones'-complement negative, then uses one 2^23-entry table: this model is exact o
 `sin` meet PTX's `.approx` bounds. **Mesa's cosine sequence does not (2^-20.29 against 2^-20.4)**; an fma-split range
 reduction fixes it (2^-20.70). [Finding](novel-results/2026-10-16-transcendentals/README.md),
 `make verify-transcendentals`.
+
