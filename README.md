@@ -132,6 +132,13 @@ Build the current simulator first: its `suite_check` now returns failure for
 mismatches, unsupported cases or an empty selection, and rejects incomplete
 deterministic expected buffers. These are offline replays, not new hardware runs.
 
+`make replay-control-suite` checks all 23 retained control-flow cases: integer
+and float conditions, uniform branches, lane-dependent trips and nested loops.
+Override `CONTROL_SUITE` for a local evidence subset. The simulator's performance
+tracer now shares lazy decoding across groups while keeping execution state
+independent; this target uses the real-memory functional executor for exact
+hardware-output replay, not the performance tracer's approximate memory model.
+
 Current priority is **actual AGX instruction execution**. The first pinned
 move-immediate experiment passed: toggling immediate bit 0 changed active uint32
 results from `0x12345678` to `0x12345679` at counts 33 and 257, preserving guards,

@@ -317,6 +317,11 @@ replay-memory-suite:
 	"$(SIMREPO)/rust/target/release/suite_check" "$(MEMORY_SUITE)" --only mem_store -v
 	"$(SIMREPO)/rust/target/release/suite_check" "$(MEMORY_SUITE)" --only threadgroup -v
 
+CONTROL_SUITE ?= $(SIMREPO)/testsuite
+.PHONY: replay-control-suite
+replay-control-suite:
+	"$(SIMREPO)/rust/target/release/suite_check" "$(CONTROL_SUITE)" --only control -v
+
 atomic-contention:
 	$(PYTHON) -B scripts/clock_keeper.py --seconds 3000 --device "$(DEVICE)" & sleep 3; \
 	$(PYTHON) -B scripts/run_drm_atomic_contend.py --device "$(DEVICE)"; \

@@ -16,3 +16,20 @@ No M2 hardware is available in the current Linux worker. New hardware claims,
 float/u64 atomic timings and other calibration changes remain blocked on actual
 measurements. Next: add bounded replay entry points for established cross-lane
 and loop findings, keeping software-model results distinct from hardware data.
+
+## 2026-10-17: complete retained control-flow replay
+
+Added `make replay-control-suite` (`CONTROL_SUITE` overrides the default adjacent
+simulator testsuite). All 23 recordings pass exact functional-output comparison,
+including uniform branches, lane-dependent trips and nested control flow. This
+supplements, rather than replaces, the 102 memory and 74 atomic replay checks.
+
+The simulator's performance tracer now shares immutable lazy decoding across
+groups, waves and overlap probes; registers, masks, taint and approximate memory
+remain local. Raw 0x78 barriers now consume its execution budget. Existing
+0x68/0x78 hardware findings and timing calibration are unchanged. Shared-cache
+regressions compare fresh versus shared traces with distinct launch geometry,
+uniforms and valid/skipped loads. No new hardware runs were performed.
+
+Next: cross-lane replay entry points and data-dependent performance-trace
+limitations. Hardware-only timing work remains blocked on an M2 device.
