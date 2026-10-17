@@ -50,3 +50,26 @@ and all 36 complete prediction reports remain identical to their reference hash.
 
 Next: resource/geometry replay coverage and bounded real-memory workload profiles.
 New hardware timing remains blocked on access to an M2 device.
+
+## 2026-10-17: complete standard integer-atomic replay
+
+Added `make replay-integer-atomic-suite` (`INTEGER_ATOMIC_SUITE` overrides the
+adjacent simulator testsuite). All 88 retained cases compare exactly: 44 device
+and 44 threadgroup, all eleven integer operations, distinct/shared addresses,
+returning/non-returning. This complements, rather than replaces, the 74 variant
+replays and independent evidence verifier, both of which also pass.
+
+The simulator caches immutable atomic fields and fixes an unnecessary next-source
+register read in TG non-CAS operations. Synthetic register-boundary tests cover
+all ten non-CAS operations and preserve CAS's comparison requirement. This is
+not new hardware validation. Retained evidence, float/u64 variant behavior,
+access suppression, group termination and timing calibration are unchanged.
+
+All 358 selected simulator recordings compare exactly, 25 Rust tests pass, the
+cost verifier has zero failures and all 36 complete prediction reports match
+their retained hash. Focused CPU atomic improvements and the unresolved padded
+standalone cost-trace slowdown are documented in the simulator's
+`results/2026-10-17-atomic-execution/README.md`; no overall speedup is claimed.
+
+Next: resource/geometry replay and real data-dependent profiles. New hardware
+timing remains blocked on an M2 device.

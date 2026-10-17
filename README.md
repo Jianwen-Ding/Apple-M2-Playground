@@ -125,6 +125,11 @@ Use `python3 scripts/replay_atomic_variants.py --only REGEX --run PATH` to narro
 a regression. This supplements `make verify-atomic-variants`, which independently
 checks the retained hardware evidence and its source hashes.
 
+`make replay-integer-atomic-suite` checks all 88 retained standard device and
+threadgroup integer-atomic cases (44 each): return/non-return, distinct/shared
+addresses and all established integer operations. Override `INTEGER_ATOMIC_SUITE`
+for another local suite. This complements the separate 74 atomic-variant replays.
+
 `make replay-memory-suite` replays the simulator repository's retained device
 loads, device stores and threadgroup layout cases (102 recordings as of
 2026-10-17). Override `MEMORY_SUITE` to use another local suite directory.

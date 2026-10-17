@@ -309,6 +309,12 @@ verify-atomic-variants:
 replay-atomic-variants:
 	$(PYTHON) -B scripts/replay_atomic_variants.py --run "$(SIMREPO)/rust/target/release/agx_run"
 
+INTEGER_ATOMIC_SUITE ?= $(SIMREPO)/testsuite
+.PHONY: replay-integer-atomic-suite
+replay-integer-atomic-suite:
+	"$(SIMREPO)/rust/target/release/suite_check" "$(INTEGER_ATOMIC_SUITE)" --only atomic -v
+	"$(SIMREPO)/rust/target/release/suite_check" "$(INTEGER_ATOMIC_SUITE)" --only tg_atomic -v
+
 # Retained device loads/stores and threadgroup layout cases live in the simulator.
 MEMORY_SUITE ?= $(SIMREPO)/testsuite
 .PHONY: replay-memory-suite
