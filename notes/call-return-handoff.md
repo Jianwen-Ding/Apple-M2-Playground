@@ -111,40 +111,16 @@ Hardware stored MARKER_B at table words 32-63, confirming that `ret rX` uses
 the explicit operand register rX, not an implicit r1 link. No fault, budget
 unchanged. Evidence: `ret-r30-vs-r1.json.gz`.
 
-### B. Partial masks and return reconvergence — direct call DONE, ret still open
+### B. Partial masks and return reconvergence — DONE (unified mask-depth rule)
 
-Direct call under a partial mask is now measured: odd lanes active via
-`if_icmp r0l, ueq, (gid & 1), 1`, callee stores link + marker. Hardware shows
-link and marker on odd lanes only, 0 on even lanes; the simulator predicts
-exactly this. Evidence: `partial-mask-call.json.gz`. The earlier claim that
-the simulator cannot model per-lane masks was wrong: the test had loaded the
-lane ID from a uniform address, so the condition was true for all lanes.
-Using r1 (the harness gid) directly gives a real per-lane mask, and
-`mask_ctl` sets exec from r0l as expected.
-
-Still open: Priority C (empty masks: skipped vs issued call/ret) and beyond.
-Measured 2026-10-17: the combined partial direct-call/return sequence diverges
-and rejoins — active lanes round-trip through the callee while inactive lanes
-run the caller post-call; evidence `partial-mask-callret.json.gz`. Ret is a
-group-level transfer, not a per-lane branch — do not assume inactive lanes
-continue past a bare ret.
-
-Start with one direct call to a common callee under an `if`, without `ret`;
-record which lanes receive a link and reach the callee. Use known branches to
-finish. Then isolate a partial-mask `ret` to one common valid landing, and only
-then attempt the combined partial direct-call/return sequence.
-
-Use odd lanes first, then one lane, 16 contiguous lanes and 31 lanes as separate
-cases. Record both selected and unselected lanes. Distinguish the caller's
-existing mask depth from return's effect; do not assume `pop_exec 2` composes
-with an outer `if`. Compare bounded landing layouts with explicit pop amounts
-and trace where lanes first become visible. Simulator-check every such layout
-and its final termination path. The prior no-pop fault is already recorded;
-do not repeat it without a new question that the added markers can answer.
-
-Test uniform register call under a partial mask only after the direct version
-and return behavior are understood. Passing partial direct call does not imply
-that the register form has the same scheduling rule.
+Direct call under a partial mask: odd lanes active, callee stores link +
+marker on odd lanes only. Partial ret: unified rule now measured — ret sets
+r0l = 2 on lanes active at issue and leaves inactive lanes' r0l unchanged;
+every lane transfers to the winning target (no fallthrough ever). Landing
+pop1/M1/pop2/M2 discriminates depth: active lanes skip M1 (need 2 pops),
+dragged lanes store M1 (need 1 pop). A single `pop_exec r0l, 2` reconverges
+all cases. Evidence: `partial-mask-call.json.gz`, `partial-mask-ret*.json.gz`,
+`partial-mask-callret.json.gz`, `ret-depth-*.json.gz`.
 
 ### C. Empty masks: skipped instruction versus issued instruction — DONE
 
@@ -167,11 +143,11 @@ Evidence: `divergent-callreg[-swap|-lane0b].json.gz`.
 
 ### E. Divergent return targets — DONE
 
-Measured 2026-10-17: all lanes land at lane 0's target (parity, swapped, and
-lane-0-alone-vs-31 all agree). Unlike calls, non-matching lanes do not fall
-through — every lane executes the winning landing.
-Evidence: `divergent-ret-{parity,swap,lane0b}.json.gz`.
-Open refinement: lane 0 vs lowest active lane (needs lane 0 masked out).
+Measured 2026-10-17: all lanes land at the winning target (parity, swapped,
+and lane-0-alone-vs-31 all agree). Unlike calls, non-matching lanes do not fall
+through — every lane executes the winning landing. Winner rule resolved same
+day (ret-depth lane0out): lane 0 if active, else lowest active lane.
+Evidence: `divergent-ret-{parity,swap,lane0b}.json.gz`, `ret-depth-lane0out.json.gz`.
 
 (The original step-by-step plans for D and E are superseded by the results above.)
 

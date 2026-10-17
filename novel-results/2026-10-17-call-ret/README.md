@@ -205,6 +205,13 @@ across four masks 2026-10-17 (odd 16 lanes, single lane 0, contiguous 0-15,
 lanes 0-30): active lanes store MARKER_B, inactive lanes store nothing, no
 FALL marker anywhere, all dispatches complete normally with passing controls.
 
+Refinement (same day, [ret mask-depth probes](#ret-mask-depth-rule-2026-10-17)):
+the inactive lanes are not dropped — they are dragged to the landing with
+their r0l unchanged (depth 1), while lanes active at issue get r0l = 2. The
+earlier probes' landings began with `pop_exec r0l, 2`, which reactivates
+depth-1 lanes but leaves depth-2 lanes masked through the first store —
+that is why inactive lanes appeared to store nothing.
+
 Evidence: [partial-mask-ret.json.gz](../../results/2026-10-17-call-ret/partial-mask-ret.json.gz),
 [partial-mask-ret-single0.json.gz](../../results/2026-10-17-call-ret/partial-mask-ret-single0.json.gz),
 [partial-mask-ret-contig16.json.gz](../../results/2026-10-17-call-ret/partial-mask-ret-contig16.json.gz),
@@ -268,6 +275,36 @@ Simulator fix: AGX-Performance-Simulator `rust/src/func.rs` (`OpKind::Call`
 empty-mask fallthrough).
 Reproducer: `scripts/probe_empty_mask.py offline` (simulator/surrogates) or
 `hardware [--case call|callreg|ret|all]` (GPU submission).
+
+## Ret mask-depth rule (2026-10-17)
+
+**`ret` sets r0l = 2 on lanes active at issue and leaves inactive lanes'
+r0l unchanged; every lane transfers to the winning target. Reconverge with
+`pop_exec r0l, 2` — it handles every depth combination.**
+
+Probes: partial-mask uniform ret (odd lanes active), and lane-0-masked
+divergent ret (lane 0 -> A, lanes 1..31 -> B). Both landings carry
+pop1/M1/pop2/M2/stop, and a FALL path catches any fallthrough (never taken).
+
+- Partial-uniform: even (inactive-at-ret) lanes store M1 + M2; odd (active)
+  lanes store M2 only. So active lanes need 2 pops, dragged lanes need 1.
+- Lane-0-masked divergent: all 32 lanes land at B — the lowest *active*
+  lane's target wins over masked-out lane 0. Lane 0 alone stores B1
+  (dragged, depth 1); lanes 1..31 store B2 only (active at issue, depth 2).
+- FALL never appears: dragged lanes transfer, they do not fall through.
+- All dispatches complete normally; controls pass before and after.
+- No fault, no hang, budget unchanged (3/30), kernel log clean.
+
+This unifies every ret observation: full-mask uniform ret (depth 2
+everywhere), partial-mask ret (active 2 / dragged 1), divergent ret
+(winner = lane 0 if active else lowest active lane), empty-mask ret
+(no active lanes: no transfer, no r0l change, falls through). A single
+`pop_exec r0l, 2` at the landing reconverges all cases.
+
+Evidence: [ret-depth-partial-uniform.json.gz](../../results/2026-10-17-call-ret/ret-depth-partial-uniform.json.gz),
+[ret-depth-lane0out.json.gz](../../results/2026-10-17-call-ret/ret-depth-lane0out.json.gz).
+Reproducer: `scripts/probe_ret_depth.py offline` (simulator/surrogates) or
+`hardware [--case partial-uniform|lane0out|all]` (GPU submission).
 
 ## Mixed direct/indirect nesting and code placement (2026-10-17)
 
@@ -361,8 +398,9 @@ Each landing pops twice, stores its marker, and stops.
 - No fault, no hang, budget unchanged (3/30), kernel log clean.
 
 Unlike calls (where non-matching lanes fall through), a divergent ret drags
-every lane to lane 0's landing. Whether lane 0 is special or it is the
-lowest active lane is open (would need lane 0 masked out).
+every lane to the winning landing. Resolved same day ([ret mask-depth probes](#ret-mask-depth-rule-2026-10-17)):
+with lane 0 masked out, all 32 lanes land at the lowest *active* lane's
+target. Winner rule: lane 0 if active, else lowest active lane.
 
 Evidence: [divergent-ret-parity.json.gz](../../results/2026-10-17-call-ret/divergent-ret-parity.json.gz),
 [divergent-ret-swap.json.gz](../../results/2026-10-17-call-ret/divergent-ret-swap.json.gz),

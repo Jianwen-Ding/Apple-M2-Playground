@@ -46,6 +46,6 @@ based on `templates/finding.md`, the hardware reproducer (or a stable link to
 it under `tests/`), exact inputs/outputs, and relevant environment evidence.
 Document which device and software versions were tested and any uncertainty.
 
-- [Uniform direct, indirect and nested call/return; ret rX uses explicit operand register (not implicit r1); partial-mask call transfers/executes active lanes only; partial-mask ret drops inactive lanes (no fallthrough); combined partial call+return diverges and rejoins via pops; empty-mask call/ret fall through (simulator fixed); divergent call/ret resolve to lane 0's target; mixed nesting exact; code placement independent; pair cost tens of ns](2026-10-17-call-ret/README.md)
+- [Uniform direct, indirect and nested call/return; ret rX uses explicit operand register (not implicit r1); partial-mask call transfers/executes active lanes only; partial-mask ret drops inactive lanes (no fallthrough); combined partial call+return diverges and rejoins via pops; empty-mask call/ret fall through (simulator fixed); divergent call/ret resolve to lane 0's target; mixed nesting exact; code placement independent; pair cost tens of ns; ret mask-depth rule (active→2, dragged→1, lane0/lowest-active wins)](2026-10-17-call-ret/README.md)
 - [Device atomic gap bits and recovered fault](2026-10-17-atomic-gap-bits/README.md)
 - [Threadgroup atomic ending opcodes, control bits, and hang diagnostics](2026-10-17-tg-atomic-followup/README.md)
