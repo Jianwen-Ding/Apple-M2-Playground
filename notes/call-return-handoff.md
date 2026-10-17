@@ -175,13 +175,20 @@ Open refinement: lane 0 vs lowest active lane (needs lane 0 masked out).
 
 (The original step-by-step plans for D and E are superseded by the results above.)
 
-### F. Nested forms and code placement
+### F. Nested forms and code placement — DONE
 
-Full-mask direct nesting at depth two is done. Next test direct-to-indirect and
-indirect-to-direct nesting with uniform targets and separate saved links.
-Then test another bounded depth with enough allocated registers. Attempt nested
-partial calls only after B; do not infer a hardware return stack from a working
-software-saved link sequence.
+Measured 2026-10-17, all uniform and simulator-exact on hardware:
+- Direct→indirect and indirect→direct nesting at depth 2 (outer link saved
+  to r29 across the inner call and restored before the outer return). Both
+  round trips match the simulator byte-for-byte, no faults.
+  Evidence: `nested-d2i.json.gz`, `nested-i2d.json.gz`.
+- Code placement: the uniform direct round trip runs identically with the
+  code blob at USC offset 0x2100 instead of 0x2000 (AGX_CODE_OFF=0x2100,
+  simulator AGX_CALL_BASE=0x2100). Links shift by exactly +0x100, proving
+  links are buffer-relative (base + code offset + len) and calls/returns
+  are placement-independent.
+  Evidence: `code-placement-2100.json.gz`.
+Reproducers: `scripts/probe_nested.py`, `scripts/probe_placement.py`.
 
 Separately move the code within the shader buffer using harness `AGX_CODE_OFF`,
 and match simulator `AGX_CALL_BASE`. Extend the runner explicitly: it currently
@@ -189,15 +196,23 @@ constructs a restricted child environment and will not inherit arbitrary exporte
 variables. Recompute all links/targets and validate the moved layout. This tests
 placement dependence; relocation across buffer objects is a different question.
 
-### G. Cost, after functional scope is stable
+### G. Cost: bounded unrolled measurement — DONE (order of magnitude)
 
-Compare unrolled chains of 1, 4 and 16 full-mask call/return pairs against
-matched known-branch controls, then repeat/interleave enough samples to estimate
-dispatch overhead and variation. Gate every full program before hardware.
-Separate direct, register-indirect and nested costs; record clocks, AC and sample
-distributions. The existing single-dispatch 5,208/5,750/9,500 ns observations are
-not cycles per pair. Introduce a counted loop only after the unrolled cases
-match, with an independently proven trip count and simulator step bound.
+Measured 2026-10-17 with a background clock keeper (started/stopped cleanly),
+5 interleaved samples per program, all simulator-gated, all exact-oracle
+passes. Per-pair delta = (call + ret + stores) − (jmp + filler + stores):
+
+- N=1 direct: 1,166 ns/pair (dominated by per-dispatch fixed/cold effects).
+- N=4 direct: 146 ns/pair. N=4 indirect: 83 ns/pair (same order; noisy).
+- N=16 direct: 26 ns/pair (best steady-state read).
+- Distributions overlap substantially (e.g. N=16 variant 11.6–15.7 µs vs
+  control 10.6–12.8 µs); firmware ns, not calibrated cycles.
+
+The pair cost is on the order of tens of ns steady-state; first-pair/cold
+effects dominate short chains. Precise cycle decomposition (in-dispatch CPU
+timer + reference chain, counted loops with proven trip counts) remains open.
+Evidence: `callret-cost.json.gz`.
+Reproducer: `scripts/probe_cost.py offline` or `hardware`.
 
 ## Historical out-of-program returns
 

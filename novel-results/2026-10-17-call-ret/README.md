@@ -269,6 +269,57 @@ empty-mask fallthrough).
 Reproducer: `scripts/probe_empty_mask.py offline` (simulator/surrogates) or
 `hardware [--case call|callreg|ret|all]` (GPU submission).
 
+## Mixed direct/indirect nesting and code placement (2026-10-17)
+
+**Depth-2 mixed nesting round-trips exactly; code placement does not matter.**
+
+- Direct→indirect: outer direct call, outer callee saves the outer link to
+  r29, inner register call, inner callee stores its link + IN marker and
+  returns; outer callee pops (inner ret leaves depth 2), restores r1, returns;
+  caller pops twice and stores CONT. Hardware matches the simulator
+  byte-for-byte, including both link values.
+- Indirect→direct: mirror image, also exact.
+- Code placement: the uniform direct round trip at USC offset 0x2100 behaves
+  identically to 0x2000; every link shifts by exactly +0x100. Links are
+  buffer-relative (base + code offset + instruction length).
+- All dispatches complete normally; no fault, no hang, budget unchanged
+  (3/30), kernel log clean.
+
+The inner-ret-then-pop ordering matters: without the pop after the inner
+return, the outer callee's restore/return is skipped (lanes still masked)
+and the program runs off its end — caught in simulation before hardware.
+
+Evidence: [nested-d2i.json.gz](../../results/2026-10-17-call-ret/nested-d2i.json.gz),
+[nested-i2d.json.gz](../../results/2026-10-17-call-ret/nested-i2d.json.gz),
+[code-placement-2100.json.gz](../../results/2026-10-17-call-ret/code-placement-2100.json.gz).
+Reproducers: `scripts/probe_nested.py`, `scripts/probe_placement.py`
+offline (simulator) or `hardware` (GPU submission).
+
+## Call/ret pair cost, bounded (2026-10-17)
+
+**A call/ret pair costs on the order of tens of ns steady-state; first-pair
+and per-dispatch fixed effects dominate short chains.**
+
+Unrolled chains of N call/ret pairs through one shared callee vs matched
+jump-pair controls (jump over filler + same stores), N = 1/4/16 direct and
+N = 4 indirect, 5 interleaved samples each with a background clock keeper
+(keeper started/stopped cleanly). Per-pair delta = (call + ret) − jmp:
+
+| config | variant median | control median | per-pair delta |
+|---|---|---|---|
+| N=1 direct | 6,166 ns | 5,000 ns | 1,166 ns |
+| N=4 direct | 7,166 ns | 6,583 ns | 146 ns |
+| N=16 direct | 11,875 ns | 11,458 ns | 26 ns |
+| N=4 indirect | 7,291 ns | 6,959 ns | 83 ns |
+
+Sample spreads are wide relative to the deltas (clock states even with the
+keeper); firmware ns, not calibrated cycles. Exact-oracle passes on every
+sample; no fault, no hang, budget unchanged (3/30).
+
+Evidence: [callret-cost.json.gz](../../results/2026-10-17-call-ret/callret-cost.json.gz).
+Reproducer: `scripts/probe_cost.py offline` (simulator) or `hardware`
+(GPU submission, starts its own keeper).
+
 ## Divergent register calls: lane 0's target wins (2026-10-17)
 
 **With per-lane call targets, the group transfers to lane 0's target; only
