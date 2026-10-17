@@ -332,6 +332,10 @@ verify-simulator-geometry:
 replay-simulator-sr:
 	AGX_RUN="$(SIMREPO)/rust/target/release/agx_run" $(PYTHON) -B "$(SIMREPO)/scripts/sr_check.py"
 
+.PHONY: replay-simulator-cost-sr
+replay-simulator-cost-sr:
+	$(PYTHON) -B scripts/replay_cost_sr.py --simrepo "$(SIMREPO)" --selftest
+
 # Retained device loads/stores and threadgroup layout cases live in the simulator.
 MEMORY_SUITE ?= $(SIMREPO)/testsuite
 .PHONY: replay-memory-suite

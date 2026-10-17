@@ -149,6 +149,13 @@ the functional simulator: 1,518 selector/pattern comparisons with lane values
 and inactive writes checked. SR17/SR20 placement and time-varying SR113 remain
 excluded from equality checks; this does not provide new hardware validation.
 
+`make replay-simulator-cost-sr` checks 6,171 reconstructed SIMD-group probes:
+retained divergent SR values, both width repetitions (including adjacent-register
+preservation for odd/64-bit encodings), and SR18/19 resource sweeps. It preserves
+lane identity via injective synthetic addresses, not aggregate value sets. Build
+the adjacent simulator's `cost_special_registers` example first. This is value
+replay, not execution of the original hardware shader or hardware timing.
+
 `make replay-memory-suite` replays the simulator repository's retained device
 loads, device stores and threadgroup layout cases (102 recordings as of
 2026-10-17). Override `MEMORY_SUITE` to use another local suite directory.

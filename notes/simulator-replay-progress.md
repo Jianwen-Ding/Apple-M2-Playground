@@ -164,3 +164,30 @@ new M2 observation, retained-evidence change or calibration change is claimed.
 
 Next: resource-width replay, lower-level geometry guards and controlled profiling.
 New hardware timing remains blocked on M2 access.
+
+## 2026-10-17: retained cost-SR width/resource value replay
+
+Add `replay-simulator-cost-sr`, using the simulator's checked cost-SR example.
+6,171 reconstructed group probes check retained divergent SR values, both
+width repetitions and all SR18/19 metadata sweep points. Injective synthetic
+addresses preserve lane identity/full u32 values. This is not execution of the
+original recorded shaders. Odd-width data checks only adjacent-register
+preservation; SR113/placement/device-state exclusions are explicit.
+
+Strict schemas/counts and four failure injections pass with normal/optimized
+Python; the baseline fails a divergent-rank probe. The independent resource
+verifier also passes all nine corruption tests. No evidence/manifest changed.
+
+Simulator now caches cost-SR operands, handles half reads/divergent ranks/counts
+and evaluates only the requested coordinate axis, once-resolved global origin.
+44 Rust tests, 363 exact cases/pinned hashes, 1,518 functional SR comparisons,
+74 atomic replays, independent evidence and launch/geometry gates pass; zero
+cost-verifier failures; 36 complete predictions retain their hash.
+
+Focused cost-SR speedups 1.572-1.962x; memory controls up to 7.8% slower,
+partial-mask functional SR57 7.9% slower and ALU CLI 1.6% slower. All trials and
+A/A controls remain in simulator `results/2026-10-17-cost-special-registers/`.
+No overall speedup, new M2 validation or timing rebaseline is claimed.
+
+Next: compact SR metadata/control profiling, cost-context guards and original
+resource-shader functional replay. Hardware timing/SR113 remain unvalidated.
