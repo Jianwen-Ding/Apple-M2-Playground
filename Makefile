@@ -549,3 +549,10 @@ verify-call-ret:
 .PHONY: verify-atomic-gap-bits
 verify-atomic-gap-bits:
 	$(PYTHON) -B scripts/verify_atomic_gap_bits.py
+
+.PHONY: verify-tg-atomic-followup test-probe-watchdog
+verify-tg-atomic-followup:
+	$(PYTHON) -B scripts/verify_tg_atomic_followup.py
+
+test-probe-watchdog:
+	$(PYTHON) -B scripts/test_probe_watchdog.py

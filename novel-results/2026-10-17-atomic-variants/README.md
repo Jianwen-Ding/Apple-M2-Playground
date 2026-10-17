@@ -85,9 +85,10 @@ Bit 46 alone changes nothing (all 11 ops, 33 variants).
 - **Bit 6 suppresses the access:** it returns 0, and a dump of all 2 KiB of threadgroup memory, pre-filled with a
   pattern, shows no changed word.
 - This parallels device load / store bit 31 (`2026-10-11-mem-control-gap-bits`).
-- **Not tested:** combinations of bits, and Mesa's constant bits (15, 34, 36, 47).
-- So **shared-memory `atomicAdd(float)` has no single-bit encoding**. It still needs a CAS loop, or a device-memory
-  float atomic.
+- No float add was found in this 19-bit scan. Shared-memory float add still needs a CAS loop, or a device-memory
+  float atomic. This does not rule out other fields or combinations.
+- The [follow-up](../2026-10-17-tg-atomic-followup/README.md) covers selected combinations, bits 34/36/47,
+  and ops 11-15. Bit 15 changes instruction length and needs a separately constructed short-form test.
 
 ## Compiler implications (PTX → AGX)
 

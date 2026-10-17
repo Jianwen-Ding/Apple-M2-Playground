@@ -289,3 +289,10 @@ calls return through the buffer-relative byte link when the continuation execute
 Further [atomic control-bit probes](novel-results/2026-10-17-atomic-gap-bits/README.md)
 record five matching add variants, bit-29 suppression on three operations and a
 recovered bit-31 fault; `make verify-atomic-gap-bits`.
+
+[Threadgroup atomic follow-up](novel-results/2026-10-17-tg-atomic-followup/README.md):
+27 variants, no new faults/hangs. Opcodes 11–15 stop the issuing group even with
+an empty mask; tested control-bit changes match the integer baseline.
+`make verify-tg-atomic-followup` checks exact evidence and simulator gates.
+The probe watchdog now retains memory-pressure and process diagnostics on a
+timeout; `make test-probe-watchdog` tests its bounded failure paths without a GPU.

@@ -131,6 +131,34 @@ def case(name):
     raise ValueError(name)
 
 
+def run_bounded(argv, env, timeout=10, kill_timeout=2):
+    """Bound both dispatch wait and post-SIGKILL pipe drain (a task may be stuck in the driver)."""
+    proc = subprocess.Popen(argv, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    r = {'command': argv, 'environment': env, 'pid': proc.pid}
+    try:
+        out, err = proc.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired as ex:
+        r['host_timeout'] = True
+        # Read only this probe's metadata; retain mappings before killing it.
+        r['process_at_timeout'] = {}
+        for name in ('status', 'wchan', 'maps'):
+            try:
+                r['process_at_timeout'][name] = Path(f'/proc/{proc.pid}/{name}').read_text()
+            except OSError as error:
+                r['process_at_timeout'][name] = str(error)
+        proc.kill()
+        try:
+            out, err = proc.communicate(timeout=kill_timeout)
+        except subprocess.TimeoutExpired as drain:
+            r['host_process_stuck'] = True
+            out, err = drain.stdout or ex.stdout or b'', drain.stderr or ex.stderr or b''
+            # Do not wait indefinitely for an uninterruptible kernel task.
+            proc.stdout.close()
+            proc.stderr.close()
+    r.update(returncode=proc.poll(), stdout=out.decode(errors='replace'), stderr=err.decode(errors='replace'))
+    return r
+
+
 def run_one(runner, code, p, label):
     """Retain full stdout/stderr, timestamps and even partial failed readbacks."""
     d = runner.out / label
@@ -140,22 +168,32 @@ def run_one(runner, code, p, label):
     argv = [str(runner.exe), '/dev/dri/renderD128', str(d / 'code.bin'), str(p['n']), str(d / 'out.bin'), '1',
             str(p['regs']), str(d / 'table.bin')]
     env = {'PATH': '/usr/bin', 'AGX_LOCAL_X': str(p['wg']), 'AGX_TABLE_OUT': str(d / 'table-out.bin')}
+    if p.get('shared', 0):
+        from run_drm_tg_layout import shared_word
+        env['AGX_SHARED_WORD'] = str(shared_word(p['shared']))
     before = len(P.gpu_safety.used())
-    try:
-        run = subprocess.run(argv, env=env, capture_output=True, timeout=10)
-        r = dict(returncode=run.returncode, stdout=run.stdout.decode(errors='replace'), stderr=run.stderr.decode(errors='replace'))
-    except subprocess.TimeoutExpired as ex:
-        r = dict(returncode=None, host_timeout=True, stdout=(ex.stdout or b'').decode(errors='replace'),
-                 stderr=(ex.stderr or b'').decode(errors='replace'))
-    lines = [json.loads(s) for s in r['stdout'].splitlines() if s.startswith('{')]
+    r = run_bounded(argv, env)
+    lines = []
+    for line in r['stdout'].splitlines():
+        if line.startswith('{'):
+            try:
+                lines.append(json.loads(line))
+            except json.JSONDecodeError:
+                r.setdefault('incomplete_json_lines', []).append(line)
     smp = [s for s in lines if 'rep' in s]
-    r['ok'] = r['returncode'] == 0 and len(smp) == 1 and all(smp[0]['fw_ts'])
+    r['ok'] = (not r.get('host_timeout') and not r.get('incomplete_json_lines')
+               and r['returncode'] == 0 and len(smp) == 1 and len(smp[0].get('fw_ts', [])) == 2
+               and all(smp[0]['fw_ts']))
     r['samples'] = smp
     for file, key in (('out.bin', 'out'), ('table-out.bin', 'table_after')):
         f = d / file
         if f.exists():
             b = f.read_bytes()
-            r[key] = list(struct.unpack(f'<{len(b)//4}I', b))
+            whole = len(b) // 4 * 4
+            r[key] = list(struct.unpack(f'<{whole//4}I', b[:whole]))
+            if whole != len(b):
+                r[key + '_partial_tail_hex'] = b[whole:].hex()
+                r['ok'] = False
     if r['ok']:
         r['fw_ns'] = smp[0]['fw_ts'][1] - smp[0]['fw_ts'][0]
     elif smp or r.get('host_timeout'):
@@ -179,7 +217,10 @@ def hardware(name, p):
     rec = dict(name=name, utc=time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), before=P.snapshot(),
                code=p['code'].hex(), control_code=p['control'].hex(), table_in=p['table'], n=p['n'], wg=p['wg'],
                regs=p['regs'], gate=p['gate'], script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-               simulator_sha256=hashlib.sha256(P.cov.RUN.read_bytes()).hexdigest())
+               simulator_sha256=hashlib.sha256(P.cov.RUN.read_bytes()).hexdigest(),
+               harness_sha256=hashlib.sha256((P.bench.REPO / 'tests/drm_compute.c').read_bytes()).hexdigest())
+    if p.get('shared', 0):
+        rec['shared'] = p['shared']
     start = Path('/save/kernel.log').stat().st_size
 
     def save():
@@ -188,19 +229,30 @@ def hardware(name, p):
         with gzip.GzipFile(filename=str(path), mode='wb', mtime=0) as f:
             f.write((json.dumps(rec, sort_keys=True) + '\n').encode())
 
+    rec['phase'] = 'pre-control'
+    save()  # Exact program and inputs survive even if the first submission wedges.
     rec['control_before'] = run_one(runner, p['control'], p, 'control-before')
     if not matches(rec['control_before'], p['expected']):
         rec['halted'] = 'pre-control failed; no variant submitted'
         save()
         return rec
+    rec['phase'] = 'variant'
+    save()
     rec['variant'] = run_one(runner, p['code'], p, 'variant')
     save()
+    if rec['variant'].get('host_process_stuck'):
+        rec['halted'] = 'probe process still blocked after SIGKILL; no more submissions'
+        save()
+        return rec
     if not rec['variant']['ok']:
         time.sleep(2)
+    rec['phase'] = 'recovery-control'
+    save()
     rec['control_after'] = run_one(runner, p['control'], p, 'control-after')
     rec['recovery_control_passed'] = matches(rec['control_after'], p['expected'])
     if not rec['recovery_control_passed']:
         rec['halted'] = 'post-control failed; GPU recovery not established, no more submissions'
+    rec['phase'] = 'finished'
     save()
     return rec
 

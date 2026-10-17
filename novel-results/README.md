@@ -48,3 +48,4 @@ Document which device and software versions were tested and any uncertainty.
 
 - [Uniform direct, indirect and nested call/return](2026-10-17-call-ret/README.md)
 - [Device atomic gap bits and recovered fault](2026-10-17-atomic-gap-bits/README.md)
+- [Threadgroup atomic ending opcodes, control bits, and hang diagnostics](2026-10-17-tg-atomic-followup/README.md)

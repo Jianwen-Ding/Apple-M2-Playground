@@ -93,7 +93,13 @@ def gate(code, surrogate):
 
 def snapshot():
     stat = dict(line.split() for line in Path('/sys/fs/cgroup/memory.stat').read_text().splitlines())
+    pressure = {}
+    for name in ('memory.current', 'memory.max', 'memory.events', 'memory.pressure'):
+        path = Path('/sys/fs/cgroup') / name
+        if path.exists():
+            pressure[name] = path.read_text()
     return {'shmem': int(stat['shmem']), 'budget_used': len(gpu_safety.used()),
+            'memory_cgroup': pressure, 'meminfo': Path('/proc/meminfo').read_text(),
             'boot_id': gpu_safety.boot_id(), 'ac_online': Path('/sys/class/power_supply/macsmc-ac/online').read_text().strip()}
 
 

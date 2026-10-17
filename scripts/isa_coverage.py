@@ -54,7 +54,7 @@ ATOM = F+'2026-10-11-atomics/README.md'
 ATOMV = F+'2026-10-17-atomic-variants/README.md'
 STATUS.update({
     'atomic': ('mapped: Mesa ops 0-10 exact; bit 45: sub = float32 add (ftz, RNE), cmpxchg = u64 min/max (bit 46 = max); ops 11-15 end the SIMD group; u1-u4 single-bit follow-up in atomic-gap-bits finding', ATOMV),
-    'threadgroup_atomic': ('mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run', ATOM),
+    'threadgroup_atomic': ('Mesa ops 0-10 exact; ops 11-15 stop one issuing group even with empty mask; sub bit 6 suppresses; selected other bits inert; termination memory effects open', F+'2026-10-17-tg-atomic-followup/README.md'),
 })
 STATUS.update({
     'call': ('uniform direct and register targets measured; nested direct calls work; divergent targets open', F+'2026-10-17-call-ret/README.md'),

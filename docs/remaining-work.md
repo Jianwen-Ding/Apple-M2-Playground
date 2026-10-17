@@ -42,9 +42,9 @@ budget, and ideally a reboot afterwards.
 - **fp64.** AGX has no fp64 unit, and no finding documents that or measures it. CUDA `double` needs software
   emulation from recorded int64 and fp32 forms. Measure the cost of a double-precision add/mul/fma sequence built only
   from safe forms, and check it bit-exact against IEEE on edge cases.
-- **64-bit atomics** (`atom.add.u64`, `atom.cas.b64`, `atom.exch.b64`). No validated encoding is known, and Mesa ops
-  11-15 may include them. On the safe side: compile a Vulkan shader with `GL_EXT_shader_atomic_int64` (if Honeykrisp
-  exposes it), export the binary and decode Mesa's lowering. Running a hand-built op 11-15 is in the unsafe list.
+- **64-bit atomics** (`atom.add.u64`, `atom.cas.b64`, `atom.exch.b64`). No validated encoding is known. Device and
+  threadgroup ops 11-15 stop the issuing group in the tested forms. Compile a Vulkan shader with
+  `GL_EXT_shader_atomic_int64` (if exposed), export the binary and decode Mesa's lowering.
 - **Warp shuffle completeness.** Check that every `shfl.sync` mode (`up`, `down`, `bfly`, `idx`) with `c`-clamp and
   segment-mask operands has a recorded AGX lowering with exact out-of-range behaviour. The cross-lane width finding
   covers reductions and scans, not every shuffle form.
@@ -110,8 +110,9 @@ built through Mesa.
 3. safe-11 (occupancy, clock) and safe-09 (preshader), the runtime-facing numbers.
 4. Stack via Mesa capture, then safe-07 and safe-05.
 5. safe-02 / safe-03 performance gaps (needed for stage 4 rather than stage 3).
-6. Unsafe: only atomic ops 11-15 (if Mesa capture does not resolve 64-bit atomics) and the register-base atomics,
-   each after owner approval and a reboot.
+6. Owner-authorized unsafe follow-ups: divergent call/return and remaining atomic-field combinations.
+   Opcode 11-15 and register-base first passes are complete. Continue past logged recovered faults only after
+   a passing control; stop further submissions on persistent unresponsiveness.
 
 ## Function calls (`call`, `ret`): uniform round trips measured, 2026-10-17
 
@@ -141,3 +142,16 @@ baseline. Bit 29 returned zero and left memory unchanged for add, exchange and
 compare/exchange. Bit 31 caused a recovered unmapped UL1C fault. These are
 single-program observations, not general inert-bit or cache-scope claims.
 [Finding and verifier](../novel-results/2026-10-17-atomic-gap-bits/README.md).
+
+## Threadgroup atomic follow-up complete for 27 variants
+
+Ops 11-15 stop the issuing group with full, odd-lane and empty masks. An empty
+group that jumps over op 11 continues. Selected constant-bit flips and pairs
+match integer sub/CAS, with all 2 KiB checked. Bit 15 changes instruction length
+and was rejected by the offline layout gate before hardware submission.
+No new faults or hangs; budget remains 3/30. Other-group effects and shared
+memory after an ending opcode remain open, as do short forms and other bit
+combinations. [Finding](../novel-results/2026-10-17-tg-atomic-followup/README.md),
+`make verify-tg-atomic-followup`. Future hang diagnostics and bounded
+unified-memory trigger investigations are prepared in
+[this procedure](../notes/hang-memory-followup.md).

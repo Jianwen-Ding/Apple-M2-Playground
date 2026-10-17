@@ -51,3 +51,10 @@ The owner subsequently selected `call` / `ret`, including the previous hang,
 as the priority. The fmadd steps above are deferred. Follow the staged
 `tasks/unsafe-01-call-ret.md` plan, simulator-check all surrounding programs,
 and preserve and push any fault report before ending the session.
+
+Later steering supersedes the earlier first-fault stop rule: log and push faults,
+validate recovery with a known-good control, and continue if it passes. Stop GPU
+submissions on a persistent hang. Higher-risk probes are prioritized while the
+owner is away from the machine. Uniform calls/returns are now measured; the
+next 27 threadgroup atomic variants completed without new faults. Hang evidence
+and unified-memory follow-ups are prepared in [hang-memory-followup.md](hang-memory-followup.md).

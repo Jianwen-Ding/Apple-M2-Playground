@@ -527,3 +527,17 @@ the code offset should be subtracted from the link was wrong.
 Device atomic add bit 31 flipped from the baseline faulted at UL1C
 0x1000382040 (budget 3/30); its control also passed. Full logs and records are
 preserved in the [atomic report](../novel-results/2026-10-17-atomic-gap-bits/README.md).
+
+### Threadgroup atomic layout and empty-mask gates, 2026-10-17
+
+Clearing local-atomic bit 15 changes the instruction from ten bytes to six.
+The proposed bit-flip probe failed the offline length assertion and was never
+submitted. Reusing all ten bytes would execute trailing operand bytes as code.
+A short-form test needs a new layout and a new complete-program gate.
+
+The hardware also ends a group when opcodes 11-15 issue with an empty mask.
+The simulator previously skipped these unsupported operations without error.
+It now rejects them before the per-lane loop, including empty masks; shared
+memory effects before termination remain unmodeled. This is distinct from a
+GPU hang: all 27 follow-up variants completed, and all controls passed.
+[Evidence and limits](../novel-results/2026-10-17-tg-atomic-followup/README.md).

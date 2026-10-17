@@ -147,7 +147,7 @@ Top-level 7-bit opcodes that applegpu cannot decode are all classified in
 | `texture_load` | 8/12 | 0 |  | open: needs texture/sampler/image state |
 | `threadgroup_barrier` | 2/2 | 8 |  | [mapped (gap bits 8-15: no observable effect with one SIMD group; scope effects untested)](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `atomic` | 8/8 | 0 | u1, u2, u3, u4, u5 | [mapped: Mesa ops 0-10 exact; bit 45: sub = float32 add (ftz, RNE), cmpxchg = u64 min/max (bit 46 = max); ops 11-15 end the SIMD group; u1-u4 single-bit follow-up in atomic-gap-bits finding](../novel-results/2026-10-17-atomic-variants/README.md) |
-| `threadgroup_atomic` | 6/10 | 3 | u1, u3, u4, u5 | [mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run](../novel-results/2026-10-11-atomics/README.md) |
+| `threadgroup_atomic` | 6/10 | 3 | u1, u3, u4, u5 | [Mesa ops 0-10 exact; ops 11-15 stop one issuing group even with empty mask; sub bit 6 suppresses; selected other bits inert; termination memory effects open](../novel-results/2026-10-17-tg-atomic-followup/README.md) |
 | `TODO.after_sampling1` | 2/2 | 0 |  | [hangs in compute](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `TODO.after_sampling2` | 2/2 | 0 |  | [hangs in compute](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `TODO.unk30C0` | 6/6 | 0 |  | [inert](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
