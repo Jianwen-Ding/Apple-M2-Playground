@@ -72,7 +72,7 @@ after about 44 recoveries in one boot.
 | Work | Pending cases | Risk | CUDA need |
 |---|---|---|---|
 | ~~`while_icmp` / `while_fcmp` loop forms~~ | done 2026-10-17: 24 guarded + 9 terminating recorded; the other 7 never exit by design | none (the hang was the test loop) | Data-dependent loops: every condition code matches the simulator |
-| `call` / `ret` | descriptor only | Bad target hangs the GPU | Non-inlined device functions, recursion. Possibly avoidable by inlining everything |
+| `call` / `ret` | descriptor only; **offline study done 2026-10-17, not run**: see "Function calls" below | Bad target hangs the GPU | Non-inlined device functions, recursion. Avoidable by inlining everything |
 | Direct-DRM scratch / helper program (`async_load`, `async_store`, `stack_get_ptr`, `stack_adjust`, `pop_exec2`) | MANUAL `stack` | Two attempts stalled ~0.5 s | Local memory, spills, `alloca`. Try the Mesa-capture route first (safe list) |
 | ~~Device atomic ops 11-15~~ and the remaining gap bits u1-u4 | done 2026-10-17 for ops 11-15 and bits 45-46 | ops 11-15 end the SIMD group, no fault | Float add and u64 min / max found; u1-u4 (bits 26, 28-29, 31, 42-44) and the threadgroup atomic's bits still open |
 | ~~Atomics with return through a register base~~ | done 2026-10-17 (11/11 exact) | none | `atomicAdd` return values with computed addresses |
@@ -112,3 +112,23 @@ built through Mesa.
 5. safe-02 / safe-03 performance gaps (needed for stage 4 rather than stage 3).
 6. Unsafe: only atomic ops 11-15 (if Mesa capture does not resolve 64-bit atomics) and the register-base atomics,
    each after owner approval and a reboot.
+
+## Function calls (`call`, `ret`): offline study, 2026-10-17
+
+Nothing was run on the GPU. Findings from sources and the simulator:
+
+- **Forms:** applegpu lists `call reg32` (2 bytes, opcode 0x04, register in bits 9-15), `ret reg32` (2 bytes, 0x14) and
+  `call off` (6 bytes, 0xC010, signed 32-bit pc-relative offset). The pseudocode says the 6-byte form writes `pc + 6`
+  into r1 of every active thread and jumps. The register form is a theory only: a `push_exec` / `call` / branch /
+  `pop_exec` loop that masks execution to threads sharing one target value.
+- **Mesa never emits them.** `agx_pack.c` has no call or ret, and its jump packer states "We don't implement indirect
+  branches". Every Mesa-compiled shader has all functions inlined, so there is no captured binary to learn from.
+- **The simulator cannot run them.** The assembler and decoder accept `call r15` and `ret r15`, but `agx_run` stops with
+  "no exec" on both. The safe-probe method (a surrogate instruction passes `agx_run` first) therefore cannot apply: the
+  instruction itself transfers control, so there is no surrogate that exercises it, and nothing is known to model.
+- **Why it matters little for CUDA:** NVCC-style device functions can be inlined by the translator, as Mesa does for
+  every shader. Only recursion and indirect calls (`call.uni` through a register, function pointers) need real calls.
+
+If this is ever pursued, it needs an owner decision, not just a gate. A candidate design would be a 6-byte `call` whose
+target is the next instruction (`off` = 6) followed by a register read of r1, so the control flow cannot leave the
+program. That has not been designed further or run.
