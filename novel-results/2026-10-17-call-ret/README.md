@@ -269,6 +269,56 @@ empty-mask fallthrough).
 Reproducer: `scripts/probe_empty_mask.py offline` (simulator/surrogates) or
 `hardware [--case call|callreg|ret|all]` (GPU submission).
 
+## Divergent register calls: lane 0's target wins (2026-10-17)
+
+**With per-lane call targets, the group transfers to lane 0's target; only
+lanes addressed to that target participate, the rest fall through.**
+
+Probe design: r30 = A for even lanes, B for odd lanes (then swapped, then
+lane 0 → B alone vs 1..31 → A). Each callee stores the link + its marker and
+returns to a common continuation that pops twice with a store after each pop.
+
+- Even→A / odd→B: link + MARK_A on even lanes; CONT1 on odd lanes; CONT2 all.
+- Even→B / odd→A: link + MARK_B on even lanes; CONT1 on odd lanes; CONT2 all.
+- Lane 0→B / rest→A (1-vs-31): link + MARK_B on lane 0 only; CONT1 on
+  lanes 1..31; CONT2 all.
+- All dispatches complete normally; controls pass before and after.
+- No fault, no hang, budget unchanged (3/30), kernel log clean.
+
+So it is lane 0's target that wins, not the majority and not a fixed
+callee: only lanes whose r30 matches lane 0's r30 enter the callee (link set
+for those lanes only); the rest skip the call and run the caller post-call
+directly. Both partitions reconverge (CONT2 everywhere).
+
+Evidence: [divergent-callreg.json.gz](../../results/2026-10-17-call-ret/divergent-callreg.json.gz),
+[divergent-callreg-swap.json.gz](../../results/2026-10-17-call-ret/divergent-callreg-swap.json.gz),
+[divergent-callreg-lane0b.json.gz](../../results/2026-10-17-call-ret/divergent-callreg-lane0b.json.gz).
+Reproducer: `scripts/probe_divergent_call.py offline` (simulator/surrogates)
+or `hardware [--swap] [--lane0b]` (GPU submission).
+
+## Divergent returns: all lanes take lane 0's target (2026-10-17)
+
+**With per-lane return targets, every lane lands at lane 0's target.**
+
+Probe design: no call; r30 = A/B per lane (parity, swapped, lane-0-alone).
+Each landing pops twice, stores its marker, and stops.
+
+- Even→A / odd→B: MARK_A on all 32 lanes.
+- Even→B / odd→A: MARK_B on all 32 lanes.
+- Lane 0→B / rest→A: MARK_B on all 32 lanes.
+- All dispatches complete normally; uniform controls pass before and after.
+- No fault, no hang, budget unchanged (3/30), kernel log clean.
+
+Unlike calls (where non-matching lanes fall through), a divergent ret drags
+every lane to lane 0's landing. Whether lane 0 is special or it is the
+lowest active lane is open (would need lane 0 masked out).
+
+Evidence: [divergent-ret-parity.json.gz](../../results/2026-10-17-call-ret/divergent-ret-parity.json.gz),
+[divergent-ret-swap.json.gz](../../results/2026-10-17-call-ret/divergent-ret-swap.json.gz),
+[divergent-ret-lane0b.json.gz](../../results/2026-10-17-call-ret/divergent-ret-lane0b.json.gz).
+Reproducer: `scripts/probe_divergent_ret.py offline` (simulator/surrogates)
+or `hardware [--case parity|swap|lane0b|all]` (GPU submission).
+
 The first successful round trip took 5,208 ns, indirect 5,750 ns, nested 9,500 ns.
 These isolated firmware times are observations, not a calibrated instruction
 cost. All had passing before/after controls and no fault.

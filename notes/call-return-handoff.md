@@ -157,25 +157,23 @@ simulator bug (empty direct calls transferred; empty register calls were
 rejected); the simulator now falls through like hardware, and predicts all
 three hardware outcomes exactly.
 
-### D. Two divergent register-call targets
+### D. Two divergent register-call targets — DONE
 
-Depends on B and C. Select exactly two valid callee entries, first by lane
-parity. Give each callee a distinct marker and the same bounded return structure;
-capture each lane's link before return. Callees must not fall into each other.
-Record which lanes run each body, whether either body runs repeatedly, and
-whether every intended lane reaches the common continuation exactly once.
+Measured 2026-10-17: lane 0's target wins (parity, swapped parity, and
+lane-0-alone-vs-31 all agree). Only lanes addressed to lane 0's target enter
+the callee (link set for those lanes only); the rest skip the call and run
+the caller post-call. Both partitions reconverge (CONT2 everywhere).
+Evidence: `divergent-callreg[-swap|-lane0b].json.gz`.
 
-Do not assume the pseudocode's serialization/replay algorithm. Repeat with the
-two target assignments swapped only after the first result and control are
-understood. Keep the first probe outside nested calls and barriers.
+### E. Divergent return targets — DONE
 
-### E. Divergent return targets
+Measured 2026-10-17: all lanes land at lane 0's target (parity, swapped, and
+lane-0-alone-vs-31 all agree). Unlike calls, non-matching lanes do not fall
+through — every lane executes the winning landing.
+Evidence: `divergent-ret-{parity,swap,lane0b}.json.gz`.
+Open refinement: lane 0 vs lowest active lane (needs lane 0 masked out).
 
-Depends on partial returns and explicit operand selection. Begin without a
-call, with two valid landing blocks selected per lane. Each block has its own
-marker and bounded stop/reconvergence path. This isolates return scheduling
-from indirect-call scheduling. Test a call/return pairing only after that model
-fits. Keep the register-call and return divergence experiments separate.
+(The original step-by-step plans for D and E are superseded by the results above.)
 
 ### F. Nested forms and code placement
 
