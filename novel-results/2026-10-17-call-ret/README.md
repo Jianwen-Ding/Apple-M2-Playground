@@ -212,6 +212,32 @@ Evidence: [partial-mask-ret.json.gz](../../results/2026-10-17-call-ret/partial-m
 Reproducer: `scripts/probe_partial_ret.py offline` (simulator/surrogates) or
 `hardware [--mask odd|single0|contig16|lanes31|all]` (GPU submission).
 
+## Combined partial-mask call + return (2026-10-17)
+
+**Lanes truly diverge and rejoin: active lanes round-trip through the callee
+while inactive lanes run the caller post-call, then all reconverge.**
+
+Probe design: odd lanes active. `call` → callee stores link + CALLEE marker,
+`ret r1` back to the caller post-call, which pops twice with a store after
+each pop (CONT1 into table[64+gid], CONT2 into table[96+gid]). The
+pre-marker survives on inactive lanes in the link slot.
+
+- Hardware result: link + CALLEE on odd lanes; CONT1 on even lanes only;
+  CONT2 on all lanes. Matches the divergence oracle byte-for-byte.
+- The dispatch completes normally; controls pass before and after.
+- No fault, no hang, budget unchanged (3/30), kernel log clean.
+- Firmware time: 8,958 ns.
+
+This answers the combined-sequence question: the machine supports real
+per-lane divergence across call/ret, with reconvergence in the caller via
+pops. (The earlier partial-ret finding — inactive lanes dropped with no
+fallthrough — applies to a bare ret with no caller continuation path; here
+the inactive lanes never enter the callee and proceed down the caller path.)
+
+Evidence: [partial-mask-callret.json.gz](../../results/2026-10-17-call-ret/partial-mask-callret.json.gz).
+Reproducer: `scripts/probe_partial_callret.py offline` (simulator/surrogates)
+or `hardware` (GPU submission).
+
 The first successful round trip took 5,208 ns, indirect 5,750 ns, nested 9,500 ns.
 These isolated firmware times are observations, not a calibrated instruction
 cost. All had passing before/after controls and no fault.
