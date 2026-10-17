@@ -45,3 +45,6 @@ For each confirmed finding, create a descriptive folder containing a report
 based on `templates/finding.md`, the hardware reproducer (or a stable link to
 it under `tests/`), exact inputs/outputs, and relevant environment evidence.
 Document which device and software versions were tested and any uncertainty.
+
+- [Uniform direct, indirect and nested call/return](2026-10-17-call-ret/README.md)
+- [Device atomic gap bits and recovered fault](2026-10-17-atomic-gap-bits/README.md)

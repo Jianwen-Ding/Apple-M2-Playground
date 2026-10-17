@@ -53,14 +53,17 @@ STATUS.update({
 ATOM = F+'2026-10-11-atomics/README.md'
 ATOMV = F+'2026-10-17-atomic-variants/README.md'
 STATUS.update({
-    'atomic': ('mapped: Mesa ops 0-10 exact; bit 45: sub = float32 add (ftz, RNE), cmpxchg = u64 min/max (bit 46 = max); ops 11-15 end the SIMD group; u1-u4 not run', ATOMV),
+    'atomic': ('mapped: Mesa ops 0-10 exact; bit 45: sub = float32 add (ftz, RNE), cmpxchg = u64 min/max (bit 46 = max); ops 11-15 end the SIMD group; u1-u4 single-bit follow-up in atomic-gap-bits finding', ATOMV),
     'threadgroup_atomic': ('mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run', ATOM),
+})
+STATUS.update({
+    'call': ('uniform direct and register targets measured; nested direct calls work; divergent targets open', F+'2026-10-17-call-ret/README.md'),
+    'ret': ('uniform buffer-relative byte target; pop_exec 2 reconverges; divergent and out-of-program behavior open', F+'2026-10-17-call-ret/README.md'),
 })
 STK = F+'2026-10-11-stack-via-mesa/README.md'
 STATUS.update({'stack_store': ('Mesa form runs exactly through Mesa; binary captured (also decodes Mesa stack_adjust)', STK),
                'stack_load': ('Mesa form runs exactly through Mesa; binary captured', STK)})
 TODO_REASON = {
-    'call': 'not run: a bad target can hang the GPU', 'ret': 'not run: a bad target can hang the GPU',
     'jmp_if_skipping_doorbell': 'not run: may loop on itself',
     'jmp_incomplete': 'not run: branch semantics unknown, could loop',
 }

@@ -281,3 +281,11 @@ ones'-complement negative, then uses one 2^23-entry table: this model is exact o
 reduction fixes it (2^-20.70). [Finding](novel-results/2026-10-16-transcendentals/README.md),
 `make verify-transcendentals`.
 
+
+**Uniform call/return decoded (2026-10-17).** Direct, register-indirect and nested
+calls return through the buffer-relative byte link when the continuation executes
+`pop_exec r0l, 2`. Partial/divergent behavior remains open.
+[Finding](novel-results/2026-10-17-call-ret/README.md), `make verify-call-ret`.
+Further [atomic control-bit probes](novel-results/2026-10-17-atomic-gap-bits/README.md)
+record five matching add variants, bit-29 suppression on three operations and a
+recovered bit-31 fault; `make verify-atomic-gap-bits`.

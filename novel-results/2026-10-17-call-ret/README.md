@@ -132,3 +132,10 @@ reconvergence that runs off the program. Default execution still rejects ret
 and register calls; divergent/partial-lane return state and the quiet
 out-of-program completions remain unmodelled. The old opt-in value `1` is the
 contradicted historical hypothesis and must not be used to gate hardware.
+
+Validation after the model update: 31 Rust library tests pass. All 23 retained
+control-flow tests and all 75 coverage control-flow cases replay exactly both
+with default settings and with `AGX_EXPERIMENTAL_RET=buffer-pop2`. The playground
+verifier additionally rejects synthetic partial-lane direct-return and indirect
+call probes; those negative tests make no new hardware claim. The initial
+post-fault recovery control is retained in `results/2026-10-17-call-ret/recovery-control.json.gz`.

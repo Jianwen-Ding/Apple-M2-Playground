@@ -72,9 +72,9 @@ after about 44 recoveries in one boot.
 | Work | Pending cases | Risk | CUDA need |
 |---|---|---|---|
 | ~~`while_icmp` / `while_fcmp` loop forms~~ | done 2026-10-17: 24 guarded + 9 terminating recorded; the other 7 never exit by design | none (the hang was the test loop) | Data-dependent loops: every condition code matches the simulator |
-| `call` / `ret` | descriptor only; **offline study done 2026-10-17, not run**: see "Function calls" below | Bad target hangs the GPU | Non-inlined device functions, recursion. Avoidable by inlining everything |
+| `call` / `ret` | uniform direct/indirect and nested round trips measured; divergence still open: see "Function calls" below | Bad target hangs the GPU | Non-inlined device functions, recursion. Avoidable by inlining everything |
 | Direct-DRM scratch / helper program (`async_load`, `async_store`, `stack_get_ptr`, `stack_adjust`, `pop_exec2`) | MANUAL `stack` | Two attempts stalled ~0.5 s | Local memory, spills, `alloca`. Try the Mesa-capture route first (safe list) |
-| ~~Device atomic ops 11-15~~ and the remaining gap bits u1-u4 | done 2026-10-17 for ops 11-15 and bits 45-46 | ops 11-15 end the SIMD group, no fault | Float add and u64 min / max found; u1-u4 (bits 26, 28-29, 31, 42-44) and the threadgroup atomic's bits still open |
+| ~~Device atomic ops 11-15~~ and the remaining gap bits u1-u4 | done 2026-10-17 for ops 11-15 and bits 45-46 | ops 11-15 end the SIMD group, no fault | Float add and u64 min / max found; u1-u4 single-bit follow-up recorded below; combinations and threadgroup atomic bits still open |
 | ~~Atomics with return through a register base~~ | done 2026-10-17 (11/11 exact) | none | `atomicAdd` return values with computed addresses |
 | `memory_barrier a, b, c` (the 251 non-Mesa encodings) | 251 | Unknown | Possibly cheaper or scope-specific fences. Not needed if safe-10 shows the 7 Mesa encodings suffice |
 
@@ -113,29 +113,31 @@ built through Mesa.
 6. Unsafe: only atomic ops 11-15 (if Mesa capture does not resolve 64-bit atomics) and the register-base atomics,
    each after owner approval and a reboot.
 
-## Function calls (`call`, `ret`): status at 2026-10-17 (stopped after new fault)
+## Function calls (`call`, `ret`): uniform round trips measured, 2026-10-17
 
+- Direct six-byte and register-indirect two-byte calls use buffer-relative byte
+  links. The link points just after the instruction (+6 or +2).
+- `ret` consumes that buffer-relative link and leaves active lanes at mask depth
+  2: the continuation needs `pop_exec r0l, 2`. Direct, indirect and two nested
+  direct calls now run with exact markers on all 32 lanes.
+- The simulator's opt-in `AGX_EXPERIMENTAL_RET=buffer-pop2` matches all seven
+  successful in-program follow-up recordings. Default rejection remains for
+  return/indirect-call paths; partial/divergent targets are not yet validated.
+- Out-of-program quiet completions are explicitly unmodelled. The old
+  code-relative model was wrong; subtracting 0x2000 from the link is not the fix.
+- Reports, exact binaries, fault logs and recovery controls are preserved in the
+  [call/return finding](../novel-results/2026-10-17-call-ret/README.md).
+  `make verify-call-ret` reconstructs the probes and checks their evidence offline.
+- Owner clarification: log and push faults; continue after a passing known-good
+  recovery control. Stop if recovery is not established. The follow-up ret/no-pop
+  and atomic-bit-31 faults both recovered. Current recorded boot budget: 3/30.
+- Next: partial active masks, divergent indirect targets, return-mask behavior
+  outside the uniform case, and calibrated call/return cost.
 
-**Latest owner-directed follow-up:** prior records are now bundled in the playground.
-Two no-call return landing probes passed simulator checks of every surrounding
-path; the first reached no marker, and the second faulted at unmapped UL1C
-address `0x1000008100`. No further GPU dispatch was submitted. Current boot
-budget was 1/30 when stopped. The simulator now rejects unresolved `ret` by
-default. See the [report and exact evidence](../novel-results/2026-10-17-call-ret/README.md);
-`make verify-call-ret` replays the direct calls and checks the diagnostics offline.
-The older historical status below describes the session before this follow-up.
+## Device atomic gap bits: first follow-up complete
 
-- **`call` (6-byte, pc-relative): confirmed on hardware.** With a target inside the program it jumps, and writes
-  r1 = 0x2000 + (byte offset of the next instruction). 0x2000 is the code's offset in the harness buffer. The link
-  moves exactly with the call's position. 3 dispatches, 0 faults. The simulator's model matches the output exactly.
-- **`ret`: unresolved.** One probe faulted (unmapped instruction fetch, recovered, 1 of 30 hang-budget events). Two
-  later probes ran without a fault but did not reach the code after the return. No simulator model matches yet.
-- **Not tried:** the 2-byte `call reg`, lane-divergent targets, and nested calls.
-- **Mesa never emits either instruction**, so there is no captured binary to learn from. A translator can inline
-  device functions; only recursion and function pointers need real calls.
-- **Code and records:** AGX-Performance-Simulator `scripts/probe_calls.py`, commit 3fb851e; raw records in
-  `/scratch/apple-m2-playground/call-probes`. No playground finding or verifier has been written.
-- **Plan for the next agent:** AGX-Performance-Simulator `tasks/unsafe-01-call-ret.md` (staged, simulator-gated,
-  nothing executed yet).
-- **Why it is paused:** several assistant responses about the `ret` investigation were stopped by a safety classifier.
-  Continuing needs the owner's decision on who runs it.
+Bits 26, 28, 42, 43 and 44 individually flipped matched the tested integer-add
+baseline. Bit 29 returned zero and left memory unchanged for add, exchange and
+compare/exchange. Bit 31 caused a recovered unmapped UL1C fault. These are
+single-program observations, not general inert-bit or cache-scope claims.
+[Finding and verifier](../novel-results/2026-10-17-atomic-gap-bits/README.md).

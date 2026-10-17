@@ -78,3 +78,18 @@ for path in sorted((DATA / 'followup').glob('*.json.gz')):
     finally:
         del os.environ['AGX_EXPERIMENTAL_RET']
     print('PASS follow-up', r['name'])
+
+# Do not extrapolate the uniform full-SIMD observations to partial active masks.
+os.environ['AGX_EXPERIMENTAL_RET'] = 'buffer-pop2'
+try:
+    for name in ('call-ret-pop2', 'callreg-ret-pop2'):
+        r = json.load(gzip.open(DATA / 'followup' / f'{name}.json.gz', 'rt'))
+        try:
+            P.cov.simulate(bytes.fromhex(r['code']), 16, 32, r['regs'], 0, r['table_in'])
+        except RuntimeError as exc:
+            assert 'only all-active uniform targets' in str(exc), str(exc)
+        else:
+            raise AssertionError(f'unmeasured partial mask accepted: {name}')
+finally:
+    del os.environ['AGX_EXPERIMENTAL_RET']
+print('PASS experimental return and indirect call refuse partial active masks')

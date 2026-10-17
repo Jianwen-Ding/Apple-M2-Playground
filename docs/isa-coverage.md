@@ -47,10 +47,10 @@ Top-level 7-bit opcodes that applegpu cannot decode are all classified in
 | `dfdx` | 4/6 | 1 |  | [mapped (sub-op space)](../novel-results/2026-10-11-subop-spaces/README.md) |
 | `dfdy` | 4/6 | 1 |  | [mapped (sub-op space)](../novel-results/2026-10-11-subop-spaces/README.md) |
 | `funop` | 4/6 | 2 |  | [mapped (sub-op space)](../novel-results/2026-10-11-subop-spaces/README.md) |
-| `ret` | 2/2 | 2 |  | open: not run: a bad target can hang the GPU |
+| `ret` | 2/2 | 2 |  | [uniform buffer-relative byte target; pop_exec 2 reconverges; divergent and out-of-program behavior open](../novel-results/2026-10-17-call-ret/README.md) |
 | `stop` | 2/2 | 0 |  | [known](../novel-results/2026-10-11-opcode-descriptions/README.md) |
 | `trap` | 2/2 | 0 |  | [known](../novel-results/2026-10-11-opcode-descriptions/README.md) |
-| `call` | 2/2 | 2 |  | open: not run: a bad target can hang the GPU |
+| `call` | 2/2 | 2 |  | [uniform direct and register targets measured; nested direct calls work; divergent targets open](../novel-results/2026-10-17-call-ret/README.md) |
 | `jmp_incomplete` | 4/4 | 0 |  | open: not run: branch semantics unknown, could loop |
 | `jmp_exec_any` | 6/6 | 0 |  | [used by every loop probe (gap bits not swept)](../novel-results/2026-10-10-agx-loop-alu-timing/README.md) |
 | `jmp_exec_none` | 6/6 | 0 |  | [used by the granularity probes (gap bits not swept)](../novel-results/2026-10-11-opcode-descriptions/README.md) |
@@ -146,7 +146,7 @@ Top-level 7-bit opcodes that applegpu cannot decode are all classified in
 | `texture_sample` | 8/12 | 0 |  | open: needs texture/sampler/image state |
 | `texture_load` | 8/12 | 0 |  | open: needs texture/sampler/image state |
 | `threadgroup_barrier` | 2/2 | 8 |  | [mapped (gap bits 8-15: no observable effect with one SIMD group; scope effects untested)](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
-| `atomic` | 8/8 | 0 | u1, u2, u3, u4, u5 | [mapped: Mesa ops 0-10 exact; bit 45: sub = float32 add (ftz, RNE), cmpxchg = u64 min/max (bit 46 = max); ops 11-15 end the SIMD group; u1-u4 not run](../novel-results/2026-10-17-atomic-variants/README.md) |
+| `atomic` | 8/8 | 0 | u1, u2, u3, u4, u5 | [mapped: Mesa ops 0-10 exact; bit 45: sub = float32 add (ftz, RNE), cmpxchg = u64 min/max (bit 46 = max); ops 11-15 end the SIMD group; u1-u4 single-bit follow-up in atomic-gap-bits finding](../novel-results/2026-10-17-atomic-variants/README.md) |
 | `threadgroup_atomic` | 6/10 | 3 | u1, u3, u4, u5 | [mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run](../novel-results/2026-10-11-atomics/README.md) |
 | `TODO.after_sampling1` | 2/2 | 0 |  | [hangs in compute](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `TODO.after_sampling2` | 2/2 | 0 |  | [hangs in compute](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
@@ -169,4 +169,4 @@ Top-level 7-bit opcodes that applegpu cannot decode are all classified in
 | `zs_emit` | 4/4 | 2 | u0 | open: fragment-stage only (needs a render pipeline, not direct-DRM compute) |
 | `memory_barrier` | 2/2 | 0 |  | [used by the in-shader clock probe (gap bits not swept)](../novel-results/2026-10-11-in-shader-clock/README.md) |
 
-159 descriptors; 131 mapped or classified, 28 open.
+159 descriptors; 133 mapped or classified, 26 open.

@@ -81,23 +81,32 @@ def case(name):
     P.RET_PC, P.VALUE, P.LANDINGS = 512, 1024, (1024, 1536, 2048, 2560)
     if name.startswith('atomic-gap'):
         import probe_atomics as A
-        bit = int(name.removeprefix('atomic-gap'))
+        spec = name.removeprefix('atomic-gap').split('-op')
+        bit, op = int(spec[0]), int(spec[1]) if len(spec) == 2 else 0
         assert bit in (26, 28, 29, 31, 42, 43, 44)
+        assert op in (0, 2, 3) and (op == 0 or bit == 29)
         table = A.table_b('atomic-gap-controls')
+        if op == 3:
+            for i in range(0, 32, 3):
+                table[A.S_WORD + 2*i + 1] = table[i]
         pre, suf = A.common(1)
-        sur = A.atomic_bytes(0, 1)
+        sur = A.atomic_bytes(op, 1)
         var = (int.from_bytes(sur, 'little') ^ (1 << bit)).to_bytes(8, 'little')
         assert (int.from_bytes(var, 'little') ^ int.from_bytes(sur, 'little')) == 1 << bit
         control, code = (P.drm.build_main(pre + op + suf) for op in (sur, var))
         tab = table.copy()
         for i in range(32):
-            tab[i] = (table[i] + table[A.S_WORD + 2*i]) & 0xffffffff
+            src = table[A.S_WORD + 2*i]
+            if op == 0:
+                tab[i] = (table[i] + src) & 0xffffffff
+            elif op == 2 or table[i] == table[A.S_WORD + 2*i + 1]:
+                tab[i] = src
         out = [0xcdcdcdcd]*8 + table[:32] + [0xcdcdcdcd]*8 + [0xa5a50000+i for i in range(16)]
         P.cov.gate(pre + sur + suf)
         assert P.cov.simulate(control, 32, 32, 64, 0, table) == (out, tab)
         return dict(code=code, control=control, table=table, n=32, wg=32, regs=64,
                     expected=(out, tab), data_dir=ROOT/'results/2026-10-17-atomic-gap-bits',
-                    gate={'baseline_add_matches_independent_oracle': True, 'changed_bit': bit,
+                    gate={('baseline_add_matches_independent_oracle' if op == 0 else 'baseline_matches_independent_oracle'): True, 'changed_bit': bit,
                           'baseline_instruction': sur.hex(), 'variant_instruction': var.hex(),
                           'variant_decode': P.cov.ASMB.info(var), 'limitation': 'unmeasured control bit; surrogate gate only'})
     if name in ('call-ret-pop2', 'callreg-ret-pop2', 'call-nested-pop2'):

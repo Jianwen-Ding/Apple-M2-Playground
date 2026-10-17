@@ -545,3 +545,7 @@ verify-transcendentals:
 .PHONY: verify-call-ret
 verify-call-ret:
 	$(PYTHON) -B scripts/verify_call_ret.py
+
+.PHONY: verify-atomic-gap-bits
+verify-atomic-gap-bits:
+	$(PYTHON) -B scripts/verify_atomic_gap_bits.py
