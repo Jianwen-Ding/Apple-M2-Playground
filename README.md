@@ -79,6 +79,7 @@ headers are read without modifying vendor sources. Python-only equivalents
 are documented in [scripts/README.md](scripts/README.md).
 
 - [Probe plan](docs/probe-plan.md)
+- [Remaining work, safe and unsafe](docs/remaining-work.md): every open Task 1 item split by GPU risk (2026-10-17)
 - [ISA coverage](docs/isa-coverage.md): every applegpu instruction descriptor, its unaccounted bits and hardware status (regenerate with `python3 -B scripts/isa_coverage.py`)
 - [Asahi Linux environment](environments/asahi-linux/README.md)
 - [Offline environment](environments/offline/README.md)

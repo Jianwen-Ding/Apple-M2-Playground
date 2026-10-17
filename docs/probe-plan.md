@@ -83,3 +83,7 @@ The next hang-free probes are written up as self-contained tasks in AGX-Performa
 - safe-06: recording the 214 coverage "may fault" special-register cases (each selector already read without fault).
 
 Its "Not safe" list is the current do-not-run list.
+
+## Remaining work (2026-10-17)
+
+All open items, split into safe and owner-approval-only work, with a suggested order: [remaining-work.md](remaining-work.md).
