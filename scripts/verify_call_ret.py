@@ -79,17 +79,63 @@ for path in sorted((DATA / 'followup').glob('*.json.gz')):
         del os.environ['AGX_EXPERIMENTAL_RET']
     print('PASS follow-up', r['name'])
 
-# Do not extrapolate the uniform full-SIMD observations to partial active masks.
+# Uniform partial masks are now modelled (measured 2026-10-17): uniform
+# full-mask binaries replayed with fewer lanes must be accepted, not rejected.
+# (Exact per-lane values under n < 32 depend on the harness lane mapping, a
+# separate untested dimension; acceptance is the contract change here.)
 os.environ['AGX_EXPERIMENTAL_RET'] = 'buffer-pop2'
 try:
     for name in ('call-ret-pop2', 'callreg-ret-pop2'):
         r = json.load(gzip.open(DATA / 'followup' / f'{name}.json.gz', 'rt'))
-        try:
-            P.cov.simulate(bytes.fromhex(r['code']), 16, 32, r['regs'], 0, r['table_in'])
-        except RuntimeError as exc:
-            assert 'only all-active uniform targets' in str(exc), str(exc)
-        else:
-            raise AssertionError(f'unmeasured partial mask accepted: {name}')
+        out16, tab16 = P.cov.simulate(bytes.fromhex(r['code']), 16, 32, r['regs'], 0, r['table_in'])
+        assert len(out16) > 0 and len(tab16) == len(r['table_in']), name
+        print(f'PASS uniform partial coverage accepted: {name}')
 finally:
     del os.environ['AGX_EXPERIMENTAL_RET']
-print('PASS experimental return and indirect call refuse partial active masks')
+
+# Divergent targets with lane 0 masked out remain unmodelled and must be
+# rejected for both register calls and returns.
+import run_drm_compute as _drm
+import record_suite as _RS
+_e, _mov, _st = _RS.e, _RS.mov, _RS.agx_loop.store
+_stop, _wait = _e('stop'), _e('wait 0')
+
+
+def _neg_case(kind):
+    _P_site = _drm.control_main()[1]
+    b = _e('iadd r29, r1, 0')
+    b += _mov(27, 0) + _e('iadd r20, r29, r27')
+    # r30: odd lanes -> A, even lanes -> B (divergent); lane 0 (-> B) masked out.
+    b += _mov(30, 0x2000 + _P_site + 512)
+    b += _mov(27, 1) + _e('and r24, r29, r27') + _mov(26, 1)
+    b += _RS.if_else('if_icmp r0l, seq, r24, r26, 1', None,
+                      _mov(30, 0x2000 + _P_site + 1024), b'')
+    # mask lane 0 out: active iff gid != 0
+    b += _mov(27, 0) + _e('if_icmp r0l, ugt, r29, r27, 1')
+    if kind == 'call':
+        b += _e('call r30') + _wait + _wait + _stop
+    else:
+        b += _e('ret r30') + _wait + _wait + _stop
+    # landing B (valid in-program target for the non-divergent lanes)
+    b += _stop * ((512 - len(b)) // 2)
+    assert len(b) == 512
+    b += _e('pop_exec r0l, 2') + _mov(23, 0xBBBB0001) + _st(23, 8, 20) + _wait + _stop
+    # landing A (valid in-program target)
+    b += _stop * ((1024 - len(b)) // 2)
+    assert len(b) == 1024
+    b += _e('pop_exec r0l, 2') + _mov(23, 0xBBBB0002) + _st(23, 8, 20) + _wait + _stop
+    return _drm.build_main(b)
+
+
+os.environ['AGX_EXPERIMENTAL_RET'] = 'buffer-pop2'
+try:
+    for kind in ('call', 'ret'):
+        try:
+            P.cov.simulate(_neg_case(kind), 32, 32, 64, 0, [0] * 128)
+        except RuntimeError as exc:
+            assert 'lane 0 inactive' in str(exc), f"{kind}: {exc}"
+            print(f'PASS divergent {kind} with lane 0 masked stays rejected')
+        else:
+            raise AssertionError(f'divergent {kind} with lane 0 masked unexpectedly accepted')
+finally:
+    del os.environ['AGX_EXPERIMENTAL_RET']

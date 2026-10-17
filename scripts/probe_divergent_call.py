@@ -143,38 +143,47 @@ def build_probe(swap=False, lane0b=False):
     # skipped, CONT2 everywhere. Control has its own (shorter) call site.
     ctrl_link = 0x2000 + ctrl_call_pc + 2
     expected_ctrl = ([ctrl_link] * N + [MARKER_A] * N + [0] * N + [MARKER_C2] * N)
-    # Divergent hope: link everywhere (uniform link), per-assignment markers,
-    # CONT1 none, CONT2 everywhere.
+    # Divergent with lane 0 active: lane 0's target wins for the whole group;
+    # matching lanes get the link and run the callee; non-matching lanes are
+    # masked at transfer (keep PRE, skip callee stores); post pop1 stores
+    # CONT1 on the non-matching lanes (matching lanes arrive with depth 2
+    # from their return and skip it); pop2 stores CONT2 on all lanes.
     if lane0b:
-        expected_div = ([link_val if i == 0 else 0 for i in range(N)]
-                        + [MARKER_B if i == 0 else MARKER_A for i in range(N)]
-                        + [0] * N + [MARKER_C2] * N)
+        match = {0}
+        expected_div = ([link_val if i == 0 else MARKER_PRE for i in range(N)]
+                        + [MARKER_B if i == 0 else 0 for i in range(N)]
+                        + [MARKER_C1 if i != 0 else 0 for i in range(N)]
+                        + [MARKER_C2] * N)
     elif not swap:
-        expected_div = ([link_val] * N
-                        + [MARKER_A if i % 2 == 0 else MARKER_B for i in range(N)]
-                        + [0] * N + [MARKER_C2] * N)
+        match = set(range(0, N, 2))
+        expected_div = ([link_val if i % 2 == 0 else MARKER_PRE for i in range(N)]
+                        + [MARKER_A if i % 2 == 0 else 0 for i in range(N)]
+                        + [MARKER_C1 if i % 2 == 1 else 0 for i in range(N)]
+                        + [MARKER_C2] * N)
     else:
-        expected_div = ([link_val] * N
-                        + [MARKER_B if i % 2 == 0 else MARKER_A for i in range(N)]
-                        + [0] * N + [MARKER_C2] * N)
+        match = set(range(0, N, 2))
+        expected_div = ([link_val if i % 2 == 0 else MARKER_PRE for i in range(N)]
+                        + [MARKER_B if i % 2 == 0 else 0 for i in range(N)]
+                        + [MARKER_C1 if i % 2 == 1 else 0 for i in range(N)]
+                        + [MARKER_C2] * N)
 
     os.environ['AGX_EXPERIMENTAL_RET'] = 'buffer-pop2'
     try:
         c_out, c_tab = cov.simulate(ctrl_a, N, WG, REGS, 0, table)
         assert (c_out, c_tab) == (expected_out, expected_ctrl), \
             f"control mismatch: link0={c_tab[0]:#x} m32={c_tab[32]:#x} c1={c_tab[64]:#x} c2={c_tab[96]:#x}"
-        try:
-            cov.simulate(code, N, WG, REGS, 0, table)
-        except RuntimeError as exc:
-            assert 'divergent' in str(exc), f"unexpected rejection: {exc}"
-            print(f"  Simulator rejects divergent callreg as expected: {exc}")
-        else:
-            raise AssertionError('divergent callreg unexpectedly accepted by simulator')
+        # Divergent calls with lane 0 active are now modelled (lane 0 wins,
+        # non-matching active lanes masked, dragged lanes keep their depth):
+        # the variant must match the hardware-validated oracle exactly.
+        v_out, v_tab = cov.simulate(code, N, WG, REGS, 0, table)
+        assert (v_out, v_tab) == (expected_out, expected_div), \
+            f"variant mismatch: link0={v_tab[0]:#x} m32={v_tab[32]:#x}"
+        print("  Simulator reproduces the divergent call exactly.")
     finally:
         del os.environ['AGX_EXPERIMENTAL_RET']
 
     cov.gate(code, allow=('call', 'ret'))
-    print("  Uniform-A control validated; divergent variant rejected as required.")
+    print("  Uniform-A control and divergent variant both validated.")
     if lane0b:
         label = 'lane0->B,rest->A'
     else:
@@ -187,7 +196,7 @@ def build_probe(swap=False, lane0b=False):
         expected_div=(expected_out, expected_div),
         gate={'call_pc': call_pc, 'post_pc': post_pc, 'link': link_val,
               'swap': swap, 'lane0b': lane0b,
-              'variant_rejected_divergent': True, 'control_matches_oracle': True},
+              'variant_matches_oracle': True, 'control_matches_oracle': True},
     )
 
 
@@ -322,7 +331,7 @@ def hardware(p):
         c2 = [i for i in range(N) if tab[96 + i] == MARKER_C2]
         rec['analysis'] = {'link': link, 'mark_a': ma, 'mark_b': mb, 'cont1': c1, 'cont2': c2}
         if (rec['variant']['out'], rec['variant']['table_after']) == p['expected_div']:
-            rec['interpretation'] = 'divergent_calls_both_callees_rejoin'
+            rec['interpretation'] = 'lane0_wins_matching_run_dragged_masked_rejoin'
         elif not ma and mb == list(range(N)):
             rec['interpretation'] = 'only_B_ran'
         elif ma == list(range(N)) and not mb:

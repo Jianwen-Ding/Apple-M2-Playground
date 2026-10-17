@@ -87,12 +87,12 @@ def build_bodies(mask='odd'):
     setup += mov(23, MARKER_PRE)
     setup += st(23, 8, 20)              # pre-marker for all lanes
     setup += wait
-    setup += mov(30, 0x2000 + LANDING_B_OFF)  # uniform ret target
+    site = drm.control_main()[1]
+    setup += mov(30, 0x2000 + site + LANDING_B_OFF)  # uniform ret target (code offset)
     setup += mov(1, 0xDEADBEEF)        # clobber r1 (not needed afterwards)
     cond, active = mask_setup(mask, e, mov)
     setup += cond
 
-    site = drm.control_main()[1]
     # jnone over the ret island when no lane is active (safety gate)
     ret_island = e('ret r30') + wait + wait
     assert len(ret_island) == 6
@@ -144,7 +144,7 @@ def build_bodies(mask='odd'):
     ctrl_setup += mov(23, MARKER_PRE)
     ctrl_setup += st(23, 8, 20)
     ctrl_setup += wait
-    ctrl_setup += mov(30, 0x2000 + LANDING_B_OFF)
+    ctrl_setup += mov(30, 0x2000 + drm.control_main()[1] + LANDING_B_OFF)
     ctrl_code = drm.build_main(ctrl_setup + e('ret r30') + wait + wait
                                + stop * ((LANDING_B_OFF - len(ctrl_setup) - 6) // 2)
                                + landing)
@@ -157,16 +157,16 @@ def build_probe(mask='odd'):
     _, active = mask_setup(mask, RS.e, RS.mov)
     table = [0] * 128
     expected_out = [0xcdcdcdcd] * 48 + [0xa5a50000 + i for i in range(16)]
-    # Jump surrogate: whole group lands at B -> all MARKER_B.
+    # Jump surrogate: jmp_exec_any moves the whole group; pop_exec 2 clamps
+    # at 0, so every lane (depth 0, 1 or 2) reactivates and stores B.
     expected_jump = [MARKER_PRE] * N + [MARKER_B] * N + [0] * (128 - 2 * N)
     # Wait surrogate: all lanes fall through; pop reactivates everyone.
     expected_wait = ([MARKER_PRE] * N + [MARKER_FALL] * N + [0] * (128 - 2 * N))
     # All-active control: all lanes MARKER_B.
     expected_ctrl = [MARKER_PRE] * N + [MARKER_B] * N + [0] * (128 - 2 * N)
-    # Variant: active lanes B, inactive lanes 0 (no fallthrough, per finding).
-    expected_var = ([MARKER_PRE] * N
-                    + [MARKER_B if i in active else 0 for i in range(N)]
-                    + [0] * (128 - 2 * N))
+    # Variant: active lanes get depth 2 at ret; dragged lanes keep depth 1.
+    # pop_exec 2 clamps at 0, so both groups reactivate and store B.
+    expected_var = [MARKER_PRE] * N + [MARKER_B] * N + [0] * (128 - 2 * N)
 
     os.environ['AGX_EXPERIMENTAL_RET'] = 'buffer-pop2'
     try:
@@ -179,14 +179,13 @@ def build_probe(mask='odd'):
         ctrl_out, ctrl_tab = cov.simulate(control, N, WG, REGS, 0, table)
         assert (ctrl_out, ctrl_tab) == (expected_out, expected_ctrl), \
             "control oracle mismatch"
-        # The variant itself must be rejected: partial-mask ret is unmodelled.
-        try:
-            cov.simulate(code, N, WG, REGS, 0, table)
-        except RuntimeError as exc:
-            assert 'only all-active' in str(exc), f"unexpected rejection: {exc}"
-            print(f"  Simulator rejects partial-mask ret as expected: {exc}")
-        else:
-            raise AssertionError('partial-mask ret unexpectedly accepted by simulator')
+        # The uniform partial-mask ret is now modelled (active lanes depth 2,
+        # dragged lanes keep depth 1, pop underflow is a no-op): the variant
+        # must simulate exactly.
+        v_out, v_tab = cov.simulate(code, N, WG, REGS, 0, table)
+        assert (v_out, v_tab) == (expected_out, expected_var), \
+            f"variant mismatch: tab[32:40]={[hex(x) for x in v_tab[32:40]]}"
+        print("  Simulator reproduces the partial-mask ret exactly.")
     finally:
         del os.environ['AGX_EXPERIMENTAL_RET']
 
@@ -217,7 +216,7 @@ def build_probe(mask='odd'):
         gate={'ret_pc': ret_pc, 'landing_b': LANDING_B_OFF,
               'marker_b': MARKER_B, 'marker_fall': MARKER_FALL,
               'mask': mask, 'active': sorted(active),
-              'variant_rejected_partial_mask': True,
+              'variant_matches_oracle': True,
               'jump_surrogate_matches_oracle': True,
               'wait_surrogate_matches_oracle': True,
               'control_matches_oracle': True},

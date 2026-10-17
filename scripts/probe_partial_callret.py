@@ -184,13 +184,13 @@ def build_probe():
         w_out, w_tab = cov.simulate(surrogate_wait, N, WG, REGS, 0, table)
         assert (w_out, w_tab) == (expected_out, expected_wait), \
             f"wait-surrogate mismatch: cont1={w_tab[64:68]} cont2={w_tab[96:100]}"
-        try:
-            cov.simulate(code, N, WG, REGS, 0, table)
-        except RuntimeError as exc:
-            assert 'only all-active' in str(exc), f"unexpected rejection: {exc}"
-            print(f"  Simulator rejects masked round trip as expected: {exc}")
-        else:
-            raise AssertionError('masked call+ret unexpectedly accepted by simulator')
+        # The uniform partial-mask call + uniform partial-mask ret is now
+        # modelled (dragged inactive lanes keep depth 1, so they store CONT1;
+        # active lanes get depth 2 from the ret and skip it).
+        v_out, v_tab = cov.simulate(code, N, WG, REGS, 0, table)
+        assert (v_out, v_tab) == (expected_out, expected_div), \
+            f"variant mismatch: c1={[hex(x) for x in v_tab[64:68]]} c2={[hex(x) for x in v_tab[96:100]]}"
+        print("  Simulator reproduces the combined partial call+ret exactly.")
     finally:
         del os.environ['AGX_EXPERIMENTAL_RET']
 

@@ -426,3 +426,39 @@ with default settings and with `AGX_EXPERIMENTAL_RET=buffer-pop2`. The playgroun
 verifier additionally rejects synthetic partial-lane direct-return and indirect
 call probes; those negative tests make no new hardware claim. The initial
 post-fault recovery control is retained in `results/2026-10-17-call-ret/recovery-control.json.gz`.
+
+## Current model: clamping pop, uniform ret, stop padding (2026-10-17, supersedes earlier mask-depth notes)
+
+Earlier sections in this file describe intermediate models (no-op pop underflow,
+"dragged lanes reactivate on divergent ret") that were fitted to probes that had
+bugs. They are kept for history; this section is the current reading.
+
+- `pop_exec r0l, n` is clamping subtraction: `r0l = max(r0l - n, 0)`.
+  Evidence: [pop-semantics.json.gz](../../results/2026-10-17-call-ret/pop-semantics.json.gz)
+  (odd lanes active, even masked; both `pop_exec 1` and `pop_exec 2` reactivate all 32 lanes).
+  The earlier record [pop-semantics-postmask-r21-bug.json.gz](../../results/2026-10-17-call-ret/pop-semantics-postmask-r21-bug.json.gz)
+  is invalid: its index register was set after the mask.
+- `ret rX` on an active mask: all active lanes get `r0l = 2` and leave the active set;
+  inactive lanes keep their `r0l`. Target is the agreed `rX`, or lane 0's `rX` when lanes
+  disagree and lane 0 is active. Divergent with lane 0 inactive is still unmodelled.
+- Empty active mask: call and ret fall through.
+- `stop` with no active lane, reached while some lane is at depth 2, kills lanes at depth 1
+  (modelled as `r0l = 0xffff`). This is the only special case and is not yet hardware-confirmed.
+- Divergent direct-target `call rX`: lane 0's target wins; matching lanes stay active and get the link.
+
+With this model every retained record that has a `variant` reproduces word-for-word in
+`AGX_EXPERIMENTAL_RET=buffer-pop2` (audit run 2026-10-17 across all 28 call/ret variant
+records, including `nested-partial`). Records whose labels came from the old model carry an
+`interpretation_note` with the previous label.
+
+Invalid or corrected records:
+- `partial-mask-ret*-site-bug.json.gz`: the probe jumped to `0x2000 + landing` without the
+  code site offset, so ret landed in stop padding. Not evidence about the landing; kept only for audit.
+- Fixed probe `scripts/probe_partial_ret.py` (uses `0x2000 + site + landing`) re-ran on hardware
+  for masks `odd`, `single0`, `contig16`, `lanes31`. All four store B on all 32 lanes, FALL nowhere.
+  This is the clamping prediction, not a masked-ret result.
+
+Open items for the next session:
+- Confirm the `stop` special case with a checkpointed probe that stores `r0l` before and after the padding.
+- Divergent ret with lane 0 inactive remains unmodelled.
+- Refresh the stale `interpretation` labels in the remaining records (done for the ones listed above).

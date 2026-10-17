@@ -156,16 +156,22 @@ def build_probe(case):
         exp[base + 32:base + 64] = [marks[1]] * N
         assert (s_out, s_tab) == (expected_out, exp), f"{case} jump surrogate mismatch"
     print(f"  {case}: jump surrogates validated.")
-    # Variant must be rejected (partial / divergent, unmodelled).
+    # Uniform partial-mask ret is now modelled (active lanes depth 2,
+    # dragged lanes keep depth 1, pop underflow is a no-op): the variant
+    # must simulate exactly.
+    if case == 'partial-uniform':
+        b1 = set(range(0, N, 2))   # even (dragged) lanes store B1
+    else:
+        b1 = {0}                    # lane 0 (dragged) stores B1
+    expected_var = ([MARKER_PRE] * N + [0] * N + [0] * N
+                    + [MARKER_B1 if i in b1 else 0 for i in range(N)]
+                    + [MARKER_B2] * N + [0] * N)
     os.environ['AGX_EXPERIMENTAL_RET'] = 'buffer-pop2'
     try:
-        try:
-            cov.simulate(code, N, WG, REGS, 0, table)
-        except RuntimeError as exc:
-            assert 'only all-active' in str(exc) or 'divergent' in str(exc), str(exc)
-            print(f"  Simulator rejects {case} variant as expected.")
-        else:
-            raise AssertionError(f'{case} unexpectedly accepted by simulator')
+        v_out, v_tab = cov.simulate(code, N, WG, REGS, 0, table)
+        assert (v_out, v_tab) == (expected_out, expected_var), \
+            f"{case} variant mismatch: b1={[i for i in range(N) if v_tab[96+i] == MARKER_B1]}"
+        print(f"  Simulator reproduces the {case} variant exactly.")
     finally:
         del os.environ['AGX_EXPERIMENTAL_RET']
     cov.gate(code, allow=('ret',))
@@ -176,7 +182,7 @@ def build_probe(case):
         assert 'ret semantics unresolved' in str(exc)
     return dict(code=code, table=table, n=N, wg=WG, regs=REGS, mode=case,
                 gate={'ret_pc': ret_pc, 'case': case,
-                      'variant_rejected': True, 'surrogates_validated': True})
+                      'variant_matches_oracle': True, 'surrogates_validated': True})
 
 
 def run_bounded(argv, env, timeout=10, kill_timeout=2):

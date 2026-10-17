@@ -141,14 +141,16 @@ def build_probe(mode='parity'):
             assert (a_out, a_tab) == (expected_out, expected_a), "jump-A surrogate mismatch"
             b_out, b_tab = cov.simulate(sur_b, N, WG, REGS, 0, table)
             assert (b_out, b_tab) == (expected_out, expected_b), "jump-B surrogate mismatch"
-            # Variant must be rejected (divergent ret unmodelled).
-            try:
-                cov.simulate(code, N, WG, REGS, 0, table)
-            except RuntimeError as exc:
-                assert 'divergent' in str(exc), f"unexpected rejection: {exc}"
-                print(f"  Simulator rejects divergent ret as expected.")
-            else:
-                raise AssertionError('divergent ret unexpectedly accepted')
+            # Divergent ret with lane 0 active is now modelled (lane 0 wins,
+            # every lane transfers, active lanes get depth 2 so the single
+            # pop-2 reactivates them): the variant must match exactly. Both
+            # landings share one marker slot; the winner overwrites it.
+            v_out, v_tab = cov.simulate(code, N, WG, REGS, 0, table)
+            winner = {'parity': MARKER_A, 'swap': MARKER_B, 'lane0b': MARKER_B}[mode]
+            exp_var = [MARKER_PRE] * N + [winner] * N + [0] * N + [0] * N
+            assert (v_out, v_tab) == (expected_out, exp_var), \
+                f"{mode} variant mismatch: tab32={[hex(x) for x in v_tab[32:36]]}"
+            print(f"  Simulator reproduces divergent ret ({mode}) exactly.")
     finally:
         del os.environ['AGX_EXPERIMENTAL_RET']
 
@@ -168,7 +170,7 @@ def build_probe(mode='parity'):
         code=code, table=table, n=N, wg=WG, regs=REGS, mode=mode,
         expected=(expected_out, expected_a if mode in ('uniformA',) else expected_out),
         gate={'ret_pc': ret_pc, 'mode': mode,
-              'variant_rejected_divergent': mode not in ('uniformA', 'uniformB')},
+              'variant_matches_oracle': True},
     )
 
 
@@ -304,12 +306,9 @@ def hardware(p, ctrl):
         mb = [i for i in range(N) if tab[32 + i] == MARKER_B]
         z = [i for i in range(N) if tab[32 + i] == 0]
         rec['analysis'] = {'mark_a': ma, 'mark_b': mb, 'zero': z}
-        if set(ma) == set(range(0, N, 2)) and set(mb) == set(range(1, N, 2)):
-            rec['interpretation'] = 'divergent_ret_both_landings_per_lane'
-        elif len(ma) == N and not mb:
-            rec['interpretation'] = 'all_land_A'
-        elif len(mb) == N and not ma:
-            rec['interpretation'] = 'all_land_B'
+        winner = {'parity': ('A', ma), 'swap': ('B', mb), 'lane0b': ('B', mb)}[p['mode']]
+        if len(winner[1]) == N and not z:
+            rec['interpretation'] = 'lane0_wins_all_transfer_depth2_rejoin'
         elif not (ma or mb):
             rec['interpretation'] = 'no_landing_markers'
         else:

@@ -236,16 +236,18 @@ def build_probe(case):
         c_out, c_tab = cov.simulate(control, N, WG, REGS, 0, table)
         assert (c_out, c_tab) == (expected_out, expected_ctrl), \
             f"{case} control mismatch: tab0={c_tab[0]:#x} tab32={c_tab[32]:#x}"
-        # Variant: record the simulator prediction (or rejection), hardware decides.
-        prediction = None
+        # Variant: empty mask falls through (no transfer, no link write).
+        # The simulator now models this; assert the fallthrough oracle, which
+        # matches every hardware run bit-for-bit.
+        expected_fall = ([MARKER_PRE] * N + [0] * N + [0] * N + [MARKER_FALL] * N)
         try:
             v_out, v_tab = cov.simulate(code, N, WG, REGS, 0, table)
+            assert (v_out, v_tab) == (expected_out, expected_fall), \
+                f"{case}: variant mismatch link0={v_tab[0]:#x} m32={v_tab[32]:#x} f96={v_tab[96]:#x}"
+            print(f"  {case}: simulator reproduces the empty-mask fallthrough exactly.")
             prediction = (v_out, v_tab)
-            print(f"  {case}: simulator predicts "
-                  f"link0={v_tab[0]:#x} m32={v_tab[32]:#x} m64={v_tab[64]:#x} fall96={v_tab[96]:#x}")
         except RuntimeError as exc:
-            print(f"  {case}: simulator rejects variant: {exc}")
-            prediction = str(exc)
+            raise AssertionError(f"{case}: simulator unexpectedly rejects empty-mask variant: {exc}")
     finally:
         del os.environ['AGX_EXPERIMENTAL_RET']
 
