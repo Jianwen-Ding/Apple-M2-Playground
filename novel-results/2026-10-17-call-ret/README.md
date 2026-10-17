@@ -150,6 +150,34 @@ Evidence: [ret-r30-vs-r1.json.gz](../../results/2026-10-17-call-ret/ret-r30-vs-r
 Reproducer: `scripts/probe_ret_reg_select.py offline` (simulator) or `hardware`
 (GPU submission).
 
+## Partial-mask direct call (2026-10-17)
+
+**A direct call under a partial exec mask transfers only the active lanes;
+the callee executes only for those lanes.**
+
+Probe design: r1 is the harness lane gid. Save it to r29, derive store
+indices (table[gid] for the link, table[32+gid] for the marker), clobber r1
+with SENTINEL, then `if_icmp r0l, ueq, (r29 & 1), 1` so odd lanes are active.
+`jmp_exec_none` skips the call when no lane is active (safety gate). The
+callee stores r1 and MARKER, then stops; it never returns.
+
+- Hardware result: table[0:32] holds the link on odd lanes and 0 on even
+  lanes; table[32:64] holds MARKER on odd lanes and 0 on even lanes.
+  Inactive lanes never execute the callee stores, so no SENTINEL is visible.
+- The simulator (default mode, call is modelled) predicts exactly this
+  pattern, so the hardware matches the model.
+- Control dispatch (all-active call) passed before and after.
+- No fault, no hang, budget unchanged (3/30), kernel log clean.
+- Firmware time: 8,834 ns.
+
+This answers the first half of handoff Priority B: the call honors the
+incoming exec mask, and the callee inherits it. Partial-mask `ret`,
+empty-mask cases, and divergent targets remain open.
+
+Evidence: [partial-mask-call.json.gz](../../results/2026-10-17-call-ret/partial-mask-call.json.gz).
+Reproducer: `scripts/probe_partial_mask.py offline` (simulator) or `hardware`
+(GPU submission).
+
 The first successful round trip took 5,208 ns, indirect 5,750 ns, nested 9,500 ns.
 These isolated firmware times are observations, not a calibrated instruction
 cost. All had passing before/after controls and no fault.

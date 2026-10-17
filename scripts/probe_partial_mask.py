@@ -2,22 +2,26 @@
 """Priority B: partial-mask direct call (no ret).
 
 Tests what happens when a direct call is made under a partial exec mask.
-Records which lanes receive a link (r1) and which lanes execute the callee.
+r1 is the harness lane gid (0..31); it is saved to r29 before the call
+clobbers it, and the mask is derived from r29 directly (no table load).
 
-Default: offline simulator validation.  --hardware submits the probe.
+Default: offline simulator validation only.  --hardware submits the probe.
 
-Setup:
-  - Load per-lane data from table (lane IDs 0..31)
-  - Compute odd-lane mask: (lane_id & 1) != 0
-  - Set r1 = sentinel (0xDEADBEEF) for all lanes
-  - Execute direct call under partial mask (odd lanes active)
-  - Callee: store r1 (link) at table[0:32], store marker at table[32:64], stop
+Setup (variant):
+  - r29 = r1 (save gid; call will clobber r1 with the link)
+  - r20 = r29 + 0  (link store index: table[gid])
+  - r21 = r29 + 32 (marker store index: table[32+gid])
+  - r1 = SENTINEL (0xDEADBEEF) for all lanes
+  - if_icmp r0l, ueq, (r29 & 1), 1  -> odd lanes active (r0l=0), even inactive
+  - jnone over the call (skip if no lane active)
+  - direct call to callee
+  - post-call: stop
+  - callee: store r1 at table[gid], store MARKER at table[32+gid], wait, stop
 
-Expected:
-  - If call sets r1 only for active lanes: odd lanes have link, even lanes have sentinel
-  - If call sets r1 for all lanes: all lanes have link
-  - If callee executes only for active lanes: only odd lanes have marker
-  - If callee executes for all lanes: all lanes have marker
+Expected (hypothesis A: mask is honored):
+  - table[0:32]: link value on odd lanes, SENTINEL on even lanes
+  - table[32:64]: MARKER on odd lanes, 0 on even lanes
+Hypothesis B (mask ignored): all lanes link + MARKER.
 """
 import argparse
 import gzip
@@ -48,142 +52,129 @@ WG = 32
 REGS = 64
 
 
-def build_probe(all_active=False):
-    """Build variant (partial mask) or control (all-active) program.
+def build_variant_body():
+    """Build the user-code body for the partial-mask call variant.
 
-    Args:
-        all_active: If True, skip the partial mask setup (control case).
-
-    Returns dict with code, control, table, expected, gate, etc.
+    Returns (body, call_pc, callee_pc) where pcs are byte offsets in the
+    full program (site + len(prefix)).
     """
-    cov.install()
     e, mov, st = RS.e, RS.mov, RS.agx_loop.store
     stop, wait = e('stop'), e('wait 0')
 
-    # Load per-lane data from table (lane IDs 0..31 stored at table words 0..31)
-    setup = mov(27, 0)  # offset = 0
-    setup += e('imadd r5, r1, r27, 0')  # r5 = r1 + 0 = table base
-    setup += e('device_load 0, i32, xyzw, r6_r7_r8_r9, u8_u9, r5, unsigned')
-    setup += wait  # wait for load
-
-    # r20 = r1 (save table base for callee stores)
-    setup += e('iadd r20, r1, 0')
-
-    # Pre-load r1 with sentinel
-    setup += mov(1, SENTINEL)
-
-    if not all_active:
-        # Set up partial mask: odd lanes active
-        # r6 = lane_id (loaded from table)
-        # r27 = r6 & 1 (lane_id % 2)
-        setup += mov(28, 1)
-        setup += e('and r27, r6, r28')
-        # if_icmp r0l, ult, r24, r27, 1 where r24 = 0
-        # Odd lanes: r27=1, 0<1=true -> active
-        # Even lanes: r27=0, 0<0=false -> inactive
-        setup += mov(24, 0)
-        setup += e('if_icmp r0l, ult, r24, r27, 1')
+    setup = e('iadd r29, r1, 0')          # save gid (call clobbers r1)
+    setup += mov(27, 0)
+    setup += e('iadd r20, r29, r27')       # link store index = gid
+    setup += mov(27, 32)
+    setup += e('iadd r21, r29, r27')       # marker store index = 32 + gid
+    setup += mov(1, SENTINEL)              # clobber r1 with sentinel
+    # odd lanes active: (gid & 1) == 1
+    setup += mov(27, 1)
+    setup += e('and r24, r29, r27')
+    setup += e('if_icmp r0l, ueq, r24, r27, 1')
 
     site = drm.control_main()[1]
-    call_pc = site + len(setup)
-
-    # Direct call to callee (6 bytes)
-    # Callee is after the caller's post-call code
-    post_call = stop  # caller never reaches here if callee doesn't return
+    call_pc = site + len(setup) + 6  # +6 for the jnone we are about to add
+    post_call = stop
     callee_pc = call_pc + 6 + len(post_call)
+
     call_off = callee_pc - call_pc
     call_instr = (0xC010 | ((call_off & 0xFFFFFFFF) << 16)).to_bytes(6, 'little')
 
-    # Callee: store r1 (link) at table[0:32], store marker at table[32:64], stop
-    callee = st(1, 8, 20)  # store r1 at table[0:32] (index=r20=lane_id)
-    callee += mov(23, MARKER)
-    callee += st(23, 8, 21)  # store marker at table[32:64] (r21 = r20+32... wait, need to set r21)
+    # Skip the call entirely when no lane is active (safety gate).
+    setup += RS.jnone(6 + len(call_instr))
 
-    # Actually, r21 needs to be set. Let me use a different approach.
-    # The callee needs r21 = r20 + 32 for the marker store.
-    # But r20 = r1 (table base). r21 = r1 + 32.
-    # The callee can compute r21 from r20.
-    callee = mov(21, 32) + e('iadd r21, r20, r21')  # r21 = r20 + 32
-    callee += st(1, 8, 20)  # store r1 at table[0:32]
+    callee = st(1, 8, 20)                 # store r1 (link or sentinel) at table[gid]
     callee += mov(23, MARKER)
-    callee += st(23, 8, 21)  # store marker at table[32:64]
+    callee += st(23, 8, 21)               # store MARKER at table[32+gid]
     callee += wait
     callee += stop
 
     body = setup + call_instr + post_call + callee
-    code = drm.build_main(body)
+    return body, call_pc, callee_pc
 
-    # Build control: all-active version (no partial mask)
-    # Build separately to avoid recursion
-    ctrl_setup = mov(27, 0)
-    ctrl_setup += e('imadd r5, r1, r27, 0')
-    ctrl_setup += e('device_load 0, i32, xyzw, r6_r7_r8_r9, u8_u9, r5, unsigned')
-    ctrl_setup += wait
-    ctrl_setup += e('iadd r20, r1, 0')
-    ctrl_setup += mov(1, SENTINEL)
-    # No partial mask - all lanes active
-    ctrl_site = drm.control_main()[1]
-    ctrl_call_pc = ctrl_site + len(ctrl_setup)
-    ctrl_callee_pc = ctrl_call_pc + 6 + len(stop)
-    ctrl_call_off = ctrl_callee_pc - ctrl_call_pc
-    ctrl_call_instr = (0xC010 | ((ctrl_call_off & 0xFFFFFFFF) << 16)).to_bytes(6, 'little')
-    ctrl_callee = mov(21, 32) + e('iadd r21, r20, r21')
-    ctrl_callee += st(1, 8, 20)
-    ctrl_callee += mov(23, MARKER)
-    ctrl_callee += st(23, 8, 21)
-    ctrl_callee += wait + stop
-    ctrl_body = ctrl_setup + ctrl_call_instr + stop + ctrl_callee
-    control = drm.build_main(ctrl_body)
 
-    # Table: pre-fill with lane IDs for the load, rest zero
-    table = list(range(N)) + [0] * (128 - N)
+def build_control_body():
+    """All-active version: same stores, no mask, no call skip."""
+    e, mov, st = RS.e, RS.mov, RS.agx_loop.store
+    stop, wait = e('stop'), e('wait 0')
 
-    # Expected output: default harness output
+    setup = e('iadd r29, r1, 0')
+    setup += mov(27, 0)
+    setup += e('iadd r20, r29, r27')
+    setup += mov(27, 32)
+    setup += e('iadd r21, r29, r27')
+    setup += mov(1, SENTINEL)
+
+    site = drm.control_main()[1]
+    call_pc = site + len(setup)
+    post_call = stop
+    callee_pc = call_pc + 6 + len(post_call)
+
+    call_off = callee_pc - call_pc
+    call_instr = (0xC010 | ((call_off & 0xFFFFFFFF) << 16)).to_bytes(6, 'little')
+
+    callee = st(1, 8, 20)
+    callee += mov(23, MARKER)
+    callee += st(23, 8, 21)
+    callee += wait
+    callee += stop
+
+    body = setup + call_instr + post_call + callee
+    return body, call_pc, callee_pc
+
+
+def build_probe():
+    cov.install()
+    variant_body, call_pc, callee_pc = build_variant_body()
+    control_body, ctrl_call_pc, ctrl_callee_pc = build_control_body()
+
+    code = drm.build_main(variant_body)
+    control = drm.build_main(control_body)
+
+    table = [0] * 128
     expected_out = [0xcdcdcdcd] * 48 + [0xa5a50000 + i for i in range(16)]
 
-    # Expected table for control (all-active):
-    # - table[0:32]: link value (0x2000 + ctrl_call_pc + 6) for all lanes
-    # - table[32:64]: MARKER for all lanes
-    ctrl_link_val = 0x2000 + ctrl_call_pc + 6
-    expected_tab_ctrl = [ctrl_link_val] * N + [MARKER] * N + [0] * (128 - 2 * N)
+    # Control (all-active): every lane gets link + marker.
+    ctrl_link = 0x2000 + ctrl_call_pc + 6
+    expected_ctrl = [ctrl_link] * N + [MARKER] * N + [0] * (128 - 2 * N)
 
-    # Expected table for variant (partial mask, odd lanes active):
-    # Hypothesis A: call sets r1 only for active lanes
-    #   - Odd lanes: link value; Even lanes: SENTINEL
-    #   - Callee executes only for active lanes: odd lanes have MARKER, even lanes 0
-    # Hypothesis B: call sets r1 for all lanes
-    #   - All lanes: link value
-    #   - Callee executes for all lanes: all lanes have MARKER
+    # Variant hypothesis A (mask honored): odd lanes link + marker,
+    # even lanes never execute the callee stores, so they keep the initial 0.
+    # (Inactive lanes cannot be observed holding SENTINEL because the store
+    # itself is masked; a SENTINEL on even lanes would mean the callee ran
+    # for all lanes but the call only set r1 for active lanes.)
     link_val = 0x2000 + call_pc + 6
-    expected_tab_var_a = []
-    for i in range(N):
-        expected_tab_var_a.append(link_val if i % 2 == 1 else SENTINEL)
-    for i in range(N):
-        expected_tab_var_a.append(MARKER if i % 2 == 1 else 0)
-    expected_tab_var_a += [0] * (128 - 2 * N)
+    expected_a = ([link_val if i % 2 == 1 else 0 for i in range(N)]
+                  + [MARKER if i % 2 == 1 else 0 for i in range(N)]
+                  + [0] * (128 - 2 * N))
+    # Hypothesis B (mask ignored): same as control with variant link.
+    expected_b = [link_val] * N + [MARKER] * N + [0] * (128 - 2 * N)
 
-    expected_tab_var_b = [link_val] * N + [MARKER] * N + [0] * (128 - 2 * N)
-
-    # Simulator gate
     os.environ['AGX_EXPERIMENTAL_RET'] = 'buffer-pop2'
     try:
-        # Test control (all-active)
         ctrl_out, ctrl_tab = cov.simulate(control, N, WG, REGS, 0, table)
-        assert (ctrl_out, ctrl_tab) == (expected_out, expected_tab_ctrl), \
-            f"control oracle mismatch"
-
-        # Test variant (partial mask)
+        assert (ctrl_out, ctrl_tab) == (expected_out, expected_ctrl), \
+            f"control oracle mismatch: tab[0:4]={ctrl_tab[0:4]}"
         var_out, var_tab = cov.simulate(code, N, WG, REGS, 0, table)
-        # The simulator should show what happens with partial mask
         print(f'  Simulator variant tab[0:8] = {[hex(x) for x in var_tab[0:8]]}')
         print(f'  Simulator variant tab[32:40] = {[hex(x) for x in var_tab[32:40]]}')
+        if (var_out, var_tab) == (expected_out, expected_a):
+            print('  Simulator matches hypothesis A (mask honored).')
+        elif (var_out, var_tab) == (expected_out, expected_b):
+            print('  Simulator matches hypothesis B (mask ignored).')
+        else:
+            print('  Simulator matches NEITHER hypothesis; see values above.')
     finally:
         del os.environ['AGX_EXPERIMENTAL_RET']
 
-    # Gate: validate surrounding code (call is known, but partial-mask behavior is the unknown)
     cov.gate(code, allow=('call',))
 
-    label = 'partial-mask-call' if not all_active else 'partial-mask-call-ctrl'
+    try:
+        cov.simulate(code, N, WG, REGS, 0, table)
+    except RuntimeError as exc:
+        # call is modelled, so default simulation may succeed; only ret must be rejected.
+        raise AssertionError(f'unexpected default-mode rejection: {exc}')
+
     return dict(
         code=code,
         control=control,
@@ -191,23 +182,20 @@ def build_probe(all_active=False):
         n=N,
         wg=WG,
         regs=REGS,
-        expected=(expected_out, expected_tab_ctrl),  # control expected
-        expected_var_a=(expected_out, expected_tab_var_a),
-        expected_var_b=(expected_out, expected_tab_var_b),
+        expected=(expected_out, expected_ctrl),
+        expected_var_a=(expected_out, expected_a),
+        expected_var_b=(expected_out, expected_b),
         gate={
             'call_pc': call_pc,
             'callee_pc': callee_pc,
-            'link_val': 0x2000 + call_pc + 6,
+            'link_val': link_val,
             'sentinel': SENTINEL,
             'marker': MARKER,
-            'all_active': all_active,
         },
-        label=label,
     )
 
 
 def run_bounded(argv, env, timeout=10, kill_timeout=2):
-    """Bound both dispatch wait and post-SIGKILL pipe drain."""
     import subprocess
     proc = subprocess.Popen(argv, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     r = {'command': argv, 'environment': env, 'pid': proc.pid}
@@ -234,7 +222,6 @@ def run_bounded(argv, env, timeout=10, kill_timeout=2):
 
 
 def run_one(runner, code, p, label):
-    """Run a single dispatch and capture full diagnostics."""
     d = runner.out / label
     d.mkdir()
     (d / 'code.bin').write_bytes(code + bytes(16))
@@ -278,7 +265,6 @@ def matches(r, expected):
 
 
 def hardware(p):
-    """Submit the probe to hardware with full diagnostics."""
     name = 'partial-mask-call'
     path = DATA / f'{name}.json.gz'
     if path.exists():
@@ -313,15 +299,12 @@ def hardware(p):
     rec['phase'] = 'pre-control'
     save()
 
-    # Run all-active control first
-    ctrl_p = build_probe(all_active=True)
-    rec['control_before'] = run_one(runner, ctrl_p['control'], ctrl_p, 'control-before')
-    if not matches(rec['control_before'], ctrl_p['expected']):
+    rec['control_before'] = run_one(runner, p['control'], p, 'control-before')
+    if not matches(rec['control_before'], p['expected']):
         rec['halted'] = 'pre-control failed; no variant submitted'
         save()
         return rec
 
-    # Run the variant (partial mask)
     rec['phase'] = 'variant'
     save()
     rec['variant'] = run_one(runner, p['code'], p, 'variant')
@@ -335,55 +318,34 @@ def hardware(p):
     if not rec['variant']['ok']:
         time.sleep(2)
 
-    # Recovery control
     rec['phase'] = 'recovery-control'
     save()
-    rec['control_after'] = run_one(runner, ctrl_p['control'], ctrl_p, 'control-after')
-    rec['recovery_control_passed'] = matches(rec['control_after'], ctrl_p['expected'])
+    rec['control_after'] = run_one(runner, p['control'], p, 'control-after')
+    rec['recovery_control_passed'] = matches(rec['control_after'], p['expected'])
     if not rec['recovery_control_passed']:
         rec['halted'] = 'post-control failed; GPU recovery not established'
 
     rec['phase'] = 'finished'
 
-    # Analyze results
     if rec['variant'].get('ok') and 'table_after' in rec['variant']:
         tab = rec['variant']['table_after']
         link_val = p['gate']['link_val']
         sentinel = p['gate']['sentinel']
         marker = p['gate']['marker']
-
-        # Check link values (table[0:32])
         link_lanes = [i for i in range(N) if i < len(tab) and tab[i] == link_val]
         sentinel_lanes = [i for i in range(N) if i < len(tab) and tab[i] == sentinel]
-        other_link_lanes = [i for i in range(N) if i < len(tab) and tab[i] not in (link_val, sentinel)]
-
-        # Check marker values (table[32:64])
         marker_lanes = [i for i in range(N) if i < len(tab) - 32 and tab[32 + i] == marker]
-        zero_lanes = [i for i in range(N) if i < len(tab) - 32 and tab[32 + i] == 0]
-
         rec['analysis'] = {
             'link_lanes': link_lanes,
             'sentinel_lanes': sentinel_lanes,
-            'other_link_lanes': other_link_lanes,
             'marker_lanes': marker_lanes,
-            'zero_marker_lanes': zero_lanes,
         }
-
-        # Determine interpretation
-        if len(link_lanes) == N:
-            rec['link_interpretation'] = 'call_sets_r1_all_lanes'
-        elif set(link_lanes) == set(range(1, N, 2)):  # odd lanes
-            rec['link_interpretation'] = 'call_sets_r1_active_lanes_only'
+        if set(link_lanes) == set(range(1, N, 2)) and set(marker_lanes) == set(range(1, N, 2)):
+            rec['interpretation'] = 'mask_honored_active_lanes_only'
+        elif len(link_lanes) == N and len(marker_lanes) == N:
+            rec['interpretation'] = 'mask_ignored_all_lanes'
         else:
-            rec['link_interpretation'] = f'unexpected_pattern_{len(link_lanes)}_lanes'
-
-        if len(marker_lanes) == N:
-            rec['callee_interpretation'] = 'callee_executes_all_lanes'
-        elif set(marker_lanes) == set(range(1, N, 2)):  # odd lanes
-            rec['callee_interpretation'] = 'callee_executes_active_lanes_only'
-        else:
-            rec['callee_interpretation'] = f'unexpected_pattern_{len(marker_lanes)}_lanes'
-
+            rec['interpretation'] = f'unexpected_link{len(link_lanes)}_marker{len(marker_lanes)}'
     elif not rec['variant'].get('ok'):
         rec['interpretation'] = 'variant_failed'
 
@@ -398,33 +360,31 @@ def main():
     args = p.parse_args()
 
     print('=== Building and validating probe ===')
-    probe = build_probe(all_active=False)
-    ctrl = build_probe(all_active=True)
-    print(f'  call_pc={probe["gate"]["call_pc"]}')
-    print(f'  callee_pc={probe["gate"]["callee_pc"]}')
-    print(f'  link_val={probe["gate"]["link_val"]:#x}')
-    print(f'  sentinel={probe["gate"]["sentinel"]:#x}')
-    print(f'  marker={probe["gate"]["marker"]:#x}')
+    probe = build_probe()
+    print(f"  call_pc={probe['gate']['call_pc']}")
+    print(f"  callee_pc={probe['gate']['callee_pc']}")
+    print(f"  link_val={probe['gate']['link_val']:#x}")
+    print(f"  sentinel={probe['gate']['sentinel']:#x}")
+    print(f"  marker={probe['gate']['marker']:#x}")
     print()
 
     if args.mode == 'offline':
-        print('Simulator validation passed. Use --hardware to submit.')
+        print('Simulator validation done. Use hardware mode to submit.')
         return
 
     print('=== Submitting to hardware ===')
     rec = hardware(probe)
-    print(f'  Variant ok: {rec["variant"].get("ok")}')
-    print(f'  Recovery control: {rec.get("recovery_control_passed")}')
+    print(f"  Variant ok: {rec['variant'].get('ok')}")
+    print(f"  Recovery control: {rec.get('recovery_control_passed')}")
     if 'analysis' in rec:
         a = rec['analysis']
-        print(f'  Link lanes: {a["link_lanes"]}')
-        print(f'  Sentinel lanes: {a["sentinel_lanes"]}')
-        print(f'  Marker lanes: {a["marker_lanes"]}')
-        print(f'  Link interpretation: {rec.get("link_interpretation")}')
-        print(f'  Callee interpretation: {rec.get("callee_interpretation")}')
+        print(f"  Link lanes: {a['link_lanes']}")
+        print(f"  Sentinel lanes: {a['sentinel_lanes']}")
+        print(f"  Marker lanes: {a['marker_lanes']}")
+        print(f"  Interpretation: {rec.get('interpretation')}")
     elif 'interpretation' in rec:
-        print(f'  Interpretation: {rec["interpretation"]}')
-    print(f'  Saved to: {DATA / "partial-mask-call.json.gz"}')
+        print(f"  Interpretation: {rec['interpretation']}")
+    print(f"  Saved to: {DATA / 'partial-mask-call.json.gz'}")
 
 
 if __name__ == '__main__':
