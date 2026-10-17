@@ -93,3 +93,28 @@ Benchmark samples, including a rejected layout and long active-code controls,
 are retained in the simulator's `results/2026-10-17-decode-pages/`. No hardware
 evidence, timing calibration or expectations were changed. Next: launch guards,
 resource replay and real data-dependent profiles. M2 hardware is unavailable.
+
+## 2026-10-17: simulator launch-domain regression gate
+
+Added `make verify-simulator-launch` / `scripts/check_simulator_launch.py`.
+Synthetic stop-only programs check 34 invalid jobs, three malformed JSON lines,
+and unchanged valid controls in one/four-worker batches. Malformed inputs must
+fail without process aborts or lost/reordered result slots. Checks stay enabled
+under Python -O, and failure injection correctly rejects the previous binary.
+No GPU is used and no recorded hardware output is modified.
+
+The simulator now validates launches before decoding, tracing, or materializing
+functional buffers; fixes large-coordinate/occupancy overflow; and reports
+batch errors without aborting later jobs. Empty performance grids now explicitly
+report not modelled, rather than a nominal timing. Valid measured rules remain
+unchanged. All 34 Rust tests, 363 exact recordings, 74 atomic replays and the
+cost verifier pass; all 36 prediction reports match their retained hash.
+
+`make verify-occupancy` also passes on all six retained evidence files, including
+the 60-point 128-lane register sweep and shared-memory sweeps. No calibration or
+hardware validation is added. Same-binary CPU A/A variability and measured launch
+controls are retained in the simulator's `results/2026-10-17-launch-validation/`;
+previous performance regressions are not declared resolved.
+
+Next: lower-level geometry/resource replay and controlled workload profiling.
+New hardware timing remains blocked on M2 access.

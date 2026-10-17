@@ -320,6 +320,10 @@ GEOMETRY_SUITE ?= $(SIMREPO)/testsuite
 replay-geometry-suite:
 	"$(SIMREPO)/rust/target/release/suite_check" "$(GEOMETRY_SUITE)" --only geometry -v
 
+.PHONY: verify-simulator-launch
+verify-simulator-launch:
+	$(PYTHON) -B scripts/check_simulator_launch.py --run "$(SIMREPO)/rust/target/release/agx_dispatch"
+
 # Retained device loads/stores and threadgroup layout cases live in the simulator.
 MEMORY_SUITE ?= $(SIMREPO)/testsuite
 .PHONY: replay-memory-suite

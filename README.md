@@ -135,6 +135,11 @@ geometry cases, including non-warp-sized workgroups. Override `GEOMETRY_SUITE`
 for another local suite. This is functional output replay, separate from the
 placement-dependent SR20 evidence checked by `verify-sr-shape`.
 
+`make verify-simulator-launch` checks malformed launch/resource inputs and mixed
+batch isolation against the adjacent simulator's `agx_dispatch`. It uses a
+synthetic stop-only shader, checks serial/parallel batch order and unchanged
+valid controls, and requires no GPU or new hardware evidence.
+
 `make replay-memory-suite` replays the simulator repository's retained device
 loads, device stores and threadgroup layout cases (102 recordings as of
 2026-10-17). Override `MEMORY_SUITE` to use another local suite directory.
