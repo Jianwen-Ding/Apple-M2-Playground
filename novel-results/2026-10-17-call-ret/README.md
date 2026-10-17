@@ -125,6 +125,31 @@ Later probes established a working sequence on 32 active lanes:
 - Two nested direct calls complete when the caller saves r1 in r29 and restores
   it before its own return (`call-nested-pop2`).
 
+## Explicit return-register selection (2026-10-17)
+
+**`ret rX` uses the explicit operand register rX, not an implicit r1 link.**
+
+Probe design: set r1 to landing A (buffer-relative 0x2400) and r30 to landing B
+(buffer-relative 0x2600). Each landing has `pop_exec r0l, 2` followed by a
+distinct marker stored to the table. Execute `ret r30`.
+
+- Hardware result: MARKER_B (0xCCCC0001) stored at table words 32-63.
+  MARKER_A not stored. This confirms the explicit operand register is used.
+- The simulator's `AGX_EXPERIMENTAL_RET=buffer-pop2` model already uses the
+  explicit operand, so the hardware matches the model.
+- Control dispatch (direct store of MARKER_B) passed before and after.
+- No fault, no hang, budget unchanged (3/30), kernel log clean.
+- Firmware time: 11,542 ns.
+
+This resolves the r1/r30 ambiguity from the earlier no-call landing map, where
+both registers were set to the same target. The result is consistent with the
+working call/return sequence (where r1 is both the explicit operand and the
+link, so the distinction was invisible).
+
+Evidence: [ret-r30-vs-r1.json.gz](../../results/2026-10-17-call-ret/ret-r30-vs-r1.json.gz).
+Reproducer: `scripts/probe_ret_reg_select.py offline` (simulator) or `hardware`
+(GPU submission).
+
 The first successful round trip took 5,208 ns, indirect 5,750 ns, nested 9,500 ns.
 These isolated firmware times are observations, not a calibrated instruction
 cost. All had passing before/after controls and no fault.

@@ -103,16 +103,13 @@ Only promote semantics after exact recorded outputs support them.
 
 ## Remaining hardware cases, in dependency order
 
-### A. Explicit return-register selection (smallest isolated uncertainty)
+### A. Explicit return-register selection (smallest isolated uncertainty) — DONE
 
-The initial no-call map set r1 and r30 to the same target. Build a full-mask
-no-call return with r1 pointing to landing A and r30 to landing B. Both landings
-must be forward, in-program, begin with measured reconvergence, write distinct
-markers and terminate. Test `ret r30`, then a separate `ret r1` case with the
-same initialized operands. Simulator-check both landing paths. This separates
-explicit operand selection from a possible implicit-link interpretation without
-revisiting invalid targets. Current working calls alone do not isolate this:
-their explicit return register and link agree.
+The initial no-call map set r1 and r30 to the same target. A probe set r1 to
+landing A (0x2400) and r30 to landing B (0x2600), then executed `ret r30`.
+Hardware stored MARKER_B at table words 32-63, confirming that `ret rX` uses
+the explicit operand register rX, not an implicit r1 link. No fault, budget
+unchanged. Evidence: `ret-r30-vs-r1.json.gz`.
 
 ### B. Partial masks and return reconvergence
 
