@@ -146,17 +146,16 @@ Test uniform register call under a partial mask only after the direct version
 and return behavior are understood. Passing partial direct call does not imply
 that the register form has the same scheduling rule.
 
-### C. Empty masks: skipped instruction versus issued instruction
+### C. Empty masks: skipped instruction versus issued instruction — DONE
 
-Build separate controls where `jmp_exec_none` skips the call/return, and cases
-where the instruction is issued under an empty mask. Start with direct call,
-then register call, then return, one unknown per dispatch. All register operands
-must still contain valid in-program addresses, including inactive lanes.
-Afterward, reconverge through known bounded code and record all lanes.
-
-Measure whether the group falls through, transfers or ends. The simulator's
-empty-return behavior is currently an assumption; threadgroup atomic probing
-already demonstrated why an empty mask cannot generally be treated as a no-op.
+Measured 2026-10-17: with an empty mask, issued direct call, register call
+and ret all fall through (FALL on all lanes, no transfer markers, no faults);
+evidence `empty-mask-{call,callreg,ret}.json.gz`. An issued instruction under
+an empty mask is a no-op — distinct from the threadgroup-atomic ending
+opcodes, which end the group even with an empty mask. This also fixed a
+simulator bug (empty direct calls transferred; empty register calls were
+rejected); the simulator now falls through like hardware, and predicts all
+three hardware outcomes exactly.
 
 ### D. Two divergent register-call targets
 

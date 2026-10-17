@@ -238,6 +238,37 @@ Evidence: [partial-mask-callret.json.gz](../../results/2026-10-17-call-ret/parti
 Reproducer: `scripts/probe_partial_callret.py offline` (simulator/surrogates)
 or `hardware` (GPU submission).
 
+## Empty-mask call / ret: issued instructions fall through (2026-10-17)
+
+**With no active lanes, an issued direct call, register call, or ret is a
+no-op: the group falls through to the next instruction.**
+
+Probe design: `if_icmp` false for every lane (gid < 0), then issue the
+instruction directly (no `jmp_exec_none` skip). All register operands hold
+valid in-program addresses on every lane, including inactive ones. The
+fallthrough block pops and stores FALL; the callee/landing blocks pop and
+store their own markers. One unknown per dispatch, with passing all-active
+controls before and after.
+
+- Hardware result, all three cases: FALL on all 32 lanes; no callee/landing
+  markers; pre-marker survives in the link slot. Dispatches complete
+  normally with no fault.
+- No fault, no hang, budget unchanged (3/30), kernel log clean.
+
+This also fixed a simulator bug: the simulator unconditionally transferred
+empty-mask direct calls (and rejected empty-mask register calls). It now
+falls through without transferring or writing the link, mirroring the
+existing empty-mask ret path. After the fix the simulator predicts the
+hardware outcome exactly for all three cases.
+
+Evidence: [empty-mask-call.json.gz](../../results/2026-10-17-call-ret/empty-mask-call.json.gz),
+[empty-mask-callreg.json.gz](../../results/2026-10-17-call-ret/empty-mask-callreg.json.gz),
+[empty-mask-ret.json.gz](../../results/2026-10-17-call-ret/empty-mask-ret.json.gz).
+Simulator fix: AGX-Performance-Simulator `rust/src/func.rs` (`OpKind::Call`
+empty-mask fallthrough).
+Reproducer: `scripts/probe_empty_mask.py offline` (simulator/surrogates) or
+`hardware [--case call|callreg|ret|all]` (GPU submission).
+
 The first successful round trip took 5,208 ns, indirect 5,750 ns, nested 9,500 ns.
 These isolated firmware times are observations, not a calibrated instruction
 cost. All had passing before/after controls and no fault.
