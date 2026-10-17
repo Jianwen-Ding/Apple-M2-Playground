@@ -73,3 +73,23 @@ standalone cost-trace slowdown are documented in the simulator's
 
 Next: resource/geometry replay and real data-dependent profiles. New hardware
 timing remains blocked on an M2 device.
+
+## 2026-10-17: all standard geometry cases and bounded decode allocation
+
+Added `make replay-geometry-suite` with `GEOMETRY_SUITE` override. All eight
+retained 1-D/2-D/3-D cases compare exactly, including non-warp-sized workgroups;
+five extend the prior replay selection, which now contains 363 exact cases.
+This is standard functional output replay, not a new SR20 placement observation.
+The existing `verify-sr-shape` evidence check remains separate.
+
+Both simulator tracers now use a bounded dense decode prefix plus lazy tail
+pages. Only immutable metadata is shared; instruction semantics, memory and
+per-group state are unchanged. Synthetic regressions cover boundary-crossing
+instructions, large jumps, decode errors and concurrent page creation. All 29
+Rust tests pass, all 74 atomic variants replay, the cost verifier has zero
+failures, and all 36 complete predictions match their retained hash.
+
+Benchmark samples, including a rejected layout and long active-code controls,
+are retained in the simulator's `results/2026-10-17-decode-pages/`. No hardware
+evidence, timing calibration or expectations were changed. Next: launch guards,
+resource replay and real data-dependent profiles. M2 hardware is unavailable.

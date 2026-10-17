@@ -130,6 +130,11 @@ threadgroup integer-atomic cases (44 each): return/non-return, distinct/shared
 addresses and all established integer operations. Override `INTEGER_ATOMIC_SUITE`
 for another local suite. This complements the separate 74 atomic-variant replays.
 
+`make replay-geometry-suite` checks all eight retained standard 1-D/2-D/3-D
+geometry cases, including non-warp-sized workgroups. Override `GEOMETRY_SUITE`
+for another local suite. This is functional output replay, separate from the
+placement-dependent SR20 evidence checked by `verify-sr-shape`.
+
 `make replay-memory-suite` replays the simulator repository's retained device
 loads, device stores and threadgroup layout cases (102 recordings as of
 2026-10-17). Override `MEMORY_SUITE` to use another local suite directory.

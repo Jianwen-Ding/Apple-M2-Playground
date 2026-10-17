@@ -315,6 +315,11 @@ replay-integer-atomic-suite:
 	"$(SIMREPO)/rust/target/release/suite_check" "$(INTEGER_ATOMIC_SUITE)" --only atomic -v
 	"$(SIMREPO)/rust/target/release/suite_check" "$(INTEGER_ATOMIC_SUITE)" --only tg_atomic -v
 
+GEOMETRY_SUITE ?= $(SIMREPO)/testsuite
+.PHONY: replay-geometry-suite
+replay-geometry-suite:
+	"$(SIMREPO)/rust/target/release/suite_check" "$(GEOMETRY_SUITE)" --only geometry -v
+
 # Retained device loads/stores and threadgroup layout cases live in the simulator.
 MEMORY_SUITE ?= $(SIMREPO)/testsuite
 .PHONY: replay-memory-suite
