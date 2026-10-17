@@ -111,7 +111,28 @@ Hardware stored MARKER_B at table words 32-63, confirming that `ret rX` uses
 the explicit operand register rX, not an implicit r1 link. No fault, budget
 unchanged. Evidence: `ret-r30-vs-r1.json.gz`.
 
-### B. Partial masks and return reconvergence
+### B. Partial masks and return reconvergence — IN PROGRESS
+
+The simulator does not model per-lane exec masks from `if_icmp`. In the
+simulator, `if_icmp` + `jmp_exec_none` only skips the body entirely if no
+lanes match — the body executes for ALL lanes when any lane matches. The exec
+mask is controlled by `push_exec` (immediate value) and `pop_exec`, not by
+register values. The `fsem.rs` compiled path sets `exec[t] = (r0l == 0)` but
+this is not reached by the main `step_group_impl` executor.
+
+This means the simulator cannot gate a call on a per-lane condition. The
+partial-mask call probe (`scripts/probe_partial_mask.py`) needs hardware
+submission to answer whether:
+1. The call sets r1 only for active lanes or all lanes
+2. The callee executes only for active lanes or all lanes
+
+The probe uses `if_icmp` + `jmp_exec_none` to skip the call entirely when no
+lanes match (as a safety gate), then submits the call under a condition where
+some lanes are active. The hardware behavior is unknown; the simulator cannot
+predict it.
+
+Owner approval is needed before hardware submission since the simulator cannot
+gate this probe.
 
 Start with one direct call to a common callee under an `if`, without `ret`;
 record which lanes receive a link and reach the callee. Use known branches to
