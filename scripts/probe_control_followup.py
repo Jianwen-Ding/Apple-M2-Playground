@@ -19,10 +19,90 @@ DATA = ROOT / 'results/2026-10-17-call-ret/followup'
 SCRATCH = Path('/scratch/apple-m2-playground/control-followup')
 
 
+def roundtrip(indirect=False, nested=False):
+    e, mov, st = P.RS.e, P.RS.mov, P.RS.agx_loop.store
+    site = P.drm.control_main()[1]
+    pre = e('iadd r20, r1, 0') + mov(21, 32) + e('iadd r21, r20, r21')
+    pre += mov(22, 64) + e('iadd r22, r20, r22')
+    pre += mov(23, 0xfeed0001) + st(23, 8, 20) + e('wait 0')
+    if indirect:
+        pre += mov(30, 0)
+    call_pc = site + len(pre)
+    continuation = e('pop_exec r0l, 2') + mov(23, 0xcafe0002) + st(23, 8, 21)
+    continuation += st(1, 8, 22) + e('wait 0') + e('stop')
+    func_pc = call_pc + 6 + len(continuation)
+    if indirect:
+        pre = pre[:-6] + mov(30, 0x2000 + func_pc)
+    function = mov(23, 0xf00d0001) + st(23, 8, 20) + e('wait 0')
+    inner_call_pc = None
+    if nested:
+        function += e('iadd r29, r1, 0')
+        inner_call_pc = func_pc + len(function)
+        function += bytes(6) + e('pop_exec r0l, 2') + e('iadd r1, r29, 0')
+    ret_pc = func_pc + len(function)
+    function += e('ret r1') + e('wait 0') * 2
+    inner_ret_pc = None
+    if nested:
+        inner_pc = func_pc + len(function)
+        function += mov(24, 96) + e('iadd r24, r20, r24') + mov(23, 0xb00d0001)
+        function += st(23, 8, 24) + e('wait 0')
+        inner_ret_pc = func_pc + len(function)
+        function += e('ret r1') + e('wait 0') * 2
+        at = inner_call_pc - func_pc
+        function = function[:at] + (0xc010 | ((inner_pc-inner_call_pc)<<16)).to_bytes(6,'little') + function[at+6:]
+    code = P.drm.build_main(pre + (0xc010 | ((func_pc - call_pc) << 16)).to_bytes(6, 'little') + continuation + function)
+    off = call_pc + 6 - ret_pc
+    jump = e(f'jmp_exec_any pc{off:+}', f'jmp_exec_any pc{off:+}')
+    control = code[:ret_pc] + jump + code[ret_pc+6:]
+    if nested:
+        off2 = inner_call_pc + 6 - inner_ret_pc
+        j2 = e(f'jmp_exec_any pc{off2:+}', f'jmp_exec_any pc{off2:+}')
+        control = control[:inner_ret_pc] + j2 + control[inner_ret_pc+6:]
+    if indirect:
+        code = code[:call_pc] + e('call r30') + e('wait 0') * 2 + code[call_pc+6:]
+    want_out = [0xcdcdcdcd] * 48 + [0xa5a50000+i for i in range(16)]
+    want_tab = [0xf00d0001]*32 + [0xcafe0002]*32 + [0x2000+call_pc+6]*32 + [0xb00d0001 if nested else 0]*32
+    assert P.simulate(control) == (want_out, want_tab)
+    P.cov.gate(code, allow=('call', 'ret'))
+    try:
+        P.simulate(code)
+    except RuntimeError as exc:
+        assert ('register form' if indirect else 'ret semantics unresolved') in str(exc)
+    else:
+        raise AssertionError('ret unexpectedly accepted')
+    return dict(code=code, control=control, table=P.TABLE, n=32, wg=32, regs=64,
+                expected=(want_out, want_tab), gate={'direct_call_and_return_jump_surrogate': True,
+                'variant_rejected_as_unresolved': True, 'call_pc': call_pc, 'ret_pc': ret_pc,
+                'return_pc': call_pc+6})
+
+
 def case(name):
     P.cov.install()
     P.RET_PC, P.VALUE, P.LANDINGS = 512, 1024, (1024, 1536, 2048, 2560)
-    maps = ('ret-byte-buffer', 'ret-shift-pc', 'ret-shift-value', 'ret-byte-nopop')
+    if name.startswith('atomic-gap'):
+        import probe_atomics as A
+        bit = int(name.removeprefix('atomic-gap'))
+        assert bit in (26, 28, 29, 31, 42, 43, 44)
+        table = A.table_b('atomic-gap-controls')
+        pre, suf = A.common(1)
+        sur = A.atomic_bytes(0, 1)
+        var = (int.from_bytes(sur, 'little') ^ (1 << bit)).to_bytes(8, 'little')
+        assert (int.from_bytes(var, 'little') ^ int.from_bytes(sur, 'little')) == 1 << bit
+        control, code = (P.drm.build_main(pre + op + suf) for op in (sur, var))
+        tab = table.copy()
+        for i in range(32):
+            tab[i] = (table[i] + table[A.S_WORD + 2*i]) & 0xffffffff
+        out = [0xcdcdcdcd]*8 + table[:32] + [0xcdcdcdcd]*8 + [0xa5a50000+i for i in range(16)]
+        P.cov.gate(pre + sur + suf)
+        assert P.cov.simulate(control, 32, 32, 64, 0, table) == (out, tab)
+        return dict(code=code, control=control, table=table, n=32, wg=32, regs=64,
+                    expected=(out, tab), data_dir=ROOT/'results/2026-10-17-atomic-gap-bits',
+                    gate={'baseline_add_matches_independent_oracle': True, 'changed_bit': bit,
+                          'baseline_instruction': sur.hex(), 'variant_instruction': var.hex(),
+                          'variant_decode': P.cov.ASMB.info(var), 'limitation': 'unmeasured control bit; surrogate gate only'})
+    if name in ('call-ret-pop2', 'callreg-ret-pop2', 'call-nested-pop2'):
+        return roundtrip(indirect=name.startswith('callreg'), nested=name == 'call-nested-pop2')
+    maps = ('ret-byte-buffer', 'ret-shift-pc', 'ret-shift-value', 'ret-byte-nopop', 'ret-byte-pop2')
     if name in ('ret-pop0', 'ret-pop1', 'ret-pop3', 'ret-r1-pop1') + maps:
         if name in maps:
             P.RET_PC = 768 if name == 'ret-shift-pc' else 512
@@ -31,6 +111,8 @@ def case(name):
             P.LANDINGS = tuple(sorted({v - 0x2000, pc + v - 0x2000, 1536, v, pc + v,
                                        2*v - 0x2000, pc + 2*v - 0x2000, 2*v, pc + 2*v}))
         reenable = None if name == 'ret-byte-nopop' else (1 if name in maps else int(name[-1]))
+        if name == 'ret-byte-pop2':
+            reenable = 2
         code, control = P.build(reenable=reenable)
         if name == 'ret-r1-pop1':
             code = code[:P.RET_PC] + P.RS.e('ret r1') + code[P.RET_PC + 2:]
@@ -78,11 +160,12 @@ def matches(r, expected):
 
 
 def hardware(name, p):
-    path = DATA / f'{name}.json.gz'
+    directory = p.get('data_dir', DATA)
+    path = directory / f'{name}.json.gz'
     if path.exists():
         raise SystemExit(f'refusing to overwrite {path}')
     P.gpu_safety.require_budget(1)
-    DATA.mkdir(parents=True, exist_ok=True)
+    directory.mkdir(parents=True, exist_ok=True)
     runner = P.bench.Runner(SCRATCH / name)
     rec = dict(name=name, utc=time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), before=P.snapshot(),
                code=p['code'].hex(), control_code=p['control'].hex(), table_in=p['table'], n=p['n'], wg=p['wg'],

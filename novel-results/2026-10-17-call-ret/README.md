@@ -1,7 +1,9 @@
-# Direct call works; return semantics remain unresolved
+# Uniform direct, indirect and nested calls return through pop_exec 2
 
-Status: partial observations on G14C. No working return model or call/return
-pair has been established. This report includes a failed experiment.
+Status: uniform 32-lane call/return sequences now work on G14C; see the final
+section for the measured target and mask rule. Earlier diagnostic records and
+failures below are retained as historical evidence. Partial/divergent lanes
+and out-of-program behavior remain unresolved.
 
 ## Earlier evidence, now preserved
 
@@ -100,3 +102,33 @@ Its post-control passed after two seconds; boot budget became 2/30.
 All fallthrough and candidate landing paths passed simulator/oracle checks
 before hardware; actual ret was rejected as unresolved. The follow-up records
 are under `results/2026-10-17-call-ret/followup/`.
+
+## Working uniform call / return sequence
+
+Later probes established a working sequence on 32 active lanes:
+
+- `ret rX` uses the **shader-buffer-relative byte address** in rX. The code
+  offset (0x2000 in this harness) must remain in the link.
+- Return leaves the lanes masked with an effective depth of **2**. At the
+  destination, `pop_exec r0l, 2` makes them active. Two `pop_exec ..., 1`
+  operations also work, but the intervening stores and stops do not execute.
+  This is why the first visible marker was misleadingly at 1536 rather than
+  the target 1024. Moving the return instruction did not move that marker.
+- A six-byte direct call and return now complete, recording the callee marker,
+  caller continuation and unchanged link on every lane (`call-ret-pop2`).
+- A two-byte `call r30` with a uniform buffer-relative target also completes;
+  its link is **0x2000 + call byte offset + 2**, not +6 (`callreg-ret-pop2`).
+- Two nested direct calls complete when the caller saves r1 in r29 and restores
+  it before its own return (`call-nested-pop2`).
+
+The first successful round trip took 5,208 ns, indirect 5,750 ns, nested 9,500 ns.
+These isolated firmware times are observations, not a calibrated instruction
+cost. All had passing before/after controls and no fault.
+
+The simulator's opt-in `AGX_EXPERIMENTAL_RET=buffer-pop2` reproduces every word
+of the seven successful in-program follow-up records, including indirect and
+nested calls. It rejects out-of-program targets and a return without
+reconvergence that runs off the program. Default execution still rejects ret
+and register calls; divergent/partial-lane return state and the quiet
+out-of-program completions remain unmodelled. The old opt-in value `1` is the
+contradicted historical hypothesis and must not be used to gate hardware.

@@ -48,4 +48,33 @@ for r in records:
         raw = json.load(gzip.open(DATA / 'fault-harness-files.json.gz', 'rt'))
         assert bytes.fromhex(raw['c.bin']) == code + bytes(16)
     print(f"PASS {r['name']}: exact bytes, simulator surrounding paths, retained outcome")
-print('PASS: return behavior remains unexplained; no return-model validation claimed')
+print('PASS historical records; out-of-program return behavior remains unexplained')
+
+# Follow-up: exact reconstruction, controls, recovered faults and the measured
+# all-active model. Out-of-program quiet cases remain explicitly unsupported.
+import os
+import probe_control_followup as F
+for path in sorted((DATA / 'followup').glob('*.json.gz')):
+    r = json.load(gzip.open(path, 'rt'))
+    p = F.case(r['name'])
+    assert p['code'].hex() == r['code'] and p['control'].hex() == r['control_code'], r['name']
+    assert p['gate'] == r['gate'], r['name']
+    assert F.matches(r['control_before'], p['expected']) and F.matches(r['control_after'], p['expected'])
+    assert r['recovery_control_passed'] and 'halted' not in r
+    os.environ['AGX_EXPERIMENTAL_RET'] = 'buffer-pop2'
+    try:
+        observed = P.cov.simulate(p['code'], p['n'], p['wg'], p['regs'], 0, p['table'])
+    except RuntimeError as exc:
+        expected_errors = {'ret-pop1': 'outside the program', 'ret-r1-pop1': 'outside the program',
+                           'ret-byte-nopop': 'fell off end'}
+        assert r['name'] in expected_errors and expected_errors[r['name']] in str(exc), str(exc)
+        if r['name'] == 'ret-byte-nopop':
+            assert not r['variant']['ok'] and '0x1000008100' in r['kernel_log_delta']
+            assert r['after']['budget_used'] == r['before']['budget_used'] + 1
+        else:
+            assert r['variant']['ok']  # Quiet out-of-program completions remain unmodelled.
+    else:
+        assert r['variant']['ok'] and observed == (r['variant']['out'], r['variant']['table_after']), r['name']
+    finally:
+        del os.environ['AGX_EXPERIMENTAL_RET']
+    print('PASS follow-up', r['name'])

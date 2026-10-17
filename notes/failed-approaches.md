@@ -514,3 +514,16 @@ The hardware variant nevertheless faulted: unmapped UL1C read 0x1000008100,
 zero firmware timestamps. Stopped immediately, no retry/post-control submitted;
 boot budget 0 -> 1/30. This does not establish a target-address formula.
 [Exact program, limits, and fault log](../novel-results/2026-10-17-call-ret/README.md).
+
+### Recovered ret/no-pop and atomic-control faults, 2026-10-17 follow-up
+
+The owner clarified: continue after logged, recovered faults; stop on persistent
+unresponsiveness. The previous ret fault's recovery control passed. A no-pop
+return layout then faulted at UL1C 0x1000008100 (budget 2/30); its control passed.
+Return with the original buffer-relative link and `pop_exec r0l, 2` at the target
+now works for direct, indirect and nested calls. The earlier interpretation that
+the code offset should be subtracted from the link was wrong.
+
+Device atomic add bit 31 flipped from the baseline faulted at UL1C
+0x1000382040 (budget 3/30); its control also passed. Full logs and records are
+preserved in the [atomic report](../novel-results/2026-10-17-atomic-gap-bits/README.md).
