@@ -203,6 +203,15 @@ SR16 = lane & 3, and SR60 / SR63 are constants. Every other selector reads 0. SR
 cycle (7 x the 8 ms power-sample period) while the GPU is busy, and cleared after about 2 ms of idle. The finding includes a map of all 256 selectors with PTX equivalents:
 [finding](novel-results/2026-10-16-special-registers/README.md), `make verify-special-registers`.
 
+**Unsafe-probe session: atomics and loops (2026-10-17, owner-approved).** Encodings Mesa never emits now run only
+after the same program with a known surrogate instruction passes `agx_run` (AGX-Performance-Simulator
+`scripts/probe_variants.py`). Device-atomic bit 45 turns `sub` into a **float32 atomic add** with exactly PTX's
+`atom.add.f32` semantics (nearest even, denormals flushed, atomic under contention) and `cmpxchg` into a **64-bit
+unsigned min / max** (bit 46 = max; Rt returns a changed flag). Ops 11-15 end the issuing SIMD group. 54 dispatch
+pairs, 0 faults: [finding](novel-results/2026-10-17-atomic-variants/README.md), `make verify-atomic-variants`. The
+2026-10-12 `while_*` "hangs" were a non-terminating test loop plus dispatches sent during recovery; all 24 condition
+codes now run bounded and match the simulator ([failed approaches](notes/failed-approaches.md)).
+
 **Transcendentals against PTX (2026-10-16).** fp32 `exp2` reads x as Q.23 fixed point, truncated, with a
 ones'-complement negative, then uses one 2^23-entry table: this model is exact on 637 M recorded inputs.
 `sin_pt_2` is a table over |x| truncated to Q.23. `rcp`, `rsqrt`, `ex2` (exactly at its 2 ulp bound), `lg2` and

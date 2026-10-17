@@ -45,7 +45,7 @@ measured on other chips (M1, M2 Pro) or through Metal.
 | L2 | ~1 MB for M2 Max (metal-benchmarks); 3 MB on M2 Pro (Chips and Cheese, probably GPU-visible L2 + something else) | L2 93-123 ns to 256 KiB, spilled by 1-2 MiB (`novel-results/2026-10-16-memory-parameters`) | **agrees with ~1 MB** |
 | SLC | 48 MB on M2 Max | latency rises only ~12% from 16 to 96 MiB, so capacity is not readable from latency (`2026-10-16-memory-parameters`) | open: needs a bandwidth probe |
 | Latencies | SLC 234 ns, DRAM 342 ns (128 MB), > 400 ns beyond (TLB?) (M2 Pro) | DRAM ~378 ns at 128 MiB; TLB adds ≤ 32 ns over 256 MiB | close; TLB reach still open |
-| Global atomics | 58.6 ns latency (M2 Pro); only 32-bit atomics; **M2 adds a non-returning u64 min/max** | atomics with and without return measured; device atomic ops 11-15 are on the do-not-run list | the u64 min/max is probably among ops 11-15: **find its encoding in Mesa before ever running it** |
+| Global atomics | 58.6 ns latency (M2 Pro); only 32-bit atomics; **M2 adds a non-returning u64 min/max** | **u64 min / max found: op 3 (cmpxchg) + bit 45, bit 46 = max**; with Rt = 1 it returns a changed flag, not the old value. Also a **float32 atomic add** (op 1 + bit 45). Ops 11-15 end the SIMD group (`novel-results/2026-10-17-atomic-variants`) | **agrees** (not among ops 11-15) |
 | Clock | 1.398 GHz M2 Max | GET_PARAMS max_frequency 1,398 MHz; battery clock states | agrees |
 | ALU latencies | FFMA32 2.2 cycles, IMAD32 4, CONVERT 3.66, RCP 6.5, RSQRT 9, EXP2 / LOG2 4.3 | instruction-bench coverage (651 forms) | cross-check in safe-02 |
 | Convert semantics | applegpu: TODO; float destinations: f32 with FTZ, f16 without | 80 forms recorded on random operands | **safe-01 is new knowledge** |
@@ -70,7 +70,7 @@ measured on other chips (M1, M2 Pro) or through Metal.
   - read `max_commands_per_submission` before N > 1;
   - priorities 2 / 3 are reserved;
   - syncobjs are the event mechanism.
-- **Device atomics:** a non-returning 64-bit min / max exists on M2 (Apple 8). It is not in the safe set. Locate
-  Mesa's encoding for it (offline) and treat it as a separate, owner-approved test.
+- **Device atomics:** the non-returning 64-bit min / max of M2 (Apple 8) was located through applegpu's `u5` note
+  and run with owner approval on 2026-10-17: op 3 + bit 45 (`novel-results/2026-10-17-atomic-variants`).
 - **Novelty:** convert semantics, fences, preamble, undecoded opcodes, lane-offset fmadd and the direct-DRM interface
   details have no public description. These are the most valuable outputs.

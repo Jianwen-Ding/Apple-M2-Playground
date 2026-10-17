@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help atomic-contention verify-atomic-contention cpu-gpu-visibility verify-cpu-gpu-visibility verify-l2-command-boundary verify-memory-parameters cache-line verify-cache-line fixed18-waits verify-fixed18-waits queue-concurrency verify-queue-concurrency queue-priority verify-queue-priority commands-per-submit verify-commands-per-submit drm-limits drm-sync submit-latency verify-submit-latency verify-drm-interface verify-transcendentals sr113-timeline verify-special-registers sr-vm-slot sr-divergence sr113-reps verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
+.PHONY: help atomic-variants verify-atomic-variants atomic-contention verify-atomic-contention cpu-gpu-visibility verify-cpu-gpu-visibility verify-l2-command-boundary verify-memory-parameters cache-line verify-cache-line fixed18-waits verify-fixed18-waits queue-concurrency verify-queue-concurrency queue-priority verify-queue-priority commands-per-submit verify-commands-per-submit drm-limits drm-sync submit-latency verify-submit-latency verify-drm-interface verify-transcendentals sr113-timeline verify-special-registers sr-vm-slot sr-divergence sr113-reps verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -51,6 +51,8 @@ help:
 	@echo 'make verify-memory-parameters Verify TLB reach / L1 / L2 / SLC latency curves (offline)'
 	@echo 'make cpu-gpu-visibility GPU: CPU<->GPU visibility ping-pong (fixed counts, agx_run-gated)'
 	@echo 'make verify-cpu-gpu-visibility Verify the CPU<->GPU visibility evidence offline'
+	@echo 'make atomic-variants    GPU: unnamed device-atomic encodings (fadd32, u64 min/max, ops 11-15; CONFIRM_GPU_FAULTS=1)'
+	@echo 'make verify-atomic-variants Verify the atomic-variant evidence offline'
 	@echo 'make atomic-contention GPU: same-address / spread device-atomic throughput (agx_run-gated, clock keeper)'
 	@echo 'make verify-atomic-contention Verify the atomic contention evidence offline'
 	@echo 'make verify-drm-interface Verify the recorded DRM interface limits offline'
@@ -292,6 +294,16 @@ cpu-gpu-visibility:
 
 verify-cpu-gpu-visibility:
 	$(PYTHON) -B scripts/verify_cpu_gpu_visibility.py
+
+SIMREPO ?= $(abspath ../AGX-Performance-Simulator)
+
+atomic-variants:
+	@test "$(CONFIRM_GPU_FAULTS)" = 1 || { echo 'atomic-variants runs device-atomic encodings Mesa never emits (each first checked with a surrogate in agx_run); re-run with CONFIRM_GPU_FAULTS=1 on an idle machine.'; exit 1; }
+	for f in A B D E F G H I; do $(PYTHON) -B $(SIMREPO)/scripts/probe_atomics.py run --family $$f --out /scratch/apple-m2-playground/atomic-variants || exit 1; done
+	$(PYTHON) -B $(SIMREPO)/scripts/probe_atomics.py analyse /scratch/apple-m2-playground/atomic-variants
+
+verify-atomic-variants:
+	$(PYTHON) -B scripts/verify_atomic_variants.py
 
 atomic-contention:
 	$(PYTHON) -B scripts/clock_keeper.py --seconds 3000 --device "$(DEVICE)" & sleep 3; \

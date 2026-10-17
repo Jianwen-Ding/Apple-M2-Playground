@@ -473,3 +473,33 @@ prefetcher). The random "neighbour" test (`novel-results/2026-10-16-cache-line`)
 
 **Rule:** any new direct-DRM program must munmap + GEM_CLOSE its BOs before exit. Check with
 `grep shmem /sys/fs/cgroup/memory.stat` before and after one run.
+
+### The 2026-10-12 `while_*` "GPU hangs" were a test-design loop plus a cascade, 2026-10-17
+
+**Cause: the test, not the ISA.**
+- The coverage `while_icmp` / `while_fcmp` cases count r3 up from 1 against r20 in 1..8, or add 0.5 to x against a
+  fixed float. For `ugte`, `sgte`, `gt`, `gte`, `gtn`, `neq`, `nlt` and `nlte` the condition stays true, so the loop
+  never exits. `while_icmp ugte` hung the GPU (display frozen until recovery).
+- The recorder then kept submitting. The next 5 control cases, including 2 *safe* `if_fcmp` cases, "faulted" 6 s
+  apart while the GPU recovered.
+
+**What was done on 2026-10-17:**
+- `agx_run` refuses all 9 non-terminating cases (step limit).
+- New `control/while_guard_*` cases end the loop body with the recorded `while_icmp ult` on a trip counter. That
+  bounds the loop under either reading of how `while` treats lanes with r0l = 1.
+- All 24 condition codes (with NaN / ±inf operands) ran on hardware and match the simulator exactly.
+- The 4 collateral cases re-recorded cleanly.
+- `coverage.py record` now **stops at the first fault** (`--keep-going` to override).
+
+**Rules:**
+- Simulate every loop before it runs; the gate exists now.
+- Bound a loop with an already-recorded guard when its exit depends on the encoding under test.
+- Never keep submitting after a fault: everything sent during recovery fails too, and is misattributed.
+
+### Coverage "register base" atomics never used a register base, 2026-10-17
+
+The 11 `atomic/*_register_base_ret` cases only prepended `mem_prologue` and kept the uniform-base atomic, byte for
+byte the same as the uniform cases. Recording them would have proved nothing. They now encode At = 0 with base
+r24_r25 (Mesa's formula), checked equal to the uniform form in `agx_run` on identical inputs, and all 11 ran exactly.
+**Rule:** disassemble a new case and confirm the instruction under test is the one you meant, not just that it
+decodes.

@@ -1,5 +1,12 @@
 # Task 1: remaining work, safe and unsafe (2026-10-17)
 
+> **Update, later on 2026-10-17 (owner-approved unsafe session):**
+> - **Done:** the `while_*` loops (24 guarded and 9 terminating forms, 0 faults; the old "faults" were test design
+>   plus a cascade) and the 11 register-base atomics with return.
+> - **Done:** device atomic ops 11-15 (they end the SIMD group) and bits 45-46 (float32 atomic add,
+>   64-bit unsigned min / max): [finding](../novel-results/2026-10-17-atomic-variants/README.md).
+> - The 64-bit atomic gap is now narrower: there is no 64-bit add / CAS / exch in that field.
+
 A single list of what is still open in Task 1 (AGX hardware probing), split by GPU risk. It consolidates the
 AGX-Performance-Simulator task files (`tasks/safe-*.md`, `tasks/agx-coverage.md`), the coverage catalog, the
 [ISA coverage table](isa-coverage.md) and [failed approaches](../notes/failed-approaches.md).
@@ -64,11 +71,11 @@ after about 44 recoveries in one boot.
 
 | Work | Pending cases | Risk | CUDA need |
 |---|---|---|---|
-| `while_icmp` / `while_fcmp` loop forms not proven to terminate | 24 (6 already faulted; `while_icmp_ugte` froze the display) | Infinite loop, GPU hang | Data-dependent loops. Today only emulator-gated counted loops are used; Mesa-compiled loops are a safe substitute |
+| ~~`while_icmp` / `while_fcmp` loop forms~~ | done 2026-10-17: 24 guarded + 9 terminating recorded; the other 7 never exit by design | none (the hang was the test loop) | Data-dependent loops: every condition code matches the simulator |
 | `call` / `ret` | descriptor only | Bad target hangs the GPU | Non-inlined device functions, recursion. Possibly avoidable by inlining everything |
 | Direct-DRM scratch / helper program (`async_load`, `async_store`, `stack_get_ptr`, `stack_adjust`, `pop_exec2`) | MANUAL `stack` | Two attempts stalled ~0.5 s | Local memory, spills, `alloca`. Try the Mesa-capture route first (safe list) |
-| Device atomic ops 11-15 and the unknown u-bits | not catalogued | Unknown; ops 11-15 never characterised | Probably 64-bit or floating-point atomics (`atom.add.f32`, `.u64`, `cas.b64`) |
-| Atomics with return through a register base | 11 | `may_fault` (never run in that addressing form) | `atomicAdd` return values with computed addresses |
+| ~~Device atomic ops 11-15~~ and the remaining gap bits u1-u4 | done 2026-10-17 for ops 11-15 and bits 45-46 | ops 11-15 end the SIMD group, no fault | Float add and u64 min / max found; u1-u4 (bits 26, 28-29, 31, 42-44) and the threadgroup atomic's bits still open |
+| ~~Atomics with return through a register base~~ | done 2026-10-17 (11/11 exact) | none | `atomicAdd` return values with computed addresses |
 | `memory_barrier a, b, c` (the 251 non-Mesa encodings) | 251 | Unknown | Possibly cheaper or scope-specific fences. Not needed if safe-10 shows the 7 Mesa encodings suffice |
 
 ### Mainly ISA completeness (low CUDA value)

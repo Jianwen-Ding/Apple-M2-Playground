@@ -51,9 +51,10 @@ STATUS.update({
     'memory_barrier': ('used by the in-shader clock probe (gap bits not swept)', F+'2026-10-11-in-shader-clock/README.md'),
 })
 ATOM = F+'2026-10-11-atomics/README.md'
+ATOMV = F+'2026-10-17-atomic-variants/README.md'
 STATUS.update({
-    'atomic': ('mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run (hang risk)', ATOM),
-    'threadgroup_atomic': ('mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run (hang risk)', ATOM),
+    'atomic': ('mapped: Mesa ops 0-10 exact; bit 45: sub = float32 add (ftz, RNE), cmpxchg = u64 min/max (bit 46 = max); ops 11-15 end the SIMD group; u1-u4 not run', ATOMV),
+    'threadgroup_atomic': ('mapped: Mesa ops 0-10 exact incl. return/contention; ops 11-15 and u-bits not run', ATOM),
 })
 STK = F+'2026-10-11-stack-via-mesa/README.md'
 STATUS.update({'stack_store': ('Mesa form runs exactly through Mesa; binary captured (also decodes Mesa stack_adjust)', STK),
