@@ -1,0 +1,28 @@
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:  (\________/) 
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:   |        |  
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu: '.| \  , / |.'
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu: --| / (( \ |--
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu: .'|  _-_-  |'.
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:   |________|  
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu: ** GPU timeout nya~!!!!! **
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:   Event slot: 24
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:   Timeout count: 0
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:   Unk: 0
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:   Fault info: FaultInfo {
+                               address: 0x1000008100,
+                               sideband: 0x51,
+                               vm_slot: 0xd,
+                               unit_code: 0x1,
+                               unit: UL1C(
+                                   0x0,
+                               ),
+                               level: 0x0,
+                               unk_5: 0x0,
+                               read: true,
+                               reason: Unmapped,
+                           }
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:   Pending events:
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:     [0:24] flags=7 value=0x18000100
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:   Halt count: 1
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:   Halted: 1
+[Sat Oct 17 12:12:42 2026] asahi 406400000.gpu:   Attempting recovery...

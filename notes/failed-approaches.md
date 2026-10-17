@@ -503,3 +503,14 @@ byte the same as the uniform cases. Recording them would have proved nothing. Th
 r24_r25 (Mesa's formula), checked equal to the uniform form in `agx_run` on identical inputs, and all 11 ran exactly.
 **Rule:** disassemble a new case and confirm the instruction under test is the one you meant, not just that it
 decodes.
+
+### Return landing map fault, 2026-10-17
+
+`probe_ret_landing.py --halfword-map` submitted `ret r30` at code byte 512 with
+r30 and r1 = 0x1200, no call or loop, and five forward marker/stop blocks.
+The wait surrogate and each direct-jump landing path passed `agx_run`; the
+actual return was rejected by the simulator because its semantics are unknown.
+The hardware variant nevertheless faulted: unmapped UL1C read 0x1000008100,
+zero firmware timestamps. Stopped immediately, no retry/post-control submitted;
+boot budget 0 -> 1/30. This does not establish a target-address formula.
+[Exact program, limits, and fault log](../novel-results/2026-10-17-call-ret/README.md).
