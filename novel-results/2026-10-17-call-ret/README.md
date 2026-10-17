@@ -178,6 +178,36 @@ Evidence: [partial-mask-call.json.gz](../../results/2026-10-17-call-ret/partial-
 Reproducer: `scripts/probe_partial_mask.py offline` (simulator) or `hardware`
 (GPU submission).
 
+## Partial-mask ret (2026-10-17)
+
+**Active lanes ret normally; inactive lanes store nothing (no fallthrough).**
+
+Probe design: odd lanes active via `if_icmp r0l, ueq, (gid & 1), 1`, then
+`ret r30` to landing B (pop_exec 2 + MARKER_B). Inactive lanes should skip
+the ret, hit `pop_exec r0l, 1`, and store MARKER_FALL in the same per-lane
+slot. `jmp_exec_none` over the ret island is a safety gate for the empty-mask
+case. Jump and wait surrogates validate the B path and the fallthrough path
+independently under simulation; the simulator rejects the partial-mask ret
+itself as unmodelled, as required.
+
+- Hardware result: table[32+gid] holds MARKER_B on odd lanes and 0 on even
+  lanes. Even lanes executed neither the B store nor the FALL store.
+- The dispatch completes normally (firmware timestamps written, no fault).
+- Control dispatch (all-active ret to B) passed before and after.
+- No fault, no hang, budget unchanged (3/30), kernel log clean.
+- Firmware time: 11,416 ns.
+
+Interpretation: `ret` under a partial mask is not a per-lane branch. Active
+lanes transfer to the target; inactive lanes do not continue past the ret to
+the fallthrough — they are dropped (at least observably: no stores). This is
+consistent with ret being a group-level reconvergence operation. One
+odd/even split only; single-lane, contiguous-block, and 31-lane cases, and
+the combined partial call/return sequence, remain open.
+
+Evidence: [partial-mask-ret.json.gz](../../results/2026-10-17-call-ret/partial-mask-ret.json.gz).
+Reproducer: `scripts/probe_partial_ret.py offline` (simulator/surrogates) or
+`hardware` (GPU submission).
+
 The first successful round trip took 5,208 ns, indirect 5,750 ns, nested 9,500 ns.
 These isolated firmware times are observations, not a calibrated instruction
 cost. All had passing before/after controls and no fault.

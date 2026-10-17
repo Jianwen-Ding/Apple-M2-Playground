@@ -122,8 +122,12 @@ lane ID from a uniform address, so the condition was true for all lanes.
 Using r1 (the harness gid) directly gives a real per-lane mask, and
 `mask_ctl` sets exec from r0l as expected.
 
-Still open: partial-mask `ret` in isolation, then the combined
-partial direct-call/return sequence.
+Still open: single-lane, contiguous-block, and 31-lane ret cases, then the
+combined partial direct-call/return sequence. Measured 2026-10-17: under an
+odd-lane mask, active lanes ret to the landing normally while inactive lanes
+store nothing (no fallthrough execution); evidence `partial-mask-ret.json.gz`.
+Ret is a group-level transfer, not a per-lane branch — do not assume inactive
+lanes continue past it.
 
 Start with one direct call to a common callee under an `if`, without `ret`;
 record which lanes receive a link and reach the callee. Use known branches to
