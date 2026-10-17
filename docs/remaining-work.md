@@ -125,5 +125,7 @@ built through Mesa.
   device functions; only recursion and function pointers need real calls.
 - **Code and records:** AGX-Performance-Simulator `scripts/probe_calls.py`, commit 3fb851e; raw records in
   `/scratch/apple-m2-playground/call-probes`. No playground finding or verifier has been written.
+- **Plan for the next agent:** AGX-Performance-Simulator `tasks/unsafe-01-call-ret.md` (staged, simulator-gated,
+  nothing executed yet).
 - **Why it is paused:** several assistant responses about the `ret` investigation were stopped by a safety classifier.
   Continuing needs the owner's decision on who runs it.
