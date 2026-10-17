@@ -78,3 +78,7 @@ including register selection, implicit execution-mask state, and any landing
 outside the tested hypotheses. Keep return unsupported until a model explains
 the quiet completions as well as the faults. Indirect calls, nesting, and
 call/return timing were not attempted. Continue to inline PTX device functions.
+
+Offline verification: `make verify-call-ret` rebuilds both exact probe binaries,
+checks all simulator landing paths and default return rejection, replays all
+three old direct calls, and checks the retained quiet/fault outcomes.

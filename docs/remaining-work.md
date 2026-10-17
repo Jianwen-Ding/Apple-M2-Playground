@@ -113,7 +113,17 @@ built through Mesa.
 6. Unsafe: only atomic ops 11-15 (if Mesa capture does not resolve 64-bit atomics) and the register-base atomics,
    each after owner approval and a reboot.
 
-## Function calls (`call`, `ret`): status at 2026-10-17 (paused)
+## Function calls (`call`, `ret`): status at 2026-10-17 (stopped after new fault)
+
+
+**Latest owner-directed follow-up:** prior records are now bundled in the playground.
+Two no-call return landing probes passed simulator checks of every surrounding
+path; the first reached no marker, and the second faulted at unmapped UL1C
+address `0x1000008100`. No further GPU dispatch was submitted. Current boot
+budget was 1/30 when stopped. The simulator now rejects unresolved `ret` by
+default. See the [report and exact evidence](../novel-results/2026-10-17-call-ret/README.md);
+`make verify-call-ret` replays the direct calls and checks the diagnostics offline.
+The older historical status below describes the session before this follow-up.
 
 - **`call` (6-byte, pc-relative): confirmed on hardware.** With a target inside the program it jumps, and writes
   r1 = 0x2000 + (byte offset of the next instruction). 0x2000 is the code's offset in the harness buffer. The link

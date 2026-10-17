@@ -541,3 +541,7 @@ sr113-timeline:
 verify-transcendentals:
 	$(PYTHON) -B scripts/verify_transcendentals.py
 
+
+.PHONY: verify-call-ret
+verify-call-ret:
+	$(PYTHON) -B scripts/verify_call_ret.py
