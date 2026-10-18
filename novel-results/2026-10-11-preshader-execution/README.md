@@ -14,8 +14,10 @@ Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, co
 * A device `atomic add` without return value (`1500208e10500400` form:
   [u8_u9 + r1] += r2) counts exactly (65,536 contending lanes).
 
-Not established: preamble behaviour across multiple dispatches in one command or
-stream, whether the preamble can be re-run within a dispatch, and fragment preambles.
+Update 2026-10-18: it runs once per core per dispatch also for several commands per submit, and the uniform file, register and cost
+questions are answered in the [follow-ups](../2026-10-18-preshader/README.md).
+
+Not established: whether the preamble can be re-run within a dispatch, and fragment preambles.
 
 ## Reproducer and evidence
 

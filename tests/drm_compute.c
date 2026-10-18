@@ -18,6 +18,7 @@
  *   AGX_LOCAL_X/Y/Z                   CDM local size (global X stays the rounded count)
  *   AGX_GLOBAL_X                      CDM global size in X (threads; default the rounded count)
  *   AGX_GLOBAL_Y/Z                    CDM global size in Y/Z (threads; default 1)
+ *   AGX_UNIFORM_GROUPS                CDM launch word 0 uniform register count in groups of 64 halves (default 1, max 7)
  *   AGX_WORD0_OR                      bits ORed into CDM launch word 0
  *   AGX_HELPER_DATA, AGX_HELPER_CFG   drm_asahi_helper_program data/cfg ("table" = table VA)
  *   AGX_HELPER_CODE, AGX_HELPER_OFF   helper program file at USC offset AGX_HELPER_OFF (default 0x4000); binary = offset | 1
@@ -286,7 +287,9 @@ int main(int argc, char **argv)
 
     /* CDM control stream. */
     uint8_t *c = data.map + cdm_off;
-    put32(c, (1u << 1) | (uint32_t)env("AGX_WORD0_OR", 0)); c += 4;                /* Launch word 0: uniform count groups(64) = 1; direct; block type 0 */
+    const uint32_t ugroups = (uint32_t)env("AGX_UNIFORM_GROUPS", 1);   /* CDM Launch word 0 `Uniform register count`, groups of 64 halves, 3 bits */
+    require(ugroups <= 7, "uniform-groups");
+    put32(c, (ugroups << 1) | (uint32_t)env("AGX_WORD0_OR", 0)); c += 4;                /* Launch word 0: uniform count groups(64) (default 1); direct; block type 0 */
     put32(c, usc_words); c += 4;               /* Launch word 1: pipeline (64 B aligned, USC relative) */
     if (g14x) { put32(c, 0); put32(c + 4, 1u << 30); c += 8; }
     uint32_t gx = (uint32_t)env("AGX_GLOBAL_X", rounded), gy = (uint32_t)env("AGX_GLOBAL_Y", 1), gz = (uint32_t)env("AGX_GLOBAL_Z", 1);
