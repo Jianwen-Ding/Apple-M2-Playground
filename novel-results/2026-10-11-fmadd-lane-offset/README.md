@@ -55,8 +55,9 @@ from the preloaded per-lane registers (`D.pre(r) + 16·lane`) and Python float a
 * The lane-offset operand is a fused `shfl.up` + fma for one source:
   `__shfl_up_sync(v, k) * b + c` in one instruction, within 2, 4, 16 or (bit 68) 32 lanes,
   with out-of-range lanes reading 0 (fmadd16) instead of keeping their own value as PTX
-  requires. Use it only for scans and stencils where 0 is the correct fill, and keep the source
-  write at least 6 instructions before the read for 32-lane shifts.
+  requires. Use it only for scans and stencils where 0 is the correct fill, and **do not rely on the 32-lane
+  shift**: the cross-half read is timing-dependent, see the [follow-ups](../2026-10-18-fmadd-followups/README.md) (corrected 2026-10-18; it
+  is not reliable at any distance).
 * Never emit bit 52. A compiler gains nothing from the remaining gap bits; keep them zero.
 
 ## Reproduce / verify
@@ -80,7 +81,7 @@ modes with k != 1, and active lanes whose source lane is inactive (not measured)
 `make verify-fmadd-lane` replays all 658 retained records: 293 match exactly, 91 differ only in lanes 16..16+k-1 (the
 cross-half write-distance / layout dependence listed above, which the model does not reproduce: it assumes the source
 was written long before the read), 274 are refused as listed, **0 mismatches**. Register r0 (slot 1) is not compared.
-Still open: write-to-read distance sweep 0-8, inactive source lanes, a rule for bit 52 beyond the 31 triples.
+Update 2026-10-18: the write-to-read distance sweep and inactive source lanes are measured ([follow-ups](../2026-10-18-fmadd-followups/README.md)); a masked-off source reads 0 and the simulator models it. Still open: a rule for bit 52 beyond the 31 triples.
 
 Not established: whether other ALU instructions have hidden 10-byte forms reached through
 constant bits (only gap bits were flipped); the meaning of bit 74 and of bits 72+73 together;
