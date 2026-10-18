@@ -163,4 +163,4 @@ combinations. [Finding](../novel-results/2026-10-17-tg-atomic-followup/README.md
 unified-memory trigger investigations are prepared in
 [this procedure](../notes/hang-memory-followup.md).
 
-- Textures (safe-05), partial 2026-10-18: [conversion, filtering and wrap rules measured](../novel-results/2026-10-18-gles-texture/README.md); still open: borders, 1D/3D/array targets, LOD/gradient, 16-bit and integer formats, simulator model, CUDA mapping table.
+- Textures (safe-05), partial 2026-10-18 ([CUDA mapping table](cuda-texture-mapping.md) written): [conversion, filtering and wrap rules measured](../novel-results/2026-10-18-gles-texture/README.md); still open: borders, 1D/3D/array targets, LOD/gradient, 16-bit and integer formats, simulator model, CUDA mapping table.
