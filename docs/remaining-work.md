@@ -48,7 +48,7 @@ budget, and ideally a reboot afterwards.
 - **64-bit atomics** (`atom.add.u64`, `atom.cas.b64`, `atom.exch.b64`). No validated encoding is known. Device and
   threadgroup ops 11-15 stop the issuing group in the tested forms. Compile a Vulkan shader with
   `GL_EXT_shader_atomic_int64` (if exposed), export the binary and decode Mesa's lowering.
-- **Warp shuffle completeness.** Check that every `shfl.sync` mode (`up`, `down`, `bfly`, `idx`) with `c`-clamp and
+- **Warp shuffle completeness** (done 2026-10-18: [exact lowerings, quad-granular index](../novel-results/2026-10-18-shfl/README.md); open: partial membermask, 64-bit values, cost). Original task: Check that every `shfl.sync` mode (`up`, `down`, `bfly`, `idx`) with `c`-clamp and
   segment-mask operands has a recorded AGX lowering with exact out-of-range behaviour. The cross-lane width finding
   covers reductions and scans, not every shuffle form.
 - **Stack / scratch through Mesa only.** Capture a Mesa shader that spills (`stack-via-mesa`) and record the
