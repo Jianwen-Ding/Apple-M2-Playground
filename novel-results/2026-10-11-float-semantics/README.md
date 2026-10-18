@@ -22,6 +22,9 @@ The before-rounding flush shows only where a result rounds up to the smallest no
 `0x00ffffff × 0.5` and `2^-126 × (1 − 2^-24)` both give 0 on hardware, while rounding first would
 give `0x00800000`. For fadd32 both flush timings agree because sums of flushed inputs are exact.
 
+Update 2026-10-18: compare and min/max semantics, including the subnormal flush and NaN rules, are in the
+[fcmp finding](../2026-10-18-fcmp/README.md).
+
 Not established: other rounding modes (Mesa advertises none for ALU ops; `convert` has
 its own rounding bit), fmin/fmax and compare NaN rules, transcendental accuracy, fp16 `.sat`,
 mixed 16/32-bit operand forms, and source modifiers (`.neg`, `.abs`) beyond assembly round trips.
