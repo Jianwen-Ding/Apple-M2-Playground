@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
     printf("limits gl=%d.%d invocations=%d size_x=%d count_x=%d\n", glmajor, glminor, invocations, size, count);
     gl_ok("identity-limits");
     if (glmajor < 3 || (glmajor == 3 && glminor < 2) || invocations < 32 || size < 32 || count < (GLint)groups) fail("capabilities");
-    char source[1024];
+    static char source[1 << 16];
     const char *expression = !strcmp(mode, "index") ? "(i * 0x9e3779b9u) ^ 0x12345678u" : "0x12345678u";
     if (!strcmp(mode, "invalid")) expression = "INTENTIONAL_UNDECLARED_IDENTIFIER";
     /* "private": a dynamically indexed 1024-entry private array, which Mesa places in scratch (stack) memory. */
@@ -177,6 +177,15 @@ int main(int argc, char **argv) {
         "layout(std430, binding=0) buffer Output { uint data[]; };\nuniform uint count;\n%s"
         "void main() { uint i=gl_GlobalInvocationID.x; if (i < count) data[8u+i]=%s; }\n", prelude, expression);
     if (length < 0 || (size_t)length >= sizeof(source)) fail("shader-source-size");
+    /* GLES_SHADER_FILE: replace the generated shader by the contents of this file (same interface: local_size_x = 32,
+     * `data[8u + i]` outputs in binding 0, `uniform uint count`). Used by scripts/run_gles_stack2.py. */
+    if (getenv("GLES_SHADER_FILE")) {
+        FILE *sf = fopen(getenv("GLES_SHADER_FILE"), "rb");
+        if (!sf) fail("shader-file-open");
+        size_t got = fread(source, 1, sizeof(source) - 1, sf);
+        if (!feof(sf) || got == 0) fail("shader-file-read");
+        fclose(sf); source[got] = 0; length = (int)got;
+    }
     save("shader.comp", source, (size_t)length);
     GLuint shader = p_glCreateShader(GL_COMPUTE_SHADER);
     const GLchar *source_ptr = source;

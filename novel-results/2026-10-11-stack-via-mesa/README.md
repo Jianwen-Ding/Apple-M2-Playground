@@ -35,6 +35,8 @@ library hands out blocks at run time. The earlier hand-built helper attempts sta
 reproducing this path over direct DRM needs Mesa's helper binary and should only be tried when
 a reboot is available.
 
+Update 2026-10-18: register spills, vec4 and 16-bit stack accesses were captured and replayed in the simulator ([follow-up](../2026-10-18-stack-mesa/README.md)).
+
 Not established: spilling of registers (as opposed to private arrays), `stack_get_ptr`,
 `TODO.stack_adjust(2)`, `async_load/store`, negative stack_adjust at shader end, and preamble
 scratch.
