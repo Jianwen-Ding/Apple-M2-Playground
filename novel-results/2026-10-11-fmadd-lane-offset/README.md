@@ -69,6 +69,19 @@ from the preloaded per-lane registers (`D.pre(r) + 16·lane`) and Python float a
   `--raw` / `--baseline` options (commands in the commit log of this finding).
 * [Evidence](../../results/2026-10-11-alu-bitflip/README.md).
 
+## Simulator model (2026-10-18)
+
+`AGX-Performance-Simulator` decodes `fmadd32_lane` / `fmadd16_lane` (10 bytes) and models the measured subset:
+default 16-lane halves with k <= 16, plus bit 68 (32-lane), bit 72 (groups of 2) and bit 73 (groups of 4) with k = 1,
+and single no-effect bits 64-67 / 69-71 with k = 1. A lane that reads outside its half/group reads 0.
+Everything else is refused (the run stops with an error rather than guessing): the 8-byte bit-52 operation, bit 74,
+combined mode bits, k > 16 (fmadd32 returns undefined values there), grouped fmadd32 with an out-of-group source,
+modes with k != 1, and active lanes whose source lane is inactive (not measured).
+`make verify-fmadd-lane` replays all 658 retained records: 293 match exactly, 91 differ only in lanes 16..16+k-1 (the
+cross-half write-distance / layout dependence listed above, which the model does not reproduce: it assumes the source
+was written long before the read), 274 are refused as listed, **0 mismatches**. Register r0 (slot 1) is not compared.
+Still open: write-to-read distance sweep 0-8, inactive source lanes, a rule for bit 52 beyond the 31 triples.
+
 Not established: whether other ALU instructions have hidden 10-byte forms reached through
 constant bits (only gap bits were flipped); the meaning of bit 74 and of bits 72+73 together;
 whether the undefined values read by fmadd32 come from another register; what bit 52 is for.
