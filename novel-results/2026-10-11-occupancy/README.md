@@ -25,7 +25,8 @@ resident SIMD groups per core = min(96, 2 * floor(3328 / (2 * declared_halves)))
 | SIMD groups / core | 96 | 82 | 68 | 58 | 52 | 46 | 40 | 34 | 26 | 20 | 16 | 12 |
 
 Smaller workgroups cap lower whatever the register count: about 53–57 groups with 32-lane
-workgroups and 84 with 64-lane workgroups (16 halves). At 48 halves and above, 64-lane groups
+workgroups and 84 with 64-lane workgroups (16 halves). *Update 2026-10-18: this is a workgroup-slot limit of about 55 per core
+plus a launch-rate effect; see the [follow-ups](../2026-10-18-occupancy/README.md).* At 48 halves and above, 64-lane groups
 follow the formula.
 
 A latency-bound loop over 2^20 lanes shows the cost: dispatch time is flat to 136 halves and
