@@ -20,7 +20,7 @@ Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, co
      source is outside the group read 0 (fmadd16) or an undefined value (fmadd32).
      Bit 74 set alone looked like the default 16-lane grouping, but lane 0 read an undefined value.
    * Bits 64–67 and 69–71 had no observable effect with k = 1 for any of A, B or C.
-3. **Bit 52 of the 8-byte fmadd32 changes the operation** (fmadd16: no effect). Over 31 float
+3. **Bit 52 of the 8-byte fmadd32 changes the operation** (*superseded 2026-10-18: it is a `pow()` special-case fixup, see the [fma-b52 finding](../2026-10-18-fma-b52/README.md); the rule below, fitted on 31 triples, is wrong on 6,062 of 13,824 triples*) (fmadd16: no effect). Over 31 float
    triples on all lanes: if B = 1.0 the result is A; else if A = 1.0 the result is 1.0;
    otherwise the result is C exactly (C is not added in the first two cases; a zero C takes the
    sign of A). A register brute force found no source redirection that explains it, so the
@@ -78,10 +78,10 @@ and single no-effect bits 64-67 / 69-71 with k = 1. A lane that reads outside it
 Everything else is refused (the run stops with an error rather than guessing): the 8-byte bit-52 operation, bit 74,
 combined mode bits, k > 16 (fmadd32 returns undefined values there), grouped fmadd32 with an out-of-group source,
 modes with k != 1, and active lanes whose source lane is inactive (not measured).
-`make verify-fmadd-lane` replays all 658 retained records: 293 match exactly, 91 differ only in lanes 16..16+k-1 (the
+`make verify-fmadd-lane` replays all 658 retained records: 391 match exactly (293 before the bit-52 model), 91 differ only in lanes 16..16+k-1 (the
 cross-half write-distance / layout dependence listed above, which the model does not reproduce: it assumes the source
-was written long before the read), 274 are refused as listed, **0 mismatches**. Register r0 (slot 1) is not compared.
-Update 2026-10-18: the write-to-read distance sweep and inactive source lanes are measured ([follow-ups](../2026-10-18-fmadd-followups/README.md)); a masked-off source reads 0 and the simulator models it. Still open: a rule for bit 52 beyond the 31 triples.
+was written long before the read), 176 are refused as listed, **0 mismatches**. Register r0 (slot 1) is not compared.
+Update 2026-10-18: the write-to-read distance sweep and inactive source lanes are measured ([follow-ups](../2026-10-18-fmadd-followups/README.md)); a masked-off source reads 0 and the simulator models it. The bit-52 rule is resolved in the [fma-b52 finding](../2026-10-18-fma-b52/README.md).
 
 Not established: whether other ALU instructions have hidden 10-byte forms reached through
 constant bits (only gap bits were flipped); the meaning of bit 74 and of bits 72+73 together;
