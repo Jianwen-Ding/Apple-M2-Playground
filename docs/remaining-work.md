@@ -1,5 +1,8 @@
 # Task 1: remaining work, safe and unsafe (2026-10-17)
 
+> **Update 2026-10-18:** the fmadd lane-offset form is decoded and modeled (measured subset, `make verify-fmadd-lane`,
+> `make verify-fmadd-decode`); safe-10 (memory ordering) is measured except for the items listed in row 1 below.
+
 > **Update, later on 2026-10-17 (owner-approved unsafe session):**
 > - **Done:** the `while_*` loops (24 guarded and 9 terminating forms, 0 faults; the old "faults" were test design
 >   plus a cascade) and the 11 register-base atomics with return.
@@ -26,7 +29,7 @@ budget, and ideally a reboot afterwards.
 
 | # | Work | Task | Why it matters for PTX translation | Status |
 |---|---|---|---|---|
-| 1 | Memory-ordering litmus tests: SB, LB, threadgroup MP/SB/LB, atomics as release, fence cost, ordering across dispatches | safe-10 | The mapping of `fence` / `membar` / `ld.acquire` / `st.release` / `atom.release`. Correctness-critical | Only cross-core MP measured |
+| 1 | ~~Memory-ordering litmus tests~~ done 2026-10-18 (safe-10): [SB/LB](../novel-results/2026-10-18-sb-lb/README.md), [atomic release](../novel-results/2026-10-18-atomic-release/README.md), [across dispatches](../novel-results/2026-10-18-dispatch-visibility/README.md), [fence cost](../novel-results/2026-10-18-fence-cost/README.md), [threadgroup](../novel-results/2026-10-18-tg-litmus/README.md). Open: a minimal sufficient SB fence set, fence costs in `cost.rs`, coverage case type | safe-10 | Mapping of `fence` / `membar` / `ld.acquire` / `st.release` / `atom.release`. Correctness-critical | MP, SB, LB, atomics, tg, dispatch boundary and cost measured |
 | 2 | Non-ftz fix-ups for `setp` and `min`/`max` on subnormals | safe-01 (open part) | Default (non-`.ftz`) PTX float compares must be bit exact | Conversions and float edges done |
 | 3 | In-shader clock: cost under load, cross-core skew, per-core copies, cost-model op | safe-11 §3 | `clock()`, `clock64()`, `%globaltimer`. No hardware shader clock exists, so this is the only path | Basic read works (0.4-0.75 µs) |
 | 4 | Occupancy: small-workgroup cap, 2-D/3-D workgroups, combined register and threadgroup-memory limits | safe-11 §1 | `cudaOccupancyMaxActiveBlocksPerMultiprocessor`, launch tuning | Formula known for the common case |
