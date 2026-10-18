@@ -51,7 +51,7 @@ budget, and ideally a reboot afterwards.
 - **Warp shuffle completeness** (done 2026-10-18: [exact lowerings, quad-granular index](../novel-results/2026-10-18-shfl/README.md); open: partial membermask, 64-bit values, cost). Original task: Check that every `shfl.sync` mode (`up`, `down`, `bfly`, `idx`) with `c`-clamp and
   segment-mask operands has a recorded AGX lowering with exact out-of-range behaviour. The cross-lane width finding
   covers reductions and scans, not every shuffle form.
-- **Stack / scratch through Mesa only** (done 2026-10-18: [spills, vec4, 16-bit; simulator replay exact](../novel-results/2026-10-18-stack-mesa/README.md); open: `stack_get_ptr`, async forms, the coverage case, spill cost). Original task: Capture a Mesa shader that spills (`stack-via-mesa`) and record the
+- **Stack / scratch through Mesa only** (done 2026-10-18: [spills, vec4, 16-bit; simulator replay exact](../novel-results/2026-10-18-stack-mesa/README.md); open: `stack_get_ptr`, async forms, the coverage case, spill cost: [rough, 20-43 ALU instructions per pair](../novel-results/2026-10-18-spill-cost/README.md)). Original task: Capture a Mesa shader that spills (`stack-via-mesa`) and record the
   `stack_*` encodings as coverage cases, without hand-built helper programs (`MANUAL` item `stack`). CUDA local arrays
   and register spills depend on it.
 
