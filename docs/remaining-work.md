@@ -162,3 +162,5 @@ combinations. [Finding](../novel-results/2026-10-17-tg-atomic-followup/README.md
 `make verify-tg-atomic-followup`. Future hang diagnostics and bounded
 unified-memory trigger investigations are prepared in
 [this procedure](../notes/hang-memory-followup.md).
+
+- Textures (safe-05), partial 2026-10-18: [conversion, filtering and wrap rules measured](../novel-results/2026-10-18-gles-texture/README.md); still open: borders, 1D/3D/array targets, LOD/gradient, 16-bit and integer formats, simulator model, CUDA mapping table.

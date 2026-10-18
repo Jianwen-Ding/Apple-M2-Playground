@@ -58,7 +58,15 @@
  X(PFNGLDELETESYNCPROC, glDeleteSync) \
  X(PFNGLDELETEBUFFERSPROC, glDeleteBuffers) \
  X(PFNGLDELETEPROGRAMPROC, glDeleteProgram) \
- X(PFNGLDELETESHADERPROC, glDeleteShader)
+ X(PFNGLDELETESHADERPROC, glDeleteShader) \
+ X(PFNGLGENTEXTURESPROC, glGenTextures) \
+ X(PFNGLBINDTEXTUREPROC, glBindTexture) \
+ X(PFNGLTEXSTORAGE2DPROC, glTexStorage2D) \
+ X(PFNGLTEXSUBIMAGE2DPROC, glTexSubImage2D) \
+ X(PFNGLTEXPARAMETERIPROC, glTexParameteri) \
+ X(PFNGLACTIVETEXTUREPROC, glActiveTexture) \
+ X(PFNGLBINDIMAGETEXTUREPROC, glBindImageTexture) \
+ X(PFNGLPIXELSTOREIPROC, glPixelStorei)
 #define DECL(type, name) static type p_##name;
 EGL_FUNCS(DECL)
 GL_FUNCS(DECL)
@@ -109,7 +117,7 @@ int main(int argc, char **argv) {
     if (strcmp(mode, "control") && strcmp(mode, "constant") && strcmp(mode, "index") && strcmp(mode, "invalid") && strcmp(mode, "private")) return 2;
     char *end = NULL;
     unsigned long parsed = strtoul(argv[2], &end, 10);
-    if (!*argv[2] || *end || parsed < 1 || parsed > 257) return 2;
+    if (!*argv[2] || *end || parsed < 1 || parsed > 262144) return 2;
     unsigned n = (unsigned)parsed, groups = (n + 31) / 32, words = 8 + groups * 32 + 8;
     printf("case mode=%s count=%u groups=%u local_size=32 words=%u byte_order=native\n", mode, n, groups, words);
     void *egl = dlopen("libEGL.so.1", RTLD_NOW | RTLD_LOCAL);
@@ -212,7 +220,8 @@ int main(int argc, char **argv) {
     save("link.log", log, strlen(log)); free(log);
     printf("link_status=%d\n", linked); gl_ok("link");
     if (!linked) fail("shader-link");
-    uint32_t input[304], control[16];
+    uint32_t *input = malloc(sizeof(uint32_t) * words), control[16];
+    if (!input) fail("input-allocation");
     for (unsigned i=0; i<words; i++) input[i] = 0xcdcdcdcdu;
     for (unsigned i=0; i<16; i++) control[i] = 0xa5a50000u + i;
     save("input.bin", input, words * 4); save("control-input.bin", control, sizeof(control));
@@ -223,6 +232,47 @@ int main(int argc, char **argv) {
     p_glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers[1]);
     p_glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(control), control, GL_DYNAMIC_COPY);
     p_glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, buffers[1]);
+    /* GLES_TEX_FORMAT (r8 rgba8 r8snorm rgba8snorm rgba8srgb r16f r32f rgba32f r8ui r32ui), GLES_TEX_W / GLES_TEX_H, GLES_TEX_DATA (raw file),
+     * GLES_TEX_FILTER (nearest | linear), GLES_TEX_WRAP (clamp | repeat | mirror), GLES_TEX_IMAGE=1 (also bind level 0 as read-write image unit 0).
+     * The texture is bound to texture unit 0 (use `layout(binding=0)` in the shader). Used by scripts/run_gles_texture.py. */
+    if (getenv("GLES_TEX_FORMAT")) {
+        static const struct { const char *name; GLenum internal, format, type; unsigned bpp; } fmts[] = {
+            {"r8", GL_R8, GL_RED, GL_UNSIGNED_BYTE, 1}, {"rgba8", GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, 4},
+            {"r8snorm", GL_R8_SNORM, GL_RED, GL_BYTE, 1}, {"rgba8snorm", GL_RGBA8_SNORM, GL_RGBA, GL_BYTE, 4},
+            {"rgba8srgb", GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4}, {"r16f", GL_R16F, GL_RED, GL_HALF_FLOAT, 2},
+            {"r32f", GL_R32F, GL_RED, GL_FLOAT, 4}, {"rgba32f", GL_RGBA32F, GL_RGBA, GL_FLOAT, 16},
+            {"r8ui", GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, 1}, {"r32ui", GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, 4}};
+        const char *fn = getenv("GLES_TEX_FORMAT");
+        int fi = -1;
+        for (unsigned k = 0; k < sizeof fmts / sizeof *fmts; k++) if (!strcmp(fn, fmts[k].name)) fi = (int)k;
+        if (fi < 0) fail("tex-format");
+        unsigned tw = (unsigned)atoi(getenv("GLES_TEX_W") ? getenv("GLES_TEX_W") : "16"), th = (unsigned)atoi(getenv("GLES_TEX_H") ? getenv("GLES_TEX_H") : "16");
+        if (!tw || !th || tw > 4096 || th > 4096) fail("tex-size");
+        size_t bytes = (size_t)tw * th * fmts[fi].bpp;
+        void *pix = calloc(1, bytes);
+        if (!pix) fail("tex-alloc");
+        if (getenv("GLES_TEX_DATA")) {
+            FILE *tf = fopen(getenv("GLES_TEX_DATA"), "rb");
+            if (!tf) fail("tex-data-open");
+            if (fread(pix, 1, bytes, tf) != bytes) fail("tex-data-read");
+            fclose(tf);
+        }
+        GLuint tex;
+        p_glGenTextures(1, &tex);
+        p_glActiveTexture(GL_TEXTURE0);
+        p_glBindTexture(GL_TEXTURE_2D, tex);
+        p_glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        p_glTexStorage2D(GL_TEXTURE_2D, 1, fmts[fi].internal, (GLsizei)tw, (GLsizei)th);
+        p_glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)tw, (GLsizei)th, fmts[fi].format, fmts[fi].type, pix);
+        const char *flt = getenv("GLES_TEX_FILTER"), *wrp = getenv("GLES_TEX_WRAP");
+        GLint f = (flt && !strcmp(flt, "linear")) ? GL_LINEAR : GL_NEAREST;
+        GLint wr = (wrp && !strcmp(wrp, "repeat")) ? GL_REPEAT : (wrp && !strcmp(wrp, "mirror")) ? GL_MIRRORED_REPEAT : GL_CLAMP_TO_EDGE;
+        p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, f); p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, f);
+        p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wr); p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wr);
+        if (getenv("GLES_TEX_IMAGE")) p_glBindImageTexture(0, tex, 0, GL_FALSE, 0, GL_READ_WRITE, fmts[fi].internal);
+        gl_ok("texture-setup");
+        free(pix);
+    }
     p_glUseProgram(program);
     GLint location = p_glGetUniformLocation(program, "count");
     if (location < 0) fail("count-uniform");
