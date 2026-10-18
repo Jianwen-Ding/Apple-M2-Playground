@@ -14,7 +14,7 @@ def check(name, cond):
     ok.append(bool(cond)); print('PASS' if cond else 'FAIL', name)
 
 
-check('all 10 cases ran with intact guard words', len(rec) == 10 and all(r['run_ok'] and r.get('guards_intact', True) for r in rec.values()))
+check('all 14 cases ran with intact guard words', len(rec) == 14 and all(r['run_ok'] and r.get('guards_intact', True) for r in rec.values()))
 check('r8 unorm: all 256 values equal float32(k/255)', all(rec['fetch_r8']['out'][k] == fb(k/255) for k in range(256)))
 sn = lambda k: max((k-256 if k >= 128 else k)/127, -1.0)
 check('r8 snorm: all 256 values equal max(k/127, -1) (-128 and -127 both give -1)', all(rec['fetch_snorm']['out'][k] == fb(sn(k)) for k in range(256)))
@@ -62,4 +62,11 @@ o = rec['image_rgba8']['out']
 check('imageLoad rgba8 unorm: r and g of all 256 values equal float32(k/255)', all(o[v] == fb(v/255) and o[256+v] == fb((255-v)/255) for v in range(256)))
 o = rec['image_r32f']['out']
 check('imageStore / imageLoad r32f round trip is bit-exact for 1,024 patterns', all(o[i] == (0x3f800000+i*977) & 0xffffffff for i in range(1024)))
+[rng.randrange(1, 255) for _ in range(0)]
+u32 = [rng.getrandbits(32) for _ in range(256)]
+f32 = [0, 0x80000000, 1, 0x7fffff, 0x7f800000, 0xff800000, 0x7fc00000, 0x7f7fffff] + [rng.getrandbits(32) for _ in range(248)]
+check('integer fetch: r8ui (256 values) and r32ui (256 random words) exact', rec['fetch_r8ui']['out'] == list(range(256)) and rec['fetch_r32ui']['out'] == u32)
+o = rec['fetch_rgba8snorm']['out']
+check('rgba8snorm: r and g channels of all 256 values equal max(k/127, -1)', all(o[k] == fb(sn(k)) and o[256+k] == fb(sn(255-k)) for k in range(256)))
+check('rgba32f fetch is bit-exact for 256 patterns incl. denormals, infinities, -0 and NaN payloads', rec['fetch_rgba32f']['out'] == [v ^ 0x80000000 for v in f32])
 sys.exit(0 if all(ok) else 1)

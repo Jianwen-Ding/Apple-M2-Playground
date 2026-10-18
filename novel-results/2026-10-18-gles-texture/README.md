@@ -1,7 +1,7 @@
 # Texture and image semantics through Mesa GLES: encodings and exact conversion rules
 
 Status: confirmed on one device (driver-reported M2 Max G14C B1). safe-05 steps 1-2, partly. Mesa builds every texture, sampler and image
-state word; no state was hand-encoded or edited and the driver never rejected a bound texture. 10 GLSL ES 3.2 compute shaders, outputs recorded as raw
+state word; no state was hand-encoded or edited and the driver never rejected a bound texture. 14 GLSL ES 3.2 compute shaders, outputs recorded as raw
 words, AGX listings captured from Mesa's shader cache. 0 faults, no hang-budget use.
 
 ## Encodings Mesa emits (from the captured listings)
@@ -25,19 +25,22 @@ words, AGX listings captured from Mesa's shader cache. 0 faults, no hang-budget 
 | address modes (nearest, x -20..35) | clamp-to-edge, repeat and mirrored-repeat all exact | 3 x 56 |
 | rgba8 `imageLoad` | same unorm conversion as sampling a texel | 512 |
 | r32f store then load | bit exact | 1,024 |
+| r8ui / r32ui fetch | exact | 256 + 256 |
+| rgba8snorm fetch | r and g channels follow the r8 snorm rule | 512 |
+| rgba32f fetch | bit exact incl. denormals, infinities, -0, NaN payloads | 256 |
 
 The 12-bit grid is the common cause of the sRGB table and the bilinear rounding: filtered unorm results are held with 4 fractional bits beyond 8.
 The 10 sub-texel bits found in the earlier `texfilter` work are consistent: the weights here resolved all 256 positions per texel (8 bits).
 
 ## Not done
 
-* Border-colour and out-of-range integer coordinates, 1D/3D/array/cube targets, LOD and gradient forms, snorm16 / unorm16 and 32-bit integer formats,
+* Border-colour and out-of-range integer coordinates, 1D/3D/array/cube targets, LOD and gradient forms, snorm16 / unorm16 formats,
   sRGB filtering, `tld4` equivalents.
 * Simulator implementation (`texture_load` / `texture_sample` / `image_write`) and the CUDA mapping table (steps 3-4). The rules above are the
   functional model to implement.
 * Textures are 2D only; the harness (`tests/gles_compute.c`, `GLES_TEX_*`) covers formats r8, rgba8, r8snorm, rgba8snorm, rgba8srgb, r16f, r32f,
-  rgba32f, r8ui and r32ui (only the first seven were run).
+  rgba32f, r8ui and r32ui (all but r8ui-with-filtering were run; integer formats cannot be filtered).
 
 ## Reproduce
 
-`python3 scripts/run_gles_texture.py` (writes to `/scratch/apple-m2-playground/gles-texture`); `make verify-gles-texture` (offline, 10 checks).
+`python3 scripts/run_gles_texture.py` (writes to `/scratch/apple-m2-playground/gles-texture`); `make verify-gles-texture` (offline, 13 checks).

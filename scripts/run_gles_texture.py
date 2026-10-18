@@ -52,6 +52,18 @@ def cases():
     out['image_r32f'] = dict(fmt='r32f', w=32, h=32, data=bytes(4*1024), count=1024, filt='nearest', image=True,
         glsl=HEAD+"layout(r32f, binding=0) uniform highp image2D img;\nvoid main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ ivec2 p=ivec2(int(i%32u),int(i/32u)); "
               "imageStore(img, p, vec4(uintBitsToFloat(0x3f800000u + i*977u), 0.0, 0.0, 0.0)); memoryBarrierImage(); data[8u+i]=floatBitsToUint(imageLoad(img, p).r); } }\n")
+    # 5. integer and wide formats through texelFetch (usampler needs its own precision statement)
+    UH = HEAD+"precision highp usampler2D;\n"
+    out['fetch_r8ui'] = dict(fmt='r8ui', w=16, h=16, data=bytes(range(256)), count=256, filt='nearest',
+        glsl=UH+"layout(binding=0) uniform highp usampler2D tex;\nvoid main(){ uint i=gl_GlobalInvocationID.x; if(i<count) data[8u+i]=texelFetch(tex, ivec2(int(i%16u),int(i/16u)), 0).r; }\n")
+    u32 = [rng.getrandbits(32) for _ in range(256)]
+    out['fetch_r32ui'] = dict(fmt='r32ui', w=16, h=16, data=b''.join(struct.pack('<I', v) for v in u32), count=256, filt='nearest', vals=u32,
+        glsl=UH+"layout(binding=0) uniform highp usampler2D tex;\nvoid main(){ uint i=gl_GlobalInvocationID.x; if(i<count) data[8u+i]=texelFetch(tex, ivec2(int(i%16u),int(i/16u)), 0).r; }\n")
+    out['fetch_rgba8snorm'] = dict(fmt='rgba8snorm', w=16, h=16, data=bytes(b for v in range(256) for b in (v, 255-v, 0, 0)), count=512, filt='nearest',
+        glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<256u && i<count){ vec4 v=texelFetch(tex, ivec2(int(i%16u),int(i/16u)), 0); data[8u+i]=floatBitsToUint(v.r); data[8u+256u+i]=floatBitsToUint(v.g); } }\n")
+    f32 = [0x00000000, 0x80000000, 0x00000001, 0x007fffff, 0x7f800000, 0xff800000, 0x7fc00000, 0x7f7fffff] + [rng.getrandbits(32) for _ in range(248)]
+    out['fetch_rgba32f'] = dict(fmt='rgba32f', w=16, h=16, data=b''.join(struct.pack('<4I', v, v ^ 0x80000000, v, v) for v in f32), count=256, filt='nearest', vals=f32,
+        glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count) data[8u+i]=floatBitsToUint(texelFetch(tex, ivec2(int(i%16u),int(i/16u)), 0).g); }\n")
     return out
 
 
