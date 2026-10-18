@@ -10,14 +10,14 @@ lane of the neighbouring workgroup 16 times: flag, `wait 0`, [reader fence], dat
 
 | Writer fence | Flag by store | Flag by atomic add / add+ret / xchg |
 | --- | --- | --- |
-| none | 72,000-109,000 violating reads | **570,000-810,000** |
+| none | 72,000-109,000 violating reads | **580,000-810,000** |
 | `memory_barrier` (f596) | 32,000-72,000 | **580,000-766,000** |
 | **f533**, reader f59d | **0** | **0** (all three atomics) |
 | f533, no reader fence | 0-240 | 256-2,400 |
 | Mesa's queue-family sequence, reader f59d | 0 | 0 |
 
 * **An atomic flag is no release.** Without f533 the atomic flags are visible almost immediately (flag seen in 85-99% of
-  reads, versus 17-50% for a store) but the data is mostly stale: the atomic goes straight to the coherence point
+  reads, versus 15-50% for a store) but the data is mostly stale: the atomic goes straight to the coherence point
   while the earlier data store is still in a core-local queue. This makes message passing worse than with a store.
 * With f533 before the atomic and f59d between the flag and data loads, MP never failed: 0 in 3 runs of each atomic form
   (add, add with return, exchange) and of the store.
