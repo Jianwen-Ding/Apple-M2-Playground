@@ -42,7 +42,7 @@ budget, and ideally a reboot afterwards.
 
 ### Gaps not yet covered by any task (safe to start)
 
-- **fp64.** AGX has no fp64 unit, and no finding documents that or measures it. CUDA `double` needs software
+- **fp64** (done 2026-10-18: [bit-exact software add / mul / fma, with costs](../novel-results/2026-10-18-fp64/README.md); open: div, sqrt, cvt, compares, other rounding modes). Original gap: AGX has no fp64 unit, and no finding documents that or measures it. CUDA `double` needs software
   emulation from recorded int64 and fp32 forms. Measure the cost of a double-precision add/mul/fma sequence built only
   from safe forms, and check it bit-exact against IEEE on edge cases.
 - **64-bit atomics** (`atom.add.u64`, `atom.cas.b64`, `atom.exch.b64`). No validated encoding is known. Device and
