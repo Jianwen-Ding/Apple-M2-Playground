@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help atomic-variants verify-atomic-variants atomic-contention verify-atomic-contention cpu-gpu-visibility verify-cpu-gpu-visibility verify-l2-command-boundary verify-memory-parameters cache-line verify-cache-line fixed18-waits verify-fixed18-waits queue-concurrency verify-queue-concurrency queue-priority verify-queue-priority commands-per-submit verify-commands-per-submit drm-limits drm-sync submit-latency verify-submit-latency verify-drm-interface verify-transcendentals sr113-timeline verify-special-registers sr-vm-slot sr-divergence sr113-reps verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-fmadd-decode verify-fmadd-lane verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering test-sb-lb verify-sb-lb test-atomic-release verify-atomic-release test-dispatch-visibility verify-dispatch-visibility verify-fence-cost verify-tg-litmus verify-fcmp verify-softfp64 verify-shfl verify-occupancy2 verify-clock2 verify-atom64 verify-preshader verify-stack-mesa verify-fmadd-followups bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
+.PHONY: help atomic-variants verify-atomic-variants atomic-contention verify-atomic-contention cpu-gpu-visibility verify-cpu-gpu-visibility verify-l2-command-boundary verify-memory-parameters cache-line verify-cache-line fixed18-waits verify-fixed18-waits queue-concurrency verify-queue-concurrency queue-priority verify-queue-priority commands-per-submit verify-commands-per-submit drm-limits drm-sync submit-latency verify-submit-latency verify-drm-interface verify-transcendentals sr113-timeline verify-special-registers sr-vm-slot sr-divergence sr113-reps verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-fmadd-decode verify-fmadd-lane verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering test-sb-lb verify-sb-lb test-atomic-release verify-atomic-release test-dispatch-visibility verify-dispatch-visibility verify-fence-cost verify-fence-model verify-tg-litmus verify-fcmp verify-softfp64 verify-shfl verify-occupancy2 verify-clock2 verify-atom64 verify-preshader verify-stack-mesa verify-fmadd-followups bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -112,6 +112,7 @@ help:
 	@echo 'make verify-softfp64  Offline: bit-exact software fp64 add/mul/fma (simulator replay + retained hardware runs)'
 	@echo 'make verify-fcmp  Offline: fp32 compare semantics, exact setp/min/max fix-up, simulator replay'
 	@echo 'make verify-tg-litmus  Offline: threadgroup-memory MP/SB/LB litmus (hardware: scripts/run_drm_litmus_tg.py)'
+	@echo 'make verify-fence-model  Offline: the simulator cost model of memory_barrier against the measured fence costs'
 	@echo 'make verify-fence-cost  Offline: barrier costs (hardware: scripts/probe_fence_cost.py hardware)'
 	@echo 'make test-atomic-release / verify-atomic-release  Hardware / offline: atomic flag as release litmus'
 	@echo 'make test-sb-lb / verify-sb-lb  Hardware / offline: store-buffering and load-buffering litmus'
@@ -552,6 +553,9 @@ verify-dispatch-visibility:
 
 verify-fence-cost:
 	$(PYTHON) -B scripts/verify_fence_cost.py
+
+verify-fence-model:
+	$(PYTHON) -B scripts/verify_fence_model.py
 
 verify-tg-litmus:
 	$(PYTHON) -B scripts/verify_tg_litmus.py

@@ -37,8 +37,10 @@ independent 5-sample run agrees within 50 ns on every cell. Contexts: *back to b
 
 Not established: the cause of each context effect (cache line refetch is the likely mechanism for the load case),
 costs with many SIMD groups per core, costs when the surrounding memory operations miss in L2, and whether the
-effects add when fences are separated by ALU work. The simulator's cost model (`cost.rs`) does not yet model fence
-costs; this table is the data to add.
+effects add when fences are separated by ALU work. The simulator's cost model (`cost.rs`) now models the seven
+barriers from this table (`FENCE_COSTS_NS`; per group, context = the last device store / load, penalty paid once; other `memory_barrier`
+encodings cost 85 ns and are flagged unmeasured): single fences reproduce the table within 0.5 ns, the sequences within 17 ns (after a store,
+Mesa's sequence is 71 ns high). `make verify-fence-model` checks it. Multi-group (core-level) fence contention is not modeled or measured.
 
 ## Reproduce
 
