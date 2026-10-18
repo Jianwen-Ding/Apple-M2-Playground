@@ -61,7 +61,9 @@ from the preloaded per-lane registers (`D.pre(r) + 16·lane`) and Python float a
 
 ## Reproduce / verify
 
-* `make verify-alu-bitflip`: 50 offline checks of the retained records.
+* `make verify-alu-bitflip`: 54 offline checks of the retained records.
+* `make verify-fmadd-decode`: the simulator decoder (`fmadd32_lane`/`fmadd16_lane`, 10 bytes when bit 53 is set) walks all 658
+  retained candidate programs on exact instruction boundaries. Decoding only; lane-read execution is still unmodeled.
 * Hardware: `CONFIRM_GPU_FAULTS=1 python3 -B scripts/run_drm_bitflip.py` (full gap sweep,
   ~4 min), then `scripts/analyze_bitflip.py <record.json>`. The fmadd experiments use the
   `--raw` / `--baseline` options (commands in the commit log of this finding).
