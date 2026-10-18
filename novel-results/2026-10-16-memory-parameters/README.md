@@ -34,8 +34,8 @@ page-walk cache). Beyond that, a miss adds 120-165 ns. The 2026-10-10 study boun
   462, 461, 466, 466 ns.
 - There is no sharp edge near the published 48 MB SLC, because SLC hits and DRAM differ by only ~10-15% in latency
   from the GPU.
-- **The SLC capacity cannot be read from latency.** A bandwidth probe is needed (open). The CPU-sharing variant of
-  the SLC test was not run.
+- **The SLC capacity cannot be read from latency.** A bandwidth probe is needed: done 2026-10-18, see the [SLC finding](../2026-10-18-slc/README.md)
+  (effective capacity about 21 MiB, smooth transition 14-30 MiB; CPU streaming has no effect).
 
 ## Reproducer and evidence
 
