@@ -1,0 +1,1 @@
+Apple M2 Max (G14C B1): shaderInt64=1 bufferInt64Atomics(1.2)=0 sharedInt64Atomics(1.2)=0 bufferInt64Atomics(ext struct)=0 shared=0
