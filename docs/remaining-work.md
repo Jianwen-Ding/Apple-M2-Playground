@@ -38,7 +38,7 @@ budget, and ideally a reboot afterwards.
 | 7 | Cost-model gaps: per-line serialisation of colliding atomic lanes, strided access, barrier after ALU, store write-back, PTX-compliant sin/cos cost | safe-02 steps 1 (rest) - 5 | Performance stage (stage 4) and kernel-time prediction | Step 1 done |
 | 8 | ~~SLC capacity by bandwidth~~ done 2026-10-18: [about 21 MiB effective, smooth 14-30 MiB, CPU-independent](../novel-results/2026-10-18-slc/README.md) | safe-03 (open part) | Cache-aware lowering and blocking | Latency could not separate the SLC |
 | 9 | Textures and images through Mesa-compiled GLSL: encodings, filtering precision, unorm/snorm/sRGB rounding, borders, out-of-range coordinates, simulator model | safe-05 | `tex*`, `tld4`, `surf*` | Not started. Never hand-encode texture state |
-| 10 | Imageblock layouts and threadgroup-memory capacity (same 13 Shared-word values only) | safe-11 §2 | Whether tile memory shares the 64 KiB per core | SR12/13/15 identified |
+| 10 | ~~Imageblock layouts and threadgroup-memory capacity~~ done 2026-10-18: [no effect on occupancy](../novel-results/2026-10-18-imageblock-occupancy/README.md) | safe-11 §2 | Whether tile memory shares the 64 KiB per core | SR12/13/15 identified |
 
 ### Gaps not yet covered by any task (safe to start)
 

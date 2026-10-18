@@ -14,6 +14,8 @@ Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, co
 The sample-count field changes no compute-visible register (SR14 stays 0).
 Imageblock layouts on a compute dispatch completed normally in all 13 probes.
 
+Update 2026-10-18: none of these imageblock layouts changes threadgroup-memory occupancy ([follow-up](../2026-10-18-imageblock-occupancy/README.md)).
+
 ## Reproducer and evidence
 
 `make sr-direct` (includes the `shared-*` configurations), `make verify-sr-direct`
