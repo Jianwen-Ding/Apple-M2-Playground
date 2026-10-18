@@ -41,6 +41,8 @@ device_load (u4=7) ..., r5   coherent load of the CPU-written timer word
 wait 0
 ```
 
+Update 2026-10-18: cost under load and per-core timer copies are measured in the [clock-load finding](../2026-10-18-clock-load/README.md).
+
 Not established: cost under load (many lanes or workgroups reading at once), whether the GPU
 L2/SLC adds staleness across cores, and the exact semantics of the two invalidating
 barriers on other memory types.
