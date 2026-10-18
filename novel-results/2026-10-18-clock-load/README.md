@@ -35,7 +35,7 @@ cores, many groups each) x L = 1, 2, 4, 8, 16. Two independent sweeps (one dispa
 
 Not established: true cross-core skew separate from staleness (there is no common instant to compare against), the L2/SLC's own
 contribution (the copies share the same CPU writes), `clock64()` beyond the low 32 bits (the CPU thread writes 32 bits), the cost of the
-CPU thread itself, and the cost-model op for `clock()` (the table above is the data to add).
+CPU thread itself, and the cost-model op: `cost::clock_read_ns(active_lanes, copies)` in the simulator now returns this table (means of the two sweeps, log-interpolated in lanes; `make verify-clock-model` checks the constants). The generic fence / load model predicts only about 0.34 us per read for the same instructions on GPU-resident data: the rest is the load fetching the CPU-written line.
 
 ## Reproduce
 
