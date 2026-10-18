@@ -32,7 +32,7 @@ With f533 on the writer, the reader still needs an acquire:
 * Store cache policy (Mesa u4 = 4 or 7) did not matter once the release and acquire are present.
 
 Update 2026-10-18: SB and LB are now measured ([sb-lb finding](../2026-10-18-sb-lb/README.md)): SB across cores needs more
-than f533; LB was not observed. Atomic flags are no release either ([atomic-release finding](../2026-10-18-atomic-release/README.md)).
+than f533; LB was not observed. Atomic flags are no release either ([atomic-release finding](../2026-10-18-atomic-release/README.md)). Across dispatches in one queue nothing stale was seen ([dispatch-visibility finding](../2026-10-18-dispatch-visibility/README.md)).
 
 Not established: which of release/acquire the other barriers implement on other memory types,
 store→load (SB) and load→store (LB) orderings, the cost of f533, behaviour across
