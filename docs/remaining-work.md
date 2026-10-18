@@ -57,7 +57,7 @@ budget, and ideally a reboot afterwards.
 
 ### Coverage-suite housekeeping (offline or safe)
 
-- Add the remaining `MANUAL` items as catalog cases: `fmadd_lane_offset`, `stack`, `preshader`, `imageblock_srs`,
+- (Done 2026-10-18: fmadd lane-offset cases recorded in the catalog; the other items are covered by `coverage.py properties` in AGX-Performance-Simulator, 17 verifiers.) Original item: add the remaining `MANUAL` items as catalog cases: `fmadd_lane_offset`, `stack`, `preshader`, `imageblock_srs`,
   `memory_ordering`, `occupancy`, `in_shader_clock` (each comes from its task above).
 - Write `results/<date>-coverage/README.md`: pass counts per area, simulator mismatches by cause, faults,
   timing rows more than 10% off, nondeterministic cases (`tasks/agx-coverage.md` step 5).
