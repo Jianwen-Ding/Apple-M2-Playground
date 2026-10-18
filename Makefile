@@ -6,7 +6,7 @@ APPLEGPU_ROOT ?= /save/workspace/AGX_Probe/applegpu
 MESA_ROOT ?= /save/workspace/AGX_Probe/mesa
 export CC PROBE_INCLUDE
 
-.PHONY: help atomic-variants verify-atomic-variants atomic-contention verify-atomic-contention cpu-gpu-visibility verify-cpu-gpu-visibility verify-l2-command-boundary verify-memory-parameters cache-line verify-cache-line fixed18-waits verify-fixed18-waits queue-concurrency verify-queue-concurrency queue-priority verify-queue-priority commands-per-submit verify-commands-per-submit drm-limits drm-sync submit-latency verify-submit-latency verify-drm-interface verify-transcendentals sr113-timeline verify-special-registers sr-vm-slot sr-divergence sr113-reps verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-fmadd-decode verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
+.PHONY: help atomic-variants verify-atomic-variants atomic-contention verify-atomic-contention cpu-gpu-visibility verify-cpu-gpu-visibility verify-l2-command-boundary verify-memory-parameters cache-line verify-cache-line fixed18-waits verify-fixed18-waits queue-concurrency verify-queue-concurrency queue-priority verify-queue-priority commands-per-submit verify-commands-per-submit drm-limits drm-sync submit-latency verify-submit-latency verify-drm-interface verify-transcendentals sr113-timeline verify-special-registers sr-vm-slot sr-divergence sr113-reps verify-cross-lane-width verify-battery-clock-states env check smoke params time compute instruction-candidates agx-instruction agx-imadd verify-imadd sr-scan sr-pairs sr-characterize sr-even sr-context verify-sr sr-shape sr-core sr-alt sr-alt-reread sr-std-preload verify-sr-shape sr-shared sr-meta sr-width verify-sr-resources opcode-scan timestamps verify-timestamps drm-compute grid-cap grid-coverage verify-alu-bitflip verify-fmadd-decode verify-fmadd-lane verify-subop-spaces verify-mem-control-bitflip gpu-faults agx-loop-test verify-loops agx-loops agx-memory verify-memory agx-bandwidth sr-direct verify-sr-direct opcode-describe test-opcode-describe verify-opcode-describe sync-probe test-sync-and-end verify-sync-and-end barrier-stress test-barrier-stress verify-barrier-stress test-tg-addressing verify-tg-addressing test-in-shader-clock verify-in-shader-clock test-atomics verify-atomics test-float-semantics verify-float-semantics test-int64 verify-int64 test-occupancy verify-occupancy test-memory-ordering verify-memory-ordering bench verify-bench verify-core-scaling verify-memory-hierarchy verify-dispatch verify-shared-memory-sync
 
 help:
 	@echo 'make env    Capture environment metadata without opening the GPU'
@@ -33,6 +33,7 @@ help:
 	@echo 'make grid-coverage      Check every sampled row of 2^16..2^30-thread grids executes (direct DRM)'
 	@echo 'make verify-alu-bitflip  Verify retained ALU bit-flip / fmadd lane-offset evidence offline'
 	@echo 'make verify-fmadd-decode  Verify the simulator decodes retained fmadd programs (10-byte lane form) on exact boundaries'
+	@echo 'make verify-fmadd-lane    Replay retained fmadd lane-offset programs in the Rust simulator (needs agx_run built)'
 	@echo 'make verify-subop-spaces Verify funop/iunop/simd_op/shuffle sub-op sweeps offline'
 	@echo 'make drm-limits    Host-side Asahi DRM interface limits (ioctls only, no GPU work submitted)'
 	@echo 'make drm-sync      GPU: cross-queue ordering via binary / timeline syncobjs (agx_run-gated kernel)'
@@ -231,6 +232,9 @@ verify-alu-bitflip:
 
 verify-fmadd-decode:
 	$(PYTHON) -B scripts/verify_fmadd_decode.py
+
+verify-fmadd-lane:
+	$(PYTHON) -B scripts/replay_fmadd_lane.py
 
 verify-subop-spaces:
 	$(PYTHON) -B scripts/verify_subop_spaces.py
