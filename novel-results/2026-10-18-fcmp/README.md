@@ -17,8 +17,7 @@ finite, +-inf and eight NaNs (quiet, signalling, payloads, both signs). Three ru
 | ltn, gtn | the same as lt / gt (including the subnormal flush), except **true when only the second operand is NaN** ("a NaN loses": the first operand wins a min/max selection) |
 
 * Against an IEEE compare (subnormals exact) the hardware differs on **189 of 2,304 pairs** for lt, gt, gte, lte and on
-  **378** for eq; every difference has a subnormal operand (subnormal vs 0, vs another subnormal, or vs a tiny normal
-  boundary pair). There is no difference without subnormals.
+  **378** for eq; every difference has a subnormal operand (checked), and there is none without one.
 * The simulator already implemented exactly this (`fsem::fcond`); the Rust replay of all seven conditions now matches
   the hardware on every result word (`make verify-fcmp`).
 
@@ -30,8 +29,8 @@ finite, +-inf and eight NaNs (quiet, signalling, payloads, both signs). Three ru
 * **Exact fix-up (integer compare), verified on hardware:** per operand x: `m = x & 0x7fffffff`;
   `key = x ^ (asr(x, 31) | 0x80000000)` (a monotonic unsigned key; -inf .. +inf); `key = (m == 0) ? 0x80000000 : key`
   (so -0 == +0); `nan = m > 0x7f800000`. Then `setp.lt = !nan(a) && !nan(b) && ka < kb`; `gt` swaps the keys; `le` / `ge`
-  also accept `ka == kb`; `eq` is `ka == kb`; NaN gives false. About 18 instructions for one compare (12 for the two keys,
-  a few for the select and NaN mask), 4 constant moves hoisted.
+  also accept `ka == kb`; `eq` is `ka == kb`; NaN gives false. About 15 instructions for one compare (12 for the two keys,
+  3 for the select and NaN mask), 4 constant moves hoisted (counted from the program, not timed).
 * **`min` / `max`:** use the raw key (no zero fix, so -0 < +0) to select an operand's bits, then let a NaN operand lose
   (both NaN gives a NaN). Exact on all 2,304 pairs; denormals and the sign of zero are preserved because no arithmetic
   is done. About 16 instructions.
