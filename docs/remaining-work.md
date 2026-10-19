@@ -4,7 +4,9 @@
 > T2 (memory_ordering property 8/8), T3 (fix-up cost ~200ns fetch-bound, no model change), T4 (coverage report
 > 2670/2681, 0 mismatches; 20/20 properties), T6a (OOB=0, gather rule, sRGB-12bit), T6b (borders), T6c (16-bit formats),
 > T6d (LOD/grad: ceil(lod-0.5), trilinear float32-exact), T6-mapping, T7a (fp64 compares, 18 ops exact).
-> Still open (safe): 3D/array targets, texture-unit simulator model, fp64 div/sqrt/cvt/rounding, shuffle
+> Still open (safe): 3D/array targets, texture-unit simulator model, fp64 rounding modes for
+> add/mul (div/sqrt/rcp/cvt all modes done 2026-10-19: [fp64-divsqrt](../novel-results/2026-10-19-fp64-divsqrt/README.md),
+> shuffle
 > membermask/64-bit/cost, stack via Mesa, 64-bit atomic decode, safe-02/03 cost-model gaps, skip-conditions analysis.
 > Blocked on owner approval: divergent call/ret + atomic-field follow-ups, all `may_fault`/hang-risk sweeps,
 > and the outward-facing bfeil upstream report.
@@ -66,7 +68,7 @@ budget, and ideally a reboot afterwards.
 
 ### Gaps not yet covered by any task (safe to start)
 
-- **fp64** (done 2026-10-18: [bit-exact software add / mul / fma, with costs](../novel-results/2026-10-18-fp64/README.md); done 2026-10-19: [all 18 setp / min / max / .u / set forms](../novel-results/2026-10-19-fp64-cmp/README.md) (`make verify-fcmp64`); open: div, sqrt, cvt, other rounding modes). Original gap: AGX has no fp64 unit, and no finding documents that or measures it. CUDA `double` needs software
+- **fp64** (done 2026-10-18: [bit-exact software add / mul / fma, with costs](../novel-results/2026-10-18-fp64/README.md); done 2026-10-19: [all 18 setp / min / max / .u / set forms](../novel-results/2026-10-19-fp64-cmp/README.md) (`make verify-fcmp64`); open: other rounding modes for add/mul; done 2026-10-19: [div/sqrt/rcp/cvt, all PTX rounding modes](../novel-results/2026-10-19-fp64-divsqrt/README.md) (`make verify-fp64-divsqrt`). Original gap: AGX has no fp64 unit, and no finding documents that or measures it. CUDA `double` needs software
   emulation from recorded int64 and fp32 forms. Measure the cost of a double-precision add/mul/fma sequence built only
   from safe forms, and check it bit-exact against IEEE on edge cases.
 - **64-bit atomics** (done 2026-10-18: [Honeykrisp exposes none; emulated add measured, final exact, returned value torn across the carry](../novel-results/2026-10-18-atom64/README.md); open: lock-based CAS / exchange, which needs a spin loop and the owner's approval) (`atom.add.u64`, `atom.cas.b64`, `atom.exch.b64`). No validated encoding is known. Device and

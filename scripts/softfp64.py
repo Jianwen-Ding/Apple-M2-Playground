@@ -442,6 +442,377 @@ F64_ONE_HI = 0x3ff00000
 F32_ONE = 0x3f800000
 
 
+def sub64(P, a, b):
+    """(hi, lo) - (hi, lo), borrow out dropped."""
+    lo = P.sub(a[1], b[1])
+    br = P.flag('ult', a[1], b[1])
+    return (P.sub(P.sub(a[0], b[0]), br), lo)
+
+
+def shl1(P, hi, lo):
+    """(hi:lo) << 1 (low 64 bits)."""
+    return (P.extr(lo, hi, 31), P.extr(0, lo, 31))
+
+
+def shl2(P, hi, lo):
+    """(hi:lo) << 2 (low 64 bits)."""
+    return (P.extr(lo, hi, 30), P.extr(0, lo, 30))
+
+
+def round_pack_mode(P, sign, e, mh, ml, g, st, mode='rn'):
+    """round_pack with a rounding mode: 'rn' (nearest even), 'rz' (zero), 'rp' (+inf), 'rm' (-inf).
+    Overflow goes to infinity except for rz and the non-saturating directed cases, which give max finite."""
+    yl = P.or_(P.extr(0, ml, 31), g)                         # ml << 1 | g
+    yh = P.extr(ml, mh, 31)                                  # mh << 1 | ml >> 31
+    sub = P.flag('slt', e, 1)
+    d = P.sel('ugt', sub, 0, P.sub(1, e), 0)
+    d = P.sel('sgt', d, 63, 63, d)
+    zh, zl = P.lsr64(yh, yl, d)
+    bh, bl = P.lsl64(zh, zl, d)
+    lost = P.flag('ugt', P.or_(P.xor(bh, yh), P.xor(bl, yl)), 0)
+    st2 = P.or_(st, lost)
+    m_lo = P.extr(zl, zh, 1)                                 # Y >> 1
+    m_hi = P.lsr(zh, 1)
+    g2 = P.and_(zl, 1)
+    lsb = P.and_(m_lo, 1)
+    if mode == 'rn':
+        up = P.and_(g2, P.or_(st2, lsb))
+    elif mode == 'rz':
+        up = 0
+    elif mode == 'rp':
+        up = P.and_(P.or_(g2, st2), P.xor(P.lsr(sign, 31), 1))
+    elif mode == 'rm':
+        up = P.and_(P.or_(g2, st2), P.lsr(sign, 31))
+    else:
+        raise ValueError(mode)
+    lo = P.add(m_lo, up)
+    carry = P.flag('ult', lo, m_lo)
+    e_eff = P.sel('ugt', sub, 0, 1, e)
+    hi = P.add(P.add(P.mullo(P.sub(e_eff, 1), 0x100000), m_hi), carry)
+    over = P.or_(P.flag('sgt', e, 0x7fe), P.flag('ugt', hi, 0x7fefffff))
+    # overflow: infinity, except rz (both signs) and directed rounding away from the overflow direction
+    pos = P.xor(P.lsr(sign, 31), 1)
+    if mode == 'rn':
+        to_inf = 1
+    elif mode == 'rz':
+        to_inf = 0
+    elif mode == 'rp':
+        to_inf = pos
+    else:
+        to_inf = P.sub(1, pos)
+    hi = P.sel('ugt', P.and_(over, to_inf), 0, 0x7ff00000, hi)
+    lo = P.sel('ugt', P.and_(over, to_inf), 0, 0, lo)
+    hi = P.sel('ugt', P.and_(over, P.sub(1, to_inf)), 0, 0x7fefffff, hi)
+    lo = P.sel('ugt', P.and_(over, P.sub(1, to_inf)), 0, M32, lo)
+    return P.or_(hi, sign), lo
+
+
+def fdiv64(P, a, b, mode='rn'):
+    """IEEE binary64 division (restoring, 55 quotient bits), branch-free. mode in rn/rz/rm/rp."""
+    ua, ub = unpack(P, *a), unpack(P, *b)
+    sign = P.xor(ua['sign'], ub['sign'])
+    nan = P.or_(P.or_(ua['nan'], ub['nan']),
+                P.or_(P.and_(ua['inf'], ub['inf']), P.and_(ua['zero'], ub['zero'])))
+    notnan = P.sub(1, nan)
+    inf = P.and_(P.or_(ua['inf'], ub['zero']), notnan)
+    zero = P.and_(P.or_(ua['zero'], ub['inf']), P.sub(1, P.or_(nan, inf)))
+    eq = P.add(P.sub(ua['e'], ub['e']), 1023)
+    # Integer bit first (the leading 52 iterations provably produce 0: R < D throughout,
+    # since D >= 2**52 and R only accumulates i+1 bits by iteration i <= 51).
+    q_int = P.sub(1, ult64(P, ua['mh'], ua['ml'], ub['mh'], ub['ml']))
+    t = sub64(P, (ua['mh'], ua['ml']), (ub['mh'], ub['ml']))
+    Rh = P.sel('ugt', q_int, 0, t[0], ua['mh'])
+    Rl = P.sel('ugt', q_int, 0, t[1], ua['ml'])
+    # 54 fraction iterations (52 more mantissa bits + guard + round), bringing zero bits.
+    Qh, Ql = 0, q_int
+    for _ in range(54):
+        nRh, nRl = shl1(P, Rh, Rl)
+        Rh, Rl = nRh, nRl
+        t = sub64(P, (Rh, Rl), (ub['mh'], ub['ml']))
+        ge = P.sub(1, ult64(P, Rh, Rl, ub['mh'], ub['ml']))
+        Rh = P.sel('ugt', ge, 0, t[0], Rh)
+        Rl = P.sel('ugt', ge, 0, t[1], Rl)
+        nQh, nQl = shl1(P, Qh, Ql)
+        Qh, Ql = nQh, P.or_(nQl, ge)
+    # Q holds q54..q0 (value = Q / 2**54 in (0.5, 2)); normalise a leading zero
+    topbit = P.and_(P.lsr(Qh, 22), 1)
+    sQ = shl1(P, Qh, Ql)
+    Qh = P.sel('ugt', topbit, 0, Qh, sQ[0])
+    Ql = P.sel('ugt', topbit, 0, Ql, sQ[1])
+    eq = P.sel('ugt', topbit, 0, eq, P.sub(eq, 1))
+    r = P.and_(Ql, 1)
+    st = P.flag('ugt', P.or_(P.or_(r, Rh), Rl), 0)
+    mh53, ml53 = P.lsr64(Qh, Ql, 2)
+    g = P.and_(P.lsr(Ql, 1), 1)
+    hi, lo = round_pack_mode(P, sign, eq, mh53, ml53, g, st, mode)
+    hi = P.sel('ugt', zero, 0, sign, hi)
+    lo = P.sel('ugt', zero, 0, 0, lo)
+    hi = P.sel('ugt', inf, 0, P.or_(sign, 0x7ff00000), hi)
+    lo = P.sel('ugt', inf, 0, 0, lo)
+    hi = P.sel('ugt', nan, 0, 0x7ff80000, hi)
+    lo = P.sel('ugt', nan, 0, 0, lo)
+    return hi, lo
+
+
+def fsqrt64(P, a, mode='rn'):
+    """IEEE binary64 square root (binary digit recurrence, 55 root bits), branch-free. mode in rn/rz/rm/rp."""
+    u = unpack(P, *a)
+    neg = P.lsr(u['sign'], 31)
+    bad = P.or_(u['nan'], P.and_(neg, P.sub(1, u['zero'])))   # NaN, or negative (incl -inf); -0 is fine
+    rsign = P.sel('ugt', u['zero'], 0, u['sign'], 0)       # sqrt(-0) = -0, else +0
+    # Make the unbiased exponent even: E' odd (i.e. e even) -> work with 2*M and E' - 1.
+    # The recurrence consumes 55 pairs (two input bits per one root bit) of S0 = Madj << 10;
+    # Q holds r54..r0 and the root = (Q >> 2) * 2**(Ep/2 - 26) after the uniform extraction below.
+    odd = P.flag('ueq', P.and_(u['e'], 1), 0)
+    Madj = P.sel2('ugt', odd, 0, shl1(P, u['mh'], u['ml']), (u['mh'], u['ml']))
+    Ep = P.sel('ugt', odd, 0, P.sub(u['e'], 1076), P.sub(u['e'], 1075))
+    half = P.or_(P.lsr(Ep, 1), P.and_(Ep, S32))              # Ep even: exact arithmetic shift
+    eq = P.add(half, 1049)
+    # 55 iterations over pairs (two input bits each, one root bit out); S0's low 8 bits are
+    # zero (shift), and pairs past bit 0 read as zero, so nothing is lost and st is exact.
+    # Trial divisor for b=1 is (Q << 2) | 1 since (2Q + 1)**2 = 4Q**2 + (4Q + 1).
+    Sh, Sl = P.lsl64(Madj[0], Madj[1], 10)
+    Qh, Ql, Rh, Rl = 0, 0, 0, 0
+    for _ in range(55):
+        pair = P.and_(P.lsr(Sh, 30), 3)
+        Sh, Sl = shl2(P, Sh, Sl)
+        nRh, nRl = shl2(P, Rh, Rl)
+        Rh, Rl = nRh, P.or_(nRl, pair)
+        nQh, nQl = shl1(P, Qh, Ql)
+        tQh, tQl = shl2(P, Qh, Ql)
+        t = (tQh, P.or_(tQl, 1))                              # trial divisor (Q << 2) | 1
+        ge = P.sub(1, ult64(P, Rh, Rl, t[0], t[1]))
+        s = sub64(P, (Rh, Rl), t)
+        Rh = P.sel('ugt', ge, 0, s[0], Rh)
+        Rl = P.sel('ugt', ge, 0, s[1], Rl)
+        Qh, Ql = nQh, P.or_(nQl, ge)
+    # 53-bit mantissa (bit 52 set in both parities: Q in [2**54, 2**55)), guard/round/sticky
+    mh53, ml53 = P.lsr64(Qh, Ql, 2)
+    g = P.and_(P.lsr(Ql, 1), 1)
+    r = P.and_(Ql, 1)
+    st = P.flag('ugt', P.or_(Rh, Rl), 0)
+    hi, lo = round_pack_mode(P, 0, eq, mh53, ml53, g, st, mode)
+    hi = P.sel('ugt', u['zero'], 0, rsign, hi)
+    lo = P.sel('ugt', u['zero'], 0, 0, lo)
+    hi = P.sel('ugt', u['inf'], 0, 0x7ff00000, hi)
+    lo = P.sel('ugt', u['inf'], 0, 0, lo)
+    hi = P.sel('ugt', bad, 0, 0x7ff80000, hi)
+    lo = P.sel('ugt', bad, 0, 0, lo)
+    return hi, lo
+
+
+def frcp64(P, a, mode='rn'):
+    """IEEE binary64 reciprocal (1/x), via the divider."""
+    one = (P.reg(0x3ff00000), P.reg(0))
+    return fdiv64(P, one, a, mode)
+
+
+def cvt_f32_f64(P, a):
+    """Exact float32 -> binary64 widening. Input is (hi ignored, lo = f32 bits)."""
+    lo = a[1]
+    sign = P.and_(lo, S32)
+    ex8 = P.and_(P.lsr(lo, 23), 0xff)
+    mn = P.and_(lo, 0x7fffff)
+    exp0 = P.flag('ueq', ex8, 0)
+    expmax = P.flag('ueq', ex8, 0xff)
+    mnz = P.flag('ugt', mn, 0)
+    zero = P.and_(exp0, P.sub(1, mnz))
+    inf = P.and_(expmax, P.sub(1, mnz))
+    nan = P.and_(expmax, mnz)
+    # normal: e = ex8 + 896, mantissa = (implicit 1 | mn) << 29
+    mni = P.or_(mn, 0x800000)
+    e_norm = P.add(ex8, 896)
+    mh_n = P.lsr(mni, 3)
+    ml_n = P.extr(0, mni, 3)
+    # subnormal: k = clz32(mn) - 9 leading-zero adjust, mantissa = mn << (k + 30), e = 896 - k
+    k = P.sub(P.clz32(mn), 9)
+    m_sub = P.lsl64(0, mn, P.add(k, 30))
+    e_sub = P.sub(896, k)
+    sub = P.and_(exp0, mnz)
+    e = P.sel('ugt', sub, 0, e_sub, e_norm)
+    mh = P.sel('ugt', sub, 0, m_sub[0], mh_n)
+    ml = P.sel('ugt', sub, 0, m_sub[1], ml_n)
+    hi = P.add(P.add(sign, P.mullo(P.sub(e, 1), 0x100000)), mh)
+    hi = P.sel('ugt', zero, 0, sign, hi)
+    lo = P.sel('ugt', zero, 0, 0, ml)
+    hi = P.sel('ugt', inf, 0, P.or_(sign, 0x7ff00000), hi)
+    lo = P.sel('ugt', inf, 0, 0, lo)
+    hi = P.sel('ugt', nan, 0, 0x7ff80000, hi)
+    lo = P.sel('ugt', nan, 0, 0, lo)
+    return hi, lo
+
+
+def round_pack_f32(P, sign, e32, m24, g, st, mode):
+    """Round a 24-bit mantissa to an f32 (in lo, hi = 0): subnormal shift, directed modes, overflow."""
+    sub = P.flag('slt', e32, 1)
+    d = P.sel('ugt', sub, 0, P.sub(1, e32), 0)
+    d = P.sel('sgt', d, 31, 31, d)
+    # Y = m24 << 1 | guard (25 bits); shift right by d, re-derive guard/sticky after the shift
+    Y = P.or_(P.extr(0, m24, 31), g)
+    Ys = P.lsr(Y, d)
+    back = P.extr(0, Ys, P.sub(32, d))
+    lost = P.flag('ugt', P.xor(back, Y), 0)
+    st2 = P.or_(st, lost)
+    m = P.lsr(Ys, 1)
+    g2 = P.and_(Ys, 1)
+    e_eff = P.sel('ugt', sub, 0, 1, e32)
+    lsb = P.and_(m, 1)
+    if mode == 'rn':
+        up = P.and_(g2, P.or_(st2, lsb))
+    elif mode == 'rz':
+        up = 0
+    elif mode == 'rp':
+        up = P.and_(P.or_(g2, st2), P.xor(P.lsr(sign, 31), 1))
+    else:
+        up = P.and_(P.or_(g2, st2), P.lsr(sign, 31))
+    r = P.add(m, up)
+    carry = P.lsr(r, 24)
+    r = P.and_(r, 0xffffff)
+    e_out = P.add(e_eff, carry)
+    over = P.flag('sgt', e_out, 254)
+    pos = P.xor(P.lsr(sign, 31), 1)
+    if mode == 'rn':
+        to_inf = 1
+    elif mode == 'rz':
+        to_inf = 0
+    elif mode == 'rp':
+        to_inf = pos
+    else:
+        to_inf = P.sub(1, pos)
+    fin = P.add(P.add(sign, P.mullo(P.add(P.sub(e_out, 1), carry), 0x800000)), r)
+    fin = P.sel('ugt', P.and_(over, to_inf), 0, P.or_(sign, 0x7f800000), fin)
+    fin = P.sel('ugt', P.and_(over, P.sub(1, to_inf)), 0, P.or_(sign, 0x7f7fffff), fin)
+    return P.reg(0), fin
+
+
+def cvt_f64_f32(P, a, mode='rn'):
+    """Binary64 -> float32 (in lo, hi = 0) with rounding mode."""
+    u = unpack(P, *a)
+    nan = u['nan']
+    inf = u['inf']
+    zero = u['zero']
+    e32 = P.sub(u['e'], 896)
+    _, m24 = P.lsr64(u['mh'], u['ml'], 29)
+    g = P.and_(P.lsr(u['ml'], 28), 1)
+    st = P.flag('ugt', P.and_(u['ml'], 0xfffffff), 0)
+    _, out = round_pack_f32(P, u['sign'], e32, m24, g, st, mode)
+    # specials override: NaN -> canonical f32, inf -> inf, zero -> signed zero
+    out = P.sel('ugt', zero, 0, u['sign'], out)
+    out = P.sel('ugt', inf, 0, P.or_(u['sign'], 0x7f800000), out)
+    out = P.sel('ugt', nan, 0, 0x7fc00000, out)
+    return P.reg(0), out
+
+
+def cvt_int_f64(P, a, unsigned):
+    """Exact 32-bit integer -> binary64. Input lo word (hi ignored, must be 0); s32 is two's complement."""
+    lo = a[1]
+    if unsigned:
+        neg, mag = 0, lo
+    else:
+        neg = P.lsr(lo, 31)
+        mag = P.sel('ugt', neg, 0, P.sub(0, lo), lo)
+    zero = P.flag('ueq', mag, 0)
+    lz = P.clz32(mag)
+    sh = P.add(lz, 21)
+    m53 = P.lsl64(0, mag, sh)
+    e = P.sub(1054, lz)
+    hi = P.add(P.add(P.extr(0, neg, 1), P.mullo(P.sub(e, 1), 0x100000)), m53[0])
+    hi = P.sel('ugt', zero, 0, 0, hi)
+    lo = P.sel('ugt', zero, 0, 0, m53[1])
+    return hi, lo
+
+
+def cvt_f64_int(P, a, mode, unsigned):
+    """Binary64 -> 32-bit integer (in lo, hi = 0) with rounding mode. Out-of-range saturates,
+    NaN gives INT_MIN (s32) or 0 (u32): x86-like, documented as an assumption."""
+    u = unpack(P, *a)
+    neg = P.lsr(u['sign'], 31)
+    E = P.sub(u['e'], 1023)
+    Emax = 32 if unsigned else 31
+    ov = P.flag('sgt', E, Emax - 1)          # E >= Emax: saturate (also covers inf: E huge)
+    ov = P.or_(ov, u['inf'])
+    nan = u['nan']
+    # E < 0: |x| < 1
+    lt0 = P.flag('slt', E, 0)
+    eqm1 = P.flag('ueq', E, M32 - 0)         # E == -1 (M32 = 0xffffffff = -1 signed)
+    M = (u['mh'], u['ml'])
+    ne52 = P.or_(P.sub(1, P.flag('ueq', u['mh'], 0x100000)), P.flag('ugt', u['ml'], 0))  # M != 2**52
+    gt_half = P.and_(eqm1, ne52)             # |x| > 0.5 (E == -1 and M != 2**52)
+    if mode == 'rn':
+        r_small = gt_half
+    elif mode == 'rz':
+        r_small = 0
+    elif mode == 'rm':
+        r_small = P.and_(neg, P.sub(1, u['zero']))
+    else:  # rp
+        r_small = P.and_(P.sub(1, neg), P.sub(1, u['zero']))
+    # 0 <= E < Emax: trunc = M >> (52-E), frac = rest
+    sh = P.sub(52, E)
+    tpair = P.lsr64(u['mh'], u['ml'], sh)
+    trunc = tpair[1]
+    tback = P.lsl64(0, trunc, sh)
+    fpair = sub64(P, M, tback)
+    fnz = P.flag('ugt', P.or_(fpair[0], fpair[1]), 0)
+    # half = 2**(51-E): compare frac
+    k = P.sub(51, E)
+    kh = P.extr(0, 1, P.sub(64, k))
+    kl = P.extr(0, 1, P.sub(32, k))
+    kh = P.sel('ugt', P.flag('slt', E, 20), 0, kh, 0)
+    kl = P.sel('ugt', P.flag('sgt', E, 19), 0, kl, 0)
+    gt = ult64(P, kh, kl, fpair[0], fpair[1])
+    eq = ueq64(P, kh, kl, fpair[0], fpair[1])
+    odd = P.and_(trunc, 1)
+    if mode == 'rn':
+        inc = P.or_(gt, P.and_(eq, odd))
+    elif mode == 'rz':
+        inc = 0
+    elif mode == 'rm':
+        inc = P.and_(fnz, neg)
+    else:
+        inc = P.and_(fnz, P.sub(1, neg))
+    mag = P.add(trunc, inc)
+    carry = P.flag('ult', mag, trunc)
+    # saturate on overflow of the magnitude
+    if unsigned:
+        mag = P.sel('ugt', carry, 0, M32, mag)
+    else:
+        toolarge = P.flag('ugt', mag, 0x7fffffff)
+        mag = P.sel('ugt', P.and_(toolarge, P.sub(1, neg)), 0, 0x7fffffff, mag)
+    r = P.sel('ugt', lt0, 0, r_small, mag)
+    # zero input: E very negative, r_small = 0 already (gt_half = 0 since E != -1; rm/rp need ~zero)
+    # apply sign / saturate specials
+    if unsigned:
+        out = P.sel('ugt', P.and_(ov, P.sub(1, neg)), 0, M32, r)
+        out = P.sel('ugt', neg, 0, 0, out)
+        out = P.sel('ugt', nan, 0, 0, out)
+    else:
+        out = P.sel('ugt', neg, 0, P.sub(0, r), r)
+        out = P.sel('ugt', P.and_(ov, P.sub(1, neg)), 0, 0x7fffffff, out)
+        out = P.sel('ugt', P.and_(ov, neg), 0, S32, out)
+        out = P.sel('ugt', nan, 0, S32, out)
+    return P.reg(0), out
+
+
+def cvt_s32_f64(P, a):
+    """Exact signed 32-bit integer -> binary64."""
+    return cvt_int_f64(P, a, False)
+
+
+def cvt_u32_f64(P, a):
+    """Exact unsigned 32-bit integer -> binary64."""
+    return cvt_int_f64(P, a, True)
+
+
+def cvt_f64_s32(P, a, mode='rn'):
+    """Binary64 -> signed 32-bit integer (in lo, hi = 0) with rounding mode. Saturates; NaN -> INT_MIN."""
+    return cvt_f64_int(P, a, mode, False)
+
+
+def cvt_f64_u32(P, a, mode='rn'):
+    """Binary64 -> unsigned 32-bit integer (in lo, hi = 0) with rounding mode. Saturates; NaN -> 0."""
+    return cvt_f64_int(P, a, mode, True)
+
+
 def f64key(P, hi, lo, zero_fix=True):
     """Monotonic u64 order key for a double (hi, lo words): if sign set, key = ~bits, else key = bits ^ 0x8000...0.
     With zero_fix, +-0 both map to 0x8000000000000000 (for setp); without it -0 < +0 (for min/max)."""
@@ -738,16 +1109,246 @@ if __name__ == '__main__':
     print(len(P.ops), 'ops,', len(lines), 'instructions, registers up to r%d' % (used-1))
 
 
-def ref(op, *xs):
-    """Host reference with IEEE binary64 semantics: mul / add use the host's doubles; fma is exact (Fractions) with a single
-    round to nearest even. A NaN result is returned as nan (matches any NaN). Compare ops return 1.0 / 0.0 (predicates and
-    set.f32 forms) or the winning operand (min / max, NaN-tolerant like PTX)."""
+def _ref_round_frac(q, mode):
+    """Round an exact nonzero Fraction to binary64 under mode."""
+    import math
+    neg = q < 0
+    aq = abs(q)
+    if aq >= 2**1024:
+        if mode == 'rn':
+            return float('-inf') if neg else float('inf')
+        if mode == 'rz':
+            return math.copysign(1.7976931348623157e308, -1.0 if neg else 1.0)
+        if mode == 'rp':
+            return float('inf') if not neg else -1.7976931348623157e308
+        return 1.7976931348623157e308 if not neg else float('-inf')
+    if aq < 2**-1074:
+        # compare against half a min-subnormal (ties round to even = 0)
+        from fractions import Fraction as F
+        half = F(1, 2**1075)
+        if mode == 'rn':
+            return math.copysign(2**-1074 if aq > half else 0.0, -1.0 if neg else 1.0)
+        if mode == 'rz':
+            return math.copysign(0.0, -1.0 if neg else 1.0)
+        if mode == 'rp':
+            return math.copysign(2**-1074 if not neg else 0.0, -1.0 if neg else 1.0)
+        return math.copysign(0.0 if not neg else 2**-1074, -1.0 if neg else 1.0)
+    v = float(aq)
+    from fractions import Fraction as F
+    if F(v) == aq:
+        return math.copysign(v, -1.0 if neg else 1.0)
+    import struct as _st
+    vb = _st.unpack('<Q', _st.pack('<d', v))[0]
+    lob = _st.unpack('<d', _st.pack('<Q', vb - 1))[0]
+    hib = _st.unpack('<d', _st.pack('<Q', vb + 1))[0]
+    def toF(c):
+        if c == float('inf'):
+            return F(10**400)
+        if c == float('-inf'):
+            return F(-10**400)
+        return F(c)
+    cands = (v, lob, hib)
+    lo = max(c for c in cands if toF(c) <= aq)
+    hi = min(c for c in cands if toF(c) >= aq)
+    if mode == 'rn':
+        dlo, dhi = aq - toF(lo), toF(hi) - aq
+        if dlo < dhi:
+            return math.copysign(lo, -1.0 if neg else 1.0)
+        if dhi < dlo:
+            return math.copysign(hi, -1.0 if neg else 1.0)
+        import struct as _st
+        return math.copysign(lo if (_st.unpack('<Q', _st.pack('<d', lo))[0] & 1) == 0 else hi, -1.0 if neg else 1.0)
+    if mode == 'rz':
+        return math.copysign(lo, -1.0 if neg else 1.0)
+    if mode == 'rp':
+        return hi if not neg else -lo
+    return lo if not neg else -hi
+
+
+def _ref_div(a, b, mode):
+    import math
+    from fractions import Fraction
+    if math.isnan(a) or math.isnan(b):
+        return float('nan')
+    if (math.isinf(a) and math.isinf(b)) or (a == 0.0 and b == 0.0):
+        return float('nan')
+    if math.isinf(a):
+        return math.copysign(float('inf'), a) * math.copysign(1.0, b)
+    if math.isinf(b):
+        return math.copysign(0.0, a) * math.copysign(1.0, b)
+    if b == 0.0:
+        if a == 0.0:
+            return math.copysign(0.0, a) * math.copysign(1.0, b)
+        return math.copysign(float('inf'), a) * math.copysign(1.0, b)
+    if a == 0.0:
+        return math.copysign(0.0, a) * math.copysign(1.0, b)
+    return _ref_round_frac(Fraction(a) / Fraction(b), mode)
+
+
+def _ref_sqrt(a, mode):
+    import math
+    if math.isnan(a):
+        return float('nan')
+    if a < 0:
+        return float('nan')
+    if a == 0.0:
+        return a
+    if math.isinf(a):
+        return a
+    from fractions import Fraction
+    v = math.sqrt(a)
+    fv, fa = Fraction(v), Fraction(a)
+    if fv * fv == fa:
+        return v
+    if fv * fv > fa:
+        lo, hi = math.nextafter(v, 0.0), v
+    else:
+        lo, hi = v, math.nextafter(v, float('inf'))
+    if mode == 'rn':
+        dlo = fa - Fraction(lo) * Fraction(lo)
+        dhi = Fraction(hi) * Fraction(hi) - fa
+        if dlo < dhi:
+            return lo
+        if dhi < dlo:
+            return hi
+        import struct as _st
+        return lo if (_st.unpack('<Q', _st.pack('<d', lo))[0] & 1) == 0 else hi
+    if mode == 'rz':
+        return lo if v > 0 else hi
+    if mode == 'rp':
+        return hi
+    return lo
+
+
+def _ref_f64_f32(x, mode):
+    import math, struct as _st
+    if math.isnan(x):
+        return float('nan')
+    if math.isinf(x) or x == 0.0:
+        return x
+    from fractions import Fraction
+    q, neg, ax = Fraction(x), x < 0, abs(Fraction(x))
+    if ax >= 2**128:
+        if mode == 'rn':
+            return math.copysign(float('inf'), x)
+        if mode == 'rz':
+            return math.copysign(3.4028234663852886e+38, x)
+        if mode == 'rp':
+            return float('inf') if not neg else -3.4028234663852886e+38
+        return 3.4028234663852886e+38 if not neg else float('-inf')
+    if ax < 2**-149:
+        from fractions import Fraction as _F
+        half = _F(1, 2**150)
+        if mode == 'rn':
+            return math.copysign(2**-149 if ax > half else 0.0, x)
+        if mode == 'rz':
+            return math.copysign(0.0, x)
+        if mode == 'rp':
+            return math.copysign(2**-149 if not neg else 0.0, x)
+        return math.copysign(0.0 if not neg else 2**-149, x)
+    vb = _st.unpack('<I', _st.pack('<f', float(x)))[0]
+    def fb(b):
+        return _st.unpack('<f', _st.pack('<I', b & 0xffffffff))[0]
+    v = fb(vb)
+    cands = {v, fb(vb - 1), fb(vb + 1)}
+    def toF(c):
+        if c == float('inf'):
+            return Fraction(10**400)
+        if c == float('-inf'):
+            return Fraction(-10**400)
+        return Fraction(c)
+    below = [c for c in cands if toF(c) <= q]
+    above = [c for c in cands if toF(c) >= q]
+    lo, hi = max(below, key=float), min(above, key=float)
+    if mode == 'rn':
+        dlo, dhi = q - toF(lo), toF(hi) - q
+        if dlo < dhi:
+            return lo
+        if dhi < dlo:
+            return hi
+        return lo if (_st.unpack('<I', _st.pack('<f', lo))[0] & 1) == 0 else hi
+    if mode == 'rz':
+        return lo if x > 0 else hi
+    if mode == 'rp':
+        return hi
+    return lo
+
+
+def _ref_i_f64(x, unsigned):
+    v = x if unsigned else (x - 2**32 if x & 0x80000000 else x)
+    return float(v)
+
+
+def _ref_f64_i(x, mode, unsigned):
+    import math
+    from fractions import Fraction
+    if math.isnan(x):
+        return 0 if unsigned else 0x80000000
+    if math.isinf(x):
+        if x > 0:
+            return 0xffffffff if unsigned else 0x7fffffff
+        return 0 if unsigned else 0x80000000
+    q = Fraction(x)
+    if mode == 'rn':
+        lo, hi = math.floor(q), math.ceil(q)
+        if lo == hi:
+            r = lo
+        else:
+            dlo, dhi = q - lo, hi - q
+            if dlo < dhi:
+                r = lo
+            elif dhi < dlo:
+                r = hi
+            else:
+                r = lo if lo % 2 == 0 else hi
+    elif mode == 'rz':
+        r = math.trunc(q)
+    elif mode == 'rp':
+        r = math.ceil(q)
+    else:
+        r = math.floor(q)
+    if unsigned:
+        if r < 0:
+            return 0
+        if r > 0xffffffff:
+            return 0xffffffff
+        return r
+    if r < -2**31:
+        return 0x80000000
+    if r > 0x7fffffff:
+        return 0x7fffffff
+    return r & 0xffffffff
+
+
+def ref(op, *xs, mode='rn'):
+    """Host reference: mul / add / div / sqrt use the host's doubles (correctly rounded); fma is exact (Fractions)
+    with a single round to nearest even. A NaN result is returned as nan (matches any NaN). Compare ops return 1.0 /
+    0.0 (predicates and set.f32 forms) or the winning operand (min / max, NaN-tolerant like PTX). div / sqrt / rcp
+    and the float conversions honour `mode` (rn/rz/rm/rp) via exact rational arithmetic."""
     import math
     from fractions import Fraction
     if op == 'mul':
         return xs[0]*xs[1]
     if op == 'add':
         return xs[0]+xs[1]
+    if op == 'div':
+        return _ref_div(*xs, mode)
+    if op == 'sqrt':
+        return _ref_sqrt(*xs, mode)
+    if op == 'rcp':
+        return _ref_div(1.0, xs[0], mode)
+    if op == 'cvt_f32_f64':
+        return xs[0]
+    if op == 'cvt_f64_f32':
+        return _ref_f64_f32(xs[0], mode)
+    if op == 'cvt_s32_f64':
+        return _ref_i_f64(xs[0], False)
+    if op == 'cvt_u32_f64':
+        return _ref_i_f64(xs[0], True)
+    if op == 'cvt_f64_s32':
+        return _ref_f64_i(xs[0], mode, False)
+    if op == 'cvt_f64_u32':
+        return _ref_f64_i(xs[0], mode, True)
     if op in ('c_'+n for n in FCMP_OPS):
         return _ref_cmp(op[2:], *xs)
     x, y, z = xs
