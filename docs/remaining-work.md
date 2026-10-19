@@ -6,7 +6,8 @@
 > independent, no serialization: [finding](../novel-results/2026-10-19-fence-contention/README.md),
 > `make verify-fence-contention`). Open: a `cost.rs` change to charge device fences once per core
 > instead of per group (recorded, not applied: no Rust toolchain in this environment to re-run
-> `verify-cost-model`), and the `memory_ordering` coverage case type.
+> `verify-cost-model`), and the `memory_ordering` coverage case type (wired 2026-10-19:
+> `verify-sb-minimal` / `verify-fence-contention` added to the property check, 8/8 pass).
 >
 > **Update 2026-10-19 (later):** the per-core fence question is settled with no code change:
 > `agx_cost` predicts identical per-fence wall costs at 1 and 8 groups (ratio 1.000 in all
