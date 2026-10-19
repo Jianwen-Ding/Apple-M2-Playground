@@ -1,0 +1,30 @@
+{
+ "results": [
+  {
+   "lanes": 32,
+   "local_x": 32,
+   "rc": 0,
+   "distinct_cores": [
+    0
+   ],
+   "output_ok": true,
+   "fw_ns": [
+    1064112249000,
+    1064112256666
+   ]
+  },
+  {
+   "lanes": 256,
+   "local_x": 256,
+   "rc": 0,
+   "distinct_cores": [
+    0
+   ],
+   "output_ok": true,
+   "fw_ns": [
+    1064115721125,
+    1064115728791
+   ]
+  }
+ ]
+}

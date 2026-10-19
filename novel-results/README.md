@@ -1,5 +1,7 @@
 # New hardware findings
 
+- [2026-10-19 Minimal sufficient SB fence set: f533+f59a for normal stores (0 in 33 runs); coherent stores need a third barrier after f59a (f533+f59a+f596 recommended, 0 in 10 runs each); order is load-bearing](2026-10-19-sb-minimal-set/README.md)
+- [2026-10-19 Fence cost with 8 SIMD groups per core: wall time within +22% of the 1-group twin in all 18 cells (17 within 12%); fence stalls overlap, no serialization](2026-10-19-fence-contention/README.md)
 - [2026-10-17 Device atomics: bit 45 makes `sub` a float32 add (PTX `atom.add.f32` semantics: nearest even, denormals flushed, atomic) and `cmpxchg` a 64-bit unsigned min / max (bit 46 = max; Rt returns a changed flag); ops 11-15 end the issuing SIMD group](2026-10-17-atomic-variants/README.md)
 - [2026-10-11 Threadgroup memory 32 banks x 4 B, 1 access/cycle/core, ~31-cycle serial access per group; barriers release 13 (0x68) / 7 (0x78) cycles after the last arrival; device atomics 1.7 cycles per 32-byte sector, one shared word ~2 ops/cycle GPU-wide; barriers write back cached registers; atomics with return and threadgroup atomics](2026-10-11-shared-memory-sync/README.md)
 - [2026-10-11 Dispatch launch cost max(100 ns/workgroup, 13.6 ns/SIMD group) per core + 5.6 us; workgroups split over clusters (busiest core ceil(ceil(n/4)/9)); sub-ms dispatches stay at low clocks; divergent if/else runs both sides; tree reduction kernels exact and within -17..+6%; whole-dispatch model 4.7% median error](2026-10-11-dispatch-launch/README.md)

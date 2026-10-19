@@ -1,7 +1,12 @@
 # Task 1: remaining work, safe and unsafe (2026-10-17)
 
-> **Update 2026-10-18:** the fmadd lane-offset form is decoded and modeled (measured subset, `make verify-fmadd-lane`,
-> `make verify-fmadd-decode`); safe-10 (memory ordering) is measured except for the items listed in row 1 below.
+> **Update 2026-10-19:** safe-10 memory-ordering litmus is now complete: the minimal SB fence
+> set is measured ([f533+f59a for normal stores, +f596 for coherent](../novel-results/2026-10-19-sb-minimal-set/README.md),
+> `make verify-sb-minimal`) and multi-group fence contention is measured (wall cost ~group-count
+> independent, no serialization: [finding](../novel-results/2026-10-19-fence-contention/README.md),
+> `make verify-fence-contention`). Open: a `cost.rs` change to charge device fences once per core
+> instead of per group (recorded, not applied: no Rust toolchain in this environment to re-run
+> `verify-cost-model`), and the `memory_ordering` coverage case type.
 
 > **Update, later on 2026-10-17 (owner-approved unsafe session):**
 > - **Done:** the `while_*` loops (24 guarded and 9 terminating forms, 0 faults; the old "faults" were test design
@@ -29,7 +34,7 @@ budget, and ideally a reboot afterwards.
 
 | # | Work | Task | Why it matters for PTX translation | Status |
 |---|---|---|---|---|
-| 1 | ~~Memory-ordering litmus tests~~ done 2026-10-18 (safe-10): [SB/LB](../novel-results/2026-10-18-sb-lb/README.md), [atomic release](../novel-results/2026-10-18-atomic-release/README.md), [across dispatches](../novel-results/2026-10-18-dispatch-visibility/README.md), [fence cost](../novel-results/2026-10-18-fence-cost/README.md), [threadgroup](../novel-results/2026-10-18-tg-litmus/README.md). Done 2026-10-18: fence costs in `cost.rs` (`make verify-fence-model`). Open: a minimal sufficient SB fence set, multi-group fence contention | safe-10 | Mapping of `fence` / `membar` / `ld.acquire` / `st.release` / `atom.release`. Correctness-critical | MP, SB, LB, atomics, tg, dispatch boundary and cost measured |
+| 1 | ~~Memory-ordering litmus tests~~ done 2026-10-18 (safe-10): [SB/LB](../novel-results/2026-10-18-sb-lb/README.md), [atomic release](../novel-results/2026-10-18-atomic-release/README.md), [across dispatches](../novel-results/2026-10-18-dispatch-visibility/README.md), [fence cost](../novel-results/2026-10-18-fence-cost/README.md), [threadgroup](../novel-results/2026-10-18-tg-litmus/README.md). Done 2026-10-18: fence costs in `cost.rs` (`make verify-fence-model`). Done 2026-10-19: [minimal SB fence set](../novel-results/2026-10-19-sb-minimal-set/README.md) (f533+f59a normal, +f596 coherent; `make verify-sb-minimal`) and [multi-group contention](../novel-results/2026-10-19-fence-contention/README.md) (wall cost group-count independent; `make verify-fence-contention`). Open: minimal sufficient SB set is settled; still open is a `cost.rs` per-core fence charge (recorded, not applied: no Rust toolchain here) and the `memory_ordering` coverage case type | safe-10 | Mapping of `fence` / `membar` / `ld.acquire` / `st.release` / `atom.release`. Correctness-critical | MP, SB, LB, atomics, tg, dispatch boundary, cost, minimal SB set, contention measured |
 | 2 | Non-ftz fix-ups for `setp` and `min`/`max` on subnormals | safe-01 (open part) | Default (non-`.ftz`) PTX float compares must be bit exact | Conversions and float edges done |
 | 3 | ~~In-shader clock~~ done 2026-10-18: [cost under load, per-core copies, skew bound](../novel-results/2026-10-18-clock-load/README.md); the cost-model op is done (`cost::clock_read_ns`) | safe-11 §3 | `clock()`, `clock64()`, `%globaltimer`. No hardware shader clock exists, so this is the only path | Basic read works (0.4-0.75 µs) |
 | 4 | ~~Occupancy~~ done 2026-10-18: [~55 workgroup slots, shape-independent, combined limits](../novel-results/2026-10-18-occupancy/README.md); the coverage cases remain | safe-11 §1 | `cudaOccupancyMaxActiveBlocksPerMultiprocessor`, launch tuning | Formula known for the common case |
@@ -108,7 +113,10 @@ built through Mesa.
 
 ## Suggested order
 
-1. safe-10 (memory ordering), because a wrong fence mapping produces silent wrong results.
+1. safe-10 is measured (2026-10-19: minimal SB set f533+f59a[+f596], no multi-group contention;
+   PTX mapping: `fence.sc.gpu` = f533, f59a, f596 in order). Still open in safe-10: the
+   `memory_ordering` coverage case type (needs a Rust toolchain for the record gate) and the
+   per-core fence charge in `cost.rs` (recorded, not applied for the same reason).
 2. safe-01 open part, then the fp64 and 64-bit atomic gaps (decode Mesa's int64 atomics if exposed).
 3. safe-11 (occupancy, clock) and safe-09 (preshader), the runtime-facing numbers.
 4. Stack via Mesa capture, then safe-07 and safe-05.
