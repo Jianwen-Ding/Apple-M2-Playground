@@ -52,7 +52,7 @@ budget, and ideally a reboot afterwards.
 | 6 | fmadd lane-offset: ~~write-to-read distance, inactive source lanes, simulator model~~ done ([2026-10-18](../novel-results/2026-10-18-fmadd-followups/README.md)); bit-52 rule resolved ([pow fixup](../novel-results/2026-10-18-fma-b52/README.md)); coverage cases for lane form and bit 52 recorded | safe-07 | A lane-shifted fma can replace `shfl.up` + `fma` in scans and stencils | Encodings found on 2026-10-11 |
 | 7 | Cost-model gaps: per-line serialisation of colliding atomic lanes, strided access, barrier after ALU, store write-back, PTX-compliant sin/cos cost | safe-02 steps 1 (rest) - 5 | Performance stage (stage 4) and kernel-time prediction | Step 1 done; step 5 (sin/cos) done 2026-10-18; step 3 (barrier after ALU) measured 2026-10-18: [the model's shortfall is the dependent-iadd chain rate (3-4x low), not the barrier](../novel-results/2026-10-18-barrier-cost/README.md); `cost.rs` not changed |
 | 8 | ~~SLC capacity by bandwidth~~ done 2026-10-18: [about 21 MiB effective, smooth 14-30 MiB, CPU-independent](../novel-results/2026-10-18-slc/README.md) | safe-03 (open part) | Cache-aware lowering and blocking | Latency could not separate the SLC |
-| 9 | Textures and images through Mesa-compiled GLSL: encodings, filtering precision, unorm/snorm/sRGB rounding, borders, out-of-range coordinates, simulator model | safe-05 | `tex*`, `tld4`, `surf*` | Not started. Never hand-encode texture state |
+| 9 | Textures and images through Mesa-compiled GLSL: encodings, filtering precision, unorm/snorm/sRGB rounding, borders, out-of-range coordinates, simulator model | safe-05 | `tex*`, `tld4`, `surf*` | 2026-10-18 base done; 2026-10-19: [OOB fetch = 0, gather footprint rule, sRGB bilinear 12-bit end to end](../novel-results/2026-10-19-texture-edge/README.md) (`make verify-texture-edge`). Still open: borders, 1D/3D/array targets, LOD/gradient, 16-bit and integer formats, simulator model, CUDA mapping table. Never hand-encode texture state |
 | 10 | ~~Imageblock layouts and threadgroup-memory capacity~~ done 2026-10-18: [no effect on occupancy](../novel-results/2026-10-18-imageblock-occupancy/README.md) | safe-11 §2 | Whether tile memory shares the 64 KiB per core | SR12/13/15 identified |
 
 ### Gaps not yet covered by any task (safe to start)
@@ -72,10 +72,8 @@ budget, and ideally a reboot afterwards.
 
 ### Coverage-suite housekeeping (offline or safe)
 
-- (Done 2026-10-18: fmadd lane-offset cases recorded in the catalog; the other items are covered by `coverage.py properties` in AGX-Performance-Simulator, 17 verifiers.) Original item: add the remaining `MANUAL` items as catalog cases: `fmadd_lane_offset`, `stack`, `preshader`, `imageblock_srs`,
-  `memory_ordering`, `occupancy`, `in_shader_clock` (each comes from its task above).
-- Write `results/<date>-coverage/README.md`: pass counts per area, simulator mismatches by cause, faults,
-  timing rows more than 10% off, nondeterministic cases (`tasks/agx-coverage.md` step 5).
+- (Done 2026-10-18: fmadd lane-offset cases recorded in the catalog; the other items are covered by `coverage.py properties` in AGX-Performance-Simulator, now 20 verifiers including `verify-sb-minimal` and `verify-fence-contention` under `memory_ordering`.)
+- (Done 2026-10-19: [coverage report](../AGX-Performance-Simulator/results/2026-10-19-coverage/README.md): 2670/2681 pass, 0 mismatches; 11 unsupported-by-design (SR21 x10 needs VM context, SR113 time-varying); 5 timing rows >10% off (2 ballot, 2 discard-select, 1 simd_min-f — flagged for safe-02); 0 nondeterministic; 20/20 properties pass.)
 - Report the `bfeil` verdict A upstream: Mesa's `fuse_ubfe` is unsound for variable shifts (m2-run-checklist Q1,
   with `viterbifix` as the workaround). This is outward-facing, so it needs the owner's go-ahead.
 

@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-19 Texture edge cases: OOB texelFetch returns 0; gather footprint is the ceil-box in order ((x0,y1),(x1,y1),(x1,y0),(x0,y0)); sRGB bilinear is 12-bit end to end](2026-10-19-texture-edge/README.md)
 - [2026-10-19 Fix-up cycle cost: ~200 ns wall per compare in unrolled code, fetch-bound, all variants equal; model predicts the issue part (21-23 ns), no fix-up-specific change](2026-10-19-fixup-cost/README.md)
 - [2026-10-19 Non-ftz setp complete: NaN-accepting variants (.neu/.equ/.ltu/.leu/.gtu/.geu/.num/.nan) and float-result set exact on all 2,304 pairs x 3 runs; fp16 fcmpsel bit-exact vs IEEE (no fix-up needed)](2026-10-19-setp-extra/README.md)
 - [2026-10-19 Minimal sufficient SB fence set: f533+f59a for normal stores (0 in 33 runs); coherent stores need a third barrier after f59a (f533+f59a+f596 recommended, 0 in 10 runs each); order is load-bearing](2026-10-19-sb-minimal-set/README.md)

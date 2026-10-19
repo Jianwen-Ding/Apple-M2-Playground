@@ -64,6 +64,21 @@ def cases():
     f32 = [0x00000000, 0x80000000, 0x00000001, 0x007fffff, 0x7f800000, 0xff800000, 0x7fc00000, 0x7f7fffff] + [rng.getrandbits(32) for _ in range(248)]
     out['fetch_rgba32f'] = dict(fmt='rgba32f', w=16, h=16, data=b''.join(struct.pack('<4I', v, v ^ 0x80000000, v, v) for v in f32), count=256, filt='nearest', vals=f32,
         glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count) data[8u+i]=floatBitsToUint(texelFetch(tex, ivec2(int(i%16u),int(i/16u)), 0).g); }\n")
+    # 6. out-of-range integer coordinates through texelFetch (no wrap mode applies; measures the raw edge rule)
+    oob = [rng.getrandbits(32) for _ in range(256)]
+    out['oob_fetch_r32ui'] = dict(fmt='r32ui', w=16, h=16, data=b''.join(struct.pack('<I', v) for v in oob), count=64, filt='nearest', vals=oob,
+        glsl=UH+"layout(binding=0) uniform highp usampler2D tex;\nvoid main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ ivec2 p = i < 32u ? ivec2(int(i)-8, 5) : ivec2(5, int(i-32u)-8); "
+              "data[8u+i]=texelFetch(tex, p, 0).r; } }\n")
+    # 7. textureGather (tld4 equivalent) on r8: 2x2 footprint at texel corners and centres
+    gvals = [rng.randrange(256) for _ in range(256)]
+    out['gather_r8'] = dict(fmt='r8', w=16, h=16, data=bytes(gvals), count=64, filt='nearest', vals=gvals,
+        glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ vec2 uv = (i < 32u ? vec2(float(i)+0.5, 5.0) : vec2(5.0, float(i-32u)+0.5))/16.0; "
+              "vec4 g=textureGather(tex, uv); data[8u+i]=uint(g.r*255.0+0.5)+uint(g.g*255.0+0.5)*256u+uint(g.b*255.0+0.5)*65536u+uint(g.a*255.0+0.5)*16777216u; } }\n")
+    # 8. bilinear filtering of an sRGB texture (does the 12-bit grid apply after sRGB decode?)
+    svals = [rng.randrange(256) for _ in range(256)]
+    out['bilinear_srgb'] = dict(fmt='rgba8srgb', w=16, h=16, data=bytes(b for v in svals for b in (v, 0, 0, 255)), count=256*15, filt='linear', vals=svals,
+        glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ float fx=float(i%256u)/256.0; float cx=float(i/256u); "
+                      "vec2 uv=(vec2(cx+0.5+fx, 3.5+0.375))/16.0; data[8u+i]=floatBitsToUint(textureLod(tex, uv, 0.0).r); } }\n")
     return out
 
 
