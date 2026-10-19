@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-19 Fix-up cycle cost: ~200 ns wall per compare in unrolled code, fetch-bound, all variants equal; model predicts the issue part (21-23 ns), no fix-up-specific change](2026-10-19-fixup-cost/README.md)
 - [2026-10-19 Non-ftz setp complete: NaN-accepting variants (.neu/.equ/.ltu/.leu/.gtu/.geu/.num/.nan) and float-result set exact on all 2,304 pairs x 3 runs; fp16 fcmpsel bit-exact vs IEEE (no fix-up needed)](2026-10-19-setp-extra/README.md)
 - [2026-10-19 Minimal sufficient SB fence set: f533+f59a for normal stores (0 in 33 runs); coherent stores need a third barrier after f59a (f533+f59a+f596 recommended, 0 in 10 runs each); order is load-bearing](2026-10-19-sb-minimal-set/README.md)
 - [2026-10-19 Fence cost with 8 SIMD groups per core: wall time within +22% of the 1-group twin in all 18 cells (17 within 12%); fence stalls overlap, no serialization](2026-10-19-fence-contention/README.md)
