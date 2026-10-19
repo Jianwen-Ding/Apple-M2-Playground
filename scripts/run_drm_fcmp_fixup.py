@@ -21,6 +21,10 @@ from run_drm_fcmp import VALS, N
 
 REPO = Path(__file__).resolve().parents[1]
 NAMES = ['eq', 'lt', 'gt', 'le', 'ge', 'min', 'max']
+# NaN-accepting (.u) variants and float-result set(): verified in the same lanes when extra=True.
+UNAMES = ['neu', 'equ', 'ltu', 'leu', 'gtu', 'geu', 'num', 'nan']
+FNAMES = ['set_lt_f', 'set_gt_f', 'set_eq_f', 'set_le_f', 'set_ge_f']
+FNAMES_SRC = {'set_lt_f': 'r25', 'set_gt_f': 'r26', 'set_eq_f': 'r27', 'set_le_f': 'r28', 'set_ge_f': 'r29'}
 f32 = lambda b: struct.unpack('<f', struct.pack('<I', b))[0]
 isnan = lambda b: (b & 0x7f800000) == 0x7f800000 and b & 0x7fffff
 
@@ -44,6 +48,23 @@ def ptx_minmax(name, a, b):
 def ieee(name, a, b):
     if name in ('min', 'max'):
         return ptx_minmax(name, a, b)
+    if name == 'num':
+        return int(not (isnan(a) or isnan(b)))
+    if name == 'nan':
+        return int(bool(isnan(a) or isnan(b)))
+    if name in ('neu', 'equ', 'ltu', 'leu', 'gtu', 'geu'):
+        if isnan(a) or isnan(b):
+            return 1
+        x, y = f32(a), f32(b)
+        base = {'neu': x != y, 'equ': x == y, 'ltu': x < y, 'leu': x <= y, 'gtu': x > y, 'geu': x >= y}
+        return int(base[name])
+    if name in FNAMES:
+        if isnan(a) or isnan(b):
+            return 0x00000000
+        x, y = f32(a), f32(b)
+        rel = {'set_lt_f': x < y, 'set_gt_f': x > y, 'set_eq_f': x == y,
+               'set_le_f': x <= y, 'set_ge_f': x >= y}[name]
+        return 0x3f800000 if rel else 0x00000000
     if isnan(a) or isnan(b):
         return 0
     x, y = f32(a), f32(b)
@@ -55,7 +76,7 @@ def same(name, got, want):
     return all(g == w or (w == 'nan' and isnan(g)) for g, w in zip(got, want))
 
 
-def body(n):
+def body(n, extra=False):
     e = agx_loop.encode; mov = chains.mov_imm
     ins = [mov(12, 0x7fffffff), mov(13, 0x80000000), mov(14, 0x7f800000), mov(15, 31), mov(21, 1), mov(22, 0),
            mov(16, n), e('iadd r17, r1, r16'), load(6, 1, True), load(7, 17, True), e('wait 0')]
@@ -82,6 +103,27 @@ def body(n):
                 e(f'icmpsel ueq, {reg}, r11, 0, {reg}, r7'),                      # a is NaN -> b
                 mov(30, (7+i)*n), e('iadd r31, r1, r30'), agx_loop.store(int(reg[1:]), 8, 31)]
     ins += [e('wait 0'), e('iadd r2, r27, 0')]
+    if extra:
+        # NaN-accepting variants: same raw relations, NaN forces true (literals/regs only, all forms used above)
+        ins += [e('icmpsel ueq, r36, r27, 0, r21, r22'), e('or r36, r36, r24'),          # neu = !eq_raw | nan
+                mov(30, 9*n), e('iadd r31, r1, r30'), agx_loop.store(36, 8, 31),
+                e('or r36, r27, r24'),                                                    # equ = eq_raw | nan
+                mov(30, 10*n), e('iadd r31, r1, r30'), agx_loop.store(36, 8, 31),
+                e('or r36, r25, r24'),                                                    # ltu
+                mov(30, 11*n), e('iadd r31, r1, r30'), agx_loop.store(36, 8, 31),
+                e('or r36, r28, r24'),                                                    # leu
+                mov(30, 12*n), e('iadd r31, r1, r30'), agx_loop.store(36, 8, 31),
+                e('or r36, r26, r24'),                                                    # gtu
+                mov(30, 13*n), e('iadd r31, r1, r30'), agx_loop.store(36, 8, 31),
+                e('or r36, r29, r24'),                                                    # geu
+                mov(30, 14*n), e('iadd r31, r1, r30'), agx_loop.store(36, 8, 31),
+                e('icmpsel ueq, r36, r24, 0, r21, r22'),                                  # num = !nan
+                mov(30, 15*n), e('iadd r31, r1, r30'), agx_loop.store(36, 8, 31),
+                mov(30, 16*n), e('iadd r31, r1, r30'), agx_loop.store(24, 8, 31),         # nan = nan mask
+                mov(30, 22*n), load(37, 30, True), e('wait 0')]                           # float 1.0 from the table
+        for i, (fname, src) in enumerate(FNAMES_SRC.items()):                             # (mov_imm cannot target r32+)
+            ins += [e(f'icmpsel ueq, r38, {src}, 0, r22, r37'),                           # rel ? 1.0 : 0.0
+                    mov(30, (17+i)*n), e('iadd r31, r1, r30'), agx_loop.store(38, 8, 31)]
     DA.decode_lengths(b''.join(ins), [len(i) for i in ins])
     return b''.join(ins)
 
@@ -90,19 +132,25 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=['offline', 'hardware'])
     p.add_argument('--repeats', type=int, default=3)
+    p.add_argument('--extra', action='store_true', help='also verify NaN-accepting (.u) variants and float-result set')
     p.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/drm-compute/fcmp-fixup'))
     p.add_argument('--result', type=Path)
     a = p.parse_args()
     n = N*N
     A = [VALS[i//N] for i in range(n)]; B = [VALS[i % N] for i in range(n)]
-    table = A+B+[0xcdcdcdcd]*(7*n)
-    want = {nm: [ieee(nm, x, y) for x, y in zip(A, B)] for nm in NAMES}
-    code = drm.build_main(body(n))
+    names = NAMES if not a.extra else NAMES + UNAMES + FNAMES
+    if not a.extra:
+        table = A+B+[0xcdcdcdcd]*(7*n)
+    else:
+        table = A+B+[0xcdcdcdcd]*(20*n)+[0x3f800000]*n  # outputs at 2..21n, float 1.0 word at 22n
+    nwords = len(table)//n
+    want = {nm: [ieee(nm, x, y) for x, y in zip(A, B)] for nm in names}
+    code = drm.build_main(body(n, extra=a.extra))
     if a.mode == 'offline':
         sys.path.insert(0, '/save/workspace/AGX-Performance-Simulator/scripts')
         import coverage as cov
         o, t = cov.simulate(code, n, 32, 80, 0, table)
-        for i, nm in enumerate(NAMES):
+        for i, nm in enumerate(names):
             got = t[(2+i)*n:(3+i)*n]
             ok = same(nm, got, want[nm])
             print(nm, 'simulator == host model on all pairs:', ok)
@@ -111,18 +159,18 @@ def main():
     out = a.output; out.mkdir(parents=True, exist_ok=True)
     exe = out/'drm_compute'
     subprocess.run(['cc', '-std=c11', '-O2', str(REPO/'tests/drm_compute.c'), '-o', str(exe)], check=True)
-    rec = {'vals': VALS, 'names': NAMES, 'results': []}
+    rec = {'vals': VALS, 'names': names, 'extra': a.extra, 'results': []}
     for rep in range(a.repeats):
-        (out/'c.bin').write_bytes(code+bytes(16)); (out/'t.bin').write_bytes(struct.pack(f'<{9*n}I', *table))
+        (out/'c.bin').write_bytes(code+bytes(16)); (out/'t.bin').write_bytes(struct.pack(f'<{nwords*n}I', *table))
         r = subprocess.run([str(exe), '/dev/dri/renderD128', str(out/'c.bin'), str(n), str(out/'rb'), '1', '80', str(out/'t.bin')],
                            capture_output=True, timeout=30, env={'PATH': '/usr/bin', 'AGX_TABLE_OUT': str(out/'t.out')})
         smp = [json.loads(l) for l in r.stdout.decode().splitlines() if '"rep"' in l]
         if r.returncode or len(smp) != 1 or not all(smp[0]['fw_ts']):
             sys.exit('dispatch failed: '+r.stdout.decode()[-300:])
-        t = struct.unpack(f'<{9*n}I', (out/'t.out').read_bytes())
-        res = {'rep': rep, 'out': {nm: list(t[(2+i)*n:(3+i)*n]) for i, nm in enumerate(NAMES)}}
+        t = struct.unpack(f'<{nwords*n}I', (out/'t.out').read_bytes())
+        res = {'rep': rep, 'out': {nm: list(t[(2+i)*n:(3+i)*n]) for i, nm in enumerate(names)}}
         rec['results'].append(res)
-        print(rep, {nm: same(nm, res['out'][nm], want[nm]) for nm in NAMES}, flush=True)
+        print(rep, {nm: same(nm, res['out'][nm], want[nm]) for nm in names}, flush=True)
     if a.result:
         a.result.write_text(json.dumps(rec)+'\n')
 

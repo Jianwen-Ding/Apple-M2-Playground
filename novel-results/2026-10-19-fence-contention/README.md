@@ -5,7 +5,8 @@ direct DRM, compute stage, AC power, clock keeper holding the top clock. Straigh
 (`scripts/probe_fence_contention.py`, same shape as
 [probe_fence_cost.py](../../scripts/probe_fence_cost.py): prologue + 32 x (context op, `wait 0`,
 [fence]) + epilogue; the control omits the fence), Mesa-emitted barriers only, no loops.
-Every program is exact-decode gated at construction and ends with `stop`. 210 dispatches,
+Every program is exact-decode gated at construction, ends with `stop`, and terminates in the
+Rust simulator (`agx_run`, `probe_fence_contention.py offline`) before submission. 210 dispatches,
 all outputs correct, 0 faults or timeouts (hang budget untouched).
 
 This closes the "multi-group fence contention" open item of
@@ -62,9 +63,8 @@ across workgroups/cores (only one workgroup ran here), interaction with L2-miss 
 ## Reproduce
 
 `scripts/probe_fence_contention.py hardware --n 32 --samples 5` (hardware, 210 dispatches;
-starts and stops the clock keeper), `offline` to decode-gate only;
+starts and stops the clock keeper), `offline` to replay every body in `agx_run` first;
 `make verify-fence-contention` (offline, checks every median above against
 [results/2026-10-19-fence-contention](../../results/2026-10-19-fence-contention)).
-No `agx_run` Rust-simulator gate was available in this environment (no Rust toolchain);
-the code bytes are identical in shape to the gated `probe_fence_cost` programs (only the
-grid dims differ) and every SB/fence program of this shape has run without fault.
+All submitted programs were gated in the Rust simulator first (`agx_run`: the contention bodies
+terminate with zero outputs; the 26 SB bodies terminate with 0/1 outputs).

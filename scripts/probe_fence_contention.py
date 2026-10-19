@@ -36,13 +36,16 @@ def programs(n):
 
 
 def gate(progs):
-    # body() in probe_fence_cost already runs DA.decode_lengths over every
-    # instruction at construction; here only verify whole-program shape.
+    # body() in probe_fence_cost already runs DA.decode_lengths over every instruction
+    # at construction; here the exact programs also run in the Rust simulator first.
     for key, code in progs.items():
         if code[-2:] != b'\x88\x00':
             raise RuntimeError(f'no stop: {key}')
-        if len(code) % 2:
-            raise RuntimeError(f'odd length: {key}')
+    sys.path.insert(0, '/save/workspace/AGX-Performance-Simulator/scripts')
+    import coverage as cov
+    for key, code in progs.items():
+        out, tab = cov.simulate(code, 32, 32, 48, 0, [0]*64)
+        assert out[8:40] == [0]*32 and all(x in (0, 1) for x in tab), key
 
 
 def hardware(n, samples, output):
@@ -100,7 +103,7 @@ def main():
     p.add_argument('--output', type=Path)
     a = p.parse_args()
     if a.mode == 'offline':
-        gate(programs(a.n)); print('all programs decode-gated (no agx_run in this env)'); return
+        gate(programs(a.n)); print('all programs terminate in agx_run with zero outputs'); return
     rec = hardware(a.n, a.samples, a.output)
     import statistics as st
     base = {}

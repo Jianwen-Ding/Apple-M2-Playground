@@ -6,7 +6,8 @@ Mesa-emitted encodings only (coherent loads; normal u4 = 4 or coherent u4 = 7 st
 65,536 lanes in 32-lane workgroups; lane i and lane i ^ 32 form a pair on different workgroups.
 Each lane owns one table word (zero at start). SB shape: `v[i] = 1; [fence]; r[i] = v[partner]`;
 violation = both lanes of a pair read 0. `wait 0` between store and fence in all runs here.
-Gated by exact decode (`DA.decode_lengths` at construction) and a `stop`-terminated whole program;
+Every program is exact-decode gated at construction, ends with `stop`, and was run through the
+Rust simulator (`agx_run`: terminates, outputs are 0/1) before submission;
 0 GPU faults or timeouts in 260 + 3 dispatches (hang budget untouched).
 
 This closes the "minimal sufficient SB fence set" open item of

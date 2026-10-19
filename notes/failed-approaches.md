@@ -541,3 +541,20 @@ It now rejects them before the per-lane loop, including empty masks; shared
 memory effects before termination remain unmodeled. This is distinct from a
 GPU hang: all 27 follow-up variants completed, and all controls passed.
 [Evidence and limits](../novel-results/2026-10-17-tg-atomic-followup/README.md).
+
+### mov_imm destinations above r31 and isnan-oracle truthiness, 2026-10-19
+
+* `chains.mov_imm(reg, value)` only encodes destinations r0-r31: `mov_imm(37, ...)` assembles
+  bytes that re-decode as an 8-byte instruction (length desync at the next instruction), while
+  `mov_imm(30, ...)` with any value is fine. The 6-byte form's D field cannot hold `2*reg`
+  for reg >= 32. High registers are fine as `icmpsel` / `load` / `store` operands (used to r38
+  here). Materialise a high-register constant with a table load instead. Caught by the
+  `DA.decode_lengths` construction gate before any submission.
+* The shared `isnan` lambda (`(b & 0x7f800000) == 0x7f800000 and b & 0x7fffff`) returns a payload
+  int, not a bool. Safe in `if` conditions, but `int(isnan(a) or isnan(b))` keeps the payload
+  (e.g. 4194304), which made the `nan` host oracle wrong while the hardware was right.
+  Normalise with `bool()` in oracles. Caught by comparing the oracle against the `num`/`nan`
+  hardware words before the full run.
+* Two inverted `icmpsel` select-operand orders (`neu`/`num` computed the non-negated relation)
+  were likewise caught by the 1-repeat small-first hardware run (1600/2304 and 2304/2304
+  mismatches) and fixed before the 3-repeat evidence run. Small-first works.
