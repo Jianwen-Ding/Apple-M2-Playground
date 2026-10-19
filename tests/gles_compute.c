@@ -2,6 +2,7 @@
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include <GLES3/gl32.h>
+#include <GLES2/gl2ext.h>
 #include <drm/drm.h>
 #include <dlfcn.h>
 #include <fcntl.h>
@@ -234,7 +235,7 @@ int main(int argc, char **argv) {
     p_glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffers[1]);
     p_glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(control), control, GL_DYNAMIC_COPY);
     p_glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, buffers[1]);
-    /* GLES_TEX_FORMAT (r8 rgba8 r8snorm rgba8snorm rgba8srgb r16f r32f rgba32f r8ui r32ui), GLES_TEX_W / GLES_TEX_H, GLES_TEX_DATA (raw file),
+    /* GLES_TEX_FORMAT (r8 rgba8 r8snorm rgba8snorm rgba8srgb r16f r32f rgba32f r8ui r32ui r16 r16snorm r16ui), GLES_TEX_W / GLES_TEX_H, GLES_TEX_DATA (raw file),
      * GLES_TEX_FILTER (nearest | linear), GLES_TEX_WRAP (clamp | repeat | mirror | border), GLES_TEX_IMAGE=1 (also bind level 0 as read-write image unit 0).
      * GLES_TEX_BORDER="r,g,b,a" (floats, for normalized/float formats) or GLES_TEX_IBORDER="r,g,b,a" (uints, for integer
      * formats): sets GL_TEXTURE_BORDER_COLOR, only meaningful with GLES_TEX_WRAP=border.
@@ -245,7 +246,9 @@ int main(int argc, char **argv) {
             {"r8snorm", GL_R8_SNORM, GL_RED, GL_BYTE, 1}, {"rgba8snorm", GL_RGBA8_SNORM, GL_RGBA, GL_BYTE, 4},
             {"rgba8srgb", GL_SRGB8_ALPHA8, GL_RGBA, GL_UNSIGNED_BYTE, 4}, {"r16f", GL_R16F, GL_RED, GL_HALF_FLOAT, 2},
             {"r32f", GL_R32F, GL_RED, GL_FLOAT, 4}, {"rgba32f", GL_RGBA32F, GL_RGBA, GL_FLOAT, 16},
-            {"r8ui", GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, 1}, {"r32ui", GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, 4}};
+            {"r8ui", GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, 1}, {"r32ui", GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, 4},
+            {"r16", GL_R16_EXT, GL_RED, GL_UNSIGNED_SHORT, 2}, {"r16snorm", GL_R16_SNORM_EXT, GL_RED, GL_SHORT, 2},
+            {"r16ui", GL_R16UI, GL_RED_INTEGER, GL_UNSIGNED_SHORT, 2}};
         const char *fn = getenv("GLES_TEX_FORMAT");
         int fi = -1;
         for (unsigned k = 0; k < sizeof fmts / sizeof *fmts; k++) if (!strcmp(fn, fmts[k].name)) fi = (int)k;

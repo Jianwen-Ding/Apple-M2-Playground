@@ -92,6 +92,13 @@ def cases():
     out['border_r32ui'] = dict(fmt='r32ui', w=16, h=16, data=b''.join(struct.pack('<I', v) for v in u32), count=56, filt='nearest', wrap='border', iborder='305419896,0,0,0', vals=u32,
         glsl=UH+"layout(binding=0) uniform highp usampler2D tex;\nvoid main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ float x=float(int(i)-20); "
                "vec2 uv=vec2(x+0.5, 5.5)/16.0; data[8u+i]=textureLod(tex, uv, 0.0).r; } }\n")
+    # 12. 16-bit normalized / integer formats through texelFetch (all 65,536 values)
+    out['fetch_r16'] = dict(fmt='r16', w=256, h=256, data=b''.join(struct.pack('<H', v) for v in range(65536)), count=65536, filt='nearest',
+        glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count) data[8u+i]=floatBitsToUint(texelFetch(tex, ivec2(int(i%256u),int(i/256u)), 0).r); }\n")
+    out['fetch_r16snorm'] = dict(fmt='r16snorm', w=256, h=256, data=b''.join(struct.pack('<H', v) for v in range(65536)), count=65536, filt='nearest',
+        glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count) data[8u+i]=floatBitsToUint(texelFetch(tex, ivec2(int(i%256u),int(i/256u)), 0).r); }\n")
+    out['fetch_r16ui'] = dict(fmt='r16ui', w=256, h=256, data=b''.join(struct.pack('<H', v) for v in range(65536)), count=65536, filt='nearest',
+        glsl=UH+"layout(binding=0) uniform highp usampler2D tex;\nvoid main(){ uint i=gl_GlobalInvocationID.x; if(i<count) data[8u+i]=texelFetch(tex, ivec2(int(i%256u),int(i/256u)), 0).r; }\n")
     return out
 
 

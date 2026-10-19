@@ -43,11 +43,24 @@ Note the test-design trap this closed: `texelFetch` takes raw integer coordinate
 the sampler wrap mode entirely, so the first integer-border attempt (via `texelFetch`) measured
 the OOB-returns-0 rule instead of the border. Integer borders need a normalized lookup.
 
+## 16-bit formats (all 65,536 values each)
+
+`tests/gles_compute.c` now takes `r16` (`GL_R16_EXT`), `r16snorm` (`GL_R16_SNORM_EXT`) and `r16ui`
+(core `GL_R16UI`); the driver accepted all three, so no extension fallback was needed.
+
+| Question | Result | Cases |
+|---|---|---|
+| r16 unorm `texelFetch` | `float32(k/65535)` | 65,536/65,536 |
+| r16 snorm `texelFetch` | `float32(max(s/32767, -1))`; -32768 and -32767 both give -1 | 65,536/65,536 |
+| r16ui `texelFetch` | exact identity | 65,536/65,536 |
+
+The encoding is the same `texture_load ... auto_lod, 0` form as the 8/32-bit fetches.
+
 ## Not established by this run (safe-05 remainder)
 
 Border wrap on the remaining formats (snorm/sRGB/integer-linear), 1D/3D/array targets (needs
 texture-target harness work), LOD and gradient forms with mipmaps (needs multi-level harness),
-snorm16/unorm16 and integer filtering formats, cube maps, simulator model (`texture_load` /
+integer filtering formats, cube maps, simulator model (`texture_load` /
 `texture_sample` in `func.rs`) and the CUDA mapping table (steps 3-4).
 
 ## Harness notes

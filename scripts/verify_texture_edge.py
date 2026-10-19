@@ -14,7 +14,7 @@ def check(name, cond):
     ok.append(bool(cond)); print('PASS' if cond else 'FAIL', name)
 
 
-check('all 21 cases ran with intact guard words', len(rec) == 21 and all(r['run_ok'] and r.get('guards_intact', True) for r in rec.values()))
+check('all 24 cases ran with intact guard words', len(rec) == 24 and all(r['run_ok'] and r.get('guards_intact', True) for r in rec.values()))
 
 # RNG must replay the case generator exactly (bilinear 256 + wrap 256 + r32ui 256 + f32 248 draws first)
 rng = random.Random(7)
@@ -97,4 +97,14 @@ for i in range(256):
     if f(bl[i]) == struct.unpack('<f', struct.pack('<f', math.floor((a0*(1-fr)+a1*fr)*16+0.5)/4080))[0]:
         blm += 1
 check('linear blend into the border: 256/256 follow the 12-bit unorm rule with the quantized border (64)', blm == 256)
+
+# 16-bit formats through texelFetch (all 65,536 values each)
+o16 = rec['fetch_r16']['out']
+check('r16 unorm: all 65,536 values equal float32(k/65535)',
+      all(o16[v] == struct.unpack('<I', struct.pack('<f', v/65535.0))[0] for v in range(65536)))
+osn = rec['fetch_r16snorm']['out']
+check('r16 snorm: all 65,536 values equal float32(max(s/32767, -1)) (-32768 and -32767 both give -1)',
+      all(osn[v] == struct.unpack('<I', struct.pack('<f', max(((v-65536 if v >= 32768 else v)/32767.0), -1.0)))[0] for v in range(65536)))
+oui = rec['fetch_r16ui']['out']
+check('r16ui: all 65,536 values exact', all(oui[v] == v for v in range(65536)))
 sys.exit(0 if all(ok) else 1)
