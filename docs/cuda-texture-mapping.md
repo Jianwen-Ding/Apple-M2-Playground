@@ -18,9 +18,9 @@ operation, not run; **open** = no evidence. Mesa builds all descriptor state; th
 | `tex1Dfetch` (linear memory) | `texelFetch` on a buffer texture | `texture_load` | open |
 | `tld4` (gather) | `textureGather` | `texture_sample ... gather_r ...` | measured 2026-10-19: footprint box (ceil-1, ceil) per axis, order ((x0,y1),(x1,y1),(x1,y0),(x0,y0)), edge-clamped |
 | `surf2Dread` | `imageLoad` | `texture_load` (mode word 0b1101) | measured: rgba8 unorm and r32f |
-| `surf2Dwrite` | `imageStore` | `image_write` (`rte`) | measured: r32f round trip bit exact; unorm8 store rounding not measured |
+| `surf2Dwrite` | `imageStore` | `image_write` (`rte`) | measured: r32f round trip bit exact; unorm8 store is RTNE on the fp32 value (ties to even, max diff 1) |
 | surface clamp / trap / zero modes | none in GLSL | none | open: GLSL has no equivalent; ZLUDA would need explicit bounds code |
-| texture objects (64-bit handles) | descriptor table index | texture / sampler slots `ts` / `ss` | open: no handle-to-slot model |
+| texture objects (64-bit handles) | descriptor table index | texture / sampler slots `ts` / `ss` | simulator model exists: set base in uniforms 2+2s, 64B sampled / 48B storage descs, bindless = base + offset; sampler-heap population is a harness gap |
 
-Unsupported or unmodelled: bindless handle semantics, CUDA's 1.8-fixed-point linear weights, `tex.level` with non-default modes beyond the measured `lod_min`/`lod_grad`, surface bounds-mode
-traps, 1D/3D/array/cube targets, the texture-unit simulator model in `func.rs`. Anything marked open needs a Mesa-compiled GLSL probe first (never hand-encoded state).
+Unsupported or unmodelled: bindless sampler-heap population, CUDA's 1.8-fixed-point linear weights, `tex.level` with non-default modes beyond the measured `lod_min`/`lod_grad`, surface bounds-mode
+traps, 1D/3D/array/cube targets. Anything marked open needs a Mesa-compiled GLSL probe first (never hand-encoded state).
