@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-19 Threadgroup ending opcode 11 ends the whole workgroup: cross-group litmus all-sentinel, explicit re-assertion absent, no fault, recovery exact (owner-approved unsafe)](2026-10-19-tg-end-scope/README.md)
 - [2026-10-19 fp64 compares bit-exact: all 18 setp/min/max/.u/set forms, 5,312 lanes x 3 runs, 0 differ](2026-10-19-fp64-cmp/README.md)
 - [2026-10-19 Texture edge cases: OOB texelFetch returns 0; gather footprint is the ceil-box in order ((x0,y1),(x1,y1),(x1,y0),(x0,y0)); sRGB bilinear is 12-bit end to end; float borders quantize to the format, integer borders exact](2026-10-19-texture-edge/README.md)
 - [2026-10-19 Fix-up cycle cost: ~200 ns wall per compare in unrolled code, fetch-bound, all variants equal; model predicts the issue part (21-23 ns), no fix-up-specific change](2026-10-19-fixup-cost/README.md)
