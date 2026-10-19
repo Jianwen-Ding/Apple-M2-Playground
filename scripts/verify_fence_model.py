@@ -25,10 +25,10 @@ def check(name, cond):
     print('PASS' if cond else 'FAIL', name)
 
 
-def predict(code):
+def predict(code, groups=1):
     with tempfile.NamedTemporaryFile(suffix='.bin', delete=False) as t:
         t.write(code+bytes(16)); p = t.name
-    r = subprocess.run([str(AGX_COST), p, '--groups', '1', '--units', 'real', '--allow-unknown'], capture_output=True, text=True)
+    r = subprocess.run([str(AGX_COST), p, '--groups', str(groups), '--units', 'real', '--allow-unknown'], capture_output=True, text=True)
     os.unlink(p)
     return json.loads(r.stdout.strip().splitlines()[-1])
 
@@ -55,4 +55,16 @@ check("Mesa's seven-barrier sequence back to back and after a load: within 17 ns
       all(abs(diff[(c, 'mesa_qf')][0]-diff[(c, 'mesa_qf')][1]) < 17 for c in ('none', 'load')))
 check("Mesa's sequence after a store: the model is 12.6%% high (%+.0f ns of %.0f; the measured sequence is sub-additive)" % (diff[('store', 'mesa_qf')][0]-diff[('store', 'mesa_qf')][1], diff[('store', 'mesa_qf')][1]),
       0 < diff[('store', 'mesa_qf')][0]-diff[('store', 'mesa_qf')][1] < 80)
+# Multi-group contention (2026-10-19 finding): the model must charge device fences per group
+# with max-combination, so 8 identical groups cost the same wall time as 1 (ratio 1.000 measured).
+grat = {}
+for ctx in ('none', 'store'):
+    c1 = predict(drm.build_main(F.body(n, ctx, None)), 1)['cycles']
+    c8 = predict(drm.build_main(F.body(n, ctx, None)), 8)['cycles']
+    for f in ('f533', 'mesa_qf'):
+        m1 = (predict(drm.build_main(F.body(n, ctx, f)), 1)['cycles']-c1)/n
+        m8 = (predict(drm.build_main(F.body(n, ctx, f)), 8)['cycles']-c8)/n
+        grat[(ctx, f)] = m8/m1
+check('fence wall cost 1 vs 8 groups identical in the model (ratios %s)' % {k: round(v, 3) for k, v in grat.items()},
+      all(abs(v-1.0) < 0.01 for v in grat.values()))
 sys.exit(0 if all(ok) else 1)
