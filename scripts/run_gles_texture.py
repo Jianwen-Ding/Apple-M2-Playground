@@ -79,6 +79,19 @@ def cases():
     out['bilinear_srgb'] = dict(fmt='rgba8srgb', w=16, h=16, data=bytes(b for v in svals for b in (v, 0, 0, 255)), count=256*15, filt='linear', vals=svals,
         glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ float fx=float(i%256u)/256.0; float cx=float(i/256u); "
                       "vec2 uv=(vec2(cx+0.5+fx, 3.5+0.375))/16.0; data[8u+i]=floatBitsToUint(textureLod(tex, uv, 0.0).r); } }\n")
+    # 9. border colour (CLAMP_TO_BORDER): OOB lanes must read the border, in-range exact
+    for bname, bcol in (('border_half', '0.5,0.5,0.5,1.0'), ('border_zero', '0.0,0.0,0.0,0.0')):
+        out[f'border_r8_{bname}'] = dict(fmt='r8', w=16, h=16, data=bytes(wrapvals), count=56, filt='nearest', wrap='border', border=bcol, vals=wrapvals,
+            glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ float x=float(int(i)-20); "
+                          "vec2 uv=vec2(x+0.5, 5.5)/16.0; data[8u+i]=floatBitsToUint(textureLod(tex, uv, 0.0).r); } }\n")
+    # 10. linear blend into the border at the left edge: x_tex = fx/256 - 0.5, border 0.25
+    out['border_r8_linear'] = dict(fmt='r8', w=16, h=16, data=bytes(wrapvals), count=256, filt='linear', wrap='border', border='0.25,0.25,0.25,1.0', vals=wrapvals,
+        glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ float x=float(i)/256.0-0.5; "
+                      "vec2 uv=vec2(x+0.5, 5.5)/16.0; data[8u+i]=floatBitsToUint(textureLod(tex, uv, 0.0).r); } }\n")
+    # 11. integer border colour on r32ui (normalized lookup: texelFetch ignores wrap modes)
+    out['border_r32ui'] = dict(fmt='r32ui', w=16, h=16, data=b''.join(struct.pack('<I', v) for v in u32), count=56, filt='nearest', wrap='border', iborder='305419896,0,0,0', vals=u32,
+        glsl=UH+"layout(binding=0) uniform highp usampler2D tex;\nvoid main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ float x=float(int(i)-20); "
+               "vec2 uv=vec2(x+0.5, 5.5)/16.0; data[8u+i]=textureLod(tex, uv, 0.0).r; } }\n")
     return out
 
 
@@ -101,6 +114,10 @@ def main():
                'MESA_SHADER_CACHE_DIR': str(cache), 'MESA_SHADER_CACHE_DISABLE': 'false'}
         if c.get('image'):
             env['GLES_TEX_IMAGE'] = '1'
+        if c.get('border'):
+            env['GLES_TEX_BORDER'] = c['border']
+        if c.get('iborder'):
+            env['GLES_TEX_IBORDER'] = c['iborder']
         r = subprocess.run([str(out/'gles_compute'), 'index', str(c['count']), '/dev/dri/renderD128'], cwd=d, capture_output=True, timeout=300, env=env)
         (d/'stdout.txt').write_bytes(r.stdout)
         res = {'run_ok': r.returncode == 0 and (d/'output.bin').exists(), 'count': c['count']}

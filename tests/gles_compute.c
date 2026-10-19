@@ -64,6 +64,8 @@
  X(PFNGLTEXSTORAGE2DPROC, glTexStorage2D) \
  X(PFNGLTEXSUBIMAGE2DPROC, glTexSubImage2D) \
  X(PFNGLTEXPARAMETERIPROC, glTexParameteri) \
+ X(PFNGLTEXPARAMETERFVPROC, glTexParameterfv) \
+ X(PFNGLTEXPARAMETERIIVPROC, glTexParameterIiv) \
  X(PFNGLACTIVETEXTUREPROC, glActiveTexture) \
  X(PFNGLBINDIMAGETEXTUREPROC, glBindImageTexture) \
  X(PFNGLPIXELSTOREIPROC, glPixelStorei)
@@ -233,7 +235,9 @@ int main(int argc, char **argv) {
     p_glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(control), control, GL_DYNAMIC_COPY);
     p_glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, buffers[1]);
     /* GLES_TEX_FORMAT (r8 rgba8 r8snorm rgba8snorm rgba8srgb r16f r32f rgba32f r8ui r32ui), GLES_TEX_W / GLES_TEX_H, GLES_TEX_DATA (raw file),
-     * GLES_TEX_FILTER (nearest | linear), GLES_TEX_WRAP (clamp | repeat | mirror), GLES_TEX_IMAGE=1 (also bind level 0 as read-write image unit 0).
+     * GLES_TEX_FILTER (nearest | linear), GLES_TEX_WRAP (clamp | repeat | mirror | border), GLES_TEX_IMAGE=1 (also bind level 0 as read-write image unit 0).
+     * GLES_TEX_BORDER="r,g,b,a" (floats, for normalized/float formats) or GLES_TEX_IBORDER="r,g,b,a" (uints, for integer
+     * formats): sets GL_TEXTURE_BORDER_COLOR, only meaningful with GLES_TEX_WRAP=border.
      * The texture is bound to texture unit 0 (use `layout(binding=0)` in the shader). Used by scripts/run_gles_texture.py. */
     if (getenv("GLES_TEX_FORMAT")) {
         static const struct { const char *name; GLenum internal, format, type; unsigned bpp; } fmts[] = {
@@ -266,9 +270,20 @@ int main(int argc, char **argv) {
         p_glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)tw, (GLsizei)th, fmts[fi].format, fmts[fi].type, pix);
         const char *flt = getenv("GLES_TEX_FILTER"), *wrp = getenv("GLES_TEX_WRAP");
         GLint f = (flt && !strcmp(flt, "linear")) ? GL_LINEAR : GL_NEAREST;
-        GLint wr = (wrp && !strcmp(wrp, "repeat")) ? GL_REPEAT : (wrp && !strcmp(wrp, "mirror")) ? GL_MIRRORED_REPEAT : GL_CLAMP_TO_EDGE;
+        GLint wr = (wrp && !strcmp(wrp, "repeat")) ? GL_REPEAT : (wrp && !strcmp(wrp, "mirror")) ? GL_MIRRORED_REPEAT : (wrp && !strcmp(wrp, "border")) ? GL_CLAMP_TO_BORDER : GL_CLAMP_TO_EDGE;
         p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, f); p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, f);
         p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wr); p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wr);
+        if (getenv("GLES_TEX_BORDER")) {
+            float bc[4] = {0, 0, 0, 0};
+            if (sscanf(getenv("GLES_TEX_BORDER"), "%f,%f,%f,%f", bc, bc+1, bc+2, bc+3) != 4) fail("tex-border-parse");
+            p_glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, bc);
+        }
+        if (getenv("GLES_TEX_IBORDER")) {
+            unsigned bcu[4] = {0, 0, 0, 0};
+            if (sscanf(getenv("GLES_TEX_IBORDER"), "%u,%u,%u,%u", bcu, bcu+1, bcu+2, bcu+3) != 4) fail("tex-iborder-parse");
+            GLint bci[4] = {(GLint)bcu[0], (GLint)bcu[1], (GLint)bcu[2], (GLint)bcu[3]};
+            p_glTexParameterIiv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, bci);
+        }
         if (getenv("GLES_TEX_IMAGE")) p_glBindImageTexture(0, tex, 0, GL_FALSE, 0, GL_READ_WRITE, fmts[fi].internal);
         gl_ok("texture-setup");
         free(pix);

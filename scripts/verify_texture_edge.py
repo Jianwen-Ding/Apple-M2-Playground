@@ -14,12 +14,14 @@ def check(name, cond):
     ok.append(bool(cond)); print('PASS' if cond else 'FAIL', name)
 
 
-check('all 17 cases ran with intact guard words', len(rec) == 17 and all(r['run_ok'] and r.get('guards_intact', True) for r in rec.values()))
+check('all 21 cases ran with intact guard words', len(rec) == 21 and all(r['run_ok'] and r.get('guards_intact', True) for r in rec.values()))
 
 # RNG must replay the case generator exactly (bilinear 256 + wrap 256 + r32ui 256 + f32 248 draws first)
 rng = random.Random(7)
-[([rng.randrange(256) for _ in range(256)], [rng.randrange(1, 255) for _ in range(256)],
-  [rng.getrandbits(32) for _ in range(256)], [rng.getrandbits(32) for _ in range(248)])]
+_bil = [rng.randrange(256) for _ in range(256)]
+wrapvals = [rng.randrange(1, 255) for _ in range(256)]
+_u32 = [rng.getrandbits(32) for _ in range(256)]
+_f32 = [rng.getrandbits(32) for _ in range(248)]
 oob = [rng.getrandbits(32) for _ in range(256)]
 gvals = [rng.randrange(256) for _ in range(256)]
 svals = [rng.randrange(256) for _ in range(256)]
@@ -66,4 +68,33 @@ for i in range(256*15):
     exact = (d[0]*(1-fx)+d[1]*fx)*0.625 + (d[2]*(1-fx)+d[3]*fx)*0.375
     sm += f(s[i]) == struct.unpack('<f', struct.pack('<f', round(exact*4095)/4095))[0]
 check('sRGB bilinear: 3840/3840 equal float32(round(bilinear(12-bit taps) * 4095) / 4095)', sm == 3840)
+
+# border colours (CLAMP_TO_BORDER): the colour converts to the texture format
+b = rec['border_r8_border_half']['out']
+check('border 0.5 on r8: 16/16 in-range exact, all 40 OOB lanes read float32(round(0.5*255)/255) = 128/255',
+      all(b[i] == struct.unpack('<I', struct.pack('<f', wrapvals[5*16+(i-20)]/255.0))[0] for i in range(56) if 0 <= (i-20) < 16) and
+      all(b[i] == struct.unpack('<I', struct.pack('<f', 128/255.0))[0] for i in range(56) if not 0 <= (i-20) < 16))
+b0 = rec['border_r8_border_zero']['out']
+check('border 0.0 on r8: 16/16 in-range exact, all 40 OOB lanes read exactly 0.0',
+      all(b0[i] == struct.unpack('<I', struct.pack('<f', wrapvals[5*16+(i-20)]/255.0))[0] for i in range(56) if 0 <= (i-20) < 16) and
+      all(b0[i] == 0 for i in range(56) if not 0 <= (i-20) < 16))
+bi = rec['border_r32ui']['out']
+rng2 = random.Random(7)
+[rng2.randrange(256) for _ in range(256)]          # bilinear vals
+[rng2.randrange(1, 255) for _ in range(256)]        # wrapvals
+raw32 = [rng2.getrandbits(32) for _ in range(256)]  # fetch_r32ui / border_r32ui words
+check('border 0x12345678 on r32ui: 16/16 in-range exact, all 40 OOB lanes read 0x12345678',
+      all(bi[i] == raw32[5*16+(i-20)] for i in range(56) if 0 <= (i-20) < 16) and
+      all(bi[i] == 0x12345678 for i in range(56) if not 0 <= (i-20) < 16))
+bl = rec['border_r8_linear']['out']
+blm = 0
+for i in range(256):
+    t = i/256.0
+    i0 = -1 if t < 0.5 else 0
+    fr = (t+0.5) if i0 == -1 else (t-0.5)
+    a0 = 64 if i0 == -1 else wrapvals[5*16]
+    a1 = wrapvals[5*16] if i0 == -1 else wrapvals[5*16+1]
+    if f(bl[i]) == struct.unpack('<f', struct.pack('<f', math.floor((a0*(1-fr)+a1*fr)*16+0.5)/4080))[0]:
+        blm += 1
+check('linear blend into the border: 256/256 follow the 12-bit unorm rule with the quantized border (64)', blm == 256)
 sys.exit(0 if all(ok) else 1)
