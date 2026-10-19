@@ -1,5 +1,14 @@
 # Task 1: remaining work, safe and unsafe (2026-10-17)
 
+> **Loop status 2026-10-19:** autonomous safe pass completed T1 (fence model verified, no change),
+> T2 (memory_ordering property 8/8), T3 (fix-up cost ~200ns fetch-bound, no model change), T4 (coverage report
+> 2670/2681, 0 mismatches; 20/20 properties), T6a (OOB=0, gather rule, sRGB-12bit), T6b (borders), T6c (16-bit formats),
+> T6d (LOD/grad: ceil(lod-0.5), trilinear float32-exact), T6-mapping, T7a (fp64 compares, 18 ops exact).
+> Still open (safe): 3D/array targets, texture-unit simulator model, fp64 div/sqrt/cvt/rounding, shuffle
+> membermask/64-bit/cost, stack via Mesa, 64-bit atomic decode, safe-02/03 cost-model gaps, skip-conditions analysis.
+> Blocked on owner approval: divergent call/ret + atomic-field follow-ups, all `may_fault`/hang-risk sweeps,
+> and the outward-facing bfeil upstream report.
+
 > **Update 2026-10-19:** safe-10 memory-ordering litmus is now complete: the minimal SB fence
 > set is measured ([f533+f59a for normal stores, +f596 for coherent](../novel-results/2026-10-19-sb-minimal-set/README.md),
 > `make verify-sb-minimal`) and multi-group fence contention is measured (wall cost ~group-count
