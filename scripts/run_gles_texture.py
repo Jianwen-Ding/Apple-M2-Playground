@@ -99,6 +99,23 @@ def cases():
         glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count) data[8u+i]=floatBitsToUint(texelFetch(tex, ivec2(int(i%256u),int(i/256u)), 0).r); }\n")
     out['fetch_r16ui'] = dict(fmt='r16ui', w=256, h=256, data=b''.join(struct.pack('<H', v) for v in range(65536)), count=65536, filt='nearest',
         glsl=UH+"layout(binding=0) uniform highp usampler2D tex;\nvoid main(){ uint i=gl_GlobalInvocationID.x; if(i<count) data[8u+i]=texelFetch(tex, ivec2(int(i%256u),int(i/256u)), 0).r; }\n")
+    # 13. mipmaps: 16x16 r8 L0 = pattern, L1..L4 solid (100/150/200/250); explicit LOD picks/blends
+    lod_levels = [bytes(wrapvals)]
+    for lv, (w, h, v) in enumerate([(8, 8, 100), (4, 4, 150), (2, 2, 200), (1, 1, 250)]):
+        lod_levels.append(bytes([v])*(w*h))
+    lod_data = b''.join(lod_levels)
+    lod_list = [-1.0, -0.5, 0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0]
+    out['lod_nearest'] = dict(fmt='r8', w=16, h=16, data=lod_data, count=16, filt='nearest_mipmap', levels=5, vals=wrapvals,
+        glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ float lod = float[](%s)[i]; "
+                      "data[8u+i]=floatBitsToUint(textureLod(tex, vec2(8.5/16.0, 8.5/16.0), lod).r); } }\n" % ",".join(f"{v:.2f}" for v in lod_list))
+    out['lod_linear'] = dict(fmt='r8', w=16, h=16, data=lod_data, count=16, filt='trilinear', levels=5, vals=wrapvals,
+        glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ float lod = float[](%s)[i]; "
+                      "data[8u+i]=floatBitsToUint(textureLod(tex, vec2(8.5/16.0, 8.5/16.0), lod).r); } }\n" % ",".join(f"{v:.2f}" for v in lod_list))
+    # 14. textureGrad: lod from explicit gradients (nearest pick on the solid-level texture).
+    # Gradients are in UV per pixel: k/16 with a 16-texel axis = k texels/pixel = lod log2(k).
+    out['grad_pick'] = dict(fmt='r8', w=16, h=16, data=lod_data, count=8, filt='nearest_mipmap', levels=5, vals=wrapvals,
+        glsl=HEAD+TEX+"void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ vec2 dx = vec2((1.0+float(i))/16.0, 0.0); vec2 dy = vec2(0.0, (1.0+float(i))/16.0); "
+                      "data[8u+i]=floatBitsToUint(textureGrad(tex, vec2(8.5/16.0, 8.5/16.0), dx, dy).r); } }\n")
     return out
 
 
@@ -118,6 +135,7 @@ def main():
         cache = d/'cache'; cache.mkdir()
         env = {'PATH': '/usr/bin', 'GLES_SHADER_FILE': str(d/'shader.glsl'), 'GLES_TEX_FORMAT': c['fmt'], 'GLES_TEX_W': str(c['w']), 'GLES_TEX_H': str(c['h']),
                'GLES_TEX_DATA': str(d/'tex.bin'), 'GLES_TEX_FILTER': c['filt'], 'GLES_TEX_WRAP': c.get('wrap', 'clamp'),
+               'GLES_TEX_LEVELS': str(c.get('levels', 1)),
                'MESA_SHADER_CACHE_DIR': str(cache), 'MESA_SHADER_CACHE_DISABLE': 'false'}
         if c.get('image'):
             env['GLES_TEX_IMAGE'] = '1'

@@ -236,7 +236,8 @@ int main(int argc, char **argv) {
     p_glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(control), control, GL_DYNAMIC_COPY);
     p_glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, buffers[1]);
     /* GLES_TEX_FORMAT (r8 rgba8 r8snorm rgba8snorm rgba8srgb r16f r32f rgba32f r8ui r32ui r16 r16snorm r16ui), GLES_TEX_W / GLES_TEX_H, GLES_TEX_DATA (raw file),
-     * GLES_TEX_FILTER (nearest | linear), GLES_TEX_WRAP (clamp | repeat | mirror | border), GLES_TEX_IMAGE=1 (also bind level 0 as read-write image unit 0).
+     * GLES_TEX_LEVELS (1 +): mipmap levels; the data file holds level 0 then each halved level back to back.
+     * GLES_TEX_FILTER (nearest | linear | trilinear | nearest_mipmap), GLES_TEX_WRAP (clamp | repeat | mirror | border), GLES_TEX_IMAGE=1 (also bind level 0 as read-write image unit 0).
      * GLES_TEX_BORDER="r,g,b,a" (floats, for normalized/float formats) or GLES_TEX_IBORDER="r,g,b,a" (uints, for integer
      * formats): sets GL_TEXTURE_BORDER_COLOR, only meaningful with GLES_TEX_WRAP=border.
      * The texture is bound to texture unit 0 (use `layout(binding=0)` in the shader). Used by scripts/run_gles_texture.py. */
@@ -255,7 +256,13 @@ int main(int argc, char **argv) {
         if (fi < 0) fail("tex-format");
         unsigned tw = (unsigned)atoi(getenv("GLES_TEX_W") ? getenv("GLES_TEX_W") : "16"), th = (unsigned)atoi(getenv("GLES_TEX_H") ? getenv("GLES_TEX_H") : "16");
         if (!tw || !th || tw > 4096 || th > 4096) fail("tex-size");
-        size_t bytes = (size_t)tw * th * fmts[fi].bpp;
+        unsigned levels = (unsigned)atoi(getenv("GLES_TEX_LEVELS") ? getenv("GLES_TEX_LEVELS") : "1");
+        if (!levels || levels > 13) fail("tex-levels");
+        /* Multi-level data layout: level 0 (tw x th) first, then each subsequent level halving (min 1x1),
+         * concatenated with no padding: GLES_TEX_DATA holds all levels back to back. */
+        size_t bytes = 0;
+        for (unsigned l = 0, w = tw, h = th; l < levels; l++, w = w > 1 ? w / 2 : 1, h = h > 1 ? h / 2 : 1)
+            bytes += (size_t)w * h * fmts[fi].bpp;
         void *pix = calloc(1, bytes);
         if (!pix) fail("tex-alloc");
         if (getenv("GLES_TEX_DATA")) {
@@ -263,18 +270,27 @@ int main(int argc, char **argv) {
             if (!tf) fail("tex-data-open");
             if (fread(pix, 1, bytes, tf) != bytes) fail("tex-data-read");
             fclose(tf);
-        }
+        } else if (levels > 1) fail("tex-levels-need-data");
         GLuint tex;
         p_glGenTextures(1, &tex);
         p_glActiveTexture(GL_TEXTURE0);
         p_glBindTexture(GL_TEXTURE_2D, tex);
         p_glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        p_glTexStorage2D(GL_TEXTURE_2D, 1, fmts[fi].internal, (GLsizei)tw, (GLsizei)th);
-        p_glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, (GLsizei)tw, (GLsizei)th, fmts[fi].format, fmts[fi].type, pix);
+        p_glTexStorage2D(GL_TEXTURE_2D, (GLsizei)levels, fmts[fi].internal, (GLsizei)tw, (GLsizei)th);
+        {   size_t off = 0;
+            for (unsigned l = 0, w = tw, h = th; l < levels; l++, w = w > 1 ? w / 2 : 1, h = h > 1 ? h / 2 : 1) {
+                size_t lb = (size_t)w * h * fmts[fi].bpp;
+                p_glTexSubImage2D(GL_TEXTURE_2D, (GLint)l, 0, 0, (GLsizei)w, (GLsizei)h, fmts[fi].format, fmts[fi].type, (char *)pix + off);
+                off += lb;
+            }
+            if (off != bytes) fail("tex-data-size"); }
         const char *flt = getenv("GLES_TEX_FILTER"), *wrp = getenv("GLES_TEX_WRAP");
         GLint f = (flt && !strcmp(flt, "linear")) ? GL_LINEAR : GL_NEAREST;
         GLint wr = (wrp && !strcmp(wrp, "repeat")) ? GL_REPEAT : (wrp && !strcmp(wrp, "mirror")) ? GL_MIRRORED_REPEAT : (wrp && !strcmp(wrp, "border")) ? GL_CLAMP_TO_BORDER : GL_CLAMP_TO_EDGE;
-        p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, f); p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, f);
+        GLint fmin = (flt && !strcmp(flt, "trilinear")) ? GL_LINEAR_MIPMAP_LINEAR :
+            (flt && !strcmp(flt, "nearest_mipmap")) ? GL_NEAREST_MIPMAP_NEAREST : f;
+        GLint fmag = (flt && !strcmp(flt, "trilinear")) ? GL_LINEAR : f;
+        p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, fmin); p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, fmag);
         p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wr); p_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wr);
         if (getenv("GLES_TEX_BORDER")) {
             float bc[4] = {0, 0, 0, 0};

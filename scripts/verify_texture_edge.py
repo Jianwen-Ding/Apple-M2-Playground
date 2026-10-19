@@ -14,7 +14,7 @@ def check(name, cond):
     ok.append(bool(cond)); print('PASS' if cond else 'FAIL', name)
 
 
-check('all 24 cases ran with intact guard words', len(rec) == 24 and all(r['run_ok'] and r.get('guards_intact', True) for r in rec.values()))
+check('all 27 cases ran with intact guard words', len(rec) == 27 and all(r['run_ok'] and r.get('guards_intact', True) for r in rec.values()))
 
 # RNG must replay the case generator exactly (bilinear 256 + wrap 256 + r32ui 256 + f32 248 draws first)
 rng = random.Random(7)
@@ -107,4 +107,26 @@ check('r16 snorm: all 65,536 values equal float32(max(s/32767, -1)) (-32768 and 
       all(osn[v] == struct.unpack('<I', struct.pack('<f', max(((v-65536 if v >= 32768 else v)/32767.0), -1.0)))[0] for v in range(65536)))
 oui = rec['fetch_r16ui']['out']
 check('r16ui: all 65,536 values exact', all(oui[v] == v for v in range(65536)))
+
+# mipmaps: 16x16 L0 = pattern, L1..L4 solid; level = ceil(lod - 0.5) clamped to [0, 4]
+lods = [-1.0, -0.5, 0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0]
+L0 = wrapvals[8*16+8]/255.0
+LV = {0: L0, 1: 100/255.0, 2: 150/255.0, 3: 200/255.0, 4: 250/255.0}
+def _level(lod):
+    return min(max(math.ceil(lod - 0.5), 0), 4)
+ln = rec['lod_nearest']['out']
+check('textureLod nearest: level = ceil(lod - 0.5) clamped (ties go to the lower level), 16/16',
+      all(struct.unpack('<f', struct.pack('<I', ln[i]))[0] == struct.unpack('<f', struct.pack('<f', LV[_level(l)]))[0] for i, l in enumerate(lods)))
+ll = rec['lod_linear']['out']
+tl = 0
+for i, l in enumerate(lods):
+    lo = 0 if l < 0 else min(math.floor(l), 4)
+    fr = 0.0 if (l < 0 or lo >= 4) else l - math.floor(l)
+    if ll[i] == struct.unpack('<I', struct.pack('<f', LV[lo]*(1-fr)+LV[min(lo+1, 4)]*fr))[0]:
+        tl += 1
+check('textureLod trilinear: float32-exact blend of adjacent levels by fractional lod, 16/16', tl == 16)
+gr = rec['grad_pick']['out']
+check('textureGrad: rho = max texel-gradient, lod = log2(rho), same level rule (k=1..8 -> L0,L1,L2,L2,L2,L3,L3,L3)',
+      [struct.unpack('<f', struct.pack('<I', gr[i]))[0] for i in range(8)] ==
+      [struct.unpack('<f', struct.pack('<f', LV[{1: 0, 2: 1, 3: 2, 4: 2, 5: 2, 6: 3, 7: 3, 8: 3}[i+1]]))[0] for i in range(8)])
 sys.exit(0 if all(ok) else 1)

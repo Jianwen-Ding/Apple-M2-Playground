@@ -56,6 +56,25 @@ the OOB-returns-0 rule instead of the border. Integer borders need a normalized 
 
 The encoding is the same `texture_load ... auto_lod, 0` form as the 8/32-bit fetches.
 
+## Mipmaps: explicit LOD, trilinear blend, and gradients
+
+`tests/gles_compute.c` takes `GLES_TEX_LEVELS` (data file holds level 0 then each halved level)
+and `GLES_TEX_FILTER=trilinear` (`LINEAR_MIPMAP_LINEAR`/`LINEAR`) / `nearest_mipmap`
+(`NEAREST_MIPMAP_NEAREST`/`NEAREST`). 16x16 r8 with L0 = pattern, L1..L4 solid
+(100/150/200/250). `textureLod` compiles to `texture_sample ... lod_min, ...`; `textureGrad`
+to `texture_sample ... lod_grad, r4_r5_r6_r7`.
+
+| Question | Result | Cases |
+|---|---|---|
+| `textureLod` with `NEAREST_MIPMAP_NEAREST`, lod in -1..6 at the texture centre | level = **ceil(lod - 0.5) clamped to [0, 4]**: exact ties (x.5) go to the **lower** level; negative lods clamp to 0, lod > 4 clamps to 4 | 16/16 |
+| `textureLod` with `LINEAR_MIPMAP_LINEAR` (trilinear) | **float32-exact** linear blend of the adjacent levels by the fractional lod: `L_lo*(1-fr) + L_hi*fr`, no 12-bit rounding on the level blend (unlike the within-level bilinear) | 16/16 |
+| `textureGrad` with dPdx=(k/16,0), dPdy=(0,k/16), k=1..8 | rho = max texel-gradient, lod = log2(rho), same nearest-level rule (k=1..8 -> L0,L1,L2,L2,L2,L3,L3,L3) | 8/8 |
+
+Note the harness trap this closed: with a non-mipmap `MIN_FILTER` (`nearest`/`linear`), an
+explicit `textureLod` ignores the lod and always samples level 0 — the level-selection cases
+need `nearest_mipmap`/`trilinear`. (Also: `texelFetch` ignores wrap modes entirely, and
+`textureGrad` derivatives are UV-per-pixel, so k texels need k/16 on a 16-texel axis.)
+
 ## Not established by this run (safe-05 remainder)
 
 Border wrap on the remaining formats (snorm/sRGB/integer-linear), 1D/3D/array targets (needs
