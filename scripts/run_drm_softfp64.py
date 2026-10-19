@@ -23,6 +23,7 @@ EDGE = [0.0, -0.0, 5e-324, -5e-324, 1e-310, -1e-310, 2.2250738585072009e-308, 2.
 EDGE = [float(x) for x in EDGE]      # some entries are written as ints: the host reference must round in binary64 at every step
 assert len(EDGE) == 48, len(EDGE)
 OPS = {'mul': (2, S.fmul64), 'add': (2, S.fadd64), 'fma': (3, S.ffma64)}
+OPS.update(('c_'+n, (2, getattr(S, 'fcmp_'+n))) for n in S.FCMP_OPS)
 # baselines for the cost comparison (no IEEE check): 'null' returns the first operand, 'f32fma' is one native fmadd32
 RAW = {'null': (3, []), 'f32fma': (3, ['fmadd32 r20, r8, r10, r12'])}
 

@@ -558,3 +558,11 @@ GPU hang: all 27 follow-up variants completed, and all controls passed.
 * Two inverted `icmpsel` select-operand orders (`neu`/`num` computed the non-negated relation)
   were likewise caught by the 1-repeat small-first hardware run (1600/2304 and 2304/2304
   mismatches) and fixed before the 3-repeat evidence run. Small-first works.
+
+### Inverted NaN-gate selects in softfp64 min/max, 2026-10-19
+
+`P.sel('ugt', nb, 0, hi, a[0])` reads "if nb then hi else a[0]" — the wrong way round for a
+keep-unless-NaN gate (it must be `sel(..., a[0], hi)`). With nb = 0 in the common case the result
+was overwritten with a's bits, then the na gate overwrote it with b's: min and max always
+returned b. The DSL's own Python interpreter (`Prog.run`) on three operand pairs catches this
+before the simulator or hardware runs; use it first for every new builder.

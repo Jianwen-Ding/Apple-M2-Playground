@@ -438,6 +438,206 @@ def ffma64(P, a, b, c):
     return rhi, rlo
 
 
+F64_ONE_HI = 0x3ff00000
+F32_ONE = 0x3f800000
+
+
+def f64key(P, hi, lo, zero_fix=True):
+    """Monotonic u64 order key for a double (hi, lo words): if sign set, key = ~bits, else key = bits ^ 0x8000...0.
+    With zero_fix, +-0 both map to 0x8000000000000000 (for setp); without it -0 < +0 (for min/max)."""
+    sx = P.lsr(hi, 31)
+    neg = P.flag('ugt', sx, 0)
+    mh = P.sel('ugt', neg, 0, M32, 0)
+    kh = P.sel('ugt', neg, 0, P.xor(hi, M32), P.xor(hi, S32))
+    kl = P.sel('ugt', neg, 0, P.xor(lo, M32), lo)
+    if zero_fix:
+        mzero = P.flag('ueq', P.or_(P.and_(hi, 0x7fffffff), lo), 0)
+        kh = P.sel('ugt', mzero, 0, S32, kh)
+        kl = P.sel('ugt', mzero, 0, 0, kl)
+    return kh, kl
+
+
+def f64nan(P, hi, lo):
+    ex = P.and_(P.lsr(hi, 20), 0x7ff)
+    exp_max = P.flag('ueq', ex, 0x7ff)
+    mant_nz = P.flag('ugt', P.or_(P.and_(hi, 0xfffff), lo), 0)
+    return P.and_(exp_max, mant_nz)
+
+
+def ult64(P, ahi, alo, bhi, blo):
+    return P.or_(P.flag('ult', ahi, bhi), P.and_(P.flag('ueq', ahi, bhi), P.flag('ult', alo, blo)))
+
+
+def ueq64(P, ahi, alo, bhi, blo):
+    return P.and_(P.flag('ueq', ahi, bhi), P.flag('ueq', alo, blo))
+
+
+def _cmp_operands(P, a, b):
+    ka = f64key(P, a[0], a[1])
+    kb = f64key(P, b[0], b[1])
+    na = f64nan(P, a[0], a[1]); nb = f64nan(P, b[0], b[1])
+    return ka, kb, P.or_(na, nb)
+
+
+def _pred(P, v):
+    return P.sel('ugt', v, 0, F64_ONE_HI, 0), P.sel('ugt', v, 0, 0, 0)
+
+
+def fcmp_eq(P, a, b):
+    ka, kb, nan = _cmp_operands(P, a, b)
+    return _pred(P, P.and_(ueq64(P, ka[0], ka[1], kb[0], kb[1]), P.sub(1, nan)))
+
+
+def fcmp_lt(P, a, b):
+    ka, kb, nan = _cmp_operands(P, a, b)
+    return _pred(P, P.and_(ult64(P, ka[0], ka[1], kb[0], kb[1]), P.sub(1, nan)))
+
+
+def fcmp_gt(P, a, b):
+    return fcmp_lt(P, b, a)
+
+
+def fcmp_le(P, a, b):
+    ka, kb, nan = _cmp_operands(P, a, b)
+    raw = P.or_(ult64(P, ka[0], ka[1], kb[0], kb[1]), ueq64(P, ka[0], ka[1], kb[0], kb[1]))
+    return _pred(P, P.and_(raw, P.sub(1, nan)))
+
+
+def fcmp_ge(P, a, b):
+    return fcmp_le(P, b, a)
+
+
+def fcmp_neu(P, a, b):
+    ka, kb, nan = _cmp_operands(P, a, b)
+    return _pred(P, P.or_(P.sub(1, ueq64(P, ka[0], ka[1], kb[0], kb[1])), nan))
+
+
+def fcmp_equ(P, a, b):
+    ka, kb, nan = _cmp_operands(P, a, b)
+    return _pred(P, P.or_(ueq64(P, ka[0], ka[1], kb[0], kb[1]), nan))
+
+
+def fcmp_ltu(P, a, b):
+    ka, kb, nan = _cmp_operands(P, a, b)
+    return _pred(P, P.or_(ult64(P, ka[0], ka[1], kb[0], kb[1]), nan))
+
+
+def fcmp_leu(P, a, b):
+    ka, kb, nan = _cmp_operands(P, a, b)
+    raw = P.or_(ult64(P, ka[0], ka[1], kb[0], kb[1]), ueq64(P, ka[0], ka[1], kb[0], kb[1]))
+    return _pred(P, P.or_(raw, nan))
+
+
+def fcmp_gtu(P, a, b):
+    return fcmp_ltu(P, b, a)
+
+
+def fcmp_geu(P, a, b):
+    return fcmp_leu(P, b, a)
+
+
+def fcmp_num(P, a, b):
+    na = f64nan(P, a[0], a[1]); nb = f64nan(P, b[0], b[1])
+    return _pred(P, P.sub(1, P.or_(na, nb)))
+
+
+def fcmp_nan(P, a, b):
+    na = f64nan(P, a[0], a[1]); nb = f64nan(P, b[0], b[1])
+    return _pred(P, P.or_(na, nb))
+
+
+def _fminmax_pick(P, a, b, is_min):
+    ka = f64key(P, a[0], a[1], zero_fix=False)
+    kb = f64key(P, b[0], b[1], zero_fix=False)
+    na = f64nan(P, a[0], a[1]); nb = f64nan(P, b[0], b[1])
+    take_a = ult64(P, ka[0], ka[1], kb[0], kb[1]) if is_min else ult64(P, kb[0], kb[1], ka[0], ka[1])
+    take_a = P.or_(take_a, ueq64(P, ka[0], ka[1], kb[0], kb[1]))
+    hi = P.sel('ugt', take_a, 0, a[0], b[0])
+    lo = P.sel('ugt', take_a, 0, a[1], b[1])
+    # a NaN operand loses (both NaN: keep a's bits, accepted as NaN by the checker)
+    hi = P.sel('ugt', nb, 0, a[0], hi)
+    lo = P.sel('ugt', nb, 0, a[1], lo)
+    hi = P.sel('ugt', na, 0, b[0], hi)
+    lo = P.sel('ugt', na, 0, b[1], lo)
+    return hi, lo
+
+
+def fcmp_min(P, a, b):
+    return _fminmax_pick(P, a, b, True)
+
+
+def fcmp_max(P, a, b):
+    return _fminmax_pick(P, a, b, False)
+
+
+def _fcmp_setf(P, a, b, rel):
+    ka, kb, nan = _cmp_operands(P, a, b)
+    if rel == 'lt':
+        raw = ult64(P, ka[0], ka[1], kb[0], kb[1])
+    elif rel == 'gt':
+        raw = ult64(P, kb[0], kb[1], ka[0], ka[1])
+    elif rel == 'eq':
+        raw = ueq64(P, ka[0], ka[1], kb[0], kb[1])
+    elif rel == 'le':
+        raw = P.or_(ult64(P, ka[0], ka[1], kb[0], kb[1]), ueq64(P, ka[0], ka[1], kb[0], kb[1]))
+    else:
+        raw = P.or_(ult64(P, kb[0], kb[1], ka[0], ka[1]), ueq64(P, ka[0], ka[1], kb[0], kb[1]))
+    v = P.and_(raw, P.sub(1, nan))
+    return P.sel('ugt', v, 0, F32_ONE, 0), P.sel('ugt', v, 0, 0, 0)
+
+
+def fcmp_set_lt_f(P, a, b):
+    return _fcmp_setf(P, a, b, 'lt')
+
+
+def fcmp_set_gt_f(P, a, b):
+    return _fcmp_setf(P, a, b, 'gt')
+
+
+def fcmp_set_eq_f(P, a, b):
+    return _fcmp_setf(P, a, b, 'eq')
+
+
+FCMP_OPS = ['eq', 'lt', 'gt', 'le', 'ge', 'min', 'max', 'neu', 'equ', 'ltu', 'leu', 'gtu', 'geu', 'num', 'nan',
+            'set_lt_f', 'set_gt_f', 'set_eq_f']
+
+
+def _ref_cmp(name, x, y):
+    import math
+    na, nb = math.isnan(x), math.isnan(y)
+    if name in ('min', 'max'):
+        if na and nb:
+            return math.nan
+        if na:
+            return y
+        if nb:
+            return x
+        if x == y:
+            if x != 0:
+                return x
+            nx, ny = math.copysign(1.0, x) < 0, math.copysign(1.0, y) < 0
+            if name == 'min':
+                return -0.0 if (nx or ny) else 0.0
+            return -0.0 if (nx and ny) else 0.0
+        return x if (x < y) == (name == 'min') else y
+    if name in ('set_lt_f', 'set_gt_f', 'set_eq_f'):
+        if na or nb:
+            return 0.0
+        r = {'set_lt_f': x < y, 'set_gt_f': x > y, 'set_eq_f': x == y}[name]
+        # the program writes the *float32* bits 0x3f800000 / 0 into the hi word (lo = 0); return the
+        # double with exactly those bits so the generic word check applies
+        import struct
+        return struct.unpack('<d', struct.pack('<Q', 0x3f80000000000000 if r else 0))[0]
+    if name == 'num':
+        return 1.0 if not (na or nb) else 0.0
+    if name == 'nan':
+        return 1.0 if (na or nb) else 0.0
+    if na or nb:
+        return 1.0 if name in ('neu', 'equ', 'ltu', 'leu', 'gtu', 'geu') else 0.0
+    return 1.0 if {'eq': x == y, 'lt': x < y, 'gt': x > y, 'le': x <= y, 'ge': x >= y,
+                   'neu': x != y, 'equ': x == y, 'ltu': x < y, 'leu': x <= y, 'gtu': x > y, 'geu': x >= y}[name] else 0.0
+
+
 def split(x):
     import struct
     b = struct.unpack('<Q', struct.pack('<d', x))[0]
@@ -540,13 +740,16 @@ if __name__ == '__main__':
 
 def ref(op, *xs):
     """Host reference with IEEE binary64 semantics: mul / add use the host's doubles; fma is exact (Fractions) with a single
-    round to nearest even. A NaN result is returned as nan (matches any NaN)."""
+    round to nearest even. A NaN result is returned as nan (matches any NaN). Compare ops return 1.0 / 0.0 (predicates and
+    set.f32 forms) or the winning operand (min / max, NaN-tolerant like PTX)."""
     import math
     from fractions import Fraction
     if op == 'mul':
         return xs[0]*xs[1]
     if op == 'add':
         return xs[0]+xs[1]
+    if op in ('c_'+n for n in FCMP_OPS):
+        return _ref_cmp(op[2:], *xs)
     x, y, z = xs
     if any(math.isnan(v) for v in (x, y, z)):
         return math.nan

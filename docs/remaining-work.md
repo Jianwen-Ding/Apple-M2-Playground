@@ -57,7 +57,7 @@ budget, and ideally a reboot afterwards.
 
 ### Gaps not yet covered by any task (safe to start)
 
-- **fp64** (done 2026-10-18: [bit-exact software add / mul / fma, with costs](../novel-results/2026-10-18-fp64/README.md); open: div, sqrt, cvt, compares, other rounding modes). Original gap: AGX has no fp64 unit, and no finding documents that or measures it. CUDA `double` needs software
+- **fp64** (done 2026-10-18: [bit-exact software add / mul / fma, with costs](../novel-results/2026-10-18-fp64/README.md); done 2026-10-19: [all 18 setp / min / max / .u / set forms](../novel-results/2026-10-19-fp64-cmp/README.md) (`make verify-fcmp64`); open: div, sqrt, cvt, other rounding modes). Original gap: AGX has no fp64 unit, and no finding documents that or measures it. CUDA `double` needs software
   emulation from recorded int64 and fp32 forms. Measure the cost of a double-precision add/mul/fma sequence built only
   from safe forms, and check it bit-exact against IEEE on edge cases.
 - **64-bit atomics** (done 2026-10-18: [Honeykrisp exposes none; emulated add measured, final exact, returned value torn across the carry](../novel-results/2026-10-18-atom64/README.md); open: lock-based CAS / exchange, which needs a spin loop and the owner's approval) (`atom.add.u64`, `atom.cas.b64`, `atom.exch.b64`). No validated encoding is known. Device and
