@@ -94,6 +94,8 @@ after about 44 recoveries in one boot.
 
 ### Needed for CUDA (worth the risk, with care)
 
+> **Update 2026-10-19 (owner-approved unsafe loop, continued):** second item done — all 10 pairs of the inert device-atomic gap bits (26/28/42/43/44) change nothing ([finding](../novel-results/2026-10-19-atomic-pairs/README.md), `make verify-atomic-pairs`): 30 dispatches, 0 faults, budget 0/30, every recovery exact. The u-field is padding singly and pairwise. Not run: triples, pairs with bit 29/31, threadgroup-atomic bit combinations.
+
 > **Update 2026-10-19 (owner-approved unsafe loop):** first item done — cross-group effect of the ending opcodes measured: [op 11 ends the whole workgroup](../novel-results/2026-10-19-tg-end-scope/README.md) (v1 128 lanes + v2 1024 lanes with explicit group-1 re-assertion; `make verify-tg-end-scope`). No fault, budget 0/30, recovery exact. Unsafe submissions pause here for the turn; next candidates: remaining atomic-field combinations, scratch helper, 251 non-Mesa barriers (not needed: safe-10 sufficed), convert/funop/sub-op sweeps, load/store format combos.
 
 | Work | Pending cases | Risk | CUDA need |

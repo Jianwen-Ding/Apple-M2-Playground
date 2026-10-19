@@ -82,17 +82,22 @@ def case(name):
     if name.startswith('atomic-gap'):
         import probe_atomics as A
         spec = name.removeprefix('atomic-gap').split('-op')
-        bit, op = int(spec[0]), int(spec[1]) if len(spec) == 2 else 0
-        assert bit in (26, 28, 29, 31, 42, 43, 44)
-        assert op in (0, 2, 3) and (op == 0 or bit == 29)
+        op = int(spec[1]) if len(spec) == 2 else 0
+        bits = tuple(int(b) for b in spec[0].split('+'))
+        assert all(b in (26, 28, 29, 31, 42, 43, 44) for b in bits) and len(bits) in (1, 2)
+        assert op in (0, 2, 3) and (op == 0 or bits == (29,))
+        bit = bits[0]
         table = A.table_b('atomic-gap-controls')
         if op == 3:
             for i in range(0, 32, 3):
                 table[A.S_WORD + 2*i + 1] = table[i]
         pre, suf = A.common(1)
         sur = A.atomic_bytes(op, 1)
-        var = (int.from_bytes(sur, 'little') ^ (1 << bit)).to_bytes(8, 'little')
-        assert (int.from_bytes(var, 'little') ^ int.from_bytes(sur, 'little')) == 1 << bit
+        flip = 0
+        for b in bits:
+            flip |= 1 << b
+        var = (int.from_bytes(sur, 'little') ^ flip).to_bytes(8, 'little')
+        assert (int.from_bytes(var, 'little') ^ int.from_bytes(sur, 'little')) == flip
         control, code = (P.drm.build_main(pre + op + suf) for op in (sur, var))
         tab = table.copy()
         for i in range(32):
@@ -105,8 +110,9 @@ def case(name):
         P.cov.gate(pre + sur + suf)
         assert P.cov.simulate(control, 32, 32, 64, 0, table) == (out, tab)
         return dict(code=code, control=control, table=table, n=32, wg=32, regs=64,
-                    expected=(out, tab), data_dir=ROOT/'results/2026-10-17-atomic-gap-bits',
-                    gate={('baseline_add_matches_independent_oracle' if op == 0 else 'baseline_matches_independent_oracle'): True, 'changed_bit': bit,
+                    expected=(out, tab), data_dir=(ROOT/'results/2026-10-19-atomic-pairs' if len(bits) == 2
+                                                         else ROOT/'results/2026-10-17-atomic-gap-bits'),
+                    gate={('baseline_add_matches_independent_oracle' if op == 0 else 'baseline_matches_independent_oracle'): True, 'changed_bits': bits,
                           'baseline_instruction': sur.hex(), 'variant_instruction': var.hex(),
                           'variant_decode': P.cov.ASMB.info(var), 'limitation': 'unmeasured control bit; surrogate gate only'})
     if name in ('call-ret-pop2', 'callreg-ret-pop2', 'call-nested-pop2'):

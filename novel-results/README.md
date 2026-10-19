@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-19 Device atomic gap bits inert in all 10 pairs: u-field is padding (owner-approved unsafe, 0 faults)](2026-10-19-atomic-pairs/README.md)
 - [2026-10-19 Mesa fuse_ubfe unsound for variable shifts (verdict A, hardware-decided; NOT reported upstream per owner instruction)](2026-10-19-bfeil-verdict/README.md)
 - [2026-10-19 Threadgroup ending opcode 11 ends the whole workgroup: cross-group litmus all-sentinel, explicit re-assertion absent, no fault, recovery exact (owner-approved unsafe)](2026-10-19-tg-end-scope/README.md)
 - [2026-10-19 fp64 compares bit-exact: all 18 setp/min/max/.u/set forms, 5,312 lanes x 3 runs, 0 differ](2026-10-19-fp64-cmp/README.md)
