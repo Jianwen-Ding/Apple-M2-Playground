@@ -80,7 +80,7 @@ icmpsel ult, r14, r20, r21, r22, r14  icmpsel ult, r14, r20, r21, r22, r14
 
 | PTX | Status on AGX |
 |---|---|
-| `add` / `sub` / `mul` / `fma` `.rn.f32` | **not exact** for denormal operands or results (DAZ, and flush before rounding; `2026-10-11-float-semantics`). The `.ftz` forms map directly, except at the min-normal rounding boundary. Exact non-`.ftz` needs a software path (scaling) |
+| `add` / `sub` / `mul` / `fma` `.rn.f32` | **not exact** for denormal operands or results (DAZ, and flush before rounding; `2026-10-11-float-semantics`). The `.ftz` forms map directly, except at the min-normal rounding boundary. Exact non-`.ftz` needs a software path: built and verified 2026-10-20 ([fp32-ieee](../2026-10-20-fp32-ieee/README.md)) |
 | `cvt.rmi` / `rpi`, `cvt.rmi.f32.f32` etc. | `floor` / `ceil` + the fix-up above (3 ALU + 2 moves) |
 | `cvt.rni` / `rzi` (int or float result) | direct |
 | `setp.*.f32`, `selp` on compares | DAZ compares. Non-`.ftz` needs a fix-up when an operand is denormal (e.g. compare as sign-magnitude integers). **Not yet verified** |

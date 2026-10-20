@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-20 Exact IEEE fp32: non-ftz add/mul/fma and .rz/.rm/.rp bit-exact on hardware (soft fma + hybrid native path); hybrid costs ~15x native on normal data, ~240x when a group hits a subnormal](2026-10-20-fp32-ieee/README.md)
 - [2026-10-20 shfl cost: native shuffle ~2x iadd, generic lowering ~18x native; warp-uniform runtime offsets lower to `and` + native op, exact](2026-10-20-shfl-cost/README.md)
 - [2026-10-20 Texture targets and filter precision: 3D/array/cube/buffer measured; weights round to 1/256, LOD is fp16 with a 1/64 level weight, trilinear rounds once (corrects 2026-10-19)](2026-10-20-texture-targets/README.md)
 
