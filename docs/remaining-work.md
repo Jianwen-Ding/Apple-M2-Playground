@@ -1,7 +1,7 @@
 # Task 1: remaining work, safe and unsafe (2026-10-17)
 
 > **Instruction cache 2026-10-20:** [12 KiB per core, 64-byte lines, 1.19x cost for 8-byte-boundary crossings, per-core sharing](../novel-results/2026-10-20-icache/README.md)
-> (`make verify-icache`). Open: replacement policy/associativity, miss latency, prefetch, the two-group anomaly, cost-model fetch term.
+> (`make verify-icache`). 32-entry per-core taken-jump structure measured. Open: replacement policies, miss latency, prefetch, the two-group anomaly, jumps vs targets, cost-model fetch/jump terms.
 
 > **fp32 IEEE update 2026-10-20:** [exact non-`.ftz` add/mul/fma and `.rz/.rm/.rp` fp32](../novel-results/2026-10-20-fp32-ieee/README.md)
 > (`make verify-fp32-ieee`): a soft fma (all modes) and a hybrid native+check path are bit-exact on 21,024 edge/random lanes; the hybrid costs ~15x

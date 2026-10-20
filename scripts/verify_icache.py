@@ -88,5 +88,22 @@ agg = {L//32: (L//32)/st.median(occ[L].values()) for L in (128, 256, 512)}
 print('  aggregate instructions per ns per core:', {k: round(v, 2) for k, v in agg.items()})
 check('issue saturates at 4+ groups per core: aggregate 4.6-5.4 instructions/ns per core (3.3-3.8 per cycle at 1,398 MHz)',
       all(4.5 <= v <= 5.5 for v in agg.values()))
+
+# taken-jump target structure (scripts/probe_icache_assoc.py): loops of n blocks joined by taken jmp_exec_any
+J = lambda k: {x['blocks']: x['ns_per_block'] for x in rec['jump/'+k]['rows']}
+l1 = {**J('s64'), **J('l1-s64-many')}
+check('1-line blocks: a taken jump costs ~39 cycles (33 ns per block) for up to 32 blocks at every stride from 64 B to 16 KB (no set aliasing seen)',
+      all(abs(J(f's{S}')[24]-J('s64')[24]) < 0.5 for S in (1024, 2048, 4096, 8192, 12288, 16384)) and max(v for b, v in l1.items() if b <= 32) < 36)
+check('a 32-entry jump-target structure: 33+ taken jumps per loop iteration cost more per jump (34: 50 ns, 96: 124 ns per block = +127 cycles)',
+      l1[34] > 45 and l1[96] > 110 and l1[32] < 36)
+l2 = {b: v/((64*2-8)//8) for b, v in J('l2-s128-fine').items()}
+check('2-line blocks: in cache through 32 jumps (64 lines), slower from 33 (2.79 -> 3.37 ns per iadd): the limit counts jumps, not lines',
+      l2[32] < 2.9 and l2[33] > 3.2 and all(l2[n] > l2[33] for n in range(34, 49)))
+l4 = {S: {x['blocks']: x['ns_per_block']/((64*4-8)//8) for x in rec[f'jump/l4-s{S}']['rows']} for S in (256, 4096, 8192, 16384)}
+check('4-line blocks at strides 256 B .. 16 KB behave identically (32 blocks fit; 48 blocks = 192 lines miss): no aliasing -> highly associative or hashed index',
+      all(abs(l4[S][32]-l4[256][32]) < 0.1 and l4[S][48] > 3 for S in l4))
+du, s2 = J('dual'), J('same2')
+check('the jump-target structure is shared per core: two groups with different chains slow from 17 jumps each (16+16 = 32 fit), the same chain shared from 33',
+      du[16] < 36 and du[17] > 45 and s2[32] < 36 and s2[34] > 45)
 print(f'{sum(ok)}/{len(ok)} icache checks passed')
 sys.exit(0 if all(ok) else 1)

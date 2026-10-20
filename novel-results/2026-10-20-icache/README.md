@@ -1,4 +1,4 @@
-# Instruction cache: 12 KiB per core, 64-byte lines, ~19% capacity lost for instructions that cross 8-byte boundaries
+# Instruction cache: 12 KiB per core, 64-byte lines, ~19% capacity lost for instructions that cross 8-byte boundaries; a 32-entry per-core taken-jump structure
 
 Status: one device (driver-reported M2 Max G14C B1), direct DRM. Straight-line `iadd` / `and` / `mov_imm` bodies in Mesa's
 counted-loop shape, gated in the applegpu emulator and the Rust simulator, with every hardware output oracle-checked.
@@ -32,6 +32,20 @@ alternated between 0.75 and 2.85 ns. A single group never shows it. With 4 or mo
 core's issue limit takes over (4.6-5.4 instructions/ns per core, 3.3-3.8 per cycle). One possible explanation, not
 established, is a phase-dependent conflict in fetch arbitration.
 
+### Taken-jump target structure: 32 entries per core
+
+A loop of n blocks joined by taken `jmp_exec_any` (`scripts/probe_icache_assoc.py`):
+
+| Question | Result |
+|---|---|
+| Cost of a taken jump within capacity | ~33 ns per 1-line block of 7 `iadd`s, about **39 cycles** per jump for a lone group (matching the loop-trip cost), at every block stride from 64 B to 16 KB |
+| **Capacity** | **32 taken jumps per loop iteration**: 33+ cost more per jump, gradually (34: 50 ns, 48: 96 ns, 96: 124 ns per block, about +127 cycles). With 2-line blocks the limit is the same 32 jumps although only 64 lines are in use, so it counts jumps, not lines |
+| **Sharing** | **per core**: two SIMD groups running different jump chains slow from 17 jumps each (16 + 16 = 32 fit); a shared chain still fits 32 |
+| Cache associativity | no set aliasing: 4-line blocks at strides of 256 B, 4, 8 and 16 KB behave identically (32 blocks fit, 48 blocks = 192 lines miss). A plainly indexed cache would put 32 blocks into the same few sets, so the cache is highly associative or uses a hashed index |
+
+Compiler implication: keep the taken branches of a hot loop, across all code resident on a core, at **≤ 32**. Fully unrolled
+branchy code (unrolled `switch` dispatch, many guards) pays up to about 166 cycles per taken jump beyond that.
+
 ## Compiler implications
 
 - Keep hot loops under about **10 KB** (161 lines × 64 B: the worst-case alignment); 12 KiB is the best case.
@@ -43,11 +57,11 @@ established, is a phase-dependent conflict in fetch arbitration.
 
 ## Not established
 
-The mechanism behind the 1.19× crossing cost (perhaps per-chunk pre-decode storage), the replacement policy and
-associativity, miss latency, whether prefetch is sequential, and the cause of the two-group anomaly.
+The mechanism behind the 1.19× crossing cost (perhaps per-chunk pre-decode storage), the replacement policies,
+the jump structure's exact role (target buffer or fetch redirect), whether it counts jumps or targets, miss latency, whether prefetch is sequential, and the cause of the two-group anomaly.
 
 ## Reproduce
 
 `python3 -B scripts/probe_icache.py [--sizes ...] [--pad P] [--kind iadd8|and6|mov4] [--shift-at F] [--groups G --local L] [--dual]`
-(do not run `clock_keeper.py` at the same time). Offline: `make verify-icache` (12 checks against
+(do not run `clock_keeper.py` at the same time). Offline: `make verify-icache` (17 checks against
 [results/2026-10-20-icache](../../results/2026-10-20-icache)).
