@@ -192,3 +192,9 @@ selection/entry. `probe_call_link_scope.py` has the same options and changes
 only the post-pop snapshot to r1. Both record actual simulator limits separately
 from exact filtered uniform-call and jump surrogates. `make verify-call-winner`
 checks all 74 records, including the supported-model link-scope counterexample.
+
+`probe_sparse_control.py --kind ret|call --first K --winner A|B --seed S`
+changes only participation input bits while re-gating every surrogate with the
+exact scattered table; `--hardware` adds bracketed submission and diagnostics.
+`make verify-sparse-control` checks 248 retained variants and all inactive-hole
+membership/link results independently without a GPU.

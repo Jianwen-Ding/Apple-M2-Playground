@@ -632,6 +632,10 @@ verify-ret-winner:
 verify-call-winner:
 	$(PYTHON) -B scripts/verify_call_winner.py
 
+.PHONY: verify-sparse-control
+verify-sparse-control:
+	$(PYTHON) -B scripts/verify_sparse_control.py
+
 verify-occupancy2:
 	$(PYTHON) -B scripts/verify_occupancy2.py
 

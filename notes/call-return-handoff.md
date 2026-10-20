@@ -28,6 +28,13 @@ entry-only inference and exposes a supported-model link-write bug. 74 variants /
 222 dispatches, no faults; `make verify-call-winner`. Scattered masks and
 simulator extensions remain open.
 
+The [scattered-mask matrix](../novel-results/2026-10-20-sparse-control/README.md)
+extends both rules through inactive holes for every first-active position 1..31,
+both address assignments and two seeded masks: 248 variants / 744 dispatches,
+zero faults. Return pop-1 membership follows all inactive holes, while call r1
+writes follow the original active bitmap. `make verify-sparse-control` checks
+the exact sparse-table gates and readbacks. Simulator integration is next.
+
 ## Established scope and files
 
 Measured with one full 32-lane SIMD group on M2 Max G14C:
