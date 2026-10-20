@@ -64,3 +64,9 @@ to test core/cluster assignment and the observed cluster-count multiples.
 Actual operating frequency and the remaining throughput gap remain open.
 
 [Evidence, CPU corruption checks and offline verification](../../results/2026-10-20-integer-core-distribution/README.md).
+
+The [geometry follow-up](../2026-10-20-integer-geometry-cost/README.md) finds
+aligned eight-workgroup cluster blocks across 32/64/128/256-lane workgroups,
+including partial final blocks on neighboring grids. It also retains a 2.23x
+timing-state variation in one cell; the host delay is not a general timing
+stability guarantee.

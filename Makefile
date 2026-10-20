@@ -860,3 +860,10 @@ verify-integer-core-distribution:
 
 test-integer-core-distribution:
 	$(PYTHON) -B scripts/test_integer_core_distribution.py
+
+.PHONY: verify-integer-geometry-cost test-integer-geometry-cost
+verify-integer-geometry-cost:
+	$(PYTHON) -B scripts/verify_integer_geometry_cost.py
+
+test-integer-geometry-cost:
+	$(PYTHON) -B scripts/test_integer_geometry_cost.py

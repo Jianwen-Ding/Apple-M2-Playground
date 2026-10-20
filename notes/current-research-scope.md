@@ -13,15 +13,16 @@ Retain watchdog/kernel/memory diagnostics and exact recovery controls. A failed
 recovery or blocked probe stops GPU submissions. Commit and push each completed
 piece. The deferred performance-simulator PR review remains a later task.
 
-Current next question: vary workgroup geometry with matched SR19/SR20 output
-planes and the 1000 us host-gap protocol. All 12 full-size arithmetic core maps
-contain all 38 IDs, but the busiest core receives 28–33 workgroups versus the
-default estimate of 27. Cluster totals are multiples of eight at the tested
-128-lane / 1024-workgroup geometry; test other shapes before generalizing.
-The simulator now accepts an explicit measured peak as a sensitivity input;
-it leaves a 2.76–3.06x final-dispatch timing residual and does not reconstruct
-the actual placement map or concurrency. Keep early and late distributions,
-exact arithmetic/guards and complete core-map property checks. Frequency is
-unmeasured. Keep small positive values and bounded serialized submissions.
+Current next implementation: optional observed M2 core-map replay in functional
+simulation, using the existing ordinary arithmetic corpus without new hardware.
+See experiments/arithmetic/observed-core-map-replay.md. Preserve default core-zero
+and synthetic stress modes, historical model provenance and literal arithmetic/
+guard checks. The geometry study adds 72 full-size maps: all 38 IDs are seen,
+and aligned eight-workgroup blocks stay within one cluster at the tested 1-D
+32/64/128/256-lane sizes, including neighboring grids' partial tails. Do not
+generalize to unmeasured shapes or infer concurrency. The 1000 us host delay
+does not guarantee timing stability: one cell retains 2.23x trial variation.
+Frequency and the throughput gap remain unresolved. Keep small positive values,
+independent whole-program gates and bounded serialized hardware submissions.
 No function transfers or execution-counter manipulation beyond the standard
 harness prefix.

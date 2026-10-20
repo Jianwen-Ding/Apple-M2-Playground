@@ -30,3 +30,9 @@ confirms these 38 packed IDs and workgroup-uniform tags in 12 final maps of
 1024 workgroups under arithmetic load. Matching SR19 twins report the declared
 64 register halves exactly. This measures cumulative assignment, not
 simultaneous residency or frequency.
+
+The [workgroup-geometry study](../2026-10-20-integer-geometry-cost/README.md)
+adds 72 full-size maps at four 1-D workgroup sizes and neighboring grids. Each
+aligned eight-workgroup block, including a shorter tail, has one cluster ID.
+All maps contain all 38 valid packed IDs. Other sizes and multidimensional
+launches remain outside that cluster-block observation's tested scope.
