@@ -145,6 +145,46 @@ def fdiv32(P, a, b, mode='rn'):
     return r
 
 
+def fsqrt32(P, a, mode='rn'):
+    """sqrt(a) in binary32 with one rounding in `mode`, subnormal inputs, +-0 -> +-0, +inf -> +inf, negative / NaN -> NaN.
+    Restoring bit-by-bit square root of the normalised mantissa (25 result bits plus a sticky remainder), branch-free."""
+    u = unpack32(P, a)
+    # a = m * 2^(e - 150), m in [2^23, 2^24). Make the exponent even: odd (e - 127) -> radicand m << 1
+    odd = P.and_(P.sub(u['e'], 127), 1)
+    rad = P.sel('ugt', odd, 0, P.add(u['m'], u['m']), u['m'])     # 24 or 25 bits
+    # result exponent: (e - 127 - odd) / 2 + 127 (arithmetic shift of a possibly negative value via +256 bias)
+    eh = P.sub(P.lsr(P.add(P.sub(P.sub(u['e'], 127), odd), 512), 1), 256-127)
+    # integer sqrt of rad << 25: 25 result bits q with rad << 25 in [2^48, 2^50) -> q in [2^24, 2^25)
+    # restoring: remainder R and q, consuming two radicand bits per step (radicand as hi:lo = rad << 25)
+    hi = P.lsr(rad, 7)                    # (rad << 25) >> 32
+    lo = P.extr(0, rad, 7)                # (rad << 25) & M32
+    R = P.reg(0); q = P.reg(0)
+    for i in range(25):
+        k = 24 - i                        # bits 2k+1, 2k of the 50-bit radicand
+        pos = 2*k
+        two = P.and_(P.extr(lo, hi, pos), 3)
+        R = P.or_(P.add(P.add(R, R), P.add(R, R)), two)          # R = R << 2 | next two bits
+        t = P.or_(P.add(P.add(q, q), P.add(q, q)), 1)            # t = q << 2 | 1
+        ge = P.sel('ult', R, t, 0, 1)
+        R = P.sel('ugt', ge, 0, P.sub(R, t), R)
+        q = P.or_(P.add(q, q), ge)
+    # q has 25 bits (top at 24): m24 = q >> 1, guard = q & 1, sticky = remainder != 0
+    m24 = P.lsr(q, 1)
+    g = P.and_(q, 1)
+    st = P.flag('ugt', R, 0)
+    _, r = round_pack_f32(P, 0, eh, m24, g, st, mode)
+    r = P.sel('ugt', u['zero'], 0, u['sign'], r)
+    r = P.sel('ugt', u['inf'], 0, P.sel('ugt', u['sign'], 0, CANON_NAN, 0x7f800000), r)
+    neg = P.and_(P.flag('ugt', u['sign'], 0), P.sub(1, u['zero']))
+    r = P.sel('ugt', P.or_(u['nan'], neg), 0, CANON_NAN, r)
+    return r
+
+
+def sqrt_fast_ok(P, a):
+    """1 when the native rsqrt + one-correction sequence is exact: a positive normal with biased exponent >= 48."""
+    return P.flag('ult', P.sub(a, 48 << 23), (255-48) << 23)   # 0x18000000 <= a < 0x7f800000, sign clear
+
+
 def div_fast_ok(P, a, b):
     """1 when the native rcp + Newton + Markstein sequence is exact (non-ftz rn): a normal with biased exponent >= 48 or
     a == +-0; b normal with exponent <= 252; quotient exponent estimate ea - eb + 127 in [2, 252] (a == 0: any normal b)."""
@@ -260,6 +300,28 @@ def ref_div32(a, b, mode='rn'):
     if va == 0:
         return sign
     return round32(va/vb, mode, 0)
+
+
+def ref_sqrt32(a, mode='rn'):
+    v = f32val(a)
+    if v == 'nan':
+        return CANON_NAN
+    if isinstance(v, tuple):
+        return CANON_NAN if v[1] < 0 else 0x7f800000
+    if v == 0:
+        return a & S32
+    if v < 0:
+        return CANON_NAN
+    # exact sqrt as a rational interval: find q with round32 semantics using integer sqrt at high precision
+    e = v.numerator.bit_length() - v.denominator.bit_length()
+    k = 2*(80 - e//2)                                 # scale by an even power of two so the root has ~80 bits
+    N = v * Fraction(2)**k
+    n = N.numerator // N.denominator
+    rt = __import__('math').isqrt(n)
+    exactsq = (rt*rt == n and N.denominator == 1)
+    # value in (rt, rt+1) * 2^(-k/2) unless exact; nudge by a quarter unit to carry the sticky information
+    val = Fraction(rt) if exactsq else Fraction(4*rt+1, 4)
+    return round32(val * Fraction(2)**(-k//2), mode, 0)
 
 
 def run1(P, ins, outs, values):

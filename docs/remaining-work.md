@@ -2,7 +2,7 @@
 
 > **fp32 IEEE update 2026-10-20:** [exact non-`.ftz` add/mul/fma and `.rz/.rm/.rp` fp32](../novel-results/2026-10-20-fp32-ieee/README.md)
 > (`make verify-fp32-ieee`): a soft fma (all modes) and a hybrid native+check path are bit-exact on 21,024 edge/random lanes; the hybrid costs ~15x
-> native on subnormal-free data. **div.rn.f32 done** ([fdiv32](../novel-results/2026-10-20-fdiv32/README.md), `make verify-fdiv32`). Open: sqrt.rn/rcp.rn, cheaper checks.
+> native on subnormal-free data. **div.rn.f32 done** ([fdiv32](../novel-results/2026-10-20-fdiv32/README.md), `make verify-fdiv32`). **sqrt.rn.f32 done** ([fsqrt32](../novel-results/2026-10-20-fsqrt32/README.md)). Open: rcp.rn (= div with a = 1), cheaper checks.
 
 > **Shuffle update 2026-10-20:** [cost measured](../novel-results/2026-10-20-shfl-cost/README.md) (`make verify-shfl-cost`): native ~2x a dependent iadd,
 > the generic sequence ~18x native; warp-uniform runtime offsets are exact as `and b,31` + native op. Still open: divergent rendezvous, partial

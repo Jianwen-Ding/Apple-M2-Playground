@@ -60,7 +60,7 @@ A first sweep without the keeper is retained. It was about 2× slower with the s
 
 ## Not established
 
-`rcp.rn.f32` / `sqrt.rn.f32` (`sqrt` has its own refinement and needs the `rsqrt` table proof), `div.full.f32`
+`rcp.rn.f32` (div with a = 1; [sqrt](../2026-10-20-fsqrt32/README.md) is done), `div.full.f32`
 over its full range, and the cost of a constant-divisor specialization.
 
 ## Reproduce
