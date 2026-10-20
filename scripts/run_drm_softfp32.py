@@ -84,6 +84,12 @@ def probe_lines(chain, kind):
             L += ['if_icmp r0l, nueq, r13, r30, 1', ('JMP', ['iadd r13, r13, 0']), 'pop_exec r0l, 1']
         elif kind == 'cftaken':           # no lane passes (r13 is never 0xffffffff): jmp_exec_none is taken
             L += ['if_icmp r0l, ueq, r13, r30, 1', ('JMP', ['iadd r13, r13, 0']), 'pop_exec r0l, 1']
+        elif kind == 'ktaken':            # constant condition (r30 != r31): no lane passes, the jump is taken; model-traceable
+            L += ['if_icmp r0l, ueq, r30, r31, 1', ('JMP', ['iadd r13, r13, 0']), 'pop_exec r0l, 1']
+        elif kind == 'kuntaken':          # constant condition true for every lane: the jump is not taken, the block runs
+            L += ['if_icmp r0l, nueq, r30, r31, 1', ('JMP', ['iadd r13, r13, 0']), 'pop_exec r0l, 1']
+        elif kind == 'kany':              # constant true + jmp_exec_any over nothing taken... (out-of-line form, untaken)
+            L += ['if_icmp r0l, ueq, r30, r31, 1', ('JANY', f'k{len(L)}'), ('LABEL', f'k{len(L)}'), 'pop_exec r0l, 1']
         elif kind == 'cfnojmp':           # the same if / pop with no jump over the (executed-by-none) block
             L += ['if_icmp r0l, ueq, r13, r30, 1', 'iadd r13, r13, 0', 'pop_exec r0l, 1']
         L.append('iadd r12, r13, 0')
@@ -149,7 +155,9 @@ def build(op, n, chain=1, mode='rn'):
         lines, rr, used = hybrid_lines(chain)
     elif op == 'hybrid3':
         lines, rr, used = hybrid3_lines(chain)
-    elif op in ('nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3'):
+    elif op in ('ktaken', 'kuntaken', 'kany'):
+        lines, rr, used = probe_lines(chain, op)
+    elif op in ('nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3', 'ktaken', 'kuntaken', 'kany'):
         lines, rr, used = probe_lines(chain, op)
     elif op in ('hybrid2', 'stub'):
         lines, rr, used = hybrid2_lines(chain, op == 'stub')
@@ -194,7 +202,7 @@ def build(op, n, chain=1, mode='rn'):
             body.append(e(l))
     tail = [mov(6, 3*n), e('iadd r7, r1, r6'), agx_loop.store(rr, 8, 7), e('wait 0'), mov(2, 0)]
     allb = ins+body+tail
-    DA.decode_lengths(b''.join(allb), [len(i) for i in allb]) if op not in ('hybrid', 'hybrid2', 'stub', 'nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3') else None
+    DA.decode_lengths(b''.join(allb), [len(i) for i in allb]) if op not in ('hybrid', 'hybrid2', 'stub', 'nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3', 'ktaken', 'kuntaken', 'kany') else None
     ninstr = sum(0 if isinstance(l, tuple) and l[0] == 'LABEL' else 1 if isinstance(l, tuple) and l[0] in ('IMM', 'JANY') else len(l[1])+1 if isinstance(l, tuple) else 1 for l in lines0)
     return b''.join(allb), ninstr, used
 
@@ -217,7 +225,7 @@ def expected(tuples, mode, chain=1):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=['offline', 'hardware'])
-    p.add_argument('--op', default='soft', choices=['soft', 'hw', 'hybrid', 'hybrid2', 'stub', 'nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3'])
+    p.add_argument('--op', default='soft', choices=['soft', 'hw', 'hybrid', 'hybrid2', 'stub', 'nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3', 'ktaken', 'kuntaken', 'kany'])
     p.add_argument('--round', default='rn', choices=['rn', 'rz', 'rm', 'rp'])
     p.add_argument('--random', type=int, default=12000)
     p.add_argument('--repeats', type=int, default=3)
@@ -242,7 +250,7 @@ def main():
     code = drm.build_main(prog)
     tb = table(tuples)
     regs = 2*used+8
-    exp = expected(tuples[:base], 'rn' if a.op in ('hybrid', 'hybrid2', 'stub', 'nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3') else a.round, a.chain) if a.op != 'hw' else None
+    exp = expected(tuples[:base], 'rn' if a.op in ('hybrid', 'hybrid2', 'stub', 'nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3', 'ktaken', 'kuntaken', 'kany') else a.round, a.chain) if a.op != 'hw' else None
     print(f'{a.op} {a.round}: {n} lanes, {ninstr} instructions, registers up to r{used-1}', flush=True)
     rec = {'op': a.op, 'data': a.data, 'round': a.round, 'lanes': n, 'checked_lanes': base, 'instructions': ninstr, 'registers': used, 'chain': a.chain, 'runs': []}
     if a.mode == 'offline':

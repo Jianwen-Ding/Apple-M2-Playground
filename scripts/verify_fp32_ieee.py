@@ -92,5 +92,28 @@ check('a taken jmp_exec_none costs >= 0.7 us per step more than the untaken one 
       L['cftaken'] - L['cfonly'] >= 700 and (L['cftaken']-L['cfonly'])/L['native'] >= 12 and abs(L['stub']/L['hybrid2']-1) < 0.25)
 check('out-of-line slow path (untaken jmp_exec_any on the common path): >= 1.5x faster than the if-skip layout on normal data, and exact under sparse subnormals',
       L['hybrid2']/L['hybrid3'] >= 1.5 and all(all(x['bad'] == 0 for x in cost[f'layout/hybrid3-sparse-k{K}']['runs']) for K in (16, 32)))
+
+# constant-condition branch probes against the simulator cost model (AGX-Performance-Simulator agx_cost, if built)
+pg = lambda us: us/1000*1398/(4096/38)                          # us per step at 131,072 lanes -> cycles per SIMD group
+K = {k: pg(lsl(f'{k}-normal', 128, 256)) for k in ('ktaken', 'kuntaken', 'kany')}
+print('  hardware cycles per group per step:', {k: round(v, 2) for k, v in K.items()})
+check('a taken jmp_exec_none over one instruction costs >= 6 cycles per group more than the untaken form (full occupancy)', K['ktaken']-K['kuntaken'] >= 6)
+import subprocess, tempfile, os
+B = '/save/workspace/AGX-Performance-Simulator/rust/target/release/agx_cost'
+if os.path.exists(B):
+    from run_drm_softfp32 import build
+    pred = {}
+    with tempfile.TemporaryDirectory() as td:
+        for k in K:
+            cyc = []
+            for KK in (128, 256):
+                prog, _, _ = build(k, 4096, KK)
+                fn = os.path.join(td, f'{k}{KK}.bin'); open(fn, 'wb').write(prog+bytes.fromhex('8800'))
+                o = subprocess.run([B, fn, '--groups', '16', '--allow-unknown'], capture_output=True, text=True).stdout
+                cyc.append(json.loads(o.splitlines()[0])['cycles'])
+            pred[k] = (cyc[1]-cyc[0])/128/16
+    print('  cost model (16 groups):', {k: round(v, 2) for k, v in pred.items()})
+    check('cost model with the 2026-10-20 forward-branch rule predicts each probe within 30% per group and the taken penalty within 25%',
+          all(abs(pred[k]/K[k]-1) <= 0.3 for k in K) and abs((pred['ktaken']-pred['kuntaken'])/(K['ktaken']-K['kuntaken'])-1) <= 0.25)
 print(f'{sum(ok)}/{len(ok)} fp32-ieee checks passed')
 sys.exit(0 if all(ok) else 1)

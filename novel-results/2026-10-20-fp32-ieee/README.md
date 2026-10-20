@@ -81,6 +81,26 @@ lane is flagged), then the soft path and a `jmp_exec_any` back, then `pop_exec`.
 jump. Result: **0.98 µs per step against 1.72 µs for the if-skip layout (1.75×)**. It is bit-exact on the 21,024-lane
 dataset (3 runs, identical to the simulator) and under one subnormal lane per group.
 
+**Constant-condition probes** (the branch direction does not depend on data). Each step is fma, then `if_icmp`, then
+`jmp_exec_none` over one instruction, then `pop_exec`. Cycles per SIMD group per step at full occupancy (131,072 lanes,
+1,398 MHz):
+
+| Probe | hardware | simulator before | simulator after (2026-10-20 rule) |
+|---|---|---|---|
+| jump taken (no lane passes) | 11.48 | 3.13 | 11.38 |
+| jump not taken (block runs) | 3.78 | 3.40 | 3.40 |
+| out-of-line form (untaken `jmp_exec_any`) | 3.43 | 2.60 | 2.60 |
+
+The simulator charged its taken-branch penalty only to backward `jmp_exec_any` (loop trips), and as a per-group latency
+that other groups hide. `AGX-Performance-Simulator/rust/src/cost.rs` now gives a **taken forward jump** (`jmp_exec_none`,
+or a forward `jmp_exec_any`) the loop-fitted latency plus a **33-cycle scheduler hold** (`branch_forward_sched_real`),
+fitted to these probes. The change leaves `make verify-cost-model` output byte-identical. It also leaves `suite-check`
+(721/721) and `coverage-check` (the same 5 known timing rows) unchanged, so no calibrated workload had a taken forward jump.
+
+**Single group:** one SIMD group running these 40 KB straight-line probes costs about 124 cycles per untaken step and
+about 350 per taken step. That is instruction-fetch-bound: no sibling groups share the fetched lines, and a taken jump
+breaks sequential fetch for about 226 cycles. Do not use single-group long-code timings for branch costs.
+
 Compiler rule for AGX: put rarely taken blocks out of line so the common path never takes a branch. This applies to
 every IEEE fix-up here and to other guard-style code (bounds checks, NaN fix-ups, slow atomics).
 
@@ -102,4 +122,4 @@ every IEEE fix-up here and to other guard-style code (bounds checks, NaN fix-ups
 
 `python3 -B scripts/run_drm_softfp32.py offline|hardware --op soft|hw|hybrid [--round rn|rz|rm|rp]` (exactness);
 cost: `--data normal|sparse|dense --lanes 131072 --chain K --check 512`. Offline: `make verify-fp32-ieee`
-(19 checks against [results/2026-10-20-fp32-ieee](../../results/2026-10-20-fp32-ieee)).
+(21 checks against [results/2026-10-20-fp32-ieee](../../results/2026-10-20-fp32-ieee)).
