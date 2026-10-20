@@ -814,3 +814,7 @@ verify-ret-stale-exec:
 .PHONY: verify-wide-r0
 verify-wide-r0:
 	$(PYTHON) -B scripts/verify_wide_r0.py
+
+.PHONY: verify-ret-stale-targets
+verify-ret-stale-targets:
+	$(PYTHON) -B scripts/verify_ret_stale_targets.py

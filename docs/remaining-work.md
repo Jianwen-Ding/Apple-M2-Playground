@@ -226,7 +226,7 @@ Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
 depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
 while masked survivors continue. Simulator c7e50f7 incorporates the later
 conditional stored-depth RET and native shuffle liveness corrections;
-all 2,313 retained original programs now replay exactly.
+all 2,403 retained original programs now replay exactly.
 
 [Masked-r0 shuffles](../novel-results/2026-10-20-masked-r0/README.md) directly
 read initialized low counters from masked lanes and corroborate the return
@@ -310,3 +310,10 @@ pop1 decrements unsigned with zero saturation. 0xffff remains living/readable
 and later rejoins after the bounded drain. Independent payload controls and
 all full buffers are exact, zero faults. Recorded AC-online is 0 throughout;
 no timing claim. Increment overflow and other mask operations remain open.
+
+[Stale-execution divergent targets](../novel-results/2026-10-20-ret-stale-targets/README.md):
+RET chooses the lowest cached issuer before conditional counter updates.
+90 programs / 270 dispatches, three destination rotations and five masks,
+all words/controls exact, zero faults. Sixty cases differ from zero-counter
+selection, 66 updated participation, 36 both. The unchanged model is exact;
+already-masked writes and increment overflow remain independent questions.

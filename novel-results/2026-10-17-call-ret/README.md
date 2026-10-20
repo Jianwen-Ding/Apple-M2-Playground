@@ -492,7 +492,7 @@ Open items for the next session:
 
 The [current handoff](../../notes/call-return-handoff.md) supersedes the
 historical mask/termination hypotheses above. Simulator c7e50f7 replays 2,313
-original programs exactly. Nonempty RET conditionally changes stored depth
+original programs exactly at that checkpoint. Nonempty RET conditionally changes stored depth
 0 to masked 2 and 1 to active 0, preserving deeper counters/execution; empty
 RET falls through. STOP terminates issuing lanes only. Call writes all issuing
 r1 links before target selection, then admits matching lanes at the lowest
@@ -503,4 +503,8 @@ from masked living sources.
 values to sampled unsigned boundaries through 0xffff. That value remains a
 living readable source and can rejoin after bounded pops. The 36 programs /
 108 dispatches have exact independent controls and zero faults; no timing
-claim. Stale-execution target disagreement and increment overflow remain open.
+claim. The later [stale target matrix](../2026-10-20-ret-stale-targets/README.md)
+confirms selection from the lowest cached issuer before counter updates with
+three destinations and partial/scattered masks. Ninety programs / 270
+dispatches, exact controls, zero faults; all 2,403 original programs now replay
+exactly. Increment overflow and other mask operations remain open.
