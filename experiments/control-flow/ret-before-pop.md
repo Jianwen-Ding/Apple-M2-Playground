@@ -92,3 +92,13 @@ required before hardware. Begin each kind at depth 1, rotation 0, offset 1;
 inspect its full fallback classification and exact recovery before extending
 across depth 3, rotated masks and boundary offsets. No timing or cross-form
 semantics are assumed from the plain shuffle finding.
+
+The four native forms also self-fallback for stopped sources in the uniform
+index matrix. Isolate low-index contributions independently with
+`probe_native_dead_index_or.py`: seeded dead lanes versus survivor-updated
+indices, paired immediate/register relative forms and exact wait controls.
+The offline oracle preserves native up/down boundary behavior and quad-low
+rotation/xor while distinguishing retained versus excluded dead seed bits.
+Start each form at rotation 0, seed 1, new offset 2, inspect full recovery and
+classification, then consider both rotations, all four low seeds and the ten
+boundary offsets. Keep original hypotheses before any simulator correction.
