@@ -22,3 +22,8 @@ Notes for Jianwen-Ding/ZLUDA (`master` after PR #1). Nothing here has been pushe
    with sync-file status 1; only the command timestamps stay 0. `agx_runtime` should zero the timestamp slots before
    each submit and turn "fence ok but start == end == 0" into `CUDA_ERROR_LAUNCH_FAILED`
    (`results/2026-10-20-b20-failed-jobs`). Out-of-bounds stores are silently dropped (soft faults).
+6. **Cooperative launch limit.** A whole grid is reliably co-resident only up to about 38 x min(15, floor(S/g) - 1)
+   workgroups (`results/2026-10-20-b5-coresidency`), well below occupancy x cores. The TMEM slab pool (B30) and any
+   `grid.sync()` emulation must cap CTAs in flight to that; non-resident workgroups start only when others exit.
+7. **Intra-warp spin deadlocks** (`results/2026-10-20-b4-simd-forward-progress`): the `if` side of a divergent
+   SIMD group runs to completion before the `else` side; report pre-Volta scheduling or rewrite such spins.
