@@ -1,0 +1,17 @@
+# ZLUDA issues found during hardware exploration
+
+Notes for Jianwen-Ding/ZLUDA (`master` after PR #1). Nothing here has been pushed to ZLUDA.
+
+## 2026-10-20
+
+1. **zluda_agx does not build on aarch64** (the Asahi machine itself). `c_char` is `u8` on aarch64:
+   `format/src/lib.rs` implements `CudaDisplay` for `Option<unsafe extern "C" fn(*const i8)>` and
+   `fn(i32, *const i8, *const i8)`, and `zluda_agx/src/bin/agx_cuda_smoke.rs` uses `[0i8; 128]`.
+   Fix: use `std::ffi::c_char` (3 lines; `results/2026-10-20-b2-hw-runner/zluda-aarch64-c_char.patch`).
+2. **agx_runtime has no scratch support** (`helper` is always zero). Kernels that spill or use `.local` need, per
+   `results/2026-10-20-b1-direct-drm-scratch`: Mesa's `libagx_helper` binary in the USC heap (tagged address | 1),
+   a scratch buffer with Mesa's header/blocklist layout (128 subgroups per core), `helper.data` = header VA, and the
+   USC Registers word's Spill size (bits 18..21) = 1 + ceil(log2(ceil(dwords / 8))). Ship the helper bytes
+   (`helper-mesa.bin`, from Mesa 25.3.6) or build them from Mesa's `libagx/helper.cl`.
+3. **Soft faults are on** (`features` = 1 on this M2 Max): out-of-bounds loads return 0 and stores are dropped
+   without a failed fence, so `CUDA_ERROR_ILLEGAL_ADDRESS` cannot come from the fence status for these.
