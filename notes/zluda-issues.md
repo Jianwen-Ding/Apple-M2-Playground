@@ -15,3 +15,6 @@ Notes for Jianwen-Ding/ZLUDA (`master` after PR #1). Nothing here has been pushe
    (`helper-mesa.bin`, from Mesa 25.3.6) or build them from Mesa's `libagx/helper.cl`.
 3. **Soft faults are on** (`features` = 1 on this M2 Max): out-of-bounds loads return 0 and stores are dropped
    without a failed fence, so `CUDA_ERROR_ILLEGAL_ADDRESS` cannot come from the fence status for these.
+4. **Uniform words can carry 64 halves, not 32** (`agx_runtime/src/lib.rs` `UNIFORM_WORD_HALVES = 32`), and halves
+   256..511 need the 0x3d "Uniform high" tag (`usc_words` asserts start < 256). Measured on the M2 Max:
+   `results/2026-10-20-b9-uniform-preload` (the full 512-half file works).
