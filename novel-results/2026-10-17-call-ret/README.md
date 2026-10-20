@@ -1,5 +1,7 @@
 # Uniform direct, indirect and nested calls return through pop_exec 2
 
+**Return-state correction, 2026-10-20:** [direct pre-pop reads](../2026-10-20-ret-mask-state/README.md) show incoming depth 1 becomes active with r0l=0 at the landing. Nonempty-return traces through depth 4 fit `0 -> 2, 1 -> 0, deeper unchanged`. Earlier statements that inactive counters simply stay unchanged, and the derived special empty-stop heuristic, are superseded in this scope.
+
 Status: uniform 32-lane call/return sequences now work on G14C; see the final
 section for the measured target and mask rule. Earlier diagnostic records and
 failures below are retained as historical evidence. Partial/divergent lanes

@@ -223,3 +223,10 @@ requires an exact actual-program gate and all six uniform/jump path gates;
 `--hardware` adds bracketed submission and diagnostics. All three addresses
 are represented in active lanes. `make verify-three-targets` independently
 checks 72 records. The combined original-byte model replay now covers 480 cases.
+
+`probe_ret_prepop.py` relocates the return snapshot before pop without changing
+program size or target PCs. `probe_ret_levels.py --depth M --rotate R`
+compares incoming depths 0..4 with a known-state jump surrogate; add
+`--known-surrogate` to submit that independently checked construction.
+`make verify-ret-mask-state` checks 57 complete hardware records and preserves
+45 model counterexamples. All hardware modes retain the bounded watchdog.

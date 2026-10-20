@@ -1,5 +1,7 @@
 # Stop behavior depends on participation and return context
 
+**Later direct-read correction:** [return-arrival snapshots](../2026-10-20-ret-mask-state/README.md) show the previously inactive depth-1 lanes already active with r0l=0 before any pop. The shallow post-return stop below is therefore not empty on hardware. The observations remain valid; the old interpretation of their incoming state is superseded.
+
 Observed on the project's M2 Max G14C B1, direct DRM, compute, AC power,
 2026-10-20. **17 variants, 51 dispatches including exact before/after controls,
 zero faults, all recovery controls passed.** The new probes expose six exact

@@ -648,6 +648,10 @@ verify-call-r1:
 verify-three-targets:
 	$(PYTHON) -B scripts/verify_three_targets.py
 
+.PHONY: verify-ret-mask-state
+verify-ret-mask-state:
+	$(PYTHON) -B scripts/verify_ret_mask_state.py
+
 verify-occupancy2:
 	$(PYTHON) -B scripts/verify_occupancy2.py
 

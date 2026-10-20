@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+"""Return mask transform from known incoming depths 0..4.
+
+Original-state jump controls and a desired-state no-return surrogate both
+validate full depth traces. Actual ret is gated against the current model;
+hardware traces classify competing inactive-depth transformations.
+"""
+import argparse
+import gzip
+import hashlib
+import json
+from pathlib import Path
+
+import probe_empty_stop as E
+from run_drm_cpu_clock import load
+
+P,CF=E.P,E.CF
+ROOT=E.ROOT
+DATA=ROOT/'results/2026-10-20-ret-levels'
+LANDING=1024
+PRE=0xface0001
+FALL=0xfa110001
+
+
+def depths(maximum,rotate):
+    return [(i+rotate)%(maximum+1) for i in range(32)]
+
+
+def transformed(original,model):
+    if model=='original':return original.copy()
+    return [2 if d==0 else (d if model=='legacy' else d-1 if model=='decrement'
+                            else 0 if model=='clear' else max(d-2,0)) for d in original]
+
+
+def table_for(maximum,rotate):
+    ds=depths(maximum,rotate)
+    return ds+transformed(ds,'decrement')+[E.SENT]*(7*32+16)
+
+
+def oracle(table,model):
+    tab=table.copy();tab[64:96]=[PRE]*32
+    state=transformed(table[:32],model)
+    for phase in range(5):
+        if phase:state=[max(d-1,0) for d in state]
+        tab[(3+phase)*32:(4+phase)*32]=[0 if d==0 else E.SENT for d in state]
+    return [E.SENT]*48+[0xa5a50000+i for i in range(16)],tab
+
+
+def construct(table,mode):
+    P.cov.install();e,mov,st=P.RS.e,P.RS.mov,P.RS.agx_loop.store
+    site=P.drm.control_main()[1]
+    body=e('iadd r20, r1, 0')
+    for plane,reg in zip(range(2,9),range(21,28)):
+        body+=mov(29,plane*32)+e(f'iadd r{reg}, r20, r29')
+    body+=load(10,20,True)+mov(29,32)+e('iadd r29, r20, r29')+load(11,29,True)+e('wait 0')
+    body+=mov(28,PRE)+st(28,8,21)+e('wait 0')+mov(30,0x2000+site+LANDING)
+    values=table[32:64] if mode=='desired-jump' else table[:32]
+    reg=11 if mode=='desired-jump' else 10
+    # Descending tests construct each desired depth exactly: a lane excluded
+    # at threshold d accumulates one level in each remaining nested IF.
+    for threshold in range(max(values),0,-1):
+        body+=e(f'if_icmp r0l, ult, r{reg}, {threshold}, 1')
+    transfer_pc=site+len(body)
+    if mode=='ret':transfer=e('ret r30')+e('wait 0')*2
+    else:
+        op='jmp_exec_any' if 0 in values else 'jmp_exec_none'
+        delta=site+LANDING-transfer_pc
+        transfer=e(f'{op} pc+{delta}',f'{op} pc+{delta}')
+    assert len(transfer)==6
+    body+=transfer+e('pop_exec r0l, 1')*4+mov(28,FALL)+st(28,8,27)+e('wait 0')+e('stop')
+    assert len(body)<=LANDING and (LANDING-len(body))%2==0
+    body+=e('stop')*((LANDING-len(body))//2)
+    for phase,reg in enumerate(range(22,27)):
+        if phase:body+=e('pop_exec r0l, 1')
+        body+=e('mov r28, r0l')+st(28,8,reg)+e('wait 0')
+    body+=e('stop')
+    code=P.drm.build_main(body)
+    P.cov.gate(code,allow=('ret',) if mode=='ret' else ())
+    decoded=[];pc=0
+    while pc<len(code):
+        info=P.cov.ASMB.info(code[pc:pc+16]);assert info and info[1]>0
+        decoded.append([pc,info[0],info[1]]);pc+=info[1]
+    assert pc==len(code) and any(row[0]==site+LANDING for row in decoded)
+    return code,transfer_pc,decoded
+
+
+def build(maximum,rotate,known=False):
+    if maximum not in range(5):raise ValueError(maximum)
+    table=table_for(maximum,rotate)
+    actual,pc,decoded=construct(table,'ret')
+    original,_,_=construct(table,'original-jump')
+    desired,_,_=construct(table,'desired-jump')
+    with E.measured_model():
+        assert P.cov.simulate(original,32,32,64,0,table)==oracle(table,'original')
+        assert P.cov.simulate(desired,32,32,64,0,table)==oracle(table,'decrement')
+        assert P.cov.simulate(actual,32,32,64,0,table)==oracle(table,'legacy'), 'current ret-depth hypothesis failed'
+    return dict(code=desired if known else actual,control=original,table=table,n=32,wg=32,regs=64,
+                expected=oracle(table,'original'),data_dir=DATA,
+                gate=dict(maximum=maximum,rotate=rotate,known_surrogate=known,ret_pc=pc,
+                          target=0x2000+P.drm.control_main()[1]+LANDING,decoded=decoded,
+                          actual_legacy_hypothesis_exact=True,original_jump_exact=True,desired_jump_exact=True,
+                          actual_ret_code=actual.hex(),desired_surrogate_code=desired.hex(),
+                          builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()))
+
+
+def main():
+    ap=argparse.ArgumentParser(description=__doc__)
+    ap.add_argument('--depth',type=int,choices=range(5),default=3)
+    ap.add_argument('--rotate',type=int,default=0)
+    ap.add_argument('--known-surrogate',action='store_true')
+    ap.add_argument('--hardware',action='store_true')
+    a=ap.parse_args();p=build(a.depth,a.rotate,a.known_surrogate)
+    print(json.dumps({'depth':a.depth,'rotate':a.rotate,'known':a.known_surrogate,'gates':True}),flush=True)
+    if not a.hardware:return
+    name=f'ret-levels-{a.depth}-r{a.rotate}-'+('surrogate' if a.known_surrogate else 'actual')
+    r=CF.hardware(name,p);v=r.get('variant',{})
+    if v.get('ok'):
+        got=(v.get('out'),v.get('table_after'))
+        r['depth_analysis']=dict(models={model:got==oracle(p['table'],model) for model in ('legacy','decrement','clear','subtract2')},
+                                  writers=[[i for i in range(32) if v['table_after'][(3+phase)*32+i]!=E.SENT] for phase in range(5)],
+                                  snapshot_values=[sorted(set(x for x in v['table_after'][(3+phase)*32:(4+phase)*32] if x!=E.SENT)) for phase in range(5)])
+    with gzip.GzipFile(filename=str(DATA/f'{name}.json.gz'),mode='wb',mtime=0) as f:
+        f.write((json.dumps(r,sort_keys=True)+'\n').encode())
+    print(json.dumps({'analysis':r.get('depth_analysis'),'recovery':r.get('recovery_control_passed'),
+                      'halted':r.get('halted'),'budget':r['after']['budget_used']}),flush=True)
+    if r.get('halted'):raise SystemExit(2)
+
+
+if __name__=='__main__':main()

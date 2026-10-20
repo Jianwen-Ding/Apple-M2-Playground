@@ -288,3 +288,11 @@ rotated winners preserve the measured rules exactly. No new simulator change;
 `make verify-three-targets` and the direct 480-case model replay pass. Next,
 inspect r0/participation at a return landing before the first pop to distinguish
 true empty-mask stop behavior from an unobserved return-mask transformation.
+
+Return-arrival correction, 2026-10-20: [pre-pop reads and depth traces](../novel-results/2026-10-20-ret-mask-state/README.md)
+show depth-1 lanes already active with r0l=0 at the landing. For nonempty issue
+masks, `0 -> 2, 1 -> 0, deeper unchanged` fits all tested depths through four.
+This explains shallow return/stop behavior without a special empty-stop rule.
+57 variants / 171 dispatches, no faults; 45 current-model counterexamples remain
+explicit (`make verify-ret-mask-state`). Probe empty issuing masks before
+updating return, then correct active-lane stop termination/liveness together.
