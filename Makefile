@@ -746,3 +746,7 @@ verify-tg-atomic-followup:
 
 test-probe-watchdog:
 	$(PYTHON) -B scripts/test_probe_watchdog.py
+
+.PHONY: verify-empty-ret-state
+verify-empty-ret-state:
+	$(PYTHON) -B scripts/verify_empty_ret_state.py

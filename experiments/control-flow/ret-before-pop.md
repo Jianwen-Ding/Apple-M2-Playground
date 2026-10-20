@@ -29,3 +29,11 @@ no-return jump validates the original depths; another constructs the proposed
 separates decrement, clear-all and subtract-two hypotheses without writing r0l
 through an unmeasured ALU trick. First actual case M=3, rotate 0; only proceed
 past a saved outcome after exact recovery. All targets remain in-program.
+
+The nonempty-depth matrix fits `0->2,1->0,deeper unchanged`. The next independent
+question is an **empty** issuing mask. `probe_empty_ret_state.py` starts with
+only depths 1..M, puts complete snapshots in fallthrough and at the valid return
+landing, and records a final fallback marker. Exact wait controls and known
+original/swap-state jump surrogates validate both paths. This distinguishes a
+true no-op, a counter update with fallthrough, or a transfer after activation.
+The first case is all depth 1; it must be inspected before extending the matrix.
