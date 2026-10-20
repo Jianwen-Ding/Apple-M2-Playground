@@ -37,3 +37,17 @@ landing, and records a final fallback marker. Exact wait controls and known
 original/swap-state jump surrogates validate both paths. This distinguishes a
 true no-op, a counter update with fallthrough, or a transfer after activation.
 The first case is all depth 1; it must be inspected before extending the matrix.
+
+The return/stop model now matches the saved operational traces. Next,
+`probe_masked_r0.py` tests direct observation of **masked** low counters with
+immediate-index simd_shuffle. The prologue initializes r0l in every lane;
+AND with 0xffff removes the unknown upper half. Gather all 32 source lanes
+through r0 and through independently initialized r10 before/after transfer.
+Use three bounded variants: original-state jump, known desired-state jump,
+and RET; a payload-only original-state jump is the exact recovery control.
+All three complete programs must match simulator oracles first. Targets are
+valid in-program instructions, each output address has a unique writer and
+shader allocation grows dynamically in the measured C harness. Begin with
+one original-state depth-3 case; inspect the complete readback and recovery
+before proceeding to the return or a matrix. A mismatch is a finding requiring
+analysis, not a reason to batch more hardware. Keep all watchdog diagnostics.

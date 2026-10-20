@@ -217,3 +217,18 @@ unified-memory trigger investigations are prepared in
 - Textures (safe-05), partial 2026-10-18 ([CUDA mapping table](cuda-texture-mapping.md) written): [conversion, filtering and wrap rules measured](../novel-results/2026-10-18-gles-texture/README.md); 2026-10-19: [simulator model](../novel-results/2026-10-19-texture-unit/README.md) (`make verify-texture-unit`) with store rounding and PBE; still open: 1D/3D/array targets, integer filtering formats.
 
 - PTX-compliant sin/cos cost (safe-02 item 5), done 2026-10-18: [fma-split costs the same as Mesa's sequence](../novel-results/2026-10-18-sincos-cost/README.md).
+
+## 2026-10-20 call/return and execution-mask update
+
+Lowest-active target selection, issue-active link writes, three-target and
+scattered masks, and call-r1 write-before-select ordering are now measured.
+Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
+depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
+while masked survivors continue. Simulator d90cdcd models these semantics;
+all 594 retained original programs replay exactly.
+
+[Masked-r0 shuffles](../novel-results/2026-10-20-masked-r0/README.md) directly
+read initialized low counters from masked lanes and corroborate the return
+map. Remaining questions include deeper counters, terminated-lane state,
+nested divergent composition and calibrated control-flow costs. The current
+probe boot has zero recorded faults; earlier boot budgets above are historical.

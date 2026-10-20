@@ -42,7 +42,8 @@ complete buffer. It is not a general decrement: in the depth-3 trace only
 original depth-1 lanes run after pop 1; original depth-2 lanes wait until pop 2.
 Clear-all and subtract-two hypotheses also fail. Masked counters are not read
 directly in this experiment; their retained depth is inferred from the verified
-pop thresholds. The active depth-1 reset is directly observed as r0l=0.
+pop thresholds. A [later shuffle experiment](../2026-10-20-masked-r0/README.md)
+also observes those low counter values directly, including masked source lanes. The active depth-1 reset is directly observed as r0l=0.
 
 The original-state jump controls independently validate all initial depth
 patterns. The known-operation state surrogates use only existing IF/pop/jump

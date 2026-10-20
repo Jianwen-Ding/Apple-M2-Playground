@@ -750,3 +750,7 @@ test-probe-watchdog:
 .PHONY: verify-empty-ret-state
 verify-empty-ret-state:
 	$(PYTHON) -B scripts/verify_empty_ret_state.py
+
+.PHONY: verify-masked-r0
+verify-masked-r0:
+	$(PYTHON) -B scripts/verify_masked_r0.py

@@ -14,7 +14,7 @@ from pathlib import Path
 import probe_empty_stop as E
 
 ROOT=E.ROOT
-GROUPS={'2026-10-20-ret-winner':64,'2026-10-20-call-winner':74,'2026-10-20-sparse-control':248,'2026-10-20-call-r1':22,'2026-10-20-three-targets':72,'2026-10-20-empty-stop':17,'2026-10-20-ret-prepop':36,'2026-10-20-ret-levels':21,'2026-10-20-empty-ret-state':16}
+GROUPS={'2026-10-20-ret-winner':64,'2026-10-20-call-winner':74,'2026-10-20-sparse-control':248,'2026-10-20-call-r1':22,'2026-10-20-three-targets':72,'2026-10-20-empty-stop':17,'2026-10-20-ret-prepop':36,'2026-10-20-ret-levels':21,'2026-10-20-empty-ret-state':16,'2026-10-20-masked-r0':24}
 
 
 def sha(path):
