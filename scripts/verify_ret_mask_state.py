@@ -27,11 +27,11 @@ def level_trace(table,original=False):
     return [0xcdcdcdcd]*48+[0xa5a50000+i for i in range(16)],result
 
 
-def common(rec,p,builder):
+def common(rec,p,builder,*,ac_online='1'):
     assert rec['phase']=='finished' and not rec.get('halted') and rec['recovery_control_passed']
     assert rec['before']['budget_used']==rec['after']['budget_used']==0
     assert rec['before']['boot_id']==rec['after']['boot_id']
-    assert rec['before']['ac_online']==rec['after']['ac_online']=='1'
+    assert rec['before']['ac_online']==rec['after']['ac_online']==ac_online
     assert rec['code']==p['code'].hex() and rec['control_code']==p['control'].hex()
     assert rec['table_in']==p['table']
     require_source(builder.__file__,rec['gate']['builder_sha256'])

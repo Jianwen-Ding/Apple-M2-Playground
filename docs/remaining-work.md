@@ -224,9 +224,9 @@ Lowest-active target selection, issue-active link writes, three-target and
 scattered masks, and call-r1 write-before-select ordering are now measured.
 Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
 depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
-while masked survivors continue. Simulator d90cdcd models these semantics;
-all 2,277 retained original programs replay exactly after native shuffle
-liveness correction 4dd68e9.
+while masked survivors continue. Simulator c7e50f7 incorporates the later
+conditional stored-depth RET and native shuffle liveness corrections;
+all 2,313 retained original programs now replay exactly.
 
 [Masked-r0 shuffles](../novel-results/2026-10-20-masked-r0/README.md) directly
 read initialized low counters from masked lanes and corroborate the return
@@ -301,4 +301,12 @@ corrects the cached-issue model: nonempty RET conditionally maps stored counter
 0 -> masked 2, 1 -> active 0, leaving deeper counters and execution unchanged.
 All 34 hardware counterexamples (102 dispatches, exact controls, zero faults)
 now replay in simulator c7e50f7. Uniform nonzero counters still transfer.
-Target disagreement in stale execution and wider counter values remain open.
+Target disagreement in stale execution remains open.
+
+[Wide unsigned counters](../novel-results/2026-10-20-wide-r0/README.md):
+36 programs / 108 dispatches, sampled boundaries through 0xffff and both lane
+rotations. Pop0 retains numeric values; RET preserves sampled deeper values;
+pop1 decrements unsigned with zero saturation. 0xffff remains living/readable
+and later rejoins after the bounded drain. Independent payload controls and
+all full buffers are exact, zero faults. Recorded AC-online is 0 throughout;
+no timing claim. Increment overflow and other mask operations remain open.

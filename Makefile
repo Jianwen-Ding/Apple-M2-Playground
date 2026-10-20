@@ -810,3 +810,7 @@ verify-r0-pop0:
 .PHONY: verify-ret-stale-exec
 verify-ret-stale-exec:
 	$(PYTHON) -B scripts/verify_ret_stale_exec.py
+
+.PHONY: verify-wide-r0
+verify-wide-r0:
+	$(PYTHON) -B scripts/verify_wide_r0.py

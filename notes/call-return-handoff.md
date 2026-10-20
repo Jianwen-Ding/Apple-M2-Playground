@@ -24,7 +24,7 @@ Current evidence and integration:
   contribute to the source quad's low-index OR. All five native simd shuffle
   forms have independent paired-index and poisoned-index hardware matrices.
   [Native shuffle integration](../results/2026-10-20-native-shuffle-model/README.md).
-- Simulator **c7e50f7** replays all **2,277** original control programs exactly.
+- Simulator **c7e50f7** replays all **2,313** original control programs exactly.
   Return/register call still require `AGX_EXPERIMENTAL_RET=buffer-pop2`;
   default rejection and target checks remain. Both interpreter paths have
   source-liveness fixtures; 42 library tests pass. Historical source and
@@ -75,7 +75,14 @@ counter 1 -> active 0, deeper counters/execution unchanged. Uniform nonzero
 inputs still transfer. All 34 counterexamples now replay in c7e50f7; 102
 dispatches, exact controls, zero faults.
 
-Next useful control questions: larger counter values and stale target disagreement,
+[Unsigned counter boundaries](../novel-results/2026-10-20-wide-r0/README.md)
+now cover sampled values through 0xffff, with both rotations: pop0 preserves
+numeric values, RET preserves deeper counters, pop1 decrements unsigned, and
+the final drain rejoins all living lanes. 36 programs / 108 dispatches, exact
+independent payload controls, zero faults. Recorded AC-online is 0; no timing
+claim. This does not test counter increment overflow or enumerate all values.
+
+Next useful control questions: increment overflow and stale target disagreement,
 permanent termination through other mask operations, quad/other cross-lane
 forms and precise timing. Earlier quiet out-of-program return observations
 remain unmodelled; do not rerun invalid targets. New probes must retain actual

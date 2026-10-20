@@ -487,3 +487,20 @@ Open items for the next session:
 - Confirm the `stop` special case with a checkpointed probe that stores `r0l` before and after the padding.
 - Divergent ret with lane 0 inactive remains unmodelled.
 - Refresh the stale `interpretation` labels in the remaining records (done for the ones listed above).
+
+## Current 2026-10-20 model and counter extension
+
+The [current handoff](../../notes/call-return-handoff.md) supersedes the
+historical mask/termination hypotheses above. Simulator c7e50f7 replays 2,313
+original programs exactly. Nonempty RET conditionally changes stored depth
+0 to masked 2 and 1 to active 0, preserving deeper counters/execution; empty
+RET falls through. STOP terminates issuing lanes only. Call writes all issuing
+r1 links before target selection, then admits matching lanes at the lowest
+issuing target. All five native shuffle forms distinguish stopped sources
+from masked living sources.
+
+[Wide counter reads](../2026-10-20-wide-r0/README.md) now extend directly read
+values to sampled unsigned boundaries through 0xffff. That value remains a
+living readable source and can rejoin after bounded pops. The 36 programs /
+108 dispatches have exact independent controls and zero faults; no timing
+claim. Stale-execution target disagreement and increment overflow remain open.
