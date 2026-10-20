@@ -66,6 +66,69 @@ def hybrid_lines(chain):
     return L, 12, used
 
 
+CHECK9 = [   # needs-IEEE test in 9 ops; r30 = 0xffffffff and r31 = 0x00fffffe are hoisted constants. t = 2|x| - 1
+    'iadd r16, r30, r12, lsl 1', 'iadd r17, r30, r9, lsl 1', 'iadd r18, r30, r10, lsl 1',
+    'icmpsel ult, r19, r16, r17, r16, r17', 'icmpsel ugt, r20, r16, r17, r16, r17', 'icmpsel ult, r19, r19, r18, r19, r18',
+    'iadd r21, r13, r13', 'icmpsel ueq, r21, r21, 0, r20, r30', 'icmpsel ult, r21, r19, r31, 0, r21']
+
+
+def probe_lines(chain, kind):
+    """Cost decomposition of the hybrid fast path (all-normal data only): 'nocf' = fma + CHECK9 (no control flow),
+    'cfonly' = fma + if_icmp/jmp_exec_none(1-instruction block)/pop_exec (no check), 'fma2' = fma + one iadd copy."""
+    L = ['iadd r12, r8, 0', ('IMM', 30, 0xffffffff), ('IMM', 31, 0x00fffffe)]
+    for _ in range(chain):
+        L.append('fmadd32 r13, r12, r9, r10')
+        if kind == 'nocf':
+            L += CHECK9
+        elif kind == 'cfonly':
+            L += ['if_icmp r0l, nueq, r13, r30, 1', ('JMP', ['iadd r13, r13, 0']), 'pop_exec r0l, 1']
+        elif kind == 'cftaken':           # no lane passes (r13 is never 0xffffffff): jmp_exec_none is taken
+            L += ['if_icmp r0l, ueq, r13, r30, 1', ('JMP', ['iadd r13, r13, 0']), 'pop_exec r0l, 1']
+        elif kind == 'cfnojmp':           # the same if / pop with no jump over the (executed-by-none) block
+            L += ['if_icmp r0l, ueq, r13, r30, 1', 'iadd r13, r13, 0', 'pop_exec r0l, 1']
+        L.append('iadd r12, r13, 0')
+    return L, 12, 32
+
+
+def hybrid3_lines(chain):
+    """Out-of-line slow path: the common case falls through an untaken jmp_exec_any; flagged groups jump to a block
+    after the main body and jump back. Lines may hold ('LABEL', name) and ('JANY', name) (resolved by build)."""
+    L = ['iadd r12, r8, 0', ('IMM', 30, 0xffffffff), ('IMM', 31, 0x00fffffe)]
+    ool = []
+    used = 32
+    for i in range(chain):
+        L.append('fmadd32 r13, r12, r9, r10')
+        L += CHECK9
+        L += ['if_icmp r0l, nueq, r21, r30, 1', ('JANY', f'ool{i}'), ('LABEL', f'ret{i}'), 'pop_exec r0l, 1', 'iadd r12, r13, 0']
+        P = S.Prog()
+        a, b, c = P.input('a'), P.input('b'), P.input('c')
+        x = S.ffma32(P, a, b, c, 'rn')
+        soft, loc2, u2 = S.emit(P, {'a': 12, 'b': 9, 'c': 10}, [x], first=32)
+        ool += [('LABEL', f'ool{i}')] + soft + [f'iadd r13, r{loc2[x.id]}, 0', ('JANY', f'ret{i}')]
+        used = max(used, u2)
+    return L + [('JANY', 'tail')] + ool + [('LABEL', 'tail')], 12, used
+
+
+def hybrid2_lines(chain, stub=False):
+    """As hybrid_lines, with the 9-op CHECK9 folded into if_icmp (nueq against 0xffffffff) and hoisted constants.
+    stub=True replaces the soft block by one instruction (a fetch-cost probe: exact only when no lane is flagged)."""
+    L = ['iadd r12, r8, 0', ('IMM', 30, 0xffffffff), ('IMM', 31, 0x00fffffe)]
+    used = 32
+    for _ in range(chain):
+        L.append('fmadd32 r13, r12, r9, r10')
+        L += CHECK9
+        L.append('if_icmp r0l, nueq, r21, r30, 1')
+        P = S.Prog()
+        a, b, c = P.input('a'), P.input('b'), P.input('c')
+        x = S.ffma32(P, a, b, c, 'rn')
+        soft, loc2, u2 = S.emit(P, {'a': 12, 'b': 9, 'c': 10}, [x], first=32)
+        L.append(('JMP', ['iadd r13, r13, 0'] if stub else soft + [f'iadd r13, r{loc2[x.id]}, 0']))
+        L.append('pop_exec r0l, 1')
+        L.append('iadd r12, r13, 0')
+        used = max(used, u2)
+    return L, 12, used
+
+
 def cost_dataset(n, kind, seed=2):
     """Cost data: x = fma(x, b, c) stays normal (b in [0.999, 1.001], c in [-1, 1], x0 in [1, 2]); 'sparse' gives lane 0
     of every SIMD group a subnormal c (that group's lanes all take the soft path), 'dense' gives every lane one."""
@@ -84,6 +147,12 @@ def build(op, n, chain=1, mode='rn'):
         rr, used = 8, 12
     elif op == 'hybrid':
         lines, rr, used = hybrid_lines(chain)
+    elif op == 'hybrid3':
+        lines, rr, used = hybrid3_lines(chain)
+    elif op in ('nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3'):
+        lines, rr, used = probe_lines(chain, op)
+    elif op in ('hybrid2', 'stub'):
+        lines, rr, used = hybrid2_lines(chain, op == 'stub')
     else:
         P = S.Prog()
         a, b, c = P.input('a'), P.input('b'), P.input('c')
@@ -92,11 +161,32 @@ def build(op, n, chain=1, mode='rn'):
             x = S.ffma32(P, x, b, c, mode)
         lines, loc, used = S.emit(P, {'a': 8, 'b': 9, 'c': 10}, [x], first=11)
         rr = loc[x.id]
+    lines0 = list(lines)
     e = agx_loop.encode; mov = chains.mov_imm
     ins = [load(8, 1, True), mov(6, n), e('iadd r7, r1, r6'), load(9, 7, True), mov(6, 2*n), e('iadd r7, r1, r6'), load(10, 7, True), e('wait 0')]
     body = []
+    if any(isinstance(l, tuple) and l[0] == 'LABEL' for l in lines):     # two-pass label resolution (jumps are 6 bytes)
+        pos, at, items = {}, 0, []
+        for l in lines:
+            if isinstance(l, tuple) and l[0] == 'LABEL':
+                pos[l[1]] = at
+            elif isinstance(l, tuple) and l[0] == 'JANY':
+                items.append(('J', l[1], at)); at += 6
+            else:
+                bts = mov(l[1], l[2]) if isinstance(l, tuple) else e(l)
+                items.append(('B', bts, at)); at += len(bts)
+        for kind, v, where in items:
+            if kind == 'B':
+                body.append(v)
+            else:
+                off = pos[v] - where
+                txt = f'jmp_exec_any pc+{off}' if off >= 0 else f'jmp_exec_any pc-{-off}'
+                body.append(e(txt, txt))
+        lines = []
     for l in lines:
-        if isinstance(l, tuple):                  # ('JMP', then-lines): jmp_exec_none over the then block
+        if isinstance(l, tuple) and l[0] == 'IMM':
+            body.append(mov(l[1], l[2]))
+        elif isinstance(l, tuple):                  # ('JMP', then-lines): jmp_exec_none over the then block
             then = b''.join(e(x) for x in l[1])
             jt = 6+len(then)
             body += [e(f'jmp_exec_none pc+{jt}', f'jmp_exec_none pc+{jt}'), then]
@@ -104,8 +194,8 @@ def build(op, n, chain=1, mode='rn'):
             body.append(e(l))
     tail = [mov(6, 3*n), e('iadd r7, r1, r6'), agx_loop.store(rr, 8, 7), e('wait 0'), mov(2, 0)]
     allb = ins+body+tail
-    DA.decode_lengths(b''.join(allb), [len(i) for i in allb]) if op != 'hybrid' else None
-    ninstr = sum(len(l[1])+1 if isinstance(l, tuple) else 1 for l in lines)
+    DA.decode_lengths(b''.join(allb), [len(i) for i in allb]) if op not in ('hybrid', 'hybrid2', 'stub', 'nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3') else None
+    ninstr = sum(0 if isinstance(l, tuple) and l[0] == 'LABEL' else 1 if isinstance(l, tuple) and l[0] in ('IMM', 'JANY') else len(l[1])+1 if isinstance(l, tuple) else 1 for l in lines0)
     return b''.join(allb), ninstr, used
 
 
@@ -127,7 +217,7 @@ def expected(tuples, mode, chain=1):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=['offline', 'hardware'])
-    p.add_argument('--op', default='soft', choices=['soft', 'hw', 'hybrid'])
+    p.add_argument('--op', default='soft', choices=['soft', 'hw', 'hybrid', 'hybrid2', 'stub', 'nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3'])
     p.add_argument('--round', default='rn', choices=['rn', 'rz', 'rm', 'rp'])
     p.add_argument('--random', type=int, default=12000)
     p.add_argument('--repeats', type=int, default=3)
@@ -152,7 +242,7 @@ def main():
     code = drm.build_main(prog)
     tb = table(tuples)
     regs = 2*used+8
-    exp = expected(tuples[:base], 'rn' if a.op == 'hybrid' else a.round, a.chain) if a.op != 'hw' else None
+    exp = expected(tuples[:base], 'rn' if a.op in ('hybrid', 'hybrid2', 'stub', 'nocf', 'cfonly', 'fma2', 'cftaken', 'cfnojmp', 'hybrid3') else a.round, a.chain) if a.op != 'hw' else None
     print(f'{a.op} {a.round}: {n} lanes, {ninstr} instructions, registers up to r{used-1}', flush=True)
     rec = {'op': a.op, 'data': a.data, 'round': a.round, 'lanes': n, 'checked_lanes': base, 'instructions': ninstr, 'registers': used, 'chain': a.chain, 'runs': []}
     if a.mode == 'offline':

@@ -53,6 +53,37 @@ of the same order. Both sweeps are retained.
 
 One subnormal lane costs a SIMD group as much as 32 of them: the soft path runs once per group.
 
+## Follow-up: what the fast path actually costs, and a 1.75× faster layout
+
+A 9-op check (`CHECK9`) flags exactly the same lanes as the 14-op `needs_ieee` on all dataset lanes. For each operand it
+computes `t = 2|x| - 1` with one shifted-source `iadd t, M1, x, lsl 1`. A subnormal gives t < 0xfffffe and zero gives
+0xffffffff. Two `min`s, one `max` and a zero test on r follow, and the final selects fold into the `if_icmp`.
+
+The cheaper check did **not** speed anything up. Decomposing the fast path (clock held, µs per dependent step, 131,072
+lanes; native `fmadd32` = 0.055):
+
+| Variant (fma + ...) | µs |
+|---|---|
+| CHECK9, no control flow | 0.41 |
+| `if_icmp` + `pop_exec`, no jump | 0.24 |
+| `if_icmp` + **untaken** `jmp_exec_none` + 1-op block + `pop_exec` | 0.30 |
+| `if_icmp` + **taken** `jmp_exec_none` over a 1-op block + `pop_exec` | **1.05** |
+| full if-skip hybrid, and the same with the 337-op soft block replaced by a 1-op stub | 1.72, 1.53 |
+
+**A taken `jmp_exec_none` costs about 0.75 µs per step more than an untaken one, ≈ 14 native fma.** That is roughly 10
+issue cycles per SIMD group at 1,398 MHz, and other groups cannot hide it at full occupancy. The skipped code size does
+not matter: the stub costs the same. The usual structured-`if` layout, which Mesa also uses, pays this exactly in the
+common case, because the jump is taken when no lane needs the fix. (Compare the ~38-cycle taken loop iteration in the
+[loop finding](../2026-10-10-agx-loop-alu-timing/README.md).)
+
+**Out-of-line layout (`hybrid3`).** `if_icmp`, then a `jmp_exec_any` to a block after the main body (taken only when some
+lane is flagged), then the soft path and a `jmp_exec_any` back, then `pop_exec`. The common case falls through an untaken
+jump. Result: **0.98 µs per step against 1.72 µs for the if-skip layout (1.75×)**. It is bit-exact on the 21,024-lane
+dataset (3 runs, identical to the simulator) and under one subnormal lane per group.
+
+Compiler rule for AGX: put rarely taken blocks out of line so the common path never takes a branch. This applies to
+every IEEE fix-up here and to other guard-style code (bounds checks, NaN fix-ups, slow atomics).
+
 ## Compiler implications (ZLUDA)
 
 - **`.ftz` forms and fast-math kernels map 1:1** onto `fadd32/fmul32/fmadd32`.
@@ -71,4 +102,4 @@ One subnormal lane costs a SIMD group as much as 32 of them: the soft path runs 
 
 `python3 -B scripts/run_drm_softfp32.py offline|hardware --op soft|hw|hybrid [--round rn|rz|rm|rp]` (exactness);
 cost: `--data normal|sparse|dense --lanes 131072 --chain K --check 512`. Offline: `make verify-fp32-ieee`
-(14 checks against [results/2026-10-20-fp32-ieee](../../results/2026-10-20-fp32-ieee)).
+(19 checks against [results/2026-10-20-fp32-ieee](../../results/2026-10-20-fp32-ieee)).

@@ -67,5 +67,30 @@ print('  clock held (keeper): native %.3f us,' % (knat/1000), {k: round(v/1000, 
 check('clock held: hybrid on normal data 15-30x native, soft 150-300x, a subnormal lane per group 180-320x; all keeper runs exact',
       15 <= ksl['hybrid-normal']/knat <= 30 and 150 <= ksl['soft-normal']/knat <= 300 and 180 <= ksl['hybrid-sparse']/knat <= 320 and
       all(all(x['bad'] == 0 for x in v['runs']) for k, v in cost.items() if k.startswith('keeper/')))
+
+# cheaper check (CHECK9) and the out-of-line slow-path layout
+for k in ('hybrid2', 'hybrid3'):
+    check(f'{k}: {n}/{n} bit-exact on hardware (3 runs) and in the simulator', ex[k]['hw']['out'] == refs['rn'] and ex[k]['sim']['sim_out'] == refs['rn'] and
+          all(x['bad'] == 0 for x in ex[k]['hw']['runs']))
+M1 = 0xffffffff
+
+
+def check9(a, b, c, r):
+    ta, tb, tc = [(M1 + ((x << 1) & M1)) & M1 for x in (a, b, c)]
+    cond = max(ta, tb) if (r << 1) & M1 == 0 else M1
+    return (0 if min(ta, tb, tc) < 0xfffffe else cond) != M1
+
+
+check('CHECK9 (9 ops, 2|x|-1 trick) flags exactly the same lanes as the 14-op needs_ieee on all dataset lanes', [check9(*x, w) for x, w in zip(t, nat)] == flag)
+lm = lambda k: st.median(x['fw_ns'] for x in cost['layout/'+k]['runs'])
+lsl = lambda op, lo, hi: (lm(f'{op}-k{hi}')-lm(f'{op}-k{lo}'))/(hi-lo)
+L = {'hybrid2': lsl('hybrid2-normal', 64, 128), 'hybrid3': lsl('hybrid3-normal', 64, 128), 'native': lsl('hw-normal', 1024, 2048),
+     'nocf': lsl('nocf-normal', 128, 256), 'cfnojmp': lsl('cfnojmp-normal', 128, 256), 'cfonly': lsl('cfonly-normal', 128, 256),
+     'cftaken': lsl('cftaken-normal', 128, 256), 'stub': lsl('stub-normal', 128, 256)}
+print('  layout study, us per step:', {k: round(v/1000, 3) for k, v in L.items()})
+check('a taken jmp_exec_none costs >= 0.7 us per step more than the untaken one (>= 12 native fma), the jump not the skipped code: a 1-instruction stub costs the same as the full hybrid',
+      L['cftaken'] - L['cfonly'] >= 700 and (L['cftaken']-L['cfonly'])/L['native'] >= 12 and abs(L['stub']/L['hybrid2']-1) < 0.25)
+check('out-of-line slow path (untaken jmp_exec_any on the common path): >= 1.5x faster than the if-skip layout on normal data, and exact under sparse subnormals',
+      L['hybrid2']/L['hybrid3'] >= 1.5 and all(all(x['bad'] == 0 for x in cost[f'layout/hybrid3-sparse-k{K}']['runs']) for K in (16, 32)))
 print(f'{sum(ok)}/{len(ok)} fp32-ieee checks passed')
 sys.exit(0 if all(ok) else 1)
