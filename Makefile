@@ -754,3 +754,7 @@ verify-empty-ret-state:
 .PHONY: verify-masked-r0
 verify-masked-r0:
 	$(PYTHON) -B scripts/verify_masked_r0.py
+
+.PHONY: verify-stopped-r0
+verify-stopped-r0:
+	$(PYTHON) -B scripts/verify_stopped_r0.py

@@ -51,3 +51,12 @@ shader allocation grows dynamically in the measured C harness. Begin with
 one original-state depth-3 case; inspect the complete readback and recovery
 before proceeding to the return or a matrix. A mismatch is a finding requiring
 analysis, not a reason to batch more hardware. Keep all watchdog diagnostics.
+
+With masked-r0 access measured, `probe_stopped_r0.py` replaces one wait with
+STOP in a nonempty partial mask, pops once to activate survivors, then gathers
+all source low counters and initialized payloads. Final four pops and marker
+check that stopped lanes remain absent. Only the wait/stop word differs between
+candidate and control. Gate against retained-zero storage in the simulator,
+classify hardware against low dead values 0/1/2/ffff without assuming any is
+architecturally required. First depth-3 case only, inspect recovery before
+extension. No source contains another dispatch's or uninitialized data.
