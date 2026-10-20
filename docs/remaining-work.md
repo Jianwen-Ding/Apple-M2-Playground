@@ -225,7 +225,7 @@ scattered masks, and call-r1 write-before-select ordering are now measured.
 Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
 depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
 while masked survivors continue. Simulator d90cdcd models these semantics;
-all 2,159 retained original programs replay exactly after native shuffle
+all 2,175 retained original programs replay exactly after native shuffle
 liveness correction 4dd68e9.
 
 [Masked-r0 shuffles](../novel-results/2026-10-20-masked-r0/README.md) directly
@@ -277,3 +277,9 @@ preserve masks/links through 3/4/8 calls with mixed forms and a divergent leaf.
 192 programs / 576 dispatches, exact controls and zero faults. Direct excluded
 low-counter reads show odd depths 3..17, with two-count restoration at each
 matching continuation. Consecutive larger depths remain a separate question.
+
+[Consecutive return counters](../novel-results/2026-10-20-deep-ret-counters/README.md):
+direct low-r0 reads confirm nonempty RET maps 0 -> 2, 1 -> 0 and leaves every
+consecutive depth 2..31 unchanged. Sixteen programs / 48 dispatches, both lane
+rotations and payload controls, every word exact, zero faults. Ordinary r0
+writes versus execution-mask synchronization remain unmeasured.

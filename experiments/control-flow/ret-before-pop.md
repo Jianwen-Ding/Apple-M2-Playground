@@ -102,3 +102,16 @@ rotation/xor while distinguishing retained versus excluded dead seed bits.
 Start each form at rotation 0, seed 1, new offset 2, inspect full recovery and
 classification, then consider both rotations, all four low seeds and the ten
 boundary offsets. Keep original hypotheses before any simulator correction.
+
+Balanced deep calls directly observe odd masked counts through 17. Separately
+isolate consecutive counters with `probe_deep_ret_counters.py`: construct
+incoming depths 0..M, M=5/7/15/31, gather all 32 low-r0 sources before/after
+an original-state jump or uniform nonempty RET. Payload-only original-state
+controls validate indices, addresses, writer masks and all buffers. The only
+change to the measured gather layout is a longer bounded final drain after
+snapshots; target/gather PCs stay fixed. All whole paths must pass the current
+explicit deeper-counter hypothesis and scalar oracle first. Start M5 original
+and inspect, then M5 RET separately; inspect before increasing to M31. The
+M31 case places all consecutive 0..31 values in one initialized physical group.
+A rotation swaps which physical lanes issue/observe RET. No uninitialized high
+half is retained; AND masks it away. Keep watchdog/recovery diagnostics.
