@@ -51,7 +51,7 @@ flag = [P.run({'a': x, 'b': y, 'c': z, 'r': w})(nd) for (x, y, z), w in zip(t, n
 check('needs_ieee flags every lane where the native result is wrong (no false negatives)', all(flag[i] for i in wrong))
 check('needs_ieee does not flag zero results of zero factors with normal c (e.g. 0 * b + c)',
       all(not flag[i] for i, (x, y, z) in enumerate(t) if (x & 0x7fffffff) == 0 and normal(y) and normal(z)))
-med = lambda k: st.median(x['fw_ns'] for x in cost[k]['runs'])
+med = lambda k: st.median(x['fw_ns'] for x in cost[k]['runs'])  # first sweep: clock not held
 nat_s = (med('hw-normal-k2048')-med('hw-normal-k1'))/2047
 sl = {k: (med(f'{k}-k32')-med(f'{k}-k1'))/31 for k in ('hybrid-normal', 'hybrid-sparse', 'hybrid-dense', 'soft-normal')}
 print('  us per dependent fma step, 131,072 lanes: native %.3f,' % (nat_s/1000), {k: round(v/1000, 2) for k, v in sl.items()})
@@ -60,5 +60,12 @@ check('native fmadd32: 0.12-0.22 us per step', 120 <= nat_s <= 220)
 check('hybrid on all-normal data: 2-3.2 us per step (10-25x native)', 2000 <= sl['hybrid-normal'] <= 3200 and 10 <= sl['hybrid-normal']/nat_s <= 25)
 check('soft path alone: 30-45 us per step; hybrid with one subnormal lane per SIMD group costs the same as every lane (35-50 us)',
       30000 <= sl['soft-normal'] <= 45000 and all(35000 <= sl[k] <= 50000 for k in ('hybrid-sparse', 'hybrid-dense')) and abs(sl['hybrid-sparse']/sl['hybrid-dense']-1) < 0.1)
+kmed = lambda k: st.median(x['fw_ns'] for x in cost['keeper/'+k]['runs'])
+knat = (kmed('hw-normal-k2048')-kmed('hw-normal-k1024'))/1024
+ksl = {k: (kmed(f'{k}-k32')-kmed(f'{k}-k16'))/16 for k in ('hybrid-normal', 'hybrid-sparse', 'hybrid-dense', 'soft-normal')}
+print('  clock held (keeper): native %.3f us,' % (knat/1000), {k: round(v/1000, 2) for k, v in ksl.items()})
+check('clock held: hybrid on normal data 15-30x native, soft 150-300x, a subnormal lane per group 180-320x; all keeper runs exact',
+      15 <= ksl['hybrid-normal']/knat <= 30 and 150 <= ksl['soft-normal']/knat <= 300 and 180 <= ksl['hybrid-sparse']/knat <= 320 and
+      all(all(x['bad'] == 0 for x in v['runs']) for k, v in cost.items() if k.startswith('keeper/')))
 print(f'{sum(ok)}/{len(ok)} fp32-ieee checks passed')
 sys.exit(0 if all(ok) else 1)

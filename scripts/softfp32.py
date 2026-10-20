@@ -116,6 +116,48 @@ def ffma32(P, a, b, c, mode='rn'):
     return r
 
 
+def fdiv32(P, a, b, mode='rn'):
+    """a / b in binary32 with one rounding in `mode`, subnormals in and out, inf/NaN/zero rules; restoring division
+    (26 quotient bits plus a sticky remainder), branch-free."""
+    ua, ub = unpack32(P, a), unpack32(P, b)
+    sign = P.xor(ua['sign'], ub['sign'])
+    x, y = ua['m'], ub['m']
+    # x < y: take one more quotient bit from x << 1 (exponent one lower)
+    lt = P.flag('ult', x, y)
+    x = P.sel('ugt', lt, 0, P.add(x, x), x)
+    e = P.sub(P.add(P.sub(ua['e'], ub['e']), 127), lt)
+    q = P.reg(0)
+    for _ in range(26):
+        ge = P.sel('ult', x, y, 0, 1)
+        x = P.sel('ugt', ge, 0, P.sub(x, y), x)
+        q = P.or_(P.add(q, q), ge)
+        x = P.add(x, x)
+    m24 = P.lsr(q, 2)
+    g = P.and_(P.lsr(q, 1), 1)
+    st = P.or_(P.and_(q, 1), P.flag('ugt', x, 0))
+    _, r = round_pack_f32(P, sign, e, m24, g, st, mode)
+    nan = P.or_(P.or_(ua['nan'], ub['nan']), P.or_(P.and_(ua['zero'], ub['zero']), P.and_(ua['inf'], ub['inf'])))
+    inf = P.or_(ua['inf'], ub['zero'])
+    zero = P.or_(ua['zero'], ub['inf'])
+    r = P.sel('ugt', zero, 0, sign, r)
+    r = P.sel('ugt', inf, 0, P.or_(sign, 0x7f800000), r)
+    r = P.sel('ugt', nan, 0, CANON_NAN, r)
+    return r
+
+
+def div_fast_ok(P, a, b):
+    """1 when the native rcp + Newton + Markstein sequence is exact (non-ftz rn): a normal with biased exponent >= 48 or
+    a == +-0; b normal with exponent <= 252; quotient exponent estimate ea - eb + 127 in [2, 252] (a == 0: any normal b)."""
+    ea = P.and_(P.lsr(a, 23), 0xff)
+    eb = P.and_(P.lsr(b, 23), 0xff)
+    az = P.flag('ueq', P.and_(a, 0x7fffffff), 0)
+    okb = P.flag('ult', P.sub(eb, 1), 252)                 # 1 <= eb <= 252
+    oka = P.flag('ult', P.sub(ea, 48), 255-48)             # 48 <= ea <= 254
+    eq = P.sub(P.add(ea, 127), eb)
+    okq = P.flag('ult', P.sub(eq, 2), 251)                 # 2 <= eq <= 252 (unsigned: wraps when negative)
+    return P.and_(okb, P.or_(az, P.and_(oka, okq)))
+
+
 def needs_ieee(P, a, b, c, r):
     """1 when the native fmadd32 result r may differ from IEEE non-ftz round-to-nearest: an operand is subnormal
     (the unit reads it as zero), or r is +-0 although neither factor is zero (an exact result below 2^-126 is
@@ -199,6 +241,25 @@ def ref_fma32(a, b, c, mode='rn'):
             return zs << 31
         return S32 if mode == 'rm' else 0
     return round32(exact, mode, 0)
+
+
+def ref_div32(a, b, mode='rn'):
+    va, vb = f32val(a), f32val(b)
+    sign = (a ^ b) & S32
+    if va == 'nan' or vb == 'nan':
+        return CANON_NAN
+    ia, ib = isinstance(va, tuple), isinstance(vb, tuple)
+    if ia and ib:
+        return CANON_NAN
+    if ia:
+        return sign | 0x7f800000
+    if ib:
+        return sign
+    if vb == 0:
+        return CANON_NAN if va == 0 else sign | 0x7f800000
+    if va == 0:
+        return sign
+    return round32(va/vb, mode, 0)
 
 
 def run1(P, ins, outs, values):

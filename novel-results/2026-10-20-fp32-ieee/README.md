@@ -37,22 +37,26 @@ them with near-cancelling addends. 21,024 lanes in all. The reference is exact r
 | native `fmadd32` alone | agrees with the reference on all 5,668 normal-domain lanes, an independent check of the reference. It differs from IEEE on 5,813 lanes, every one with a subnormal operand or an exact result in (0, 2^-126). That includes 4 lanes where IEEE rounds up to 2^-126 and the unit flushes to 0 |
 | `needs_ieee` | flags every lane where the native result is wrong (no false negatives) |
 
-## Cost (dependent chains `x = fma(x, b, c)`, 131,072 lanes, firmware time, slope over K)
+## Cost (dependent chains `x = fma(x, b, c)`, 131,072 lanes, firmware time)
 
-| Lowering | Instructions per step | µs per step | vs native |
-|---|---|---|---|
-| native `fmadd32` (K = 1 → 2048) | 1 | 0.17 | 1 |
-| hybrid, all-normal data (no group takes the soft path) | 18 (fma + 14 check + if/jmp/pop) | 2.6 | ≈ 15 |
-| soft `ffma32` alone | ≈ 337 | 36.5 | ≈ 215 |
-| hybrid, one subnormal lane in every SIMD group | 18 + 337 | 40.8 | ≈ 240 |
-| hybrid, every lane subnormal | 18 + 337 | 41.5 | ≈ 245 |
+The clock is held at its top state by `scripts/clock_keeper.py`. Slopes use K = 16 → 32, and K = 1024 → 2048 for the
+native op. A first sweep without the keeper ran at mixed clock states, about 2-3× slower in absolute terms, with ratios
+of the same order. Both sweeps are retained.
+
+| Lowering | Instructions per step | µs per step (clock held) | vs native | first sweep (clock not held) |
+|---|---|---|---|---|
+| native `fmadd32` | 1 | 0.06 | 1 | 0.17 |
+| hybrid, all-normal data (no group takes the soft path) | 18 (fma + 14 check + if/jmp/pop) | 1.0 | ≈ 15 | 2.6 |
+| soft `ffma32` alone | ≈ 337 | 12.8 | ≈ 200 | 36.5 |
+| hybrid, one subnormal lane in every SIMD group | 18 + 337 | 15.5 | ≈ 240 | 40.8 |
+| hybrid, every lane subnormal | 18 + 337 | 14.4 | ≈ 225 | 41.5 |
 
 One subnormal lane costs a SIMD group as much as 32 of them: the soft path runs once per group.
 
 ## Compiler implications (ZLUDA)
 
 - **`.ftz` forms and fast-math kernels map 1:1** onto `fadd32/fmul32/fmadd32`.
-- **Exact default forms cost ≈ 15× on subnormal-free data**, because the check, not the soft path, dominates. Ways to
+- **Exact default forms cost ≈ 15× on subnormal-free data** (clock held), because the check, not the soft path, dominates. Ways to
   cut this:
   - Skip the check for operands provably normal or zero (constants, already-checked values).
   - Specialize: `mul` has `c = -0`, so its check covers only a, b and r; `add` has `b = 1`.
@@ -60,11 +64,11 @@ One subnormal lane costs a SIMD group as much as 32 of them: the soft path runs 
   - Offer a ZLUDA option that treats non-`.ftz` as `.ftz`. That breaks bit-exactness only when subnormals actually occur.
 - **Directed rounding** (`add/mul/fma.rz/.rm/.rp.f32`, `__fadd_rz`, etc.) has no hardware form and costs about 215×.
   It is rare in CUDA code.
-- Not covered: `div.rn` / `sqrt.rn` / `rcp.rn` non-ftz (they build on fma but need their own fix-ups), `.sat` with
+- `div.rn.f32`: see the [fdiv32 finding](../2026-10-20-fdiv32/README.md). Not covered: `sqrt.rn` / `rcp.rn` non-ftz, `.sat` with
   directed modes, `f16` (the fp16 unit is already full IEEE with RNE), and lowering the check to fewer instructions.
 
 ## Reproduce
 
 `python3 -B scripts/run_drm_softfp32.py offline|hardware --op soft|hw|hybrid [--round rn|rz|rm|rp]` (exactness);
 cost: `--data normal|sparse|dense --lanes 131072 --chain K --check 512`. Offline: `make verify-fp32-ieee`
-(13 checks against [results/2026-10-20-fp32-ieee](../../results/2026-10-20-fp32-ieee)).
+(14 checks against [results/2026-10-20-fp32-ieee](../../results/2026-10-20-fp32-ieee)).
