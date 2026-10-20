@@ -103,3 +103,8 @@ resets sentinels and retains the full readback. Fresh command-buffer allocation
 is a confounder when interpreting changing special-register values. The SR
 runners check guards, padding, and untouched tails; `make verify-sr` independently
 checks the retained evidence and deliberate corruption rejection.
+
+`make verify-shfl-mask` checks sparse-mask shuffle index initialization and
+paired 64-bit payloads against two retained hardware runs and exact simulator
+replays. It rejects corrupted payloads, input words, inactive destinations,
+programs and missing cases. No GPU is accessed.

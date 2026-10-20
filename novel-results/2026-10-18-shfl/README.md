@@ -3,6 +3,13 @@
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, compute stage, AC power. Straight-line programs, no
 loops, only `simd_shuffle*` forms already recorded safe and integer ALU. Each program was run in the Rust simulator first. 0 faults.
 
+**Sparse-mask correction (2026-10-20):** the generic sequence below was tested
+with all 32 lanes active. Under divergence its index registers must also have
+compatible low bits in inactive lanes. Initialize r19..r22 to 0..3 before
+divergence; merely computing the four indices in active lanes is insufficient.
+The [follow-up](../2026-10-20-shfl-mask/README.md) records both the failure and
+the fix, plus paired b32 lowerings of arbitrary 64-bit payloads.
+
 ## Why this needs care: the index is quad-granular
 
 `simd_shuffle` takes the **low two bits of the source lane from the OR over the source quad's index operands**, not from the reading lane

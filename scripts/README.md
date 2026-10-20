@@ -161,3 +161,15 @@ disassembly, annotated with `agx_cost.py` cycle predictions when the cost model 
 [AGX-Performance-Simulator](https://github.com/Jianwen-Ding/AGX-Performance-Simulator) is available (`AGX_SIM_SCRIPTS=<that repo>/scripts`;
 otherwise each region shows `cost model unavailable`). See `make capture-demo` and
 `docs/shader-capture.md`. `tests/agx_cache_layout.c` prints the struct layouts it relies on.
+
+## Sparse-mask shuffles
+
+`run_drm_shfl_mask.py offline|hardware --output NEW_SCRATCH_DIR` tests 96
+participation masks with paired b32 payloads, native immediate shuffles and
+four-shuffle generic lowerings. It contrasts full-mask index initialization
+with poison left in inactive lanes. Each exact program is simulator-gated;
+hardware failures stop the runner. Start with `--groups 5 --only control-before`.
+`make verify-shfl-mask` checks retained raw hardware bytes and replays all 236
+programs in the adjacent Rust simulator. `verify_shfl_mask.py --no-sim` skips
+replay while retaining shader/input reconstruction, independent PTX checks,
+guards, controls, source hashes and deliberate-corruption rejection.

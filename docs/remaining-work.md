@@ -7,7 +7,7 @@
 > Still open (safe): 3D/array targets, texture-unit simulator model, fp64 rounding modes for
 > add/mul (div/sqrt/rcp/cvt all modes done 2026-10-19: [fp64-divsqrt](../novel-results/2026-10-19-fp64-divsqrt/README.md),
 > shuffle
-> membermask/64-bit/cost, stack via Mesa, 64-bit atomic decode, safe-02/03 cost-model gaps, skip-conditions analysis.
+> partial physical launches / divergent rendezvous / cost (converged sparse masks and paired 64-bit values done 2026-10-20), stack via Mesa, 64-bit atomic decode, safe-02/03 cost-model gaps, skip-conditions analysis.
 > Blocked on owner approval: divergent call/ret + atomic-field follow-ups, all `may_fault`/hang-risk sweeps,
 > and the outward-facing bfeil upstream report.
 
@@ -74,7 +74,7 @@ budget, and ideally a reboot afterwards.
 - **64-bit atomics** (done 2026-10-18: [Honeykrisp exposes none; emulated add measured, final exact, returned value torn across the carry](../novel-results/2026-10-18-atom64/README.md); open: lock-based CAS / exchange, which needs a spin loop and the owner's approval) (`atom.add.u64`, `atom.cas.b64`, `atom.exch.b64`). No validated encoding is known. Device and
   threadgroup ops 11-15 stop the issuing group in the tested forms. Compile a Vulkan shader with
   `GL_EXT_shader_atomic_int64` (if exposed), export the binary and decode Mesa's lowering.
-- **Warp shuffle completeness** (done 2026-10-18: [exact lowerings, quad-granular index](../novel-results/2026-10-18-shfl/README.md); open: partial membermask, 64-bit values, cost). Original task: Check that every `shfl.sync` mode (`up`, `down`, `bfly`, `idx`) with `c`-clamp and
+- **Warp shuffle completeness** (done 2026-10-18: [exact lowerings, quad-granular index](../novel-results/2026-10-18-shfl/README.md); 2026-10-20: [converged sparse masks and paired 64-bit payloads](../novel-results/2026-10-20-shfl-mask/README.md) measured; generic index initialization before divergence is required (`make verify-shfl-mask`). Open: partial physical launches, divergent rendezvous, 16-bit forms, cost). Original task: Check that every `shfl.sync` mode (`up`, `down`, `bfly`, `idx`) with `c`-clamp and
   segment-mask operands has a recorded AGX lowering with exact out-of-range behaviour. The cross-lane width finding
   covers reductions and scans, not every shuffle form.
 - **Stack / scratch through Mesa only** (done 2026-10-18: [spills, vec4, 16-bit; simulator replay exact](../novel-results/2026-10-18-stack-mesa/README.md); open: `stack_get_ptr`, async forms, the coverage case, spill cost: [rough, 20-43 ALU instructions per pair](../novel-results/2026-10-18-spill-cost/README.md)). Original task: Capture a Mesa shader that spills (`stack-via-mesa`) and record the

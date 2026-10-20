@@ -296,3 +296,5 @@ an empty mask; tested control-bit changes match the integer baseline.
 `make verify-tg-atomic-followup` checks exact evidence and simulator gates.
 The probe watchdog now retains memory-pressure and process diagnostics on a
 timeout; `make test-probe-watchdog` tests its bounded failure paths without a GPU.
+
+**Sparse-mask shuffles (2026-10-20).** Inactive lanes contribute index bits, so the generic four-shuffle lowering needs index initialization before divergence. Paired b32 lowerings preserve 64-bit payloads: 360,552 defined positive data words exact, 236 retained dispatches, zero faults. [Finding](novel-results/2026-10-20-shfl-mask/README.md), `make verify-shfl-mask`.

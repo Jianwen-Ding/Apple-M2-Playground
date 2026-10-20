@@ -116,6 +116,7 @@ help:
 	@echo 'make verify-clock-model  Offline: the cost-model clock-read table equals the retained sweeps'
 	@echo 'make verify-clock2  Offline: in-shader clock cost under load and per-core timer copies'
 	@echo 'make verify-occupancy2  Offline: workgroup slots, 2-D/3-D shapes, registers x threadgroup memory'
+	@echo 'make verify-shfl-mask  Offline: sparse-mask index initialization and paired 64-bit shuffle payloads'
 	@echo 'make verify-shfl  Offline: exact PTX shfl.sync lowerings (retained hardware run + simulator replay)'
 	@echo 'make verify-softfp64  Offline: bit-exact software fp64 add/mul/fma (simulator replay + retained hardware runs)'
 	@echo 'make verify-fp64-divsqrt  Offline: bit-exact fp64 div/sqrt/rcp/cvt, all rounding modes (simulator replay + retained hardware runs)'
@@ -614,6 +615,10 @@ verify-fp64-divsqrt:
 
 verify-shfl:
 	$(PYTHON) -B scripts/verify_shfl.py
+
+.PHONY: verify-shfl-mask
+verify-shfl-mask:
+	$(PYTHON) -B scripts/verify_shfl_mask.py
 
 verify-occupancy2:
 	$(PYTHON) -B scripts/verify_occupancy2.py
