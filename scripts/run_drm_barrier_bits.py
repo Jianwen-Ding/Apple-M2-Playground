@@ -18,6 +18,22 @@ import gpu_safety
 REPO = Path(__file__).resolve().parents[1]
 
 
+def split(b_lo, b_hi, half=128):
+    """Group-uniform if/else inside the stress loop: lanes with local index < half execute barrier b_lo, the others b_hi
+    (r25 = local index, set before the loop by run_drm_barrier_stress.body)."""
+    e = BS.enc
+    return (e(f'if_icmp r0l, ult, r25, {half}, 1') + e(f'jmp_exec_none pc+{6+len(b_lo)}', f'jmp_exec_none pc+{6+len(b_lo)}') + b_lo +
+            e(f'else_icmp r0l, ugt, r25, {half-1}, 1') + e(f'jmp_exec_none pc+{6+len(b_hi)}', f'jmp_exec_none pc+{6+len(b_hi)}') + b_hi +
+            e('pop_exec r0l, 1'))
+
+
+def split_variants(pairs):
+    v = [('split-6800-6800', split(bytes([0x68, 0]), bytes([0x68, 0])))]
+    v += [(f'split-6800-{b:04x}', split(bytes([0x68, 0]), bytes([0x68, b >> 8 if b > 0xff else 0]) if False else bytes([0x68, b & 0xff]))) for b in pairs]
+    v += [('split-6800-6800-after', split(bytes([0x68, 0]), bytes([0x68, 0])))]
+    return v
+
+
 def variants(bits):
     v = [('wait', BS.WAIT), ('6800', bytes([0x68, 0]))]
     v += [(f'68{1 << b:02x}', bytes([0x68, 1 << b])) for b in bits]
@@ -33,6 +49,7 @@ def main():
     p.add_argument('--total', type=int, default=2048)
     p.add_argument('--timeout', type=int, default=20)
     p.add_argument('--sim-only', action='store_true')
+    p.add_argument('--split', default=None, help='comma-separated byte-1 values: groups 4-7 use 68XX, groups 0-3 6800 (barrier-ID test)')
     p.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/drm-compute/barrier-bits'))
     p.add_argument('--result', type=Path)
     a = p.parse_args()
@@ -40,7 +57,8 @@ def main():
     sys.path.insert(0, '/save/workspace/AGX-Performance-Simulator/scripts')
     import coverage as cov
     jobs = []
-    for name, enc_bar in variants(bits):
+    vs = split_variants([int(x, 0) for x in a.split.split(',')]) if a.split else variants(bits)
+    for name, enc_bar in vs:
         BS.BARRIERS[name] = enc_bar
         body = BS.body('tg', name, 'wait+mb' if name != 'wait' else 'none', a.size, a.trips, a.total)
         code = drm.build_main(body)
