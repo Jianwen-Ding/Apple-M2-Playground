@@ -790,3 +790,7 @@ verify-nested-partial-outer:
 .PHONY: verify-call-mask-reserve
 verify-call-mask-reserve:
 	$(PYTHON) -B scripts/verify_call_mask_reserve.py
+
+.PHONY: verify-deep-call-reserve
+verify-deep-call-reserve:
+	$(PYTHON) -B scripts/verify_deep_call_reserve.py

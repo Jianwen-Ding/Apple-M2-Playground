@@ -62,3 +62,18 @@ reserve 0/2/4. Separate known-op controls write exact scalar traces; gate every
 actual/three-winner/control path. First both reserves 2, direct/k1/A/seed17;
 inspect all words and recovery before outer-only, inner-only, neither, or a
 matrix. The convention is a hypothesis until those hardware contrasts agree.
+
+The two-level four-way reserve contrast is exact. Extend balanced reserves
+with `probe_deep_call_reserve.py` to 3, 4 and 8 calls, mixed static direct/
+indirect call patterns and a three-way divergent register-call leaf. Every
+function saves its incoming link separately. All saved-link registers are
+preinitialized to a valid main continuation before the original conditional;
+only admitted lanes overwrite/consume them in the predicted flow. Every call
+has push2 and two explicit pops, with entry/link/low-counter and continuation
+checkpoints at each level. Immediate-index low-r0 gathers read initialized
+original excluded lane 0, predicted depths 3..17 and restored 1..15. The main
+caller records its preserved mask before an original-IF pop and full-group
+r1/guard checks. Bounded drain pops follow diagnostics. All target/link PCs
+must decode in-program; each whole actual, no-call control and three-winner
+path must match independent scalar gates. Begin depth3/direct/k1/A/seed17;
+inspect exact recovery before depth4 and depth8 initial cases, then matrix.
