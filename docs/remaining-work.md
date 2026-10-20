@@ -1,5 +1,10 @@
 # Task 1: remaining work, safe and unsafe (2026-10-17)
 
+> **Shuffle update 2026-10-20:** [cost measured](../novel-results/2026-10-20-shfl-cost/README.md) (`make verify-shfl-cost`): native ~2x a dependent iadd,
+> the generic sequence ~18x native; warp-uniform runtime offsets are exact as `and b,31` + native op. Still open: divergent rendezvous, partial
+> physical launches, cost.rs wiring, and the threadgroup-barrier gap bits 8-15 with several SIMD groups (a possible named-barrier field;
+> deadlock risk, so it needs owner approval).
+
 > **Texture update 2026-10-20 (safe-05):** [3D, 2D-array, cube and buffer targets measured, plus filter precision](../novel-results/2026-10-20-texture-targets/README.md)
 > (`make verify-texture-targets`, 35/35): weights round to 1/256; the lod is fp16 with a 1/64 level weight; trilinear is rounded once to
 > the 12-bit grid, which corrects the 2026-10-19 "float32-exact" row. Simulator `texture.rs` was updated to match. Follow-ups: wide buffers,

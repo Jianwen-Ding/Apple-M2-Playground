@@ -42,7 +42,7 @@ down, 0 for up, segment mask 32 - width. The reference lives in `ptx_shfl()`.)
 
 Not established: `membermask` other than all ones (PTX requires every named lane to execute the instruction; a source lane that is
 inactive was not measured), shuffles of 16/64-bit values (two shuffles for 64-bit), `.b32` vs the `f32` forms (bit-identical
-moves), and the cost of the generic sequence versus the single instruction (no timing taken).
+moves), and the cost of the generic sequence versus the single instruction (measured 2026-10-20: [~18x](../2026-10-20-shfl-cost/README.md)).
 
 ## Reproduce
 
