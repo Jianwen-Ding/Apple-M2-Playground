@@ -71,3 +71,14 @@ M=3 source 2 (live masked). Only extend to other indices after exact recovery.
 The complete actual shader is gated against the simulator's current retained
 source hypothesis and hardware must fit a full independent self-fallback
 oracle; preserve any discrepancy rather than widening the batch.
+
+The all-index paired matrix agrees on stopped-source self fallback. Next,
+`probe_dead_index_or.py` isolates low-index contributions: seed r15 in all
+lanes, stop half at depth 0, pop once, then surviving lanes update r15 while
+dead lanes retain the seed. Compare immediate/register reads with the same
+new index. Exact wait controls update all living indices and must match first.
+The actual shader is gated against the current simulator's retained-bit/source
+hypothesis. Begin rotation 0, seed 3, target 0: retained dead bits select live
+lane 3; ignored dead bits select stopped lane 0 and self-fallback. Both are
+bounded, initialized, in-bounds cases. Inspect complete hardware classification
+and recovery before extending seeds/targets or changing the simulator.
