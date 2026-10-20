@@ -1,5 +1,7 @@
 # New hardware findings
 
+- [2026-10-20 Texture targets and filter precision: 3D/array/cube/buffer measured; weights round to 1/256, LOD is fp16 with a 1/64 level weight, trilinear rounds once (corrects 2026-10-19)](2026-10-20-texture-targets/README.md)
+
 - [2026-10-20 Exhaustive supplied-map cost path keeps actual core partitions; timing assumptions explicit (host-only)](2026-10-20-observed-core-map-cost/README.md)
 
 - [2026-10-20 Prepared functional traces replay 80 supplied core maps: 69,624 SIMD traces match independent addresses across fresh memory snapshots (host-only)](2026-10-20-observed-core-map-tracing/README.md)

@@ -119,23 +119,21 @@ def cases():
     return out
 
 
-def main():
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--out', type=Path, default=Path('/scratch/apple-m2-playground/gles-texture'))
-    p.add_argument('--only')
-    a = p.parse_args()
-    out = a.out; out.mkdir(parents=True, exist_ok=True)
+def run_cases(all_cases, out, only=None):
+    """Build the harness into out, run every case (or only one) and write out/record.json. Case keys besides the
+    texture ones: target (GLES_TEX_TARGET) and d (GLES_TEX_D) for 3d / 2darray / cube / buffer targets."""
+    out.mkdir(parents=True, exist_ok=True)
     subprocess.run(['cc', '-std=c11', '-O2', '-Wall', f'-I{INC}', str(REPO/'tests/gles_compute.c'), '-o', str(out/'gles_compute'), '-ldl'], check=True)
     rec = {}
-    for name, c in cases().items():
-        if a.only and name != a.only:
+    for name, c in all_cases.items():
+        if only and name != only:
             continue
         d = out/name; subprocess.run(['rm', '-rf', str(d)], check=True); d.mkdir()
         (d/'shader.glsl').write_text(c['glsl']); (d/'tex.bin').write_bytes(c['data'])
         cache = d/'cache'; cache.mkdir()
         env = {'PATH': '/usr/bin', 'GLES_SHADER_FILE': str(d/'shader.glsl'), 'GLES_TEX_FORMAT': c['fmt'], 'GLES_TEX_W': str(c['w']), 'GLES_TEX_H': str(c['h']),
                'GLES_TEX_DATA': str(d/'tex.bin'), 'GLES_TEX_FILTER': c['filt'], 'GLES_TEX_WRAP': c.get('wrap', 'clamp'),
-               'GLES_TEX_LEVELS': str(c.get('levels', 1)),
+               'GLES_TEX_LEVELS': str(c.get('levels', 1)), 'GLES_TEX_TARGET': c.get('target', '2d'), 'GLES_TEX_D': str(c.get('d', 1)),
                'MESA_SHADER_CACHE_DIR': str(cache), 'MESA_SHADER_CACHE_DISABLE': 'false'}
         if c.get('image'):
             env['GLES_TEX_IMAGE'] = '1'
@@ -152,10 +150,19 @@ def main():
             res['guards_intact'] = all(x == 0xcdcdcdcd for x in w[:8]) and all(x == 0xcdcdcdcd for x in w[8+c['count']:8+groups*32+8][-8:])
             res['out'] = list(w[8:8+c['count']])
         else:
-            res['stderr'] = r.stderr.decode()[-300:]
+            res['stderr'] = (r.stderr.decode() + r.stdout.decode())[-300:]
         rec[name] = res
         print(name, {k: (v if k != 'out' else f'{len(v)} words') for k, v in res.items()}, flush=True)
     (out/'record.json').write_text(json.dumps(rec)+'\n')
+    return rec
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--out', type=Path, default=Path('/scratch/apple-m2-playground/gles-texture'))
+    p.add_argument('--only')
+    a = p.parse_args()
+    run_cases(cases(), a.out, a.only)
 
 
 if __name__ == '__main__':

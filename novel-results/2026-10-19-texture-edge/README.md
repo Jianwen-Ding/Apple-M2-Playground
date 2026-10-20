@@ -67,7 +67,7 @@ to `texture_sample ... lod_grad, r4_r5_r6_r7`.
 | Question | Result | Cases |
 |---|---|---|
 | `textureLod` with `NEAREST_MIPMAP_NEAREST`, lod in -1..6 at the texture centre | level = **ceil(lod - 0.5) clamped to [0, 4]**: exact ties (x.5) go to the **lower** level; negative lods clamp to 0, lod > 4 clamps to 4 | 16/16 |
-| `textureLod` with `LINEAR_MIPMAP_LINEAR` (trilinear) | **float32-exact** linear blend of the adjacent levels by the fractional lod: `L_lo*(1-fr) + L_hi*fr`, no 12-bit rounding on the level blend (unlike the within-level bilinear) | 16/16 |
+| `textureLod` with `LINEAR_MIPMAP_LINEAR` (trilinear) | **Corrected 2026-10-20:** these values all lay on the 12-bit grid, so this row cannot distinguish the rules; off-grid data shows one 12-bit rounding of the full blend and a 1/64 level weight from an fp16 lod ([texture-targets](../2026-10-20-texture-targets/README.md)). Original claim: **float32-exact** linear blend of the adjacent levels by the fractional lod: `L_lo*(1-fr) + L_hi*fr`, no 12-bit rounding on the level blend (unlike the within-level bilinear) | 16/16 |
 | `textureGrad` with dPdx=(k/16,0), dPdy=(0,k/16), k=1..8 | rho = max texel-gradient, lod = log2(rho), same nearest-level rule (k=1..8 -> L0,L1,L2,L2,L2,L3,L3,L3) | 8/8 |
 
 Note the harness trap this closed: with a non-mipmap `MIN_FILTER` (`nearest`/`linear`), an
