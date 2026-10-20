@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline arithmetic/core-plane validation and measured-peak model sensitivity."""
 import argparse
+from integer_recorded_model import RECORDED_FUNCTIONAL_SHA256
 from collections import Counter
 from datetime import datetime,timezone
 import gzip
@@ -84,7 +85,7 @@ def main():
         assert recorded_builder_available(g['builder_sha256']);recorded_builders.add(g['builder_sha256'])
         wanted['builder_sha256']=g['builder_sha256'];assert g==wanted
         assert r['code']==p['code'].hex() and r['control_code']==p['control'].hex() and r['table_in']==p['table']
-        assert r['native_binary_sha256']==report['native_binary_sha256'] and r['simulator_sha256']==report['functional_binary_sha256']
+        assert r['native_binary_sha256']==report['native_binary_sha256'] and r['simulator_sha256']==RECORDED_FUNCTIONAL_SHA256
         assert hashlib.sha256(r['wrapper_text'].encode()).hexdigest()==r['wrapper_sha256']
         assert r['phase']=='finished' and not r.get('halted') and r['arithmetic_and_guards_exact'] and r['recovery_control_passed']
         assert r['before']['budget_used']==r['after']['budget_used']==0 and r['before']['ac_online']==r['after']['ac_online']=='1'
@@ -132,6 +133,7 @@ def main():
         for a in (1024,4096):
             tag,core=[report['cells'][f'{c}:{a}:{sr}'] for sr in (19,20)]
             report['paired'][f'{c}:{a}']=dict(sr20_to_sr19_late_ratio=core['late_median_ns']/tag['late_median_ns'])
+    report['recorded_functional_sha256']=RECORDED_FUNCTIONAL_SHA256
     report.update(trains=28,dispatches=1608,timed_dispatches=1552,arithmetic_and_guards_exact=28,
         literal_final_buffers_exact=14,core_property_buffers_valid=14,recovery_controls_exact=56,fault_events=0,
         own_probe_windows_nonoverlapping=True,intermediate_buffers_captured=False,default_predictions_unchanged=8,calibration_changed=False)

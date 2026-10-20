@@ -5,6 +5,7 @@ No GPU access. Complete hardware buffers are checked independently; the model
 uses saved shader bytes. Timing residuals remain visible, without recalibration.
 """
 import argparse
+from integer_recorded_model import RECORDED_FUNCTIONAL_SHA256
 from datetime import datetime,timezone
 import gzip
 import hashlib
@@ -46,13 +47,14 @@ def main():
     wanted={f'integer-chain-n131072-w128-c{c}-a{a}-r{r}.json.gz' for c in (1,2,4,8) for a in (64,256,1024,2048) for r in range(5)}
     wanted|={'integer-chain-n32-w32-c1-a64-r0.json.gz','integer-chain-n32768-w128-c1-a1024-r0.json.gz','integer-chain-n32768-w128-c8-a1024-r0.json.gz'}
     paths=sorted(B.DATA.glob('*.json.gz'));assert {p.name for p in paths}==wanted
-    report=dict(utc=datetime.now(timezone.utc).isoformat(),records={},cells={},slopes={},dispatch_model_sha256=sha(MODEL),
+    report=dict(recorded_functional_sha256=RECORDED_FUNCTIONAL_SHA256,utc=datetime.now(timezone.utc).isoformat(),records={},cells={},slopes={},dispatch_model_sha256=sha(MODEL),
         functional_model_sha256=sha(B.P.cov.RUN),source_sha256={name:sha(SIM/name) for name in
         ('rust/src/cost.rs','rust/src/dispatch.rs','rust/src/func.rs','rust/src/fsem.rs','rust/src/isa/compiled.rs','rust/src/isa/exec.rs')},
         parameter_sha256={name:sha(SIM/name) for name in ('results/2026-10-11-instruction-bench/bench.json.gz','results/2026-10-11-cost-model/calibration.json')})
     cache={};cells={};codes={};boots=set()
     for path in paths:
-        r=json.load(gzip.open(path));g=r['gate'];key=(r['n'],g['chains'],g['adds'],r['wg'])
+        r=json.load(gzip.open(path));assert r['simulator_sha256']==RECORDED_FUNCTIONAL_SHA256
+        g=r['gate'];key=(r['n'],g['chains'],g['adds'],r['wg'])
         if key not in cache:cache[key]=B.build(*key)
         p=cache[key]
         assert r['code']==p['code'].hex() and r['control_code']==p['control'].hex() and r['table_in']==p['table']

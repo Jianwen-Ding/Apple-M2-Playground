@@ -1,0 +1,70 @@
+{
+ "command": [
+  "make",
+  "verify-integer-chain-cost",
+  "verify-integer-chain-train",
+  "verify-integer-immediate-cost",
+  "verify-integer-timing-state",
+  "verify-integer-length-cost",
+  "verify-integer-core-distribution",
+  "verify-integer-geometry-cost"
+ ],
+ "exit_code": 0,
+ "new_hardware_submissions": 0,
+ "recorded_dispatches_rechecked": 19821,
+ "recorded_functional_sha256": "d775e81956d33580f7e115c7444727ae2e21f78b1c0014675a7bec294817156d",
+ "records_checked": 405,
+ "targets": [
+  {
+   "baseline_sha256": "0e7bfa537f28470558b9e64998d551e6884738fa690920af17700fbc93b40d5d",
+   "recorded_dispatches": 249,
+   "records": 83,
+   "target": "verify-integer-chain-cost",
+   "verifier_sha256": "ae60494c782cd277ed3e3bc4bf49499b8b51fe648763f08e69b65c72296b3d92"
+  },
+  {
+   "baseline_sha256": "c7444812d81e3fec345268156cc5ee09dfc9fbc3672bff55dd3097c70a994df9",
+   "recorded_dispatches": 1194,
+   "records": 19,
+   "target": "verify-integer-chain-train",
+   "verifier_sha256": "b159e12d4ecba8cbd9afc955e323feb16fc4e56d8841c7362a4616563b9dffd2"
+  },
+  {
+   "baseline_sha256": "c367d513d5fbef65f5611bc5be18670230cfacdcc8eda7a46648125f13c4c10a",
+   "recorded_dispatches": 1596,
+   "records": 26,
+   "target": "verify-integer-immediate-cost",
+   "verifier_sha256": "b06846756dc05ada16500d0c65afcd99388ac63c43851c511a4b106cab3ad176"
+  },
+  {
+   "baseline_sha256": "32cace93773a256e2e353087179b82f43c8ae9b39bd716b83a75388504cc21d0",
+   "recorded_dispatches": 2394,
+   "records": 39,
+   "target": "verify-integer-timing-state",
+   "verifier_sha256": "699e86ae03bfca69bdd7859f1c2c5ad81b468f41e68e00ba53600563c1ff98f8"
+  },
+  {
+   "baseline_sha256": "76afe9010febc815b3ba1ecbfc280a1663d3108b1f537539448b18ffe484b73f",
+   "recorded_dispatches": 3180,
+   "records": 50,
+   "target": "verify-integer-length-cost",
+   "verifier_sha256": "0f3ae5298b9f61f8fc7924277af2cab5feee28eac47e4b0050aa645994a9a082"
+  },
+  {
+   "baseline_sha256": "098b82f84b35988a600d7f5b048fce7bf4e199f4ff228da28dc499ea051bc636",
+   "recorded_dispatches": 1608,
+   "records": 28,
+   "target": "verify-integer-core-distribution",
+   "verifier_sha256": "86388700ec689c916f32084f080161e0cff844e11060f6a6749b8e454444dab6"
+  },
+  {
+   "baseline_sha256": "c578136b73d55c8692d7829d4308b019bc232bbbb767e0d9ba56581f53f78369",
+   "recorded_dispatches": 9600,
+   "records": 160,
+   "target": "verify-integer-geometry-cost",
+   "verifier_sha256": "9af7050a8f694982e29cf9ee195e9fa46865de6bd7a9538fa83cdfe5f66dbbcb"
+  }
+ ],
+ "tested_functional_sha256": "b89e169035f35f44c4aaca605e4a218cacffc4fad199b4a9bcd516f404f0835f",
+ "utc": "2026-10-20T06:22:45.036375+00:00"
+}

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline validation and adjacent-length residuals for controlled-gap trains."""
 import argparse
+from integer_recorded_model import RECORDED_FUNCTIONAL_SHA256
 from datetime import datetime,timezone
 import gzip
 import hashlib
@@ -41,7 +42,7 @@ def main():
         if key not in prepared:prepared[key]=L.build(*key)
         p=prepared[key];assert g==json.loads(json.dumps(p['gate']))
         assert r['code']==p['code'].hex() and r['control_code']==p['control'].hex() and r['table_in']==p['table']
-        assert r['native_binary_sha256']==report['native_binary_sha256'] and r['simulator_sha256']==report['functional_binary_sha256']
+        assert r['native_binary_sha256']==report['native_binary_sha256'] and r['simulator_sha256']==RECORDED_FUNCTIONAL_SHA256
         assert hashlib.sha256(r['wrapper_text'].encode()).hexdigest()==r['wrapper_sha256']
         assert r['phase']=='finished' and not r.get('halted') and r['final_arithmetic_exact'] and r['recovery_control_passed']
         assert r['before']['budget_used']==r['after']['budget_used']==0
@@ -95,6 +96,7 @@ def main():
             model=(high['model_ns']-low['model_ns'])/(hi-lo)
             slopes[f'{lo}:{hi}']=dict(hardware_ns_per_extra_add=hw,model_ns_per_extra_add=model,ratio=hw/model)
         report['slopes'][str(c)]=slopes
+    report['recorded_functional_sha256']=RECORDED_FUNCTIONAL_SHA256
     report.update(trains=50,dispatches=3180,timed_dispatches=3080,final_train_buffers_exact=50,control_buffers_exact=100,
         fault_events=0,own_probe_windows_nonoverlapping=True,intermediate_buffers_captured=False,calibration_changed=False)
     assert report['functional_binary_sha256']==sha(S.P.cov.RUN) and report['native_binary_sha256']==sha(exe)

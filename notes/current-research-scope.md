@@ -13,16 +13,19 @@ Retain watchdog/kernel/memory diagnostics and exact recovery controls. A failed
 recovery or blocked probe stops GPU submissions. Commit and push each completed
 piece. The deferred performance-simulator PR review remains a later task.
 
-Current next implementation: optional observed M2 core-map replay in functional
-simulation, using the existing ordinary arithmetic corpus without new hardware.
-See experiments/arithmetic/observed-core-map-replay.md. Preserve default core-zero
-and synthetic stress modes, historical model provenance and literal arithmetic/
-guard checks. The geometry study adds 72 full-size maps: all 38 IDs are seen,
-and aligned eight-workgroup blocks stay within one cluster at the tested 1-D
-32/64/128/256-lane sizes, including neighboring grids' partial tails. Do not
-generalize to unmeasured shapes or infer concurrency. The 1000 us host delay
-does not guarantee timing stability: one cell retains 2.23x trial variation.
-Frequency and the throughput gap remain unresolved. Keep small positive values,
-independent whole-program gates and bounded serialized hardware submissions.
+Current next implementation: carry the optional observed M2 core-map context
+into prepared functional tracing, then assess cost-path integration carefully.
+Functional execution now supports --m2-core-map / run_with_m2_core_map: all 80
+retained maps replay literal complete hardware buffers, with 64 default cases
+matching the archived model and independent oracles. Preserve default core-zero
+and synthetic stress modes and separate historical/current model provenance.
+Do not present supplied state as a placement or timing predictor. Cost replay
+must not mix workgroups assigned to different actual cores and imply they were
+one observed schedule; SR17 slots and concurrency remain unmeasured.
+The geometry corpus's eight-workgroup cluster rule is scoped to tested 1-D
+32/64/128/256-lane sizes. Host delay does not guarantee stable timing, and
+frequency/throughput remain unresolved. The archived recorded checker is at
+the path in results/2026-10-20-observed-core-map-replay/recorded-model.json.
+Keep independent whole-program gates and bounded serialized hardware work.
 No function transfers or execution-counter manipulation beyond the standard
 harness prefix.

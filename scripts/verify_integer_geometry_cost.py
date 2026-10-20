@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline geometry, arithmetic, core-map and cluster-packet evidence checks."""
 import argparse
+from integer_recorded_model import RECORDED_FUNCTIONAL_SHA256
 from datetime import datetime,timezone
 import gzip
 import hashlib
@@ -60,7 +61,7 @@ def main():
         if key not in prepared:prepared[key]=G.build(*key)
         p=prepared[key];assert g==json.loads(json.dumps(p['gate']))
         assert r['code']==p['code'].hex() and r['control_code']==p['control'].hex() and r['table_in']==p['table']
-        assert r['native_binary_sha256']==report['native_binary_sha256'] and r['simulator_sha256']==report['functional_binary_sha256']
+        assert r['native_binary_sha256']==report['native_binary_sha256'] and r['simulator_sha256']==RECORDED_FUNCTIONAL_SHA256
         assert hashlib.sha256(r['wrapper_text'].encode()).hexdigest()==r['wrapper_sha256']
         assert r['phase']=='finished' and not r.get('halted') and r['arithmetic_and_guards_exact'] and r['recovery_control_passed']
         assert r['before']['budget_used']==r['after']['budget_used']==0 and r['before']['ac_online']==r['after']['ac_online']=='1'
@@ -117,6 +118,7 @@ def main():
             for a in (1024,4096):
                 tag,core=[report['cells'][f'{n}:{wg}:{c}:{a}:{sr}'] for sr in (19,20)]
                 report['paired'][f'{n}:{wg}:{c}:{a}']=dict(sr20_to_sr19_late_ratio=core['late_median_ns']/tag['late_median_ns'])
+    report['recorded_functional_sha256']=RECORDED_FUNCTIONAL_SHA256
     report.update(trains=160,dispatches=9600,timed_dispatches=9280,arithmetic_and_guards_exact=160,
         literal_final_buffers_exact=80,core_property_buffers_valid=80,recovery_controls_exact=320,fault_events=0,
         own_probe_windows_nonoverlapping=True,intermediate_buffers_captured=False,calibration_changed=False)

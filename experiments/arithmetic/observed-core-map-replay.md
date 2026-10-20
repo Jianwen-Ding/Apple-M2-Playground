@@ -1,13 +1,13 @@
-# Next implementation: optional observed core-map replay
+# Optional observed core-map replay
 
-Proposed, not implemented yet. The geometry corpus provides 72 full-size end
+Implemented 2026-10-20. The geometry corpus provides 72 full-size end
 maps with all 38 M2 Max core IDs and aligned eight-workgroup cluster blocks
 at the tested 1-D shapes. Default functional simulation deliberately uses
 core zero; nonzero `Dispatch::placement` is a synthetic stress mode, not a
 physical M2 scheduling model. Preserve both existing behaviors.
 
-Add a separate optional input, tentatively `--m2-core-map FILE` and a library
-entry point such as `run_with_m2_core_map`. A JSON array supplies one packed
+The separate optional input is `--m2-core-map FILE`, with library entry points
+`run_with_m2_core_map` and `validate_m2_core_map`. A JSON array supplies one packed
 SR20 core ID per linear workgroup. Validate array length against checked
 geometry and each ID against enabled M2 masks before executing or mutating
 mapped memory. At the measured 1-D workgroup sizes, check the observed aligned
@@ -23,8 +23,9 @@ the scalar/default-placement expectations. Historical provenance checks should
 distinguish a recorded model from a newer model being tested, rather than
 rewriting the raw evidence or demanding identical binary hashes across versions.
 
-CPU tests should reject a wrong map length, disabled core IDs and a mixed
-cluster block before any writes, and cover whole and partial blocks. Replay
-several seeds/maps and confirm the default and synthetic modes are unchanged.
-All evidence can come from the existing ordinary arithmetic corpus; no new
-hardware or excluded-family experiments are needed for this implementation.
+Completed: 80 observed maps reproduce complete hardware buffers literally;
+64 unique default cases match both the archived model and independent oracles.
+Three targeted library tests and five CLI failures pass. All evidence comes
+from the existing ordinary arithmetic corpus; no hardware was submitted.
+See the [finding](../../novel-results/2026-10-20-observed-core-map-replay/README.md)
+and [evidence](../../results/2026-10-20-observed-core-map-replay/README.md).

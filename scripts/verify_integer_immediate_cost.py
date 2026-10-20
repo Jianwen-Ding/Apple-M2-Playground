@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Offline full-buffer and timing verification of matched immediate-add trains."""
 import argparse
+from integer_recorded_model import RECORDED_FUNCTIONAL_SHA256
 from datetime import datetime,timezone
 import gzip
 import hashlib
@@ -40,7 +41,7 @@ def main():
         p=prepared[key]
         assert g==json.loads(json.dumps(p['gate']))
         assert r['code']==p['code'].hex() and r['control_code']==p['control'].hex() and r['table_in']==p['table']
-        assert r['harness_sha256']==report['harness_sha256'] and r['simulator_sha256']==report['functional_binary_sha256']
+        assert r['harness_sha256']==report['harness_sha256'] and r['simulator_sha256']==RECORDED_FUNCTIONAL_SHA256
         assert r['phase']=='finished' and not r.get('halted') and r['final_arithmetic_exact'] and r['recovery_control_passed']
         assert r['before']['budget_used']==r['after']['budget_used']==0
         assert r['before']['ac_online']==r['after']['ac_online']=='1'
@@ -89,6 +90,7 @@ def main():
             hw=(high['late_median_ns']-low['late_median_ns'])/1024
             model=(high['model_ns']-low['model_ns'])/1024
             report['slopes'][f'{c}:{i}']=dict(hardware_ns_per_extra_add=hw,model_ns_per_extra_add=model,ratio=hw/model)
+    report['recorded_functional_sha256']=RECORDED_FUNCTIONAL_SHA256
     report.update(trains=26,dispatches=1596,timed_dispatches=1544,final_train_buffers_exact=26,control_buffers_exact=52,
         fault_events=0,own_probe_windows_nonoverlapping=True,intermediate_buffers_captured=False,calibration_changed=False)
     assert report['functional_binary_sha256']==sha(I.P.cov.RUN) and report['dispatch_binary_sha256']==sha(A.MODEL)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """CPU-only verification of complete buffers, controlled gaps and timing states."""
 import argparse
+from integer_recorded_model import RECORDED_FUNCTIONAL_SHA256
 from datetime import datetime,timezone
 import difflib
 import gzip
@@ -46,7 +47,7 @@ def main():
         if key not in prepared:prepared[key]=S.build(*key,0)
         p=prepared[key];wanted=json.loads(json.dumps(p['gate']));wanted['timing_state']['gap_us']=gap
         assert g==wanted and r['code']==p['code'].hex() and r['control_code']==p['control'].hex() and r['table_in']==p['table']
-        assert r['native_binary_sha256']==report['native_binary_sha256'] and r['simulator_sha256']==report['functional_binary_sha256']
+        assert r['native_binary_sha256']==report['native_binary_sha256'] and r['simulator_sha256']==RECORDED_FUNCTIONAL_SHA256
         assert hashlib.sha256(r['wrapper_text'].encode()).hexdigest()==r['wrapper_sha256']
         assert r['phase']=='finished' and not r.get('halted') and r['final_arithmetic_exact'] and r['recovery_control_passed']
         assert r['before']['budget_used']==r['after']['budget_used']==0
@@ -93,6 +94,7 @@ def main():
             trial_late_max_to_min_ratio=max(late)/min(late),minimum_trial_late_ns=min(late),maximum_trial_late_ns=max(late),
             host_gap_median_ns=st.median([v for t in trials for v in t['host_inter_submission_ns']]),
             observed_train_duty_median=st.median([t['observed_train_duty'] for t in trials]))
+    report['recorded_functional_sha256']=RECORDED_FUNCTIONAL_SHA256
     report.update(trains=39,dispatches=2394,timed_dispatches=2316,final_train_buffers_exact=39,control_buffers_exact=78,
         fault_events=0,own_probe_windows_nonoverlapping=True,intermediate_buffers_captured=False,calibration_changed=False)
     assert report['functional_binary_sha256']==sha(S.P.cov.RUN) and report['native_binary_sha256']==sha(exe)

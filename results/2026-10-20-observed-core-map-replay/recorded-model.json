@@ -1,0 +1,6 @@
+{
+ "archived_binary": "/scratch/apple-m2-playground/model-versions/d775e81956d33580f7e115c7444727ae2e21f78b1c0014675a7bec294817156d/agx_run",
+ "geometry_analysis_sha256": "c578136b73d55c8692d7829d4308b019bc232bbbb767e0d9ba56581f53f78369",
+ "recorded_functional_sha256": "d775e81956d33580f7e115c7444727ae2e21f78b1c0014675a7bec294817156d",
+ "source_commit": "ceada2f11a2be8310a346b3a9734e15f76d9dffe"
+}

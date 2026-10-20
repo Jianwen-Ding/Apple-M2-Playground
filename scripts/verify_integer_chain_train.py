@@ -6,6 +6,7 @@ timestamps are checked for every completed dispatch. Intermediate result
 buffers are explicitly outside what the retained harness captures.
 """
 import argparse
+from integer_recorded_model import RECORDED_FUNCTIONAL_SHA256
 from datetime import datetime,timezone
 import gzip
 import hashlib
@@ -42,7 +43,7 @@ def main():
         if key not in prepared:prepared[key]=B.build(*key)
         p=prepared[key]
         assert source_available(g['builder_sha256']) and g['base_builder_sha256']==sha(Path(B.B.__file__))
-        assert r['harness_sha256']==report['harness_sha256'] and r['simulator_sha256']==report['functional_binary_sha256']
+        assert r['harness_sha256']==report['harness_sha256'] and r['simulator_sha256']==RECORDED_FUNCTIONAL_SHA256
         assert r['code']==p['code'].hex() and r['control_code']==p['control'].hex() and r['table_in']==p['table']
         assert g['repeat_invariance_exact'] and g['final_buffer_oracle_exact'] and not g['intermediate_buffers_captured']
         assert r['phase']=='finished' and not r.get('halted') and r['final_arithmetic_exact'] and r['recovery_control_passed']
@@ -93,6 +94,7 @@ def main():
             rows[f'{lo}:{hi}']=dict(hardware_ns_per_extra_add=hw,model_ns_per_extra_add=model,ratio=hw/model)
         report['slopes'][str(chains)]=rows
     assert report['functional_binary_sha256']==sha(B.P.cov.RUN) and report['dispatch_binary_sha256']==sha(A.MODEL)
+    report['recorded_functional_sha256']=RECORDED_FUNCTIONAL_SHA256
     report.update(trains=19,dispatches=1194,timed_dispatches=1156,final_train_buffers_exact=19,control_buffers_exact=38,
         fault_events=0,own_probe_windows_nonoverlapping=True,intermediate_buffers_captured=False,calibration_changed=False)
     if args.result:args.result.write_text(json.dumps(report,indent=1,sort_keys=True)+'\n')

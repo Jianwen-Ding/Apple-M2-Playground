@@ -87,3 +87,8 @@ historical and current model versions separately. The eight-workgroup rule
 is a measured constraint for these 1-D shapes, not a complete schedule.
 
 [Evidence and offline verification](../../results/2026-10-20-integer-geometry-cost/README.md).
+
+[Observed-core-map replay is implemented](../2026-10-20-observed-core-map-replay/README.md):
+80 retained maps reproduce complete hardware buffers literally when supplied
+as simulator input, while 64 default cases match the archived model. This
+replays known scheduling state rather than predicting a schedule.
