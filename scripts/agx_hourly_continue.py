@@ -18,7 +18,8 @@ import time
 
 DEFAULT_STATE=Path('/scratch/apple-m2-playground/hourly-continuation')
 PROMPT=("Hourly continuation requested by the owner: Continue the active AGX ISA goal in /save/workspace. "
-        "Read AGENTS.md and durable handoff/evidence; preserve current work. Document functionality/performance "
+        "Read AGENTS.md and durable scope/evidence; preserve current work. Focus ordinary numeric, texture and memory instructions; "
+        "exclude function-transfer and execution-counter-boundary experiments per the owner's current scope. Document functionality/performance "
         "and keep AGX-Performance-Simulator aligned. Gate complete programs in simulation with independent "
         "oracles before hardware; use bounded watchdogs and exact recovery controls. Investigate, preserve and "
         "push fault/hang diagnostics; commit/push completed work. Do not start parallel GPU workers. Respect "

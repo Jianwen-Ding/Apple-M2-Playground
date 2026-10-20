@@ -830,3 +830,7 @@ verify-overflow-register-visibility:
 .PHONY: verify-overflow-guard
 verify-overflow-guard:
 	$(PYTHON) -B scripts/verify_overflow_guard.py
+
+.PHONY: verify-integer-chain-cost
+verify-integer-chain-cost:
+	$(PYTHON) -B scripts/verify_integer_chain_cost.py

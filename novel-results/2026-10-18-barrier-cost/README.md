@@ -25,3 +25,9 @@ mixed ALU, workgroups per core.
 
 `python3 scripts/run_drm_barrier_cost.py offline|hardware [--control]`; `make verify-barrier-cost` (offline, 5 checks against
 [results/2026-10-18-barrier-cost](../../results/2026-10-18-barrier-cost)).
+
+Later [ordinary arithmetic follow-up](../2026-10-20-integer-chain-cost/README.md):
+1/2/4/8 interleaved chains all retain a similar isolated-dispatch timing
+shortfall. This does not support assigning the entire gap to single-register
+dependency latency. Clock/warm-up and program-length effects remain open;
+consecutive repetitions are next. No global add-cost parameter was changed.
