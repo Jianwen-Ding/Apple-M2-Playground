@@ -1,0 +1,35 @@
+diff --git a/format/src/lib.rs b/format/src/lib.rs
+index a5987a8..867a218 100644
+--- a/format/src/lib.rs
++++ b/format/src/lib.rs
+@@ -185,7 +185,7 @@ impl CudaDisplay
+     }
+ }
+ 
+-impl CudaDisplay for Option<unsafe extern "C" fn(*const i8)> {
++impl CudaDisplay for Option<unsafe extern "C" fn(*const std::ffi::c_char)> {
+     fn write(
+         &self,
+         _fn_name: &'static str,
+@@ -200,7 +200,7 @@ impl CudaDisplay for Option<unsafe extern "C" fn(*const i8)> {
+     }
+ }
+ 
+-impl CudaDisplay for Option<unsafe extern "C" fn(i32, *const i8, *const i8)> {
++impl CudaDisplay for Option<unsafe extern "C" fn(i32, *const std::ffi::c_char, *const std::ffi::c_char)> {
+     fn write(
+         &self,
+         _fn_name: &'static str,
+diff --git a/zluda_agx/src/bin/agx_cuda_smoke.rs b/zluda_agx/src/bin/agx_cuda_smoke.rs
+index 2426510..c22cade 100644
+--- a/zluda_agx/src/bin/agx_cuda_smoke.rs
++++ b/zluda_agx/src/bin/agx_cuda_smoke.rs
+@@ -41,7 +41,7 @@ fn main() {
+         check("cuInit", cuInit(0));
+         let mut dev = 0;
+         check("cuDeviceGet", cuDeviceGet(&mut dev, 0));
+-        let mut name = [0i8; 128];
++        let mut name = [0 as std::ffi::c_char; 128];
+         check("cuDeviceGetName", cuDeviceGetName(name.as_mut_ptr(), 128, dev));
+         let mut ctx = CUcontext(null_mut());
+         check("cuCtxCreate", cuCtxCreate_v2(&mut ctx, 0, dev));
