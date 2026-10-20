@@ -70,3 +70,15 @@ squares over the medians of K (firmware ns; the run-to-run spread is about +-15%
 `scripts/run_drm_softfp64.py offline|hardware --op mul|add|fma [--chain K --lanes N --keeper]`; `make verify-softfp64`
 (offline: retained records, fresh random interpreter checks and the simulator replay of all three programs; needs `agx_run`
 built; `--no-sim` skips the replay). Records: [results/2026-10-18-fp64](../../results/2026-10-18-fp64).
+
+## Update 2026-10-20: directed rounding for add / mul / fma
+
+`fadd64` / `fmul64` / `ffma64` now take `mode` (`rn` default, which is unchanged, and `rz` / `rm` / `rp`). The modes
+use `round_pack_mode`, the IEEE `.rm` signed-zero rule (an exact zero sum of non-zero terms is -0, and a zero sum of
+zeros is -0 unless both are +0) and per-mode overflow to inf or max finite. **All 9 PTX forms are bit-exact on hardware**:
+`add` / `mul` on 14,304 lanes and `fma` on 20,000 lanes (the edge sets plus random and near-cancelling operands),
+3 runs each, identical to the simulator. Directed forms cost 8-13 instructions more than `rn` (221-225 vs 213 for add,
+185-189 vs 176 for mul, 411-415 vs 403 for fma). The rational reference's overflow edge (max finite < |x| < 2^1024)
+was fixed along the way. `make verify-fp64-modes` (11 checks); evidence:
+[results/2026-10-20-fp64-modes](../../results/2026-10-20-fp64-modes).
+

@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-10-20 fp64 add/mul/fma .rz/.rm/.rp: all 9 directed-rounding PTX forms bit-exact on hardware (soft-fp64, +8-13 instructions over rn)](2026-10-18-fp64/README.md#update-2026-10-20-directed-rounding-for-add--mul--fma)
 - [2026-10-20 IEEE sqrt.rn.f32: a 5-op rsqrt + one-correction sequence is correctly rounded on all 2^24 inputs of [1,4) on hardware (Mesa's sqrt: 32% misrounded); hybrid exact over all exponents at ~5x Mesa](2026-10-20-fsqrt32/README.md)
 - [2026-10-20 IEEE div.rn.f32: Newton-refined rcp is correctly rounded for all 2^23 mantissas, so a 6-op Markstein sequence is exact in range; hybrid bit-exact everywhere at ~10x Mesa's inexact a*rcp(b) (which is <= 1.82 ulp)](2026-10-20-fdiv32/README.md)
 - [2026-10-20 Exact IEEE fp32: non-ftz add/mul/fma and .rz/.rm/.rp bit-exact on hardware (soft fma + hybrid native path); hybrid costs ~15x native on normal data, ~240x when a group hits a subnormal](2026-10-20-fp32-ieee/README.md)

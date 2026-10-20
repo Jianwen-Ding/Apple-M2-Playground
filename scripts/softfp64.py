@@ -237,14 +237,14 @@ def mul_core(P, ua, ub):
     return [n0, n1, n2, n3], e, sign
 
 
-def fmul64(P, a, b):
+def fmul64(P, a, b, mode='rn'):
     ua, ub = unpack(P, *a), unpack(P, *b)
     (n0, n1, n2, n3), e, sign = mul_core(P, ua, ub)
     mh = P.extr(n2, n3, 21)
     ml = P.extr(n1, n2, 21)
     g = P.and_(P.lsr(n1, 20), 1)
     st = P.flag('ugt', P.or_(P.and_(n1, 0xfffff), n0), 0)
-    hi, lo = round_pack(P, sign, e, mh, ml, g, st)
+    hi, lo = round_pack(P, sign, e, mh, ml, g, st) if mode == 'rn' else round_pack_mode(P, sign, e, mh, ml, g, st, mode)
     # special operands
     nan = P.or_(P.or_(ua['nan'], ub['nan']), P.or_(P.and_(ua['inf'], ub['zero']), P.and_(ub['inf'], ua['zero'])))
     inf = P.or_(ua['inf'], ub['inf'])
@@ -258,8 +258,8 @@ def fmul64(P, a, b):
     return hi, lo
 
 
-def fadd64(P, a, b):
-    """IEEE binary64 add (round to nearest even), branch-free."""
+def fadd64(P, a, b, mode='rn'):
+    """IEEE binary64 add, branch-free; mode rn (default, the original program) / rz / rm / rp."""
     # order by magnitude (raw bits are monotonic for non-NaN): x = larger, y = smaller
     ma_h, mb_h = P.and_(a[0], 0x7fffffff), P.and_(b[0], 0x7fffffff)
     gt = P.or_(P.flag('ugt', ma_h, mb_h), P.and_(P.flag('ueq', ma_h, mb_h), P.flag('ugt', a[1], b[1])))
@@ -296,9 +296,9 @@ def fadd64(P, a, b):
     ml = P.extr(nl, nh, 11)
     g = P.and_(P.lsr(nl, 10), 1)
     st = P.flag('ugt', P.and_(nl, 0x3ff), 0)
-    rhi, rlo = round_pack(P, ux['sign'], e, mh, ml, g, st)
-    # exact zero result: -0 only when both operands are -0
-    zsign = P.and_(ux['sign'], uy['sign'])
+    rhi, rlo = round_pack(P, ux['sign'], e, mh, ml, g, st) if mode == 'rn' else round_pack_mode(P, ux['sign'], e, mh, ml, g, st, mode)
+    # exact zero result: -0 only when both operands are -0 (rm: -0 unless both are +0)
+    zsign = P.and_(ux['sign'], uy['sign']) if mode != 'rm' else P.or_(ux['sign'], uy['sign'])
     rhi = P.sel('ugt', szero, 0, zsign, rhi)
     rlo = P.sel('ugt', szero, 0, 0, rlo)
     # inf / NaN operands (the larger operand carries them)
@@ -363,8 +363,8 @@ def clz128(P, w):
     return r
 
 
-def ffma64(P, a, b, c):
-    """IEEE binary64 fused multiply-add a*b + c, round to nearest even, branch-free."""
+def ffma64(P, a, b, c, mode='rn'):
+    """IEEE binary64 fused multiply-add a*b + c, branch-free; mode rn (default) / rz / rm / rp."""
     ua, ub, uc = unpack(P, *a), unpack(P, *b), unpack(P, *c)
     pw, ep, sp = mul_core(P, ua, ub)
     czero = uc['zero']
@@ -416,13 +416,13 @@ def ffma64(P, a, b, c):
     ml = P.extr(N[2], N[3], 11)
     g = P.and_(P.lsr(N[2], 10), 1)
     st = P.flag('ugt', P.or_(P.or_(P.and_(N[2], 0x3ff), N[1]), N[0]), 0)
-    rhi, rlo = round_pack(P, sx, e, mh, ml, g, st)
-    zsign = P.and_(sx, sy)
+    rhi, rlo = round_pack(P, sx, e, mh, ml, g, st) if mode == 'rn' else round_pack_mode(P, sx, e, mh, ml, g, st, mode)
+    zsign = P.and_(sx, sy) if mode != 'rm' else P.or_(sx, sy)
     rhi = P.sel('ugt', szero, 0, zsign, rhi)
     rlo = P.sel('ugt', szero, 0, 0, rlo)
     # product zero: result is c (both zero: -0 only if both are -0)
     both0 = P.and_(pzero, czero)
-    rhi = P.sel('ugt', pzero, 0, P.sel('ugt', czero, 0, P.and_(sp, sc), a_c_hi := c[0]), rhi)
+    rhi = P.sel('ugt', pzero, 0, P.sel('ugt', czero, 0, P.and_(sp, sc) if mode != 'rm' else P.or_(sp, sc), a_c_hi := c[0]), rhi)
     rlo = P.sel('ugt', pzero, 0, P.sel('ugt', czero, 0, 0, c[1]), rlo)
     # inf / NaN
     pinf = P.or_(ua['inf'], ub['inf'])
@@ -1133,7 +1133,12 @@ def _ref_round_frac(q, mode):
         if mode == 'rp':
             return math.copysign(2**-1074 if not neg else 0.0, -1.0 if neg else 1.0)
         return math.copysign(0.0 if not neg else 2**-1074, -1.0 if neg else 1.0)
-    v = float(aq)
+    try:
+        v = float(aq)
+    except OverflowError:                 # max finite < aq < 2^1024: rn rounds to inf, directed modes see max / inf
+        if mode == 'rn':
+            return float('-inf') if neg else float('inf')
+        v = 1.7976931348623157e308
     from fractions import Fraction as F
     if F(v) == aq:
         return math.copysign(v, -1.0 if neg else 1.0)
@@ -1163,6 +1168,34 @@ def _ref_round_frac(q, mode):
     if mode == 'rp':
         return hi if not neg else -lo
     return lo if not neg else -hi
+
+
+def _ref_mode2(op, a, b, mode):
+    """Exact add / mul under a directed rounding mode (IEEE 754 zero-sign rules)."""
+    import math
+    from fractions import Fraction
+    if math.isnan(a) or math.isnan(b):
+        return float('nan')
+    if op == 'mul':
+        if (math.isinf(a) and b == 0) or (math.isinf(b) and a == 0):
+            return float('nan')
+        sg = -1.0 if (math.copysign(1, a)*math.copysign(1, b)) < 0 else 1.0
+        if math.isinf(a) or math.isinf(b):
+            return math.copysign(float('inf'), sg)
+        if a == 0 or b == 0:
+            return math.copysign(0.0, sg)
+        return _ref_round_frac(Fraction(a)*Fraction(b), mode)
+    if math.isinf(a) and math.isinf(b):
+        return a if (a > 0) == (b > 0) else float('nan')
+    if math.isinf(a) or math.isinf(b):
+        return a if math.isinf(a) else b
+    ex = Fraction(a)+Fraction(b)
+    if ex == 0:
+        na, nb = math.copysign(1, a) < 0, math.copysign(1, b) < 0
+        if a == 0 and b == 0:
+            return -0.0 if ((na and nb) if mode != 'rm' else (na or nb)) else 0.0
+        return -0.0 if mode == 'rm' else 0.0
+    return _ref_round_frac(ex, mode)
 
 
 def _ref_div(a, b, mode):
@@ -1328,9 +1361,9 @@ def ref(op, *xs, mode='rn'):
     import math
     from fractions import Fraction
     if op == 'mul':
-        return xs[0]*xs[1]
+        return xs[0]*xs[1] if mode == 'rn' else _ref_mode2('mul', *xs, mode)
     if op == 'add':
-        return xs[0]+xs[1]
+        return xs[0]+xs[1] if mode == 'rn' else _ref_mode2('add', *xs, mode)
     if op == 'div':
         return _ref_div(*xs, mode)
     if op == 'sqrt':
@@ -1365,9 +1398,12 @@ def ref(op, *xs, mode='rn'):
         return z
     ex = Fraction(x)*Fraction(y)+Fraction(z)
     if ex == 0:
+        sp, sz = math.copysign(1, x)*math.copysign(1, y) < 0, math.copysign(1, z) < 0
         if x*y == 0 and z == 0:
-            return -0.0 if (math.copysign(1, x)*math.copysign(1, y) < 0 and math.copysign(1, z) < 0) else 0.0
-        return 0.0
+            return -0.0 if ((sp and sz) if mode != 'rm' else (sp or sz)) else 0.0
+        return -0.0 if mode == 'rm' else 0.0
+    if mode != 'rn':
+        return _ref_round_frac(ex, mode)
     try:
         return float(ex)
     except OverflowError:
