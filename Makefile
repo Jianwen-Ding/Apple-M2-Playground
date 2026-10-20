@@ -624,6 +624,10 @@ verify-shfl-mask:
 verify-empty-stop:
 	$(PYTHON) -B scripts/verify_empty_stop.py
 
+.PHONY: verify-ret-winner
+verify-ret-winner:
+	$(PYTHON) -B scripts/verify_ret_winner.py
+
 verify-occupancy2:
 	$(PYTHON) -B scripts/verify_occupancy2.py
 

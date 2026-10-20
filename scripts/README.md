@@ -180,3 +180,9 @@ compares a partial return to a known-operation landing surrogate, with optional
 `--hardware --repeat N`. Both use the bounded unsafe harness with kernel,
 memory and recovery diagnostics. `make verify-empty-stop` checks all retained
 raw bytes, controls and simulator counterexamples; it does not use the GPU.
+
+`probe_ret_winner.py --first K --winner A|B [--hardware] [--repeat N]`
+checks genuinely divergent return operands with lane 0 excluded. Both uniform
+return and jump landing substitutions pass exact simulator oracles first;
+the unsupported actual model diagnostic remains explicit. `make verify-ret-winner`
+checks all 64 retained cases and their guarded readbacks without a GPU.

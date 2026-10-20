@@ -9,6 +9,12 @@ The current [agent handoff](../../notes/call-return-handoff.md) lists remaining
 cases, dependencies, simulator gates and the owner's updated fault/hang policy.
 Use it instead of the historical next-work suggestions below.
 
+2026-10-20: the [divergent-ret matrix](../2026-10-20-ret-winner/README.md)
+establishes lowest-active target selection when lane 0 is masked and active
+operands genuinely disagree, for every first-active lane 1..31 and both target
+assignments. The simulator still rejects this scope; both uniform-return and
+jump surrogates plus exact hardware oracles are retained.
+
 ## Earlier evidence, now preserved
 
 Six previous scratch records are bundled in

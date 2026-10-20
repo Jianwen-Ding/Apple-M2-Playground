@@ -13,6 +13,13 @@ while masked lanes resume. `make verify-empty-stop` preserves 17 exact variants,
 including six known simulator counterexamples. A qualified model and the
 additional return state remain open; no simulator semantics were changed.
 
+The subsequent [divergent-ret winner matrix](../novel-results/2026-10-20-ret-winner/README.md)
+tests genuine disagreement among active lanes with lane 0 excluded. Every
+first-active lane 1..31 and both target assignments select the lowest active
+lane's target (64 variants / 192 dispatches, no faults). Scattered masks and
+the simulator winner extension remain open; `make verify-ret-winner` retains
+the actual model rejection and checks both landing surrogates separately.
+
 ## Established scope and files
 
 Measured with one full 32-lane SIMD group on M2 Max G14C:
