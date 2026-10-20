@@ -853,3 +853,10 @@ verify-integer-timing-state:
 .PHONY: verify-integer-length-cost
 verify-integer-length-cost:
 	$(PYTHON) -B scripts/verify_integer_length_cost.py
+
+.PHONY: verify-integer-core-distribution test-integer-core-distribution
+verify-integer-core-distribution:
+	$(PYTHON) -B scripts/verify_integer_core_distribution.py
+
+test-integer-core-distribution:
+	$(PYTHON) -B scripts/test_integer_core_distribution.py

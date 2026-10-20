@@ -13,13 +13,15 @@ Retain watchdog/kernel/memory diagnostics and exact recovery controls. A failed
 recovery or blocked probe stops GPU submissions. Commit and push each completed
 piece. The deferred performance-simulator PR review remains a later task.
 
-Current next question: instrument ordinary arithmetic shaders with the known
-SR20 core-identity read and a separate output plane to check final-dispatch
-per-core work distribution against the model's 38-core assumption. Use matched
-instrumentation controls and the same 1000 us host-gap protocol. The completed
-length study retains 2.58–3.78x adjacent slope residuals over 600–33066-byte
-shaders, with late medians agreeing within 2.3% across three trials per cell.
-Keep early and late distributions and do not infer actual operating frequency.
-Keep small positive values, full scalar/simulator gates and bounded serialized
-submissions. No function transfers or execution-counter manipulation beyond
-the standard harness prefix.
+Current next question: vary workgroup geometry with matched SR19/SR20 output
+planes and the 1000 us host-gap protocol. All 12 full-size arithmetic core maps
+contain all 38 IDs, but the busiest core receives 28–33 workgroups versus the
+default estimate of 27. Cluster totals are multiples of eight at the tested
+128-lane / 1024-workgroup geometry; test other shapes before generalizing.
+The simulator now accepts an explicit measured peak as a sensitivity input;
+it leaves a 2.76–3.06x final-dispatch timing residual and does not reconstruct
+the actual placement map or concurrency. Keep early and late distributions,
+exact arithmetic/guards and complete core-map property checks. Frequency is
+unmeasured. Keep small positive values and bounded serialized submissions.
+No function transfers or execution-counter manipulation beyond the standard
+harness prefix.

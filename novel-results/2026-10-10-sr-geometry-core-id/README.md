@@ -24,3 +24,9 @@ oracles and runs failure injection. Hardware: `make sr-shape`, `make sr-core`.
 [Report](../../experiments/registers/sr-geometry-core-alt.md) ·
 [evidence](../../results/2026-10-10-sr-shape-core/README.md).
 These are observations from one device, not claims of first community discovery.
+
+The [2026-10-20 arithmetic placement study](../2026-10-20-integer-core-distribution/README.md)
+confirms these 38 packed IDs and workgroup-uniform tags in 12 final maps of
+1024 workgroups under arithmetic load. Matching SR19 twins report the declared
+64 register halves exactly. This measures cumulative assignment, not
+simultaneous residency or frequency.

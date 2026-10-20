@@ -1,0 +1,221 @@
+{
+ "model_sha256": "ab2a17060a7584814210b1fec77f6787b7488bcbed2fc9dcc4b5febb30bbc271",
+ "predictions": {
+  "1:1024:19": {
+   "busiest_core_wgs": 27,
+   "clock_mhz": 1398.0,
+   "core_cycles": 32537.1,
+   "group_cap_per_core": 52,
+   "groups_per_wg": 4,
+   "launch_core_us": 2.7,
+   "launch_us": 5.6,
+   "paths": "cost-emulation",
+   "simulated_waves": [
+    [
+     0,
+     13,
+     15138.3
+    ],
+    [
+     2,
+     1,
+     2260.5
+    ]
+   ],
+   "time_us": 28.874034334763948,
+   "warnings": [],
+   "waves": 3,
+   "wgs_per_core": 13,
+   "workgroups": 1024
+  },
+  "1:1024:20": {
+   "busiest_core_wgs": 27,
+   "clock_mhz": 1398.0,
+   "core_cycles": 32537.1,
+   "group_cap_per_core": 52,
+   "groups_per_wg": 4,
+   "launch_core_us": 2.7,
+   "launch_us": 5.6,
+   "paths": "cost-emulation",
+   "simulated_waves": [
+    [
+     0,
+     13,
+     15138.3
+    ],
+    [
+     2,
+     1,
+     2260.5
+    ]
+   ],
+   "time_us": 28.874034334763948,
+   "warnings": [],
+   "waves": 3,
+   "wgs_per_core": 13,
+   "workgroups": 1024
+  },
+  "1:4096:19": {
+   "busiest_core_wgs": 27,
+   "clock_mhz": 1398.0,
+   "core_cycles": 127833.5,
+   "group_cap_per_core": 52,
+   "groups_per_wg": 4,
+   "launch_core_us": 2.7,
+   "launch_us": 5.6,
+   "paths": "cost-emulation",
+   "simulated_waves": [
+    [
+     0,
+     13,
+     59560.9
+    ],
+    [
+     2,
+     1,
+     8711.7
+    ]
+   ],
+   "time_us": 97.04027181688126,
+   "warnings": [],
+   "waves": 3,
+   "wgs_per_core": 13,
+   "workgroups": 1024
+  },
+  "1:4096:20": {
+   "busiest_core_wgs": 27,
+   "clock_mhz": 1398.0,
+   "core_cycles": 127833.5,
+   "group_cap_per_core": 52,
+   "groups_per_wg": 4,
+   "launch_core_us": 2.7,
+   "launch_us": 5.6,
+   "paths": "cost-emulation",
+   "simulated_waves": [
+    [
+     0,
+     13,
+     59560.9
+    ],
+    [
+     2,
+     1,
+     8711.7
+    ]
+   ],
+   "time_us": 97.04027181688126,
+   "warnings": [],
+   "waves": 3,
+   "wgs_per_core": 13,
+   "workgroups": 1024
+  },
+  "8:1024:19": {
+   "busiest_core_wgs": 27,
+   "clock_mhz": 1398.0,
+   "core_cycles": 34650.8,
+   "group_cap_per_core": 52,
+   "groups_per_wg": 4,
+   "launch_core_us": 2.7,
+   "launch_us": 5.6,
+   "paths": "cost-emulation",
+   "simulated_waves": [
+    [
+     0,
+     13,
+     16537.5
+    ],
+    [
+     2,
+     1,
+     1575.8
+    ]
+   ],
+   "time_us": 30.3859799713877,
+   "warnings": [],
+   "waves": 3,
+   "wgs_per_core": 13,
+   "workgroups": 1024
+  },
+  "8:1024:20": {
+   "busiest_core_wgs": 27,
+   "clock_mhz": 1398.0,
+   "core_cycles": 34650.8,
+   "group_cap_per_core": 52,
+   "groups_per_wg": 4,
+   "launch_core_us": 2.7,
+   "launch_us": 5.6,
+   "paths": "cost-emulation",
+   "simulated_waves": [
+    [
+     0,
+     13,
+     16537.5
+    ],
+    [
+     2,
+     1,
+     1575.8
+    ]
+   ],
+   "time_us": 30.3859799713877,
+   "warnings": [],
+   "waves": 3,
+   "wgs_per_core": 13,
+   "workgroups": 1024
+  },
+  "8:4096:19": {
+   "busiest_core_wgs": 27,
+   "clock_mhz": 1398.0,
+   "core_cycles": 126199.79999999999,
+   "group_cap_per_core": 52,
+   "groups_per_wg": 4,
+   "launch_core_us": 2.7,
+   "launch_us": 5.6,
+   "paths": "cost-emulation",
+   "simulated_waves": [
+    [
+     0,
+     13,
+     60604.2
+    ],
+    [
+     2,
+     1,
+     4991.4
+    ]
+   ],
+   "time_us": 95.87167381974247,
+   "warnings": [],
+   "waves": 3,
+   "wgs_per_core": 13,
+   "workgroups": 1024
+  },
+  "8:4096:20": {
+   "busiest_core_wgs": 27,
+   "clock_mhz": 1398.0,
+   "core_cycles": 126199.79999999999,
+   "group_cap_per_core": 52,
+   "groups_per_wg": 4,
+   "launch_core_us": 2.7,
+   "launch_us": 5.6,
+   "paths": "cost-emulation",
+   "simulated_waves": [
+    [
+     0,
+     13,
+     60604.2
+    ],
+    [
+     2,
+     1,
+     4991.4
+    ]
+   ],
+   "time_us": 95.87167381974247,
+   "warnings": [],
+   "waves": 3,
+   "wgs_per_core": 13,
+   "workgroups": 1024
+  }
+ }
+}

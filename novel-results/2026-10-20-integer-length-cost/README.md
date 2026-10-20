@@ -65,3 +65,8 @@ instrumentation controls. Verify that assumption before assigning the whole
 residual to instruction cost. No simulator timing parameter changed here.
 
 [Evidence and offline verification](../../results/2026-10-20-integer-length-cost/README.md).
+
+The [core-distribution follow-up](../2026-10-20-integer-core-distribution/README.md)
+observes all 38 core IDs and a busiest-core tail of 28–33 workgroups versus
+the default estimate of 27. A measured-peak model input quantifies that
+sensitivity while retaining the remaining timing gap.
