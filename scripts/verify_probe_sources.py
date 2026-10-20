@@ -12,7 +12,8 @@ ROOT=Path(__file__).resolve().parents[1]
 ARCHIVES=(ROOT/'results/2026-10-20-control-simulator/source-before-model',
           ROOT/'results/2026-10-20-call-r1/source-before-model',
           ROOT/'results/2026-10-20-ret-prepop/source-before-model',
-          ROOT/'results/2026-10-20-stopped-r0/source-before-model')
+          ROOT/'results/2026-10-20-stopped-r0/source-before-model',
+          ROOT/'results/2026-10-20-ret-stale-exec/source-before-model')
 
 
 def require_source(path,recorded_sha):

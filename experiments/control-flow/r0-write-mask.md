@@ -28,3 +28,17 @@ zero-count operation, every lane will still store its nonzero counter at the
 second checkpoint; true synchronization lets only zero-counter lanes write.
 Start mixed mov-half 0..3 and inspect exact recovery before extending forms.
 No transfer/loop/barrier is introduced and the known bounded drain remains.
+
+Pop0 zero-membership synchronization is exact in 34 cases. Next isolate RET
+with deliberately stale issuing execution using `probe_ret_stale_exec.py`:
+ordinary r0 write leaves all lanes active, uniform initialized r30 names one
+valid decoded landing, and RET is followed by four membership/r0 snapshots
+before a bounded drain. The current simulator predicts every issue-active lane
+receives depth 2. A competing raw-counter transform maps 0->2,1->0,>=2 unchanged
+independently of stale execution. Separate branch-only, sync-only and empty-
+fallthrough hypotheses are retained. A no-RET/no-r0-write IF/jump control
+constructs known depth 2 and validates all landing/trace addresses. Gate the
+whole actual against the current issue hypothesis before hardware. First
+mov-half mixed 0..3 only; inspect complete classification and exact recovery
+before any uniform inputs, other forms or matrix. All targets are valid and
+all sources/indices initialized; no uninitialized link, loop or barrier occurs.

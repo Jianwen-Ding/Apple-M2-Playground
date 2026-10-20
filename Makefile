@@ -806,3 +806,7 @@ verify-r0-write-mask:
 .PHONY: verify-r0-pop0
 verify-r0-pop0:
 	$(PYTHON) -B scripts/verify_r0_pop0.py
+
+.PHONY: verify-ret-stale-exec
+verify-ret-stale-exec:
+	$(PYTHON) -B scripts/verify_ret_stale_exec.py
