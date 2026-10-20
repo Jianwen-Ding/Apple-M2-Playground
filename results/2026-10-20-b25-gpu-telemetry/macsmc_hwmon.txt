@@ -1,0 +1,13 @@
+curr1_input | AC Input Current | 1570
+fan1_input | Fan 1 | 0
+fan2_input | Fan 2 | 0
+in0_input | Charger Input Voltage | 11707
+in1_input | Battery Voltage | 11208
+power1_input | Total System Power | 19260303
+power2_input | AC Input Power | 18386796
+power3_input | 3.8 V Rail Power | 105693038
+power4_input | Heatpipe Power | 8248505
+temp1_input | NAND Flash Temperature | 33218
+temp2_input | Battery Hotspot | 31799
+temp3_input | Charge Regulator Temp | 43413
+temp4_input | WiFi/BT Module Temp | 43239
