@@ -186,3 +186,9 @@ checks genuinely divergent return operands with lane 0 excluded. Both uniform
 return and jump landing substitutions pass exact simulator oracles first;
 the unsupported actual model diagnostic remains explicit. `make verify-ret-winner`
 checks all 64 retained cases and their guarded readbacks without a GPU.
+
+`probe_call_winner.py --first K --winner A|B [--hardware]` tests indirect-call
+selection/entry. `probe_call_link_scope.py` has the same options and changes
+only the post-pop snapshot to r1. Both record actual simulator limits separately
+from exact filtered uniform-call and jump surrogates. `make verify-call-winner`
+checks all 74 records, including the supported-model link-scope counterexample.

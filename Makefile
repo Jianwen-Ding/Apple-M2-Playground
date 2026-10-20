@@ -628,6 +628,10 @@ verify-empty-stop:
 verify-ret-winner:
 	$(PYTHON) -B scripts/verify_ret_winner.py
 
+.PHONY: verify-call-winner
+verify-call-winner:
+	$(PYTHON) -B scripts/verify_call_winner.py
+
 verify-occupancy2:
 	$(PYTHON) -B scripts/verify_occupancy2.py
 

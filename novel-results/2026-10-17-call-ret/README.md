@@ -15,6 +15,12 @@ operands genuinely disagree, for every first-active lane 1..31 and both target
 assignments. The simulator still rejects this scope; both uniform-return and
 jump surrogates plus exact hardware oracles are retained.
 
+The [2026-10-20 indirect-call matrix](../2026-10-20-call-winner/README.md)
+likewise selects the lowest active operand. A post-pop r1 snapshot corrects
+the earlier entry-only link inference: every issue-active lane receives the
+link, including lanes whose different operand masks them out of callee entry.
+The simulator's matched-lanes-only link write is a known counterexample.
+
 ## Earlier evidence, now preserved
 
 Six previous scratch records are bundled in
@@ -380,9 +386,12 @@ returns to a common continuation that pops twice with a store after each pop.
 - No fault, no hang, budget unchanged (3/30), kernel log clean.
 
 So it is lane 0's target that wins, not the majority and not a fixed
-callee: only lanes whose r30 matches lane 0's r30 enter the callee (link set
-for those lanes only); the rest skip the call and run the caller post-call
-directly. Both partitions reconverge (CONT2 everywhere).
+callee: only lanes whose r30 matches lane 0's r30 enter the callee unmasked.
+The original trace stored links only at entry, so it did not establish link
+state in other lanes. The 2026-10-20 post-pop snapshot above shows every
+issue-active lane gets the link; the no-return probe also shows nonmatching
+lanes follow the selected callee masked until its pop. Both partitions
+reconverge (CONT2 everywhere in these original return probes).
 
 Evidence: [divergent-callreg.json.gz](../../results/2026-10-17-call-ret/divergent-callreg.json.gz),
 [divergent-callreg-swap.json.gz](../../results/2026-10-17-call-ret/divergent-callreg-swap.json.gz),

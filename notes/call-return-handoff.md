@@ -20,6 +20,14 @@ lane's target (64 variants / 192 dispatches, no faults). Scattered masks and
 the simulator winner extension remain open; `make verify-ret-winner` retains
 the actual model rejection and checks both landing surrogates separately.
 
+The [indirect-call follow-up](../novel-results/2026-10-20-call-winner/README.md)
+also selects the lowest active target for every suffix start 0..31. Only
+matching lanes enter, but **r1 is written in every issue-active lane**, including
+nonmatching lanes, as shown by a new post-pop snapshot. This corrects the older
+entry-only inference and exposes a supported-model link-write bug. 74 variants /
+222 dispatches, no faults; `make verify-call-winner`. Scattered masks and
+simulator extensions remain open.
+
 ## Established scope and files
 
 Measured with one full 32-lane SIMD group on M2 Max G14C:
