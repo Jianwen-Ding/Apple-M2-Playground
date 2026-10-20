@@ -2,7 +2,7 @@
 
 > **Next session, first (2026-10-20):** re-measure `2026-10-16-memory-parameters` (TLB reach and miss cost, L2/SLC latency curve)
 > **without** `clock_keeper.py`: another GPU context adds ~190 ns to far loads ([finding](../novel-results/2026-10-20-cross-context-latency/README.md)).
-> Also open from this session: the barrier gap bits 8-15 with several SIMD groups (needs owner approval), I-cache miss latency / replacement,
+> Done: the barrier gap bits 8-15 with several SIMD groups are inert, with no barrier ID ([finding](../novel-results/2026-10-20-barrier-bits/README.md)). Also open from this session: I-cache miss latency / replacement,
 > the two-group fetch anomaly, the jump-structure mechanism, cost-model fetch and jump terms.
 
 > **Instruction cache 2026-10-20:** [12 KiB per core, 64-byte lines, 1.19x cost for 8-byte-boundary crossings, per-core sharing](../novel-results/2026-10-20-icache/README.md)
