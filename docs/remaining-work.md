@@ -225,7 +225,7 @@ scattered masks, and call-r1 write-before-select ordering are now measured.
 Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
 depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
 while masked survivors continue. Simulator d90cdcd models these semantics;
-all 1,607 retained original programs replay exactly after native shuffle
+all 1,631 retained original programs replay exactly after native shuffle
 liveness correction 4dd68e9.
 
 [Masked-r0 shuffles](../novel-results/2026-10-20-masked-r0/README.md) directly
@@ -249,3 +249,11 @@ direct/indirect full-group outer calls with three-way divergent inner calls
 complete exact round trips after explicit two-pop reconvergence and saved-link
 restoration. Twelve programs / 36 dispatches, exact no-call controls, no faults.
 Partial outer masks and fewer inner pops remain separate work.
+
+[Nested early returns](../novel-results/2026-10-20-nested-early-return/README.md):
+zero/one inner pop cases follow the same counter transform. One pop makes
+inner participants active immediately at the outer landing. Only lanes that
+were active during r1 restoration receive the outer link; matching inner
+participants retain inner links even at the final full-group marker. Twenty-four
+programs / 72 dispatches, exact controls, no faults. Partial original outer
+participation remains open.

@@ -21,3 +21,16 @@ First direct outer, winner A, seed 17 only; inspect every word and recovery
 before varying outer form, winner or random seed. Partial original outer masks
 and fewer inner pops remain separate follow-ups because they can reactivate
 lanes whose saved link was never initialized by a call.
+
+The two-pop nested matrix is exact. Next `probe_nested_early_return.py` removes
+one or both inner pops without moving any function or link address, then
+returns from the outer function using the lanes that are already active.
+All saved outer r29 values were initialized by the full-group outer call;
+inactive r1 values are never consumed as a transfer target. Add a main landing
+snapshot before any pop, consuming only STOP padding and keeping targets fixed.
+The scalar hypothesis predicts that one inner pop leaves matching lanes at
+depth 1; the next RET reactivates them immediately at the outer landing.
+Restoring r1 before they reconverge only changes nonmatching lanes, so the
+final r1 payload must retain inner links in matching lanes. Exact no-call
+controls construct that full trace. Start direct/A/seed17/one pop; inspect every
+word and recovery before the zero-pop case or broader target/form variation.

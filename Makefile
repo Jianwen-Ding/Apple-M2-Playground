@@ -778,3 +778,7 @@ verify-native-dead-index-or:
 .PHONY: verify-nested-divergent
 verify-nested-divergent:
 	$(PYTHON) -B scripts/verify_nested_divergent.py
+
+.PHONY: verify-nested-early-return
+verify-nested-early-return:
+	$(PYTHON) -B scripts/verify_nested_early_return.py
