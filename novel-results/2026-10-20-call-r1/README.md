@@ -1,9 +1,10 @@
 # Call r1 writes the link and falls through instead of using its old target
 
 Observed on M2 Max G14C B1, compute, direct DRM, AC power, 2026-10-20.
-**13 variants / 39 dispatches including exact controls, zero faults, every
+**22 variants / 66 dispatches including exact controls, zero faults, every
 recovery passed.** The explicit source/link alias is a counterexample to the
 initial consume-before-write implementation in simulator commit `753616b`.
+The correction is integrated in `d66f359`, with all 408 original cases exact.
 
 The winner probe normally calls through r30. Keep its code length, call PC,
 link and valid callee addresses unchanged. Replace the six-byte r1 sentinel
@@ -35,6 +36,24 @@ does not uniquely identify internal pipeline ordering or prove a general
 read/write rule for other opcodes. A compiler must keep an indirect call target
 in a register other than r1 when it intends to call that original address.
 
+## Participation before reconvergence
+
+Nine additional cases insert a marker immediately after the call's wait island,
+**before** the fallback pop, removing the same 16 bytes of stop padding before
+callee A. Call PC, link, overall size and both callee addresses remain fixed.
+Test k=0,1,17,31 with both addresses plus a k=1/B repeat. Every originally
+active lane writes that marker, including lanes whose old r1 target differs;
+inactive lanes do not. Thus fallback is reached with the original issue-active
+mask, rather than hiding a target-based filter behind the following pop.
+All nine match the refined known-op link-write/fallthrough surrogate.
+
+The experimental simulator now applies the issue-active r1 write before
+selecting/matching the explicit operand. This reproduces `call r1` fallthrough
+and unchanged issue mask. Its complete original-byte replay covers **408**
+call/return cases (the earlier 386 plus these 22), with 40 Rust library tests,
+23 older control tests and 75 coverage cases passing. The two older suites
+also pass under default settings. Stop counterexamples remain separate.
+
 ## Simulator gate and provenance
 
 Every exact program first passes the existing simulator's original-target
@@ -47,9 +66,10 @@ full readback exactly, without changing code size or later boundaries.
 
 A simulator match validates the stated hypothesis and surrounding code; the
 recorded hardware decides that the original hypothesis is wrong. The report
-keeps those predictions and thirteen exact counterexamples explicit. No model
-guard was removed to submit the tests. The alias model correction is the next
-step; ordinary r30 target selection/link findings remain valid.
+keeps those predictions and the original exact counterexamples explicit. No model
+guard was removed to submit the tests. The corrected simulator now replays every case exactly; ordinary r30 target
+selection/link findings remain valid. Original hypotheses and source versions
+remain archived.
 
 Complete main/table outputs, guards, inputs, decoded call, source hashes,
 known-op controls, firmware, kernel/memory snapshots and recovery status are

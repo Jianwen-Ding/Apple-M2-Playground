@@ -1,5 +1,12 @@
 # Task 1: remaining work, safe and unsafe (2026-10-17)
 
+> **Alias update, 2026-10-20:** `call r1` writes the link, preserves the original
+> issue-active mask and falls through. [22 exact cases](../novel-results/2026-10-20-call-r1/README.md)
+> correct the earlier consume-before-write assumption. Simulator `d66f359` and
+> `make verify-control-model` now replay all 408 recorded cases exactly. More
+> than two target addresses, scattered/empty aliases and the stop/return state
+> are the next control gaps.
+
 > **Later 2026-10-20:** suffix and scattered-mask call/return winner rules plus
 > all-issue-active call links are measured and integrated into the simulator:
 > [386 exact hardware replays](../results/2026-10-20-control-simulator/README.md),

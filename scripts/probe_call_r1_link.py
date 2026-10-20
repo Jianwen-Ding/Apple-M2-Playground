@@ -57,7 +57,7 @@ def build(first,winner):
             assert P.cov.simulate(jump,32,32,64,0,p['table'])==C.oracle(p['table'],name,p['gate']['link'])
         g['uniform_code'],g['jump_code']=uniform.hex(),jump.hex()
     with E.measured_model():
-        assert P.cov.simulate(code,32,32,64,0,p['table'])==C.oracle(p['table'],winner,p['gate']['link']), 'pre-overwrite hypothesis gate failed'
+        assert P.cov.simulate(code,32,32,64,0,p['table'])==fall_oracle(p['table'],p['gate']['link'],True), 'measured alias link/fallthrough gate failed'
     p.update(code=code,control=control,expected=expected)
     p['gate'].update(fallback_stop=fallback_stop,fallback_r1_snapshot=True,
                      link_fall_surrogate_code=link_fall.hex(),link_fall_surrogate_exact=True,

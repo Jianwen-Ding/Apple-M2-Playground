@@ -273,3 +273,11 @@ unchanged. Exact no-call controls verify the target copy. The current simulator
 consumes the old operand and is wrong for this alias; `make verify-call-r1`
 retains all counterexamples and nine refined known-op link/fallthrough gates.
 Do not allocate an intended indirect target to r1. Model correction is next.
+
+Alias correction, later 2026-10-20: nine pre-pop checkpoints show the original
+issue-active mask persists immediately after `call r1`. The complete alias
+corpus is now 22 variants / 66 dispatches, no faults. Simulator `d66f359` makes
+the link write visible before operand selection/matching and replays all 408
+original cases exactly. Current alias probes require actual-program equality;
+old source/hypothesis versions remain archived. Empty/scattered aliases, more
+callee addresses, nested divergence and the stop/return hidden state remain open.

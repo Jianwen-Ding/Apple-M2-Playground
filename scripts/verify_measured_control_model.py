@@ -14,7 +14,7 @@ from pathlib import Path
 import probe_empty_stop as E
 
 ROOT=E.ROOT
-GROUPS={'2026-10-20-ret-winner':64,'2026-10-20-call-winner':74,'2026-10-20-sparse-control':248}
+GROUPS={'2026-10-20-ret-winner':64,'2026-10-20-call-winner':74,'2026-10-20-sparse-control':248,'2026-10-20-call-r1':22}
 
 
 def sha(path):
@@ -45,12 +45,12 @@ def main():
                 summary['records'][str(path.relative_to(ROOT))]=sha(path)
             summary['groups'][group]=count;summary['cases']+=count
             print('PASS original shader/input/readback replay:',group,count)
-    assert summary['cases']==386
+    assert summary['cases']==sum(GROUPS.values())
     assert summary['simulator_binary_sha256']==sha(E.P.cov.RUN), 'simulator changed during replay'
     summary['passed']=True
     if args.result:
         args.result.write_text(json.dumps(summary,indent=1,sort_keys=True)+'\n')
-    print('PASS 386 exact hardware cases; model opt-in required, no GPU used')
+    print(f'PASS {summary["cases"]} exact hardware cases; model opt-in required, no GPU used')
 
 
 if __name__=='__main__':main()

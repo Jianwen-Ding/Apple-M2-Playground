@@ -211,3 +211,9 @@ addresses. `probe_call_r1_link.py` snapshots r1 at fallback and gates both a
 no-call control and the refined link-write/fallthrough surrogate. Both accept
 `--first K --winner A|B [--hardware] [--repeat N]`. `make verify-call-r1` checks
 13 retained counterexamples and every complete guarded readback without a GPU.
+
+`probe_call_r1_mask.py` adds a checkpoint immediately after the call and before
+reconvergence, keeping every callee address and the call/link PC fixed. It has
+the same CLI as the other alias probes. `make verify-call-r1` now checks 22
+cases including nine pre-pop checkpoints; `make verify-control-model` directly
+replays all 408 original call/return/alias hardware programs and inputs.

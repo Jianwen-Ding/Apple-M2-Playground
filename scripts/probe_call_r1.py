@@ -39,7 +39,7 @@ def build(first,winner):
             assert P.cov.simulate(uniform,32,32,64,0,p['table'])==C.oracle(p['table'],name,p['gate']['link'],fall=not eligible)
         g['uniform_code']=uniform.hex()
     with E.measured_model():
-        assert P.cov.simulate(code,32,32,64,0,p['table'])==C.oracle(p['table'],winner,p['gate']['link']), 'actual call r1 gate failed'
+        assert P.cov.simulate(code,32,32,64,0,p['table'])==C.oracle(p['table'],winner,p['gate']['link'],fall=True), 'measured call r1 fallthrough gate failed'
     P.cov.gate(code,allow=('call',))
     p['code']=code;p['data_dir']=DATA
     p['gate'].update(source_register=1,copy_old_hex=old.hex(),copy_new_hex=new.hex(),
@@ -61,7 +61,8 @@ def main():
     name=f'call-r1-k{a.first}-{a.winner}-r{a.repeat}'
     r=CF.hardware(name,p);v=r.get('variant',{})
     if v.get('ok'):
-        r['alias_analysis']=dict(exact=(v.get('out'),v.get('table_after'))==C.oracle(p['table'],a.winner,p['gate']['link']))
+        r['alias_analysis']=dict(exact_measured_fallthrough=(v.get('out'),v.get('table_after'))==C.oracle(p['table'],a.winner,p['gate']['link'],fall=True),
+                                  original_target_oracle=(v.get('out'),v.get('table_after'))==C.oracle(p['table'],a.winner,p['gate']['link']))
     with gzip.GzipFile(filename=str(DATA/f'{name}.json.gz'),mode='wb',mtime=0) as f:
         f.write((json.dumps(r,sort_keys=True)+'\n').encode())
     print(json.dumps({'analysis':r.get('alias_analysis'),'recovery':r.get('recovery_control_passed'),

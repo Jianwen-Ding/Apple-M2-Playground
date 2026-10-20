@@ -1,28 +1,31 @@
 # Measured call/return model integration
 
-Simulator commit: `753616b` in AGX-Performance-Simulator.
+Initial simulator commit: `753616b`; alias correction: `d66f359` in AGX-Performance-Simulator.
 
-Later alias probing [found `call r1` falls through after writing the link](../../novel-results/2026-10-20-call-r1/README.md). The operand-before-write implementation below is a new alias counterexample; the 386 non-alias replays remain exact. Alias correction follows separately.
+Later alias probing [found `call r1` falls through after writing the link](../../novel-results/2026-10-20-call-r1/README.md). The original operand-before-write implementation was a new alias counterexample. Commit `d66f359` corrects it; all 408 cases now replay exactly, including 22 alias cases.
 
 The functional simulator's opt-in `AGX_EXPERIMENTAL_RET=buffer-pop2` now:
 
 - selects the lowest active operand for both register calls and returns;
 - writes the call link in every issue-active lane before masking nonmatching
   lanes, preserving inactive r1 values;
-- captures each call operand before the implicit r1 write, so a source alias
-  cannot be compared against the newly written link;
+- makes the implicit link write visible before operand selection/matching,
+  reproducing `call r1` fallthrough with the issue-active mask unchanged;
 - preserves default refusal of register calls/returns without opt-in, empty-mask
   fallthrough and existing target bounds/alignment checks.
 
 Hardware basis: [return winner](../../novel-results/2026-10-20-ret-winner/README.md),
 [call winner/link scope](../../novel-results/2026-10-20-call-winner/README.md) and
 [scattered masks](../../novel-results/2026-10-20-sparse-control/README.md).
-The r1-operand alias ordering is a defensive implementation detail; explicit
-`call r1` hardware validation remains a separate follow-up.
+The initial consume-before-write alias assumption was tested separately and
+contradicted by 22 exact hardware cases. The corrected ordering is supported
+by both post-pop r1 values and immediate pre-pop participation checkpoints.
 
 `replay.json` records the actual simulator binary/function source SHA-256 and
 each retained evidence-file digest from an exact replay of **386 original
-shader/input/readback cases**. The replay uses retained bytes directly, without
+shader/input/readback cases**. That initial manifest remains preserved. The alias extension
+[`model-replay.json`](../2026-10-20-call-r1/model-replay.json) binds the corrected
+source/binary and all **408** cases. The replay uses retained bytes directly, without
 regenerating the shader from a builder. `make verify-control-model` repeats it
 without GPU access. The target-specific verifiers also check independent host
 oracles and complete surrogate paths.
@@ -45,4 +48,5 @@ and input is still reconstructed and checked independently.
 The model update does not change stop semantics. The six independently measured
 conditional/partial-stop counterexamples remain explicit under
 `make verify-empty-stop`. Additional return state, nested divergent calls,
-more target addresses and alias forms remain separate probing work.
+more target addresses, scattered/empty alias masks and other alias forms
+remain separate probing work.
