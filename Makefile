@@ -849,3 +849,7 @@ verify-integer-immediate-cost:
 .PHONY: verify-integer-timing-state
 verify-integer-timing-state:
 	$(PYTHON) -B scripts/verify_integer_timing_state.py
+
+.PHONY: verify-integer-length-cost
+verify-integer-length-cost:
+	$(PYTHON) -B scripts/verify_integer_length_cost.py

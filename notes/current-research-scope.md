@@ -13,12 +13,13 @@ Retain watchdog/kernel/memory diagnostics and exact recovery controls. A failed
 recovery or blocked probe stops GPU submissions. Commit and push each completed
 piece. The deferred performance-simulator PR review remains a later task.
 
-Current next question: compare ordinary arithmetic program lengths under the
-controlled 1000 us host-gap protocol. The immediate-1/3 study retains the
-eight-chain 3.6x slope gap. The controlled-gap study finds timing transitions
-within one process using the same objects, ruling out a fixed allocation
-effect alone. Its late 1000 us-gap medians agree within 1.1% across six trials,
-but early quarters can be faster. Keep both distributions and do not infer
-actual frequency. Keep small positive values, full scalar/simulator gates,
-and serialized bounded submissions. No function transfers or execution-counter
-manipulation beyond the standard harness prefix.
+Current next question: instrument ordinary arithmetic shaders with the known
+SR20 core-identity read and a separate output plane to check final-dispatch
+per-core work distribution against the model's 38-core assumption. Use matched
+instrumentation controls and the same 1000 us host-gap protocol. The completed
+length study retains 2.58–3.78x adjacent slope residuals over 600–33066-byte
+shaders, with late medians agreeing within 2.3% across three trials per cell.
+Keep early and late distributions and do not infer actual operating frequency.
+Keep small positive values, full scalar/simulator gates and bounded serialized
+submissions. No function transfers or execution-counter manipulation beyond
+the standard harness prefix.

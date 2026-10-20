@@ -60,3 +60,7 @@ protocol, retaining early and late distributions. This can test how much
 length-dependent residual remains in a more reproducible timing regime.
 
 [Evidence, native-source diff and offline verifier](../../results/2026-10-20-integer-timing-state/README.md).
+
+The [program-length follow-up](../2026-10-20-integer-length-cost/README.md)
+retains the shortfall over 600–33066-byte shaders, with last-quarter medians
+agreeing within 2.3% across three trials per cell under the 1000 us protocol.
