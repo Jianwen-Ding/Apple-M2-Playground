@@ -25,8 +25,9 @@ default cases; timing calibration is unchanged.
 
 The supplied map describes core identity only. SR17 slots keep the selected
 existing behavior; workgroups trace independently. This is not a concurrent
-schedule or a timing replay. `agx_dispatch` still does not accept complete core
-maps. Cost integration must group workgroups by actual supplied core without
-implying that their unknown slots, overlap or memory interference were measured.
+schedule or a timing replay. The subsequent
+[cost-path extension](../2026-10-20-observed-core-map-cost/README.md) partitions
+workgroups by supplied core while reporting its wave and memory assumptions.
+Slots, overlap and memory interference remain unmeasured.
 
 [Evidence, implementation fixture and reproduction commands](../../results/2026-10-20-observed-core-map-tracing/README.md).

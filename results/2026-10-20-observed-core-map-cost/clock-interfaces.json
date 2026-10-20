@@ -1,0 +1,46 @@
+{
+ "drm_ioctls": 0,
+ "gpu_device_files": [
+  "driver",
+  "driver_override",
+  "drm",
+  "modalias",
+  "of_node",
+  "power",
+  "subsystem",
+  "supplier:platform:404e80000.power-management:power-controller@108",
+  "supplier:platform:406408000.mbox",
+  "uevent"
+ ],
+ "hardware_submissions": 0,
+ "interfaces": {
+  "/sys/class/devfreq": {
+   "children": [],
+   "exists": true
+  },
+  "/sys/kernel/debug/asahi": {
+   "children": [],
+   "exists": false
+  },
+  "/sys/kernel/debug/dri": {
+   "children": [],
+   "exists": false
+  },
+  "/sys/module/asahi/parameters": {
+   "children": [],
+   "exists": false
+  }
+ },
+ "render_device_target": "/sys/devices/platform/soc/406400000.gpu",
+ "runtime_pm": {
+  "autosuspend_delay_ms": {
+   "error": "[Errno 5] Input/output error"
+  },
+  "control": "auto",
+  "runtime_active_time": "0",
+  "runtime_status": "unsupported",
+  "runtime_suspended_time": "0"
+ },
+ "source_sha256": "f698ae97d4dc0777306f875d972d792796e1197502289649e7297f8a2e290d0a",
+ "utc": "2026-10-20T06:45:58.415363+00:00"
+}

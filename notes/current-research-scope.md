@@ -13,9 +13,22 @@ Retain watchdog/kernel/memory diagnostics and exact recovery controls. A failed
 recovery or blocked probe stops GPU submissions. Commit and push each completed
 piece. The deferred performance-simulator PR review remains a later task.
 
-Current next implementation: add an explicit observed-map cost path with real
-core partitions; see notes/observed-core-map-cost-integration.md for the audit
-and required host-only gates.
+Current next implementation: improve ordinary texture/image memory-address
+tracing with independent texel/segment oracles, so supplied-map footprint and
+sharing estimates can cover those operations. Reuse existing validated texture
+fixtures and the new Trace::device_segments byte-range footprint field; preserve
+the explicit footprint-incomplete flag until proven. Existing host fixture builder:
+scripts/verify_texture_unit.py; its shader extracts are under the simulator
+spirv/expected/{texfetch,texfilter,imgerode,imgtonemap}/code. Retained hardware
+value oracles are in verify_gles_texture.py and verify_texture_edge.py.
+The exhaustive supplied-map cost path now partitions all workgroups by actual
+core, reports wave/memory/cache/slot assumptions and evaluates every wave.
+All 80 maps and 128 unchanged legacy default/peak predictions pass; see
+results/2026-10-20-observed-core-map-cost. Full supplied state changes fixed-grid
+predictions by at most 0.33% versus scalar peak; the 2.666–3.425x timing gap
+remains. No model constants were fitted. Clock telemetry is not exposed through
+the inspected devfreq/debugfs/runtime-PM paths in this container; see the
+clock-interfaces.json inventory. This is not a blocker for host-only work.
 Prepared functional tracing now accepts an immutable borrowed map and is checked
 against per-lane address oracles across all 80 retained maps and fresh memory
 snapshots; see results/2026-10-20-observed-core-map-tracing. This does not supply

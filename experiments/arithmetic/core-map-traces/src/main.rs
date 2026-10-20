@@ -20,6 +20,7 @@ fn check(traces: &[Vec<Trace>], wgs: &[[u32; 3]], cores: &[u32], wg: u32,
             assert_eq!(tr.pcs, pcs);
             assert_eq!(tr.mem, vec![(3, vec![(1u64 << 36) / 64]),
                 (6, segments.into_iter().collect())]);
+            assert_eq!(tr.device_segments, tr.mem); // all accesses here are ordinary loads/stores
             assert!(tr.warnings.is_empty() && tr.skipped.is_empty());
             groups += 1;
         }

@@ -47,6 +47,7 @@ reconstruct SR17 slots, replay concurrent execution, infer operating frequency
 or calibrate timing. The existing zero-core default and synthetic stress mode
 remain available. Prepared functional traces now accept this map in the
 [subsequent tracing extension](../2026-10-20-observed-core-map-tracing/README.md).
-`agx_dispatch` does not yet accept complete core maps. No hardware was submitted for this change.
+The subsequent [cost-path extension](../2026-10-20-observed-core-map-cost/README.md)
+accepts complete core maps with explicit wave and memory assumptions. No hardware was submitted for this change.
 
 [Replay evidence and commands](../../results/2026-10-20-observed-core-map-replay/README.md).

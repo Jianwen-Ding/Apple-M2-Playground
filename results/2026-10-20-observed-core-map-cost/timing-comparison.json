@@ -1,0 +1,602 @@
+{
+ "calibration_changed": false,
+ "cost_analysis_sha256": "aed267802a38d9554bafa729a7ebb26e8cdfd39de669165a54cf68f53488ef83",
+ "fixed_grid_last_to_peak": {
+  "maximum": 3.4247225336055,
+  "median": 2.9542378718330156,
+  "minimum": 2.6662350405399566
+ },
+ "fixed_grid_last_to_supplied": {
+  "maximum": 3.4247225336055003,
+  "median": 2.9542378718330156,
+  "minimum": 2.666235040539957
+ },
+ "fixed_grid_maps": 48,
+ "fixed_grid_supplied_to_peak": {
+  "maximum": 1.00326736255709,
+  "median": 1.0,
+  "minimum": 0.9999999999999998
+ },
+ "full_maps_compared": 72,
+ "geometry_analysis_sha256": "c578136b73d55c8692d7829d4308b019bc232bbbb767e0d9ba56581f53f78369",
+ "hardware_submissions": 0,
+ "records": {
+  "integer-core-s20-n130944-w128-c1-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 80750,
+   "last_to_peak_ratio": 2.7868267671244373,
+   "last_to_supplied_ratio": 2.7868267671244373,
+   "observed_peak_model_us": 28.975608011444923,
+   "supplied_map_us": 28.975608011444923,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n130944-w128-c1-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 80833,
+   "last_to_peak_ratio": 2.789691245411389,
+   "last_to_supplied_ratio": 2.789691245411389,
+   "observed_peak_model_us": 28.975608011444923,
+   "supplied_map_us": 28.975608011444923,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n130944-w128-c1-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 82791,
+   "last_to_peak_ratio": 2.7780747720977566,
+   "last_to_supplied_ratio": 2.778074772097757,
+   "observed_peak_model_us": 29.801573676680974,
+   "supplied_map_us": 29.801573676680967,
+   "supplied_to_peak_ratio": 0.9999999999999998
+  },
+  "integer-core-s20-n130944-w128-c1-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 331417,
+   "last_to_peak_ratio": 2.9994352667907043,
+   "last_to_supplied_ratio": 2.9994352667907043,
+   "observed_peak_model_us": 110.4931330472103,
+   "supplied_map_us": 110.4931330472103,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n130944-w128-c1-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 333375,
+   "last_to_peak_ratio": 3.0171558250371917,
+   "last_to_supplied_ratio": 3.0171558250371917,
+   "observed_peak_model_us": 110.4931330472103,
+   "supplied_map_us": 110.4931330472103,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n130944-w128-c1-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 317000,
+   "last_to_peak_ratio": 2.8689565700391144,
+   "last_to_supplied_ratio": 2.8689565700391144,
+   "observed_peak_model_us": 110.4931330472103,
+   "supplied_map_us": 110.4931330472103,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n130944-w128-c8-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 87833,
+   "last_to_peak_ratio": 2.8138184259734547,
+   "last_to_supplied_ratio": 2.8138184259734547,
+   "observed_peak_model_us": 31.214878397711015,
+   "supplied_map_us": 31.214878397711015,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n130944-w128-c8-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 90000,
+   "last_to_peak_ratio": 2.8832404487790573,
+   "last_to_supplied_ratio": 2.8832404487790573,
+   "observed_peak_model_us": 31.214878397711015,
+   "supplied_map_us": 31.214878397711015,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n130944-w128-c8-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 39167,
+   "last_to_peak_ratio": 1.189852516476997,
+   "last_to_supplied_ratio": 1.189852516476997,
+   "observed_peak_model_us": 32.91752503576539,
+   "supplied_map_us": 32.91752503576539,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n130944-w128-c8-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 331625,
+   "last_to_peak_ratio": 3.0387499623115417,
+   "last_to_supplied_ratio": 3.0387499623115417,
+   "observed_peak_model_us": 109.13204577968526,
+   "supplied_map_us": 109.13204577968526,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n130944-w128-c8-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 317417,
+   "last_to_peak_ratio": 3.001906111658315,
+   "last_to_supplied_ratio": 3.001906111658314,
+   "observed_peak_model_us": 105.73848354792558,
+   "supplied_map_us": 105.73848354792561,
+   "supplied_to_peak_ratio": 1.0000000000000002
+  },
+  "integer-core-s20-n130944-w128-c8-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 331292,
+   "last_to_peak_ratio": 3.0356986129336305,
+   "last_to_supplied_ratio": 3.0356986129336305,
+   "observed_peak_model_us": 109.13204577968526,
+   "supplied_map_us": 109.13204577968526,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w128-c1-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 83250,
+   "last_to_peak_ratio": 2.7934766433203877,
+   "last_to_supplied_ratio": 2.7934766433203886,
+   "observed_peak_model_us": 29.801573676680974,
+   "supplied_map_us": 29.801573676680967,
+   "supplied_to_peak_ratio": 0.9999999999999998
+  },
+  "integer-core-s20-n131072-w128-c1-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 81041,
+   "last_to_peak_ratio": 2.7968696970220623,
+   "last_to_supplied_ratio": 2.7968696970220623,
+   "observed_peak_model_us": 28.975608011444923,
+   "supplied_map_us": 28.975608011444923,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w128-c1-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 82750,
+   "last_to_peak_ratio": 2.776699005822968,
+   "last_to_supplied_ratio": 2.7766990058229686,
+   "observed_peak_model_us": 29.801573676680974,
+   "supplied_map_us": 29.801573676680967,
+   "supplied_to_peak_ratio": 0.9999999999999998
+  },
+  "integer-core-s20-n131072-w128-c1-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 338125,
+   "last_to_peak_ratio": 2.9721200319659364,
+   "last_to_supplied_ratio": 2.9721200319659364,
+   "observed_peak_model_us": 113.76559370529327,
+   "supplied_map_us": 113.76559370529327,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w128-c1-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 296542,
+   "last_to_peak_ratio": 2.9453691571753664,
+   "last_to_supplied_ratio": 2.9453691571753664,
+   "observed_peak_model_us": 100.68075822603718,
+   "supplied_map_us": 100.68075822603718,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w128-c1-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 320958,
+   "last_to_peak_ratio": 2.9047778006517797,
+   "last_to_supplied_ratio": 2.9047778006517797,
+   "observed_peak_model_us": 110.4931330472103,
+   "supplied_map_us": 110.4931330472103,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w128-c8-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 89541,
+   "last_to_peak_ratio": 2.7941089891251942,
+   "last_to_supplied_ratio": 2.7941089891251942,
+   "observed_peak_model_us": 32.04635193133047,
+   "supplied_map_us": 32.04635193133047,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w128-c8-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 89833,
+   "last_to_peak_ratio": 2.8778904359463224,
+   "last_to_supplied_ratio": 2.8778904359463224,
+   "observed_peak_model_us": 31.214878397711015,
+   "supplied_map_us": 31.214878397711015,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w128-c8-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 91709,
+   "last_to_peak_ratio": 2.861760995339369,
+   "last_to_supplied_ratio": 2.861760995339369,
+   "observed_peak_model_us": 32.04635193133047,
+   "supplied_map_us": 32.04635193133047,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w128-c8-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 332167,
+   "last_to_peak_ratio": 3.043716422860574,
+   "last_to_supplied_ratio": 3.043716422860574,
+   "observed_peak_model_us": 109.13204577968526,
+   "supplied_map_us": 109.13204577968526,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w128-c8-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 343458,
+   "last_to_peak_ratio": 3.052829947794308,
+   "last_to_supplied_ratio": 3.052829947794308,
+   "observed_peak_model_us": 112.50479256080115,
+   "supplied_map_us": 112.50479256080115,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w128-c8-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 328042,
+   "last_to_peak_ratio": 3.0059181760621265,
+   "last_to_supplied_ratio": 3.0059181760621265,
+   "observed_peak_model_us": 109.13204577968526,
+   "supplied_map_us": 109.13204577968526,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w256-c1-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 82750,
+   "last_to_peak_ratio": 2.6955779142705354,
+   "last_to_supplied_ratio": 2.6955779142705354,
+   "observed_peak_model_us": 30.698426323319026,
+   "supplied_map_us": 30.698426323319026,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w256-c1-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 88708,
+   "last_to_peak_ratio": 2.741496425397583,
+   "last_to_supplied_ratio": 2.741496425397583,
+   "observed_peak_model_us": 32.357510729613736,
+   "supplied_map_us": 32.357510729613736,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w256-c1-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 90208,
+   "last_to_peak_ratio": 2.787853514251986,
+   "last_to_supplied_ratio": 2.787853514251986,
+   "observed_peak_model_us": 32.357510729613736,
+   "supplied_map_us": 32.357510729613736,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w256-c1-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 310833,
+   "last_to_peak_ratio": 2.9889803153343393,
+   "last_to_supplied_ratio": 2.9889803153343397,
+   "observed_peak_model_us": 103.99298998569385,
+   "supplied_map_us": 103.99298998569384,
+   "supplied_to_peak_ratio": 0.9999999999999999
+  },
+  "integer-core-s20-n131072-w256-c1-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 320292,
+   "last_to_peak_ratio": 3.0799383693464533,
+   "last_to_supplied_ratio": 3.0799383693464537,
+   "observed_peak_model_us": 103.99298998569385,
+   "supplied_map_us": 103.99298998569384,
+   "supplied_to_peak_ratio": 0.9999999999999999
+  },
+  "integer-core-s20-n131072-w256-c1-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 309958,
+   "last_to_peak_ratio": 2.980566286656826,
+   "last_to_supplied_ratio": 2.980566286656826,
+   "observed_peak_model_us": 103.99298998569385,
+   "supplied_map_us": 103.99298998569384,
+   "supplied_to_peak_ratio": 0.9999999999999999
+  },
+  "integer-core-s20-n131072-w256-c8-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 95167,
+   "last_to_peak_ratio": 2.8522617906780803,
+   "last_to_supplied_ratio": 2.8522617906780803,
+   "observed_peak_model_us": 33.36545064377683,
+   "supplied_map_us": 33.36545064377683,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w256-c8-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 94583,
+   "last_to_peak_ratio": 2.834758655287073,
+   "last_to_supplied_ratio": 2.834758655287073,
+   "observed_peak_model_us": 33.36545064377683,
+   "supplied_map_us": 33.36545064377683,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w256-c8-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 94458,
+   "last_to_peak_ratio": 2.8310122650064633,
+   "last_to_supplied_ratio": 2.8310122650064633,
+   "observed_peak_model_us": 33.36545064377683,
+   "supplied_map_us": 33.36545064377683,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w256-c8-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 331750,
+   "last_to_peak_ratio": 3.109395165480552,
+   "last_to_supplied_ratio": 3.109395165480552,
+   "observed_peak_model_us": 106.69277539341917,
+   "supplied_map_us": 106.69277539341917,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w256-c8-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 321125,
+   "last_to_peak_ratio": 3.0098101658325316,
+   "last_to_supplied_ratio": 3.0098101658325316,
+   "observed_peak_model_us": 106.69277539341917,
+   "supplied_map_us": 106.69277539341917,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w256-c8-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 333041,
+   "last_to_peak_ratio": 3.1214953287319025,
+   "last_to_supplied_ratio": 3.1214953287319025,
+   "observed_peak_model_us": 106.69277539341917,
+   "supplied_map_us": 106.69277539341917,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w32-c1-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 83375,
+   "last_to_peak_ratio": 2.8155730873937443,
+   "last_to_supplied_ratio": 2.8155730873937443,
+   "observed_peak_model_us": 29.612088698140198,
+   "supplied_map_us": 29.6120886981402,
+   "supplied_to_peak_ratio": 1.0000000000000002
+  },
+  "integer-core-s20-n131072-w32-c1-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 87125,
+   "last_to_peak_ratio": 2.923503333925391,
+   "last_to_supplied_ratio": 2.9235033339253915,
+   "observed_peak_model_us": 29.801573676680974,
+   "supplied_map_us": 29.801573676680967,
+   "supplied_to_peak_ratio": 0.9999999999999998
+  },
+  "integer-core-s20-n131072-w32-c1-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 83292,
+   "last_to_peak_ratio": 2.8132254838008266,
+   "last_to_supplied_ratio": 2.8132254838008266,
+   "observed_peak_model_us": 29.607296137339052,
+   "supplied_map_us": 29.607296137339052,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w32-c1-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 329417,
+   "last_to_peak_ratio": 3.1981677749111954,
+   "last_to_supplied_ratio": 3.1981677749111954,
+   "observed_peak_model_us": 103.00178826895566,
+   "supplied_map_us": 103.00178826895566,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w32-c1-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 327167,
+   "last_to_peak_ratio": 3.139901926863225,
+   "last_to_supplied_ratio": 3.139901926863225,
+   "observed_peak_model_us": 104.19656652360514,
+   "supplied_map_us": 104.19656652360514,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w32-c1-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 318959,
+   "last_to_peak_ratio": 3.0792161788702663,
+   "last_to_supplied_ratio": 3.0792161788702663,
+   "observed_peak_model_us": 103.58447782546494,
+   "supplied_map_us": 103.58447782546494,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w32-c8-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 96791,
+   "last_to_peak_ratio": 2.9631065864906643,
+   "last_to_supplied_ratio": 2.9631065864906643,
+   "observed_peak_model_us": 32.6653791130186,
+   "supplied_map_us": 32.6653791130186,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w32-c8-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 96916,
+   "last_to_peak_ratio": 3.0307929491768073,
+   "last_to_supplied_ratio": 3.0307929491768073,
+   "observed_peak_model_us": 31.97711015736767,
+   "supplied_map_us": 31.97711015736767,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w32-c8-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 98125,
+   "last_to_peak_ratio": 3.061970991589436,
+   "last_to_supplied_ratio": 3.061970991589436,
+   "observed_peak_model_us": 32.04635193133047,
+   "supplied_map_us": 32.04635193133047,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w32-c8-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 341250,
+   "last_to_peak_ratio": 3.2569003065285806,
+   "last_to_supplied_ratio": 3.2462934887341657,
+   "observed_peak_model_us": 104.77753934191703,
+   "supplied_map_us": 105.11988555078683,
+   "supplied_to_peak_ratio": 1.00326736255709
+  },
+  "integer-core-s20-n131072-w32-c8-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 358834,
+   "last_to_peak_ratio": 3.4247225336055,
+   "last_to_supplied_ratio": 3.4247225336055003,
+   "observed_peak_model_us": 104.77753934191703,
+   "supplied_map_us": 104.77753934191702,
+   "supplied_to_peak_ratio": 0.9999999999999999
+  },
+  "integer-core-s20-n131072-w32-c8-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 343250,
+   "last_to_peak_ratio": 3.265319384638835,
+   "last_to_supplied_ratio": 3.265319384638835,
+   "observed_peak_model_us": 105.11988555078683,
+   "supplied_map_us": 105.11988555078683,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w64-c1-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 79458,
+   "last_to_peak_ratio": 2.6662350405399566,
+   "last_to_supplied_ratio": 2.666235040539957,
+   "observed_peak_model_us": 29.801573676680974,
+   "supplied_map_us": 29.801573676680967,
+   "supplied_to_peak_ratio": 0.9999999999999998
+  },
+  "integer-core-s20-n131072-w64-c1-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 81500,
+   "last_to_peak_ratio": 2.7522543522949348,
+   "last_to_supplied_ratio": 2.7522543522949343,
+   "observed_peak_model_us": 29.612088698140198,
+   "supplied_map_us": 29.6120886981402,
+   "supplied_to_peak_ratio": 1.0000000000000002
+  },
+  "integer-core-s20-n131072-w64-c1-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 81000,
+   "last_to_peak_ratio": 2.7353693562685852,
+   "last_to_supplied_ratio": 2.735369356268585,
+   "observed_peak_model_us": 29.612088698140198,
+   "supplied_map_us": 29.6120886981402,
+   "supplied_to_peak_ratio": 1.0000000000000002
+  },
+  "integer-core-s20-n131072-w64-c1-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 310375,
+   "last_to_peak_ratio": 2.9858782896638285,
+   "last_to_supplied_ratio": 2.9858782896638285,
+   "observed_peak_model_us": 103.94763948497854,
+   "supplied_map_us": 103.94763948497854,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w64-c1-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 311917,
+   "last_to_peak_ratio": 3.0007126813598792,
+   "last_to_supplied_ratio": 3.0007126813598792,
+   "observed_peak_model_us": 103.94763948497854,
+   "supplied_map_us": 103.94763948497854,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w64-c1-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 310709,
+   "last_to_peak_ratio": 2.9156909484746314,
+   "last_to_supplied_ratio": 2.9156909484746314,
+   "observed_peak_model_us": 106.56444921316165,
+   "supplied_map_us": 106.56444921316165,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w64-c8-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 90916,
+   "last_to_peak_ratio": 2.8579908256880735,
+   "last_to_supplied_ratio": 2.8579908256880735,
+   "observed_peak_model_us": 31.811158798283262,
+   "supplied_map_us": 31.811158798283262,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w64-c8-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 91916,
+   "last_to_peak_ratio": 2.8682203889216265,
+   "last_to_supplied_ratio": 2.8682203889216265,
+   "observed_peak_model_us": 32.04635193133047,
+   "supplied_map_us": 32.04635193133047,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w64-c8-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 90917,
+   "last_to_peak_ratio": 2.8580222611980575,
+   "last_to_supplied_ratio": 2.8580222611980575,
+   "observed_peak_model_us": 31.811158798283262,
+   "supplied_map_us": 31.811158798283262,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131072-w64-c8-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 325209,
+   "last_to_peak_ratio": 3.0087254339448837,
+   "last_to_supplied_ratio": 3.008725433944883,
+   "observed_peak_model_us": 108.08862660944204,
+   "supplied_map_us": 108.08862660944207,
+   "supplied_to_peak_ratio": 1.0000000000000002
+  },
+  "integer-core-s20-n131072-w64-c8-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 325416,
+   "last_to_peak_ratio": 3.1057801323056546,
+   "last_to_supplied_ratio": 3.105780132305655,
+   "observed_peak_model_us": 104.77753934191703,
+   "supplied_map_us": 104.77753934191702,
+   "supplied_to_peak_ratio": 0.9999999999999999
+  },
+  "integer-core-s20-n131072-w64-c8-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 324583,
+   "last_to_peak_ratio": 2.974222628019501,
+   "last_to_supplied_ratio": 2.974222628019501,
+   "observed_peak_model_us": 109.13204577968526,
+   "supplied_map_us": 109.13204577968526,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131200-w128-c1-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 82625,
+   "last_to_peak_ratio": 2.7725045964486132,
+   "last_to_supplied_ratio": 2.7725045964486137,
+   "observed_peak_model_us": 29.801573676680974,
+   "supplied_map_us": 29.801573676680967,
+   "supplied_to_peak_ratio": 0.9999999999999998
+  },
+  "integer-core-s20-n131200-w128-c1-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 81625,
+   "last_to_peak_ratio": 2.7389493214537737,
+   "last_to_supplied_ratio": 2.7389493214537746,
+   "observed_peak_model_us": 29.801573676680974,
+   "supplied_map_us": 29.801573676680967,
+   "supplied_to_peak_ratio": 0.9999999999999998
+  },
+  "integer-core-s20-n131200-w128-c1-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 81917,
+   "last_to_peak_ratio": 2.748747461752267,
+   "last_to_supplied_ratio": 2.7487474617522674,
+   "observed_peak_model_us": 29.801573676680974,
+   "supplied_map_us": 29.801573676680967,
+   "supplied_to_peak_ratio": 0.9999999999999998
+  },
+  "integer-core-s20-n131200-w128-c1-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 320667,
+   "last_to_peak_ratio": 2.9021441528225007,
+   "last_to_supplied_ratio": 2.9021441528225007,
+   "observed_peak_model_us": 110.4931330472103,
+   "supplied_map_us": 110.4931330472103,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131200-w128-c1-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 327833,
+   "last_to_peak_ratio": 2.8816533129448842,
+   "last_to_supplied_ratio": 2.8816533129448842,
+   "observed_peak_model_us": 113.76559370529327,
+   "supplied_map_us": 113.76559370529327,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131200-w128-c1-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 331792,
+   "last_to_peak_ratio": 2.9164529379550226,
+   "last_to_supplied_ratio": 2.9164529379550226,
+   "observed_peak_model_us": 113.76559370529327,
+   "supplied_map_us": 113.76559370529327,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131200-w128-c8-a1024-k64-t0.json.gz": {
+   "hardware_last_ns": 90041,
+   "last_to_peak_ratio": 2.884553924983501,
+   "last_to_supplied_ratio": 2.884553924983501,
+   "observed_peak_model_us": 31.214878397711015,
+   "supplied_map_us": 31.214878397711015,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131200-w128-c8-a1024-k64-t1.json.gz": {
+   "hardware_last_ns": 90125,
+   "last_to_peak_ratio": 2.812332592275138,
+   "last_to_supplied_ratio": 2.812332592275138,
+   "observed_peak_model_us": 32.04635193133047,
+   "supplied_map_us": 32.04635193133047,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131200-w128-c8-a1024-k64-t2.json.gz": {
+   "hardware_last_ns": 89917,
+   "last_to_peak_ratio": 2.880581460365183,
+   "last_to_supplied_ratio": 2.880581460365183,
+   "observed_peak_model_us": 31.214878397711015,
+   "supplied_map_us": 31.214878397711015,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131200-w128-c8-a4096-k64-t0.json.gz": {
+   "hardware_last_ns": 332542,
+   "last_to_peak_ratio": 3.144947693989545,
+   "last_to_supplied_ratio": 3.144947693989544,
+   "observed_peak_model_us": 105.73848354792558,
+   "supplied_map_us": 105.73848354792561,
+   "supplied_to_peak_ratio": 1.0000000000000002
+  },
+  "integer-core-s20-n131200-w128-c8-a4096-k64-t1.json.gz": {
+   "hardware_last_ns": 328875,
+   "last_to_peak_ratio": 3.0135511311125764,
+   "last_to_supplied_ratio": 3.0135511311125764,
+   "observed_peak_model_us": 109.13204577968526,
+   "supplied_map_us": 109.13204577968526,
+   "supplied_to_peak_ratio": 1.0
+  },
+  "integer-core-s20-n131200-w128-c8-a4096-k64-t2.json.gz": {
+   "hardware_last_ns": 328959,
+   "last_to_peak_ratio": 3.014320840865563,
+   "last_to_supplied_ratio": 3.014320840865563,
+   "observed_peak_model_us": 109.13204577968526,
+   "supplied_map_us": 109.13204577968526,
+   "supplied_to_peak_ratio": 1.0
+  }
+ },
+ "summarizer_sha256": "ceb997e2700ed2fbb5156e5a775ad9fa6e8bc55db3b2f6b4ae400b8984956c9b"
+}

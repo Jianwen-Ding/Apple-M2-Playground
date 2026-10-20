@@ -1,5 +1,7 @@
 # New hardware findings
 
+- [2026-10-20 Exhaustive supplied-map cost path keeps actual core partitions; timing assumptions explicit (host-only)](2026-10-20-observed-core-map-cost/README.md)
+
 - [2026-10-20 Prepared functional traces replay 80 supplied core maps: 69,624 SIMD traces match independent addresses across fresh memory snapshots (host-only)](2026-10-20-observed-core-map-tracing/README.md)
 - [2026-10-20 Supplied core maps reproduce 80 retained full hardware buffers; historical defaults preserved (host-only)](2026-10-20-observed-core-map-replay/README.md)
 - [2026-10-20 Ordinary integer geometry: eight-workgroup cluster blocks across four sizes; frequency and timing variation unresolved](2026-10-20-integer-geometry-cost/README.md)

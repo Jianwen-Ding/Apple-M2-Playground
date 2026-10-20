@@ -1,0 +1,56 @@
+warning: unused variable: `f`
+    --> src/func.rs:1814:49
+     |
+1814 | fn image_write(g: &mut Group, mem: &mut Memory, f: &Fields, args: &TexOp) -> Result<(), String> {
+     |                                                 ^ help: if this is intentional, prefix it with an underscore: `_f`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> src/isa/fma.rs:326:13
+    |
+326 |         let mut pick = |r: u64| -> u64 {
+    |             ----^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `0` is never read
+   --> src/isa/exec.rs:126:7
+    |
+126 |     F(f64),
+    |     - ^^^
+    |     |
+    |     field in this variant
+    |
+    = note: `Val` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+    |
+126 -     F(f64),
+126 +     F(()),
+    |
+
+warning: `agx-sim` (lib test) generated 3 warnings (run `cargo fix --lib -p agx-sim --tests` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 0.01s
+     Running unittests src/lib.rs (rust/target/release/deps/agx_sim-c4048a8e34710476)
+
+running 14 tests
+test dispatch::tests::occupancy_keeps_retained_rules_and_never_invents_a_resident_workgroup ... ok
+test dispatch::tests::invalid_launches_fail_before_decode_or_external_trace ... ok
+test mapped_dispatch::tests::mapped_atomic_word_addresses_normalize_to_64_byte_segments ... ok
+test mapped_dispatch::tests::mapped_validation_precedes_decode_and_rejects_conflicting_context ... ok
+test mapped_dispatch::tests::mapped_descriptor_reads_alone_mark_the_footprint_incomplete ... ok
+test mapped_dispatch::tests::mapped_critical_core_can_have_fewer_workgroups ... ok
+test dispatch::tests::observed_peak_rejects_impossible_counts_before_tracing ... ok
+test mapped_dispatch::tests::mapped_two_dimensional_coordinates_and_single_core_sharing ... ok
+test dispatch::tests::observed_peak_samples_distinct_workgroups_across_waves ... ok
+test mapped_dispatch::tests::mapped_waves_keep_interleaved_core_partitions_and_exact_footprint ... ok
+test dispatch::tests::large_coordinates_do_not_truncate_to_u32_or_overflow_xy ... ok
+test dispatch::tests::finite_inputs_cannot_silently_serialize_an_infinite_time ... ok
+test mapped_dispatch::tests::mapped_atomic_byte_ranges_cover_crossing_and_unaligned_accesses ... ok
+test dispatch::tests::observed_peak_controls_partial_wave_and_launch_work ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 46 filtered out; finished in 0.02s
+

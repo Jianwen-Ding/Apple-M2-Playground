@@ -37,6 +37,6 @@ canonical reports are preserved.
 
 This replays supplied core identities into isolated functional traces. It
 neither reconstructs SR17 slots nor measures concurrent residency, memory
-interference, operating frequency or dispatch timing. `agx_dispatch` does
-not yet accept complete observed maps; its scalar busiest-core input is a
-separate approximation.
+interference, operating frequency or dispatch timing. The later [cost-path extension](../2026-10-20-observed-core-map-cost/README.md)
+accepts complete maps with explicit wave/memory assumptions; the scalar
+busiest-core input remains a separate approximation.

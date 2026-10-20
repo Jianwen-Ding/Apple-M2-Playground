@@ -47,3 +47,12 @@ per-lane address sets; retain default/scalar regression comparisons. Recorded
 geometry kernels then provide real maps and arithmetic oracles. None of these
 checks infers frequency or resolves the current 2.67–3.42x timing residual.
 No new GPU probe is necessary to implement or validate partition correctness.
+
+Implemented in the subsequent [supplied-map cost path](../novel-results/2026-10-20-observed-core-map-cost/README.md).
+It traces every workgroup, retains full atomic byte ranges, partitions all
+workgroups by core, and evaluates all waves without extrapolation. Explicit
+wave/memory/cache/slot assumptions accompany the output. All 80 maps and
+128 default/scalar-peak predictions pass. Texture/image/stack footprints are
+explicitly incomplete; their memory-address tracing remains to be added.
+The fixed-grid timing gap stays 2.666–3.425x despite complete supplied core
+partitions. Do not fit it away or call these inferred waves measured scheduling.
