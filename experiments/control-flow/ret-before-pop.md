@@ -82,3 +82,13 @@ hypothesis. Begin rotation 0, seed 3, target 0: retained dead bits select live
 lane 3; ignored dead bits select stopped lane 0 and self-fallback. Both are
 bounded, initialized, in-bounds cases. Inspect complete hardware classification
 and recovery before extending seeds/targets or changing the simulator.
+
+After simulator bf03118 corrects plain simd_shuffle liveness, test the four
+other native forms separately with `probe_stopped_native_shuffle.py`: down,
+up, xor and rotate_up. Keep source payload and index fully initialized and
+compare immediate/register forms before STOP and after pop 1, with wait-only
+controls and final survival marker. Exact current-model source hypotheses are
+required before hardware. Begin each kind at depth 1, rotation 0, offset 1;
+inspect its full fallback classification and exact recovery before extending
+across depth 3, rotated masks and boundary offsets. No timing or cross-form
+semantics are assumed from the plain shuffle finding.

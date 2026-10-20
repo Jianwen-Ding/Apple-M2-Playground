@@ -766,3 +766,7 @@ verify-stopped-shuffle-index:
 .PHONY: verify-dead-index-or
 verify-dead-index-or:
 	$(PYTHON) -B scripts/verify_dead_index_or.py
+
+.PHONY: verify-stopped-native-shuffle
+verify-stopped-native-shuffle:
+	$(PYTHON) -B scripts/verify_stopped_native_shuffle.py
