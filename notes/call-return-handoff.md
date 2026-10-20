@@ -281,3 +281,10 @@ the link write visible before operand selection/matching and replays all 408
 original cases exactly. Current alias probes require actual-program equality;
 old source/hypothesis versions remain archived. Empty/scattered aliases, more
 callee addresses, nested divergence and the stop/return hidden state remain open.
+
+Three-address extension, 2026-10-20: [72 variants / 216 dispatches](../novel-results/2026-10-20-three-targets/README.md)
+with all three addresses live, scattered masks, six first-active positions and
+rotated winners preserve the measured rules exactly. No new simulator change;
+`make verify-three-targets` and the direct 480-case model replay pass. Next,
+inspect r0/participation at a return landing before the first pop to distinguish
+true empty-mask stop behavior from an unobserved return-mask transformation.

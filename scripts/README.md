@@ -217,3 +217,9 @@ reconvergence, keeping every callee address and the call/link PC fixed. It has
 the same CLI as the other alias probes. `make verify-call-r1` now checks 22
 cases including nine pre-pop checkpoints; `make verify-control-model` directly
 replays all 408 original call/return/alias hardware programs and inputs.
+
+`probe_three_targets.py --kind call|ret --first K --winner A|B|C --seed S`
+requires an exact actual-program gate and all six uniform/jump path gates;
+`--hardware` adds bracketed submission and diagnostics. All three addresses
+are represented in active lanes. `make verify-three-targets` independently
+checks 72 records. The combined original-byte model replay now covers 480 cases.

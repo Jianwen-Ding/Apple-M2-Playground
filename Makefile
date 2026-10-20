@@ -644,6 +644,10 @@ verify-control-model:
 verify-call-r1:
 	$(PYTHON) -B scripts/verify_call_r1.py
 
+.PHONY: verify-three-targets
+verify-three-targets:
+	$(PYTHON) -B scripts/verify_three_targets.py
+
 verify-occupancy2:
 	$(PYTHON) -B scripts/verify_occupancy2.py
 
