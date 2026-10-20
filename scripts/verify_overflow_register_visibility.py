@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import probe_overflow_register_visibility as B
 from verify_ret_mask_state import common
+from overflow_hypothesis import counter_sync_hypothesis
 
 
 def cases():
@@ -65,14 +66,14 @@ def main():
         info=B.P.cov.ASMB.info(p['code'][g['op_pc']:g['op_pc']+16]);next_pc=g['op_pc']+info[1]
         store=B.P.cov.ASMB.info(p['code'][next_pc:next_pc+16]);assert store[0]=='device_store'
         f=dict(store[3]);assert f['R']==56 and f['O']==44
-        with B.E.measured_model():prediction=B.P.cov.simulate(p['code'],32,32,64,0,tab)
+        with B.E.measured_model(), counter_sync_hypothesis():prediction=B.P.cov.simulate(p['code'],32,32,64,0,tab)
         assert prediction==want and (prediction==actual)==(not bad)
         exact+=not bad;counterexamples+=bool(bad)
         manifest['records'][str(path.relative_to(B.E.ROOT))]=dict(sha256=sha(path),model_exact=not bad,retained_destination_lanes=bad)
     assert (exact,counterexamples)==(10,17)
     assert manifest['simulator_binary_sha256']==sha(B.P.cov.RUN)
     manifest.update(cases=27,model_exact=exact,model_counterexamples=counterexamples,independent_hardware_checks_passed=True,
-        simulator_sources={n:sha(B.E.ROOT.parent/'AGX-Performance-Simulator'/n) for n in ('rust/src/func.rs','rust/src/isa/exec.rs','rust/src/isa/compiled.rs','rust/src/isa/mod.rs')})
+        simulator_sources={n:sha(B.E.ROOT.parent/'AGX-Performance-Simulator'/n) for n in ('rust/src/func.rs','rust/src/fsem.rs','rust/src/isa/exec.rs','rust/src/isa/compiled.rs','rust/src/isa/mod.rs')})
     if args.result:args.result.write_text(json.dumps(manifest,sort_keys=True,indent=1)+'\n')
     print('PASS 27 prepared-index programs / 81 dispatches: direct first/after-wait/after-drain destination reads, all buffers/guards/controls exact, zero faults')
     print('PASS 10 model matches, 17 explicit counterexamples; immediate/copy/add also affected, masked destinations retain their seeds')

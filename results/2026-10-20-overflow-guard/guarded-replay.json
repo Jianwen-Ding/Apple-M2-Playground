@@ -1,0 +1,1028 @@
+{
+ "cases": 54,
+ "default_exact": 11,
+ "default_refused": 43,
+ "experimental_counterexamples": 35,
+ "experimental_exact": 19,
+ "passed": true,
+ "records": {
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-alu.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "a10e8a0d83466ee30b58fa47636453cd0c21a37e47adf21dbdd69737b4c671d2"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-down.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "19002b7c1a33dab0623d22dc24172b2e0ed8cc08b5bd6529bd6b1c08a6aa67c8"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-half.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "9652e4775f0a6c395ef3b4d4092fde209c37e410ac63c4d1a5309860de3d8088"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-integer.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "91faaf8e2541e56c76f0ea0afa2219c445bf8853a970892be0ad56d8db02e48e"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-payload-no-and.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 76
+    },
+    {
+     "actual": 3452816845,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "6de0b6550568a3131669e3d0d3fae1b21108651b2a9f391704ba26052147c566"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-payload.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "862e5c884e1e58789a2e27f33daecb2107b1ed033e13312d9575c9e868d93569"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-postmove.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "1b8045749558094f941f81fe5ed3ded2c4939e0c2dd54711a28a4bd4f9ea4cb7"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-postsync.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [],
+   "sha256": "58f1ac3ceb59623da4c26e87d194af35fb6de8508bf029fad2fff7e83596e97e"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-postwait.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "4f6dbe1cda986c57c56e5be24c4ae804cf8ef19d5aa5e2e81758f1b0033a725e"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-repeat-n1-cached-r0.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "a509a14330d5495cad33564818890873ce73a27465ee1a01b03a5cca0081aff8"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-repeat-n1-synced-r1.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 60382,
+     "word": 2189
+    }
+   ],
+   "sha256": "4af5f1626d5cf3ab2ee1df564efb25ea22e9aecc5aed14a041fa6d7e6d2b535b"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-repeat-n2-synced-r0.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2187
+    }
+   ],
+   "sha256": "c1dbd4f2111714c120170c40f0c7d926f8625ed552420645d5376bf54869e04e"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-repeat-n3-synced-r0.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2186
+    }
+   ],
+   "sha256": "1c9aff47cf025b89fa0183ad0c617b5fcc94efd78c06a5991c9e566a5c44d712"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-repeat.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "753c5591c4e1a45a279b66706788eb423994b2cafe5d9fcbf4adc19128fc6a88"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-repeat2.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [],
+   "sha256": "032bbe09300e7944f52990e62ce8b06a4072384004da89bc3e04ba283ccf2b64"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-rotate.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "69778ed321c21e6c8e44057d1fe9c8dcae3a2ed3bd5beea0726c38a4e6151ed7"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-seed1234.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "5a2c0689625c7c3fa358714481ec37e5389f207861f753ee2fb94f5be7d5779d"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-seed5678.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 22136,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "bae86850a09f4f7b98f38ea3ca8a3764bf6c3e69f8045ca5081c731b57663286"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-sync.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "2513c08fe4e7d15482217e6f071515b7c3ae8c56250a13e825717b00f2f594de"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-up.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "3c69740d49fda17d74252692b7fee1bb3e52348e370b351042acd4dcd05ca8f9"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-wait1-n2-synced-r0.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "8c234dcf9a668cb4037d1baac70bff98f089f6caf7cedf09447125df38fd7d62"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-wait1-n3-synced-r0.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "86daed0941c91dc449e306185d26e5201756913cfe6ff94190e273ffe0a31a83"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-wait1.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "e44c9eee3089a24980acafbe1898179136797818cfc476f80c87e295be2ffedd"
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-xor.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "d3e719e5e7b5ac6e5b8c24bd38dfd5b3f1bafc92bfe9a7000a5c4f6ca9ba1adc"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m31-n1-synced-shuffle-none.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "fc27c7d67148dd676d170b94d8edbd28dbe9f5081370fd43accea793da098102"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-cached-imm-none.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "08bc31e5cade80a7d135e8b278beefa9f63f708fcbe670cd51ae5b8d4577ea33"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-cached-shuffle-none.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "80f1b24aa4b464da74f6506a5de7a4b90c6bde48d5d2d37f6ce5a5cb23a89098"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-add-none.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 147
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 157
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 179
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 189
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 211
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 221
+    }
+   ],
+   "sha256": "9a382b7c2fe4ed04c77d0aadb0ca63d220b2990f33e33bf07c7e0d1969658adf"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-copy-none.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 147
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 157
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 179
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 189
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 211
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 221
+    }
+   ],
+   "sha256": "4ee3c5597535047401b8c6d4909cdf0636c6d90f38c69945154999f2d7ce83da"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov1.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 147
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 157
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 179
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 189
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 211
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 221
+    }
+   ],
+   "sha256": "78f60f3c1c6a4dc8a42daf532b1b545817d88f62cb788d50eadcb9b4fbfd5132"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov2.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 147
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 157
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 179
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 189
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 211
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 221
+    }
+   ],
+   "sha256": "a31686dd4acbd78010ffcca54a9e999a307f25663d89485fbb08e35d8f6648b5"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov4.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 147
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 157
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 179
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 189
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 211
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 221
+    }
+   ],
+   "sha256": "13549e4fe4e8ebc9b7404fdac630007b3619a50f3d79805268ae21ef7f9886ef"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov5.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 147
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 157
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 179
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 189
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 211
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 221
+    }
+   ],
+   "sha256": "2593ac325aaf9fa8e0a955d100aace5471823c6ab1d0666100745fa97d217cab"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov6.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 147
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 157
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 179
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 189
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 211
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 221
+    }
+   ],
+   "sha256": "da179b6392b708115bedf0b513d66ac069681ce234769ebe773b80280e79b8b5"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov7.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [],
+   "sha256": "f5ec6f75d7f50e1c076d05d7586d686e602ba883d209c8789a61c93ba470b2bf"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov8.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [],
+   "sha256": "7cee449bb536e5709781f50a75f1dc4ad2b873f5d9f06f4cd2c47994f8f466d7"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-none.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 147
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 157
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 179
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 189
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 211
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 221
+    }
+   ],
+   "sha256": "6587ff1de95acecd72bbe57e66b52aca3bd8ef32abf77577706bf8aadc9f6a6c"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov2.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    }
+   ],
+   "sha256": "a915c1cf17ce0f980cd45ddeedfa9cf1c3bf0d0e193c08e9897ed7de9a7ca9bc"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov4.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    }
+   ],
+   "sha256": "9f46a9ba548c7a00ffe54a4c5175f38cd69c3032b435c11ccfaff2c594487373"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov5.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    }
+   ],
+   "sha256": "9ed493d504a0a2db7ae63ecb5ee4c0573b3b0b1945887a64f7d06915ef270b8b"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov6.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [],
+   "sha256": "479f53bc9bcb9784cc9eda9e5516190b01f6a95d56357ea9e2892a7cfb526e56"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov7.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [],
+   "sha256": "15b881bd670df51deea9b9b6b477c93b0a6f2649425d8b565e144f3a04d4a5ff"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov8.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [],
+   "sha256": "a091bf5d8173c5bb8524c74adc4581fdd26ce40d22c44433224c095562129710"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-none-highonly.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [],
+   "sha256": "b060d15f0a2e7eac3eac3adc118b5f5a277c883a58f1ea3b9a7c6c9c5b7f4c09"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-none-low8.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 135
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 143
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 167
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 175
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 199
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 207
+    }
+   ],
+   "sha256": "5ade459f41a4f4302c55e8781da265782e6eca8151641b876ca9fad26168e810"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-none.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 137
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 169
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 201
+    }
+   ],
+   "sha256": "a5f87d61b5f911692370c75c984a46cd4c8dd99da9b3e47ea788dfd0f4361151"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-wait.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "ca65c759e873d097674cfe554e389750c5109361af17c6264f8961cf6c5ebce7"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n2-synced-imm-none.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 136
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 146
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 156
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 168
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 178
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 188
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 200
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 210
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 220
+    }
+   ],
+   "sha256": "4627f706c8d77e1b4cf5f396409d7802e0d4f6f89a35a25577617816fb568a97"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n2-synced-shuffle-none.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 136
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 168
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 200
+    }
+   ],
+   "sha256": "f403a4ea2369ea2c1339737915fe61d6edf764bb0186b2a24bcbda1ceadf9a9f"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n3-synced-imm-none.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 135
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 145
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 155
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 167
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 177
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 187
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 199
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 209
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 219
+    }
+   ],
+   "sha256": "51d390ad39597505702f8f4c4a73ca3a02088533450e9840859652e5460b4a8c"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n3-synced-shuffle-none.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 135
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 167
+    },
+    {
+     "actual": 4660,
+     "predicted": 48879,
+     "word": 199
+    }
+   ],
+   "sha256": "06f9bde9fb37e11237760d7e1b451a098f5104eece41baaf0ca63bb1aa01cee9"
+  },
+  "results/2026-10-20-push-overflow/push-overflow-m31-n1-cached-r0.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "a3d17c3f357abd8da2b55f41cbeb3f2bff5b9022d0afe2129a0a569511f96ead"
+  },
+  "results/2026-10-20-push-overflow/push-overflow-m31-n1-synced-r0.json.gz": {
+   "counter_sync_hypothesis_exact": true,
+   "default": "exact_hardware_match",
+   "hypothesis_table_differences": [],
+   "sha256": "5bb41a5f9aaab9fe2c5079deb624136d5dc03bc64737e4145639ac065a3a3b2f"
+  },
+  "results/2026-10-20-push-overflow/push-overflow-m65535-n1-synced-r0.json.gz": {
+   "counter_sync_hypothesis_exact": false,
+   "default": "refused_unresolved_activation",
+   "hypothesis_table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ],
+   "sha256": "3ff85c9474a8e91aa57ec6268221ff837be6816a87353e741520ac01bbbb27e1"
+  }
+ },
+ "simulator_binary_sha256": "d775e81956d33580f7e115c7444727ae2e21f78b1c0014675a7bec294817156d",
+ "simulator_sources": {
+  "rust/src/fsem.rs": "d3b6e49020fc3e1ffc871ec695568b117827355865bde633b8221536fd6f779d",
+  "rust/src/func.rs": "09cecfc088b92ce286ba0c060a89ae2ae42c69fc1e34b9ee4bbbcf8b9f14f00a",
+  "rust/src/isa/compiled.rs": "c2918a025be4fdd67c9271b61baef2c323be142a11b28c130b49a48c53629a6f",
+  "rust/src/isa/exec.rs": "e9ee294ed1358aa0f79543290143d5e4f2a4338cf363e11275076526897dde04",
+  "rust/src/isa/mod.rs": "8930365ee73bd7c4294c11f1b5d6688c8f48077090583b467e2cbd3a8890dd44"
+ },
+ "utc": "2026-10-20T04:54:03.493915+00:00"
+}

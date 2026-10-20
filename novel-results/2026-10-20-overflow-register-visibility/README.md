@@ -70,3 +70,9 @@ make verify-overflow-register-visibility
 ```
 
 [Complete evidence and diagnostic replay](../../results/2026-10-20-overflow-register-visibility/README.md).
+
+The later [default activation guard](../../results/2026-10-20-overflow-guard/README.md)
+now refuses unresolved unsynchronized overflow activation instead of silently
+using the incomplete prediction. The old hypothesis remains explicitly opt-in;
+all original counterexamples and historical manifests stay preserved. This
+does not supply the missing physical activation/timing model.

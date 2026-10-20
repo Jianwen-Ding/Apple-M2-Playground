@@ -224,7 +224,7 @@ Lowest-active target selection, issue-active link writes, three-target and
 scattered masks, and call-r1 write-before-select ordering are now measured.
 Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
 depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
-while masked survivors continue. Simulator c7e50f7 incorporates the later
+while masked survivors continue. Simulator defc29d incorporates the later
 conditional stored-depth RET and native shuffle liveness corrections;
 all 2,403 retained original programs now replay exactly.
 
@@ -333,3 +333,10 @@ extend the effect to immediate/copy/add and separate it from address ALU.
 persist after wait/drain; spacing and lane-dependent boundaries are recorded
 without claiming calibrated cycles. There are now 35 explicit counterexamples
 across the two overflow families; the 2,403-program exact corpus is separate.
+
+[Overflow activation guard](../results/2026-10-20-overflow-guard/README.md):
+default simulation requires measured wait0/pop0 settlement after masked-lane
+IF/push overflow activation. Raw overflow replay accepts 11 exact and refuses
+43 unresolved programs, including eight conservatively refused hardware-exact
+ones. Explicit counter-sync opt-in retains all 35 old counterexamples. Earlier
+2,403 cases remain exact, 44 library tests pass; timing/alignment remain open.

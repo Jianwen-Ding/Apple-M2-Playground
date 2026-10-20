@@ -9,6 +9,7 @@ from pathlib import Path
 import probe_overflow_first_shuffle as D
 from verify_ret_mask_state import common
 from verify_probe_sources import require_source
+from overflow_hypothesis import counter_sync_hypothesis
 
 
 def expected(table,n,cached):
@@ -43,7 +44,7 @@ def main():
         if g['maximum']==65535:actual[1][2188]=64
         assert (r['variant']['out'],r['variant']['table_after'])==actual
         assert r['push_analysis']['exact']==(g['maximum']==31)
-        with D.E.measured_model():prediction=D.P.cov.simulate(p['code'],32,32,64,0,p['table'])
+        with D.E.measured_model(), counter_sync_hypothesis():prediction=D.P.cov.simulate(p['code'],32,32,64,0,p['table'])
         assert prediction==want;retain(path,r,prediction)
     # Explicit retained diagnostics, rather than requiring unrun plan options.
     simple=('repeat','wait1','seed1234','payload','half','integer','alu','sync','seed5678','repeat2','down','up','xor','rotate','postwait','postsync','payload-no-and','postmove')
@@ -75,7 +76,7 @@ def main():
         assert (r['variant']['out'],r['variant']['table_after'])==hardware,path.name
         assert r['first_shuffle_analysis']['exact']==settled
         assert r['variant']['table_after'][8352:]==[0xcdcdcdcd]*16
-        with D.E.measured_model():prediction=D.P.cov.simulate(p['code'],32,32,64,0,p['table'])
+        with D.E.measured_model(), counter_sync_hypothesis():prediction=D.P.cov.simulate(p['code'],32,32,64,0,p['table'])
         assert prediction==want
         assert (prediction==hardware)==settled
         retain(path,r,prediction)
@@ -86,7 +87,7 @@ def main():
     assert manifest['simulator_binary_sha256']==sha(D.P.cov.RUN)
     manifest.update(cases=27,model_exact=9,model_counterexamples=18,independent_hardware_checks_passed=True,
         simulator_sources={name:sha(D.E.ROOT.parent/'AGX-Performance-Simulator'/name) for name in
-                           ('rust/src/func.rs','rust/src/isa/exec.rs','rust/src/isa/compiled.rs','rust/src/isa/mod.rs')})
+                           ('rust/src/func.rs','rust/src/fsem.rs','rust/src/isa/exec.rs','rust/src/isa/compiled.rs','rust/src/isa/mod.rs')})
     if args.result:args.result.write_text(json.dumps(manifest,indent=1,sort_keys=True)+'\n')
     print('PASS including the base family: 27 programs / 81 dispatches, 9 model matches, 18 retained model counterexamples')
 

@@ -1,0 +1,10 @@
+2026-10-20T04:55:25.562685+00:00
+Simulator revision: defc29dd11ddd590fe22b0b6d3d05f2881cce11e
+cargo test --manifest-path rust/Cargo.toml --lib --offline: test result: ok. 44 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.85s
+suite_check testsuite --only control: 23/23 exact, default and AGX_EXPERIMENTAL_RET=buffer-pop2
+suite_check coverage/expected --only control: 75/75 exact, default and AGX_EXPERIMENTAL_RET=buffer-pop2
+verify_measured_control_model.py: 2403 original programs exact; source/binary/record bindings in control-model-replay.json
+verify_overflow_guard.py: 54 originals, default 11 exact + 43 refusals; explicit hypothesis 19 exact + 35 counterexamples
+verify_overflow_first_shuffle.py: 27 original base/diagnostic programs independently checked, 18 retained hypothesis counterexamples
+verify_overflow_register_visibility.py: 27 original programs independently checked, 17 retained hypothesis counterexamples
+No GPU submissions were needed for this integration; historical manifests and hardware records preserved.

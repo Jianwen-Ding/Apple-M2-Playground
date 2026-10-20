@@ -73,3 +73,10 @@ Next discriminators should use output indices prepared before divergence and
 directly read masked destination registers after
 the first shuffle and distinguish which operation updates its execution mask.
 Broader overflow matrices remain pending. [Evidence](../../results/2026-10-20-overflow-first-shuffle/README.md).
+
+The [prepared-index follow-up](../2026-10-20-overflow-register-visibility/README.md)
+extends destination retention to immediate/copy/add and records spacing/lane
+dependence. A later [default model guard](../../results/2026-10-20-overflow-guard/README.md)
+rejects unresolved activation until measured wait0/pop0 settlement; the known-
+incomplete old hypothesis is available only by explicit opt-in. Original data
+and failed predictions remain unchanged.

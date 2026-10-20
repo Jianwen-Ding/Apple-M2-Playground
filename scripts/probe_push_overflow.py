@@ -12,6 +12,7 @@ import json
 import random
 from pathlib import Path
 import probe_masked_r0 as B
+from overflow_hypothesis import counter_sync_hypothesis, SOURCE_SHA256 as HYPOTHESIS_SHA256
 
 P,E,CF=B.P,B.E,B.CF
 DATA=E.ROOT/'results/2026-10-20-push-overflow'
@@ -86,12 +87,14 @@ def build(maximum,n,cached,rotate):
     assert maximum in (31,65535) and n in range(4) and rotate in (0,1)
     P.cov.install();table=table_for(maximum,n,rotate)
     code,sites,drain,bounds=construct(table,n,cached);control,_,_,_=construct(table,n,cached,True)
-    with E.measured_model():
+    with E.measured_model(), counter_sync_hypothesis():
         assert P.cov.simulate(control,32,32,64,0,table)==oracle(table,cached,True),'independent payload control mismatch'
         assert P.cov.simulate(code,32,32,64,0,table)==oracle(table,cached),'actual increment/wrap/sync hypothesis mismatch'
     return dict(code=code,control=control,table=table,n=32,wg=32,regs=64,expected=oracle(table,cached,True),data_dir=DATA,
         gate=dict(maximum=maximum,push_n=n,cached=cached,rotate=rotate,push_pc=sites[0],drain_pop3_count=drain,
-                  boundaries=bounds,actual_measured_model_exact=True,payload_control_exact=True,
+                  boundaries=bounds,actual_counter_sync_hypothesis_exact=True,payload_control_exact=True,
+                  overflow_hypothesis='counter-sync',
+                  overflow_hypothesis_sha256=HYPOTHESIS_SHA256,
                   builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()))
 
 

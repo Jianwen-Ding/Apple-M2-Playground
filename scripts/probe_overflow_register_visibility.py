@@ -11,6 +11,7 @@ import hashlib
 import json
 from pathlib import Path
 import probe_masked_r0 as B
+from overflow_hypothesis import counter_sync_hypothesis, SOURCE_SHA256 as HYPOTHESIS_SHA256
 
 P,E,CF=B.P,B.E,B.CF
 DATA=E.ROOT/'results/2026-10-20-overflow-register-visibility'
@@ -84,13 +85,14 @@ def build(maximum,n,cached,op,delay,layout='balanced'):
     assert maximum in (31,65535) and n in (1,2,3) and op in OPS and delay in DELAYS and layout in LAYOUTS
     P.cov.install();table=table_for(maximum,n,layout);code,pc,drain,bounds=construct(table,n,cached,op,delay)
     ctrl,_,_,_=construct(table,n,cached,op,delay,True)
-    with E.measured_model():
+    with E.measured_model(), counter_sync_hypothesis():
         assert P.cov.simulate(ctrl,32,32,64,0,table)==oracle(table),'independent IF control failed'
         assert P.cov.simulate(code,32,32,64,0,table)==oracle(table),'actual visibility hypothesis failed'
     return dict(code=code,control=ctrl,table=table,n=32,wg=32,regs=64,expected=oracle(table),data_dir=DATA,
         gate=dict(maximum=maximum,push_n=n,cached=cached,op=op,delay=delay,layout=layout,op_pc=pc,drain_pop3_count=drain,
                   boundaries=bounds,all_output_indices_initialized_before_divergence=True,
-                  actual_measured_model_exact=True,no_r0_write_push_control_exact=True,
+                  actual_counter_sync_hypothesis_exact=True,overflow_hypothesis='counter-sync',no_r0_write_push_control_exact=True,
+                  overflow_hypothesis_sha256=HYPOTHESIS_SHA256,
                   builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()))
 
 

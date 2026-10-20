@@ -11,6 +11,7 @@ import hashlib
 import json
 from pathlib import Path
 import probe_push_overflow as B
+from overflow_hypothesis import counter_sync_hypothesis, SOURCE_SHA256 as HYPOTHESIS_SHA256
 
 P,E,CF=B.P,B.E,B.CF
 DATA=E.ROOT/'results/2026-10-20-overflow-first-shuffle'
@@ -54,9 +55,10 @@ def build(kind,n=1,cached=False,rotate=0):
         info=P.cov.ASMB.info(code[pc:pc+16]);assert info and info[1]>0
         bounds.append(pc);pc+=info[1]
     assert pc==len(code) and len(code)<1024*1024 and at in bounds
-    with E.measured_model():assert P.cov.simulate(code,32,32,64,0,p['table'])==B.oracle(p['table'],cached)
+    with E.measured_model(), counter_sync_hypothesis():assert P.cov.simulate(code,32,32,64,0,p['table'])==B.oracle(p['table'],cached)
     p.update(code=code,data_dir=DATA)
-    p['gate']=dict(kind=kind,push_n=n,cached=cached,rotate=rotate,push_pc=at,boundaries=bounds,actual_measured_model_exact=True,base_gate=p['gate'],
+    p['gate']=dict(kind=kind,push_n=n,cached=cached,rotate=rotate,push_pc=at,boundaries=bounds,actual_counter_sync_hypothesis_exact=True,overflow_hypothesis='counter-sync',base_gate=p['gate'],
+                   overflow_hypothesis_sha256=HYPOTHESIS_SHA256,
                    base_builder_sha256=hashlib.sha256(Path(B.__file__).read_bytes()).hexdigest(),
                    builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
     return p

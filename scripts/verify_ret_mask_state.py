@@ -35,6 +35,8 @@ def common(rec,p,builder,*,ac_online='1'):
     assert rec['code']==p['code'].hex() and rec['control_code']==p['control'].hex()
     assert rec['table_in']==p['table']
     require_source(builder.__file__,rec['gate']['builder_sha256'])
+    if 'overflow_hypothesis_sha256' in rec['gate']:
+        require_source(Path(__file__).with_name('overflow_hypothesis.py'),rec['gate']['overflow_hypothesis_sha256'])
     assert rec['harness_sha256']==hashlib.sha256((R.P.bench.REPO/'tests/drm_compute.c').read_bytes()).hexdigest()
     for phase in ('control_before','variant','control_after'):
         v=rec[phase];assert v['ok'] and v['returncode']==0 and not v.get('host_timeout')

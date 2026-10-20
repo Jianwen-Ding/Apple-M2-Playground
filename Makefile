@@ -826,3 +826,7 @@ verify-overflow-first-shuffle:
 .PHONY: verify-overflow-register-visibility
 verify-overflow-register-visibility:
 	$(PYTHON) -B scripts/verify_overflow_register_visibility.py
+
+.PHONY: verify-overflow-guard
+verify-overflow-guard:
+	$(PYTHON) -B scripts/verify_overflow_guard.py

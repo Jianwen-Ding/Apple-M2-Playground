@@ -29,7 +29,7 @@ def main():
                  simulator_binary_sha256=sha(E.P.cov.RUN),
                  simulator_func_sha256=sha(ROOT.parent/'AGX-Performance-Simulator/rust/src/func.rs'),
                  simulator_sources={name:sha(ROOT.parent/'AGX-Performance-Simulator'/name) for name in
-                                    ('rust/src/func.rs','rust/src/isa/exec.rs','rust/src/isa/compiled.rs','rust/src/isa/mod.rs')},
+                                    ('rust/src/func.rs','rust/src/fsem.rs','rust/src/isa/exec.rs','rust/src/isa/compiled.rs','rust/src/isa/mod.rs')},
                  records={})
     E.P.cov.install()
     with E.measured_model():

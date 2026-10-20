@@ -24,10 +24,10 @@ Current evidence and integration:
   contribute to the source quad's low-index OR. All five native simd shuffle
   forms have independent paired-index and poisoned-index hardware matrices.
   [Native shuffle integration](../results/2026-10-20-native-shuffle-model/README.md).
-- Simulator **c7e50f7** replays all **2,403** original control programs exactly.
+- Simulator **defc29d** replays all **2,403** original control programs exactly.
   Return/register call still require `AGX_EXPERIMENTAL_RET=buffer-pop2`;
   default rejection and target checks remain. Both interpreter paths have
-  source-liveness fixtures; 42 library tests pass. Historical source and
+  source-liveness fixtures; 44 library tests pass. Historical source and
   diagnostic hashes resolve through preserved source-before-model archives.
 
 The [nested divergent matrix](../novel-results/2026-10-20-nested-divergent/README.md)
@@ -118,6 +118,16 @@ seven/eight fix the tested immediate. Counts are not calibrated cycles or a
 universal pipeline rule. This adds 27 programs / 81 dispatches, exact controls,
 zero faults, 17 counterexamples; combined overflow scope has 35 counterexamples
 in 54 programs / 162 dispatches. The simulator limitation is still explicit.
+
+The [overflow guard integration](../results/2026-10-20-overflow-guard/README.md)
+now refuses unsynchronized masked-lane overflow activation by default. Wait0
+or pop0 settlement is accepted; already-issuing wraps stay supported. This is
+conservative and may reject empirically sufficient spacing. The explicit
+`AGX_EXPERIMENTAL_EXEC_OVERFLOW=counter-sync` retains the incomplete old
+hypothesis for diagnostics, not measured timing. Default raw replay accepts
+11 exact and refuses 43 overflow programs; the opt-in retains all 35 known
+counterexamples. All 2,403 earlier exact programs and 44 library tests pass.
+The functional mask path also now skips stopped/absent lanes consistently.
 
 Owner follow-up, deferred at their request: later inspect performance-simulator
 pull requests from other branches for requested behavior/support, and implement
