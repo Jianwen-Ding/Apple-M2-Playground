@@ -78,10 +78,12 @@ def hardware(p,trial):
 
 def _hardware(p,trial):
     base=p['gate']['base_gate'];repeats=p['gate']['repeats']
-    name=f'integer-train-n{p["n"]}-w{p["wg"]}-c{base["chains"]}-a{base["adds"]}-k{repeats}-t{trial}'
-    path=DATA/f'{name}.json.gz';assert not path.exists(),'refusing to overwrite evidence'
-    P.gpu_safety.require_budget(1);DATA.mkdir(parents=True,exist_ok=True)
-    runner=P.bench.Runner(SCRATCH/name)
+    prefix=p.get('train_prefix','integer-train')
+    name=f'{prefix}-n{p["n"]}-w{p["wg"]}-c{base["chains"]}-a{base["adds"]}-k{repeats}-t{trial}'
+    data=p.get('train_data_dir',DATA)
+    path=data/f'{name}.json.gz';assert not path.exists(),'refusing to overwrite evidence'
+    P.gpu_safety.require_budget(1);data.mkdir(parents=True,exist_ok=True)
+    runner=P.bench.Runner(p.get('train_scratch',SCRATCH)/name)
     r=dict(name=name,utc=time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),before=P.snapshot(),
         code=p['code'].hex(),control_code=p['control'].hex(),table_in=p['table'],n=p['n'],wg=p['wg'],regs=p['regs'],gate=p['gate'],
         simulator_sha256=hashlib.sha256(P.cov.RUN.read_bytes()).hexdigest(),
@@ -101,7 +103,9 @@ def _hardware(p,trial):
     r['recovery_control_passed']=H.matches(r['control_after'],p['expected'])
     if not r['recovery_control_passed']:r['halted']='recovery failed; no further submissions'
     if r['train']['ok']:
-        r['final_arithmetic_exact']=(r['train']['out'],r['train']['table_after'])==B.oracle(p['n'],base['chains'],base['adds'])
+        expected=p.get('final_expected')
+        if expected is None:expected=B.oracle(p['n'],base['chains'],base['adds'])
+        r['final_arithmetic_exact']=(r['train']['out'],r['train']['table_after'])==expected
         ns=[s['fw_ts'][1]-s['fw_ts'][0] for s in r['train']['samples']]
         r['timing']=dict(ns=ns,first_ns=ns[0],last_ns=ns[-1],minimum_ns=min(ns),maximum_ns=max(ns),
             first_quarter_median_ns=statistics.median(ns[:len(ns)//4]),last_quarter_median_ns=statistics.median(ns[-len(ns)//4:]))

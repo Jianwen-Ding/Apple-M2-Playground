@@ -841,3 +841,7 @@ verify-integer-chain-train:
 
 test-integer-chain-train:
 	$(PYTHON) -B scripts/test_integer_chain_train.py
+
+.PHONY: verify-integer-immediate-cost
+verify-integer-immediate-cost:
+	$(PYTHON) -B scripts/verify_integer_immediate_cost.py

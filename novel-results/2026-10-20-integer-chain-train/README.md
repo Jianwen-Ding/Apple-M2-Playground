@@ -28,3 +28,8 @@ encoded forms is a useful next check before attributing the gap to latency,
 instruction fetch, scheduling, or frequency. No causal conclusion follows yet.
 
 [Evidence and offline verification](../../results/2026-10-20-integer-chain-train/README.md).
+
+The [matched immediate-value follow-up](../2026-10-20-integer-immediate-cost/README.md)
+retains the eight-chain gap and finds substantial timing variation between
+trials of identical one-chain programs. The absence of large warm-up in this
+earlier batch does not establish invariant timing across allocations or batches.

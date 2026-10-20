@@ -13,10 +13,10 @@ Retain watchdog/kernel/memory diagnostics and exact recovery controls. A failed
 recovery or blocked probe stops GPU submissions. Commit and push each completed
 piece. The deferred performance-simulator PR review remains a later task.
 
-Current next question: compare ordinary immediate-add values and encoded forms
-under matched launches. Independent-chain and consecutive-dispatch studies
-retain a roughly 3–4x timing-model gap. Calibration uses immediate 1 whereas
-the latest programs use immediate 3; this is a hypothesis to test, not an
-established explanation. Keep small positive values, full scalar/simulator
-gates, and serialized bounded submissions. No function transfers or
-execution-counter manipulation beyond the standard harness prefix.
+Current next question: repeat identical ordinary arithmetic programs across
+allocations and run order to characterize timing-state variability. The
+matched immediate-1/3 study retains the eight-chain 3.6x model gap, while
+identical one-chain shaders vary by over 2x across trials. Immediate value
+alone cannot explain the observed gap. Keep small positive values, full
+scalar/simulator gates, and serialized bounded submissions. No function
+transfers or execution-counter manipulation beyond the standard harness prefix.
