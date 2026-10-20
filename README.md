@@ -298,3 +298,5 @@ The probe watchdog now retains memory-pressure and process diagnostics on a
 timeout; `make test-probe-watchdog` tests its bounded failure paths without a GPU.
 
 **Sparse-mask shuffles (2026-10-20).** Inactive lanes contribute index bits, so the generic four-shuffle lowering needs index initialization before divergence. Paired b32 lowerings preserve 64-bit payloads: 360,552 defined positive data words exact, 236 retained dispatches, zero faults. [Finding](novel-results/2026-10-20-shfl-mask/README.md), `make verify-shfl-mask`.
+
+**Stop and return context (2026-10-20, owner-authorized unsafe probes).** Empty-mask stops preserve conditional-only mask depths, while the same reactivation pattern after return loses depth-1 lanes. Partial active stops leave masked lanes able to resume. 17 variants / 51 dispatches, zero faults; six simulator counterexamples retained explicitly. [Finding](novel-results/2026-10-20-empty-stop/README.md), `make verify-empty-stop`.

@@ -429,6 +429,14 @@ post-fault recovery control is retained in `results/2026-10-17-call-ret/recovery
 
 ## Current model: clamping pop, uniform ret, stop padding (2026-10-17, supersedes earlier mask-depth notes)
 
+**Qualification from isolated hardware probes (2026-10-20):** the empty-stop
+depth-1 kill rule below fits return-context records, but fails when equivalent
+pop-reactivation patterns are constructed with conditionals. A partial active
+stop also leaves masked lanes able to resume. The simulator is unchanged and
+the [new evidence](../2026-10-20-empty-stop/README.md) retains six exact
+counterexamples; do not generalize the old stop heuristic outside its measured
+return scope.
+
 Earlier sections in this file describe intermediate models (no-op pop underflow,
 "dragged lanes reactivate on divergent ret") that were fitted to probes that had
 bugs. They are kept for history; this section is the current reading.

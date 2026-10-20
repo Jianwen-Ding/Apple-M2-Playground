@@ -173,3 +173,10 @@ hardware failures stop the runner. Start with `--groups 5 --only control-before`
 programs in the adjacent Rust simulator. `verify_shfl_mask.py --no-sim` skips
 replay while retaining shader/input reconstruction, independent PTX checks,
 guards, controls, source hashes and deliberate-corruption rejection.
+
+`probe_empty_stop.py CASE [--hardware] [--repeat N]` isolates empty/partial-mask
+stops using conditional mask depths. `probe_ret_stop_context.py --stops N`
+compares a partial return to a known-operation landing surrogate, with optional
+`--hardware --repeat N`. Both use the bounded unsafe harness with kernel,
+memory and recovery diagnostics. `make verify-empty-stop` checks all retained
+raw bytes, controls and simulator counterexamples; it does not use the GPU.

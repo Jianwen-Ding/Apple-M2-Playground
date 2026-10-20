@@ -620,6 +620,10 @@ verify-shfl:
 verify-shfl-mask:
 	$(PYTHON) -B scripts/verify_shfl_mask.py
 
+.PHONY: verify-empty-stop
+verify-empty-stop:
+	$(PYTHON) -B scripts/verify_empty_stop.py
+
 verify-occupancy2:
 	$(PYTHON) -B scripts/verify_occupancy2.py
 

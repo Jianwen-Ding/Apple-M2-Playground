@@ -1,5 +1,12 @@
 # Task 1: remaining work, safe and unsafe (2026-10-17)
 
+> **Update 2026-10-20 (owner-authorized unsafe probing):** isolated empty/partial-mask
+> stops and return context now measured: [finding](../novel-results/2026-10-20-empty-stop/README.md),
+> `make verify-empty-stop`. 17 variants / 51 dispatches, zero faults, exact recovery controls.
+> The old depth-1-kill heuristic holds after return but fails for conditional-only
+> masks; six simulator counterexamples retained. Qualified simulator semantics,
+> additional return state and broader mask shapes remain open.
+
 > **Loop status 2026-10-19:** autonomous safe pass completed T1 (fence model verified, no change),
 > T2 (memory_ordering property 8/8), T3 (fix-up cost ~200ns fetch-bound, no model change), T4 (coverage report
 > 2670/2681, 0 mismatches; 20/20 properties), T6a (OOB=0, gather rule, sRGB-12bit), T6b (borders), T6c (16-bit formats),

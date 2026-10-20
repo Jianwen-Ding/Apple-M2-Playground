@@ -6,6 +6,13 @@ and [hang/memory procedure](hang-memory-followup.md) first. Earlier task plans
 and the early sections of the finding retain historical hypotheses, not the
 current target formula or recovery policy.
 
+2026-10-20 follow-up: [isolated stop probes](../novel-results/2026-10-20-empty-stop/README.md)
+confirm the old stop heuristic in return context and contradict it for masks
+constructed only from conditionals. Partial stops terminate issuing lanes
+while masked lanes resume. `make verify-empty-stop` preserves 17 exact variants,
+including six known simulator counterexamples. A qualified model and the
+additional return state remain open; no simulator semantics were changed.
+
 ## Established scope and files
 
 Measured with one full 32-lane SIMD group on M2 Max G14C:
