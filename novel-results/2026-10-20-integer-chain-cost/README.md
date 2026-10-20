@@ -46,3 +46,6 @@ warm-up from the isolated-dispatch observation before calibration changes.
 No function-transfer or execution-counter-boundary experiments are involved.
 
 [Evidence and offline verification](../../results/2026-10-20-integer-chain-cost/README.md).
+
+The [consecutive-dispatch follow-up](../2026-10-20-integer-chain-train/README.md)
+is complete: no large late-run speed-up, with the timing gap retained.

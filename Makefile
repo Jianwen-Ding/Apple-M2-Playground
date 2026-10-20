@@ -834,3 +834,10 @@ verify-overflow-guard:
 .PHONY: verify-integer-chain-cost
 verify-integer-chain-cost:
 	$(PYTHON) -B scripts/verify_integer_chain_cost.py
+
+.PHONY: verify-integer-chain-train test-integer-chain-train
+verify-integer-chain-train:
+	$(PYTHON) -B scripts/verify_integer_chain_train.py
+
+test-integer-chain-train:
+	$(PYTHON) -B scripts/test_integer_chain_train.py
