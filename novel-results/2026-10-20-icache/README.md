@@ -1,0 +1,53 @@
+# Instruction cache: 12 KiB per core, 64-byte lines, ~19% capacity lost for instructions that cross 8-byte boundaries
+
+Status: one device (driver-reported M2 Max G14C B1), direct DRM. Straight-line `iadd` / `and` / `mov_imm` bodies in Mesa's
+counted-loop shape, gated in the applegpu emulator and the Rust simulator, with every hardware output oracle-checked.
+SR20 (cluster/core) is recorded per group. 0 faults, hang budget unused. This is the first direct measurement of AGX
+instruction-cache structure in this project; an earlier note only said that unrolled code is fetch-bound.
+
+Method: one SIMD group (or a chosen few) runs a counted loop whose body is B bytes of independent instructions over 4
+registers (fewer than the 9 destinations that trigger the result-cache slowdown). Each run executes about 3M body
+instructions and is timed with firmware timestamps. **No clock keeper** (see
+[failed approaches](../../notes/failed-approaches.md)): its kernel can share the probe's core. Each size runs 8-16
+back-to-back dispatches, and the minimum or the median of the settled repeats is used.
+
+## Results
+
+| Question | Result |
+|---|---|
+| In-cache rate | 0.745 ns per independent `iadd` per group, about 1 per cycle at 1,398 MHz |
+| **Capacity** | **12 KiB**: a 12,284-byte loop starting on a 64-byte boundary (192 lines) runs in cache; 12,292 bytes (193 lines) misses. Dense 8-byte scan, 353 sizes |
+| **Line size** | **64 bytes**: shifting the loop start changes the outcome exactly at 64-byte line counts (130-run start-offset sweep, model 0 mismatches) |
+| **Instruction alignment** | lines whose instructions cross 8-byte boundaries cost about 192/161 = **1.19×**: 8-byte or 4-byte instructions all shifted by 2 or 4 bytes fit only **161** lines; 4-byte instructions at 0 mod 4 (no crossing) fit 192; 6-byte streams 168-169 |
+| Mixed alignment | proportional: aligned fraction f fits floor(192 / (f + 1.19 (1 - f))) lines: 167 / 175 / 183 for f = 0.25 / 0.5 / 0.75 (measured exactly) |
+| Beyond capacity | gradual: rises to the streaming cost by ~20 KB, which suggests replacement other than strict LRU |
+| Streaming cost | 3.1 ns per 8-byte instruction (0.39 ns/byte); 0.48 ns/byte for 6-byte and 0.53 for 4-byte instructions, so neither bytes nor instructions alone set it. Flat from 1 to 152 groups GPU-wide: no global fetch bottleneck at this scale |
+| **Sharing** | **per core**: two SIMD groups on one core running different loops (one aligned, one misaligned) both fit through 5,376 B each and miss from 5,632 B, matching 85 + 85×1.19 ≤ 192 < 89 + 89×1.19. Different code on different cores (SR20 0x30 / 0x31) does not interact |
+
+### Anomaly: two groups, same loop
+
+Two SIMD groups of one workgroup running the *same* in-cache loop sometimes fall into a state 2-3.5× slower: 63 of 257
+sizes between 4 and 12 KB. The state depends on loop length and changes between repeats; at 10,240 bytes, repeats
+alternated between 0.75 and 2.85 ns. A single group never shows it. With 4 or more groups per core it disappears, and the
+core's issue limit takes over (4.6-5.4 instructions/ns per core, 3.3-3.8 per cycle). One possible explanation, not
+established, is a phase-dependent conflict in fetch arbitration.
+
+## Compiler implications
+
+- Keep hot loops under about **10 KB** (161 lines × 64 B: the worst-case alignment); 12 KiB is the best case.
+  All SIMD groups resident on a core share this budget when they run different code.
+- AGX instructions are 2-12 bytes long, so 8-byte-boundary crossings are common. Aligning loop starts to 64 bytes only
+  removes the extra partial line; it does not remove the crossing cost.
+- Code beyond the cache streams at about 0.4-0.5 ns per byte per group. Large unrolled bodies are fetch-bound, so
+  prefer loops for long straight-line code at low occupancy.
+
+## Not established
+
+The mechanism behind the 1.19× crossing cost (perhaps per-chunk pre-decode storage), the replacement policy and
+associativity, miss latency, whether prefetch is sequential, and the cause of the two-group anomaly.
+
+## Reproduce
+
+`python3 -B scripts/probe_icache.py [--sizes ...] [--pad P] [--kind iadd8|and6|mov4] [--shift-at F] [--groups G --local L] [--dual]`
+(do not run `clock_keeper.py` at the same time). Offline: `make verify-icache` (12 checks against
+[results/2026-10-20-icache](../../results/2026-10-20-icache)).

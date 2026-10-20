@@ -1,5 +1,8 @@
 # Task 1: remaining work, safe and unsafe (2026-10-17)
 
+> **Instruction cache 2026-10-20:** [12 KiB per core, 64-byte lines, 1.19x cost for 8-byte-boundary crossings, per-core sharing](../novel-results/2026-10-20-icache/README.md)
+> (`make verify-icache`). Open: replacement policy/associativity, miss latency, prefetch, the two-group anomaly, cost-model fetch term.
+
 > **fp32 IEEE update 2026-10-20:** [exact non-`.ftz` add/mul/fma and `.rz/.rm/.rp` fp32](../novel-results/2026-10-20-fp32-ieee/README.md)
 > (`make verify-fp32-ieee`): a soft fma (all modes) and a hybrid native+check path are bit-exact on 21,024 edge/random lanes; the hybrid costs ~15x
 > native on subnormal-free data. **div.rn.f32 done** ([fdiv32](../novel-results/2026-10-20-fdiv32/README.md), `make verify-fdiv32`). **sqrt.rn.f32 done** ([fsqrt32](../novel-results/2026-10-20-fsqrt32/README.md)). **rcp.rn.f32 done** (3 ops, exhaustive on hardware; fdiv32 finding). Layout follow-up: a taken `jmp_exec_none` costs ~14 fma at full occupancy; out-of-line slow paths make the exact fma 1.75x faster. Applied to div (1.27x) and sqrt (2.2x). Taken forward jumps now modelled in cost.rs (scheduler hold 33 cycles; probes predicted within 1%). Open: single-group fetch-bound behaviour of long straight-line code (taken jump ~226 cycles).

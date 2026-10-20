@@ -23,19 +23,23 @@ KINDS = {   # instruction text for step i (4 independent destinations), and its 
 STEP = agx_loop.encode('iadd r5, r5, 1')
 
 
-def loop_part(size_bytes, kind, cnt_reg, lim_reg, base):
+def loop_part(size_bytes, kind, cnt_reg, lim_reg, base, shift_at=None):
     """One counted loop over a body of size_bytes; trip counter cnt_reg vs lim_reg; base = register offset of r5..r8."""
     e = agx_loop.encode
     fn, w = KINDS[kind]
     n = size_bytes // w
     regs = [r+base for r in REGS]
-    loop = b''.join(e(fn(regs[i % 4])) for i in range(n))
+    ins = [e(fn(regs[i % 4])) for i in range(n)]
+    if shift_at is not None:                          # one 2-byte wait after instruction k: the rest is shifted by 2
+        k = int(n*shift_at)
+        ins = ins[:k] + [e('wait 0')] + ins[k:]
+    loop = b''.join(ins)
     loop += e(f'iadd r{cnt_reg}, 1, r{cnt_reg}.sx') + e(f'while_icmp r0l, ult, r{cnt_reg}, r{lim_reg}, 1')
     jump = e(f'jmp_exec_any pc-{len(loop)}', f'jmp_exec_any pc-{len(loop)}')
     return loop+jump, n, len(loop)
 
 
-def body(size_bytes, trips, kind='iadd8', dual=False, tag=False, select=32, pad=0):
+def body(size_bytes, trips, kind='iadd8', dual=False, tag=False, select=32, pad=0, shift_at=None):
     """dual=True: SIMD groups with (thread index & 32) == 0 run loop A, the others a different loop B of the same size
     (two code footprints of size_bytes each on one core when the workgroup is 64 lanes)."""
     e, mov = agx_loop.encode, chains.mov_imm
@@ -45,7 +49,7 @@ def body(size_bytes, trips, kind='iadd8', dual=False, tag=False, select=32, pad=
         head += e('wait 0')*(pad//2)
     if not dual:
         head += e('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
-        lp, n, lb = loop_part(size_bytes, kind, 3, 4, 0)
+        lp, n, lb = loop_part(size_bytes, kind, 3, 4, 0, shift_at)
         tail = e('pop_exec r0l, 1')
     else:
         head += mov(12, select) + e('and r9, r1, r12')
@@ -88,6 +92,7 @@ def main():
     p.add_argument('--kind', default='iadd8', choices=sorted(KINDS))
     p.add_argument('--local', type=int, default=32, help='workgroup size in lanes (64 = two SIMD groups on one core)')
     p.add_argument('--select', type=int, default=32, help='dual: thread-index bit mask choosing loop B (32 = alternate SIMD groups / 32-lane workgroups, 256 = workgroups 8-15 with local 32)')
+    p.add_argument('--shift-at', type=float, default=None, help='insert one 2-byte wait after this fraction of the body (misaligns the rest)')
     p.add_argument('--pad', type=int, default=0, help='bytes of wait 0 before the loop (shifts its start address)')
     p.add_argument('--dual', action='store_true', help='the two SIMD groups of a 64-lane workgroup run different loop bodies')
     p.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/drm-compute/icache'))
@@ -95,7 +100,7 @@ def main():
     a = p.parse_args()
     sizes = [int(x) for x in a.sizes.split(',')]
     for s in sizes:                                   # emulator gate: exact result at 2 trips, terminates
-        b, n, _ = body(s, 2, a.kind, a.dual, select=a.select, pad=a.pad)
+        b, n, _ = body(s, 2, a.kind, a.dual, select=a.select, pad=a.pad, shift_at=a.shift_at)
         st = agx_loop.emulate(b, 32, max_steps=4*n+1000)
         if st['r2'] != [oracle(n, 2, a.kind)]*32:
             sys.exit(f'emulator gate failed at {s} bytes: {st["r2"][:2]} != {oracle(n, 2)}')
@@ -106,16 +111,16 @@ def main():
     exe = out/'drm_compute'
     subprocess.run(['cc', '-std=c11', '-O2', str(REPO/'tests/drm_compute.c'), '-o', str(exe)], check=True)
     lanes = 32*a.groups
-    rec = {'groups': a.groups, 'instr': a.instr, 'pad': a.pad, 'kind': a.kind, 'local': a.local, 'dual': a.dual, 'step_bytes': KINDS[a.kind][1], 'rows': []}
+    rec = {'groups': a.groups, 'instr': a.instr, 'pad': a.pad, 'shift_at': a.shift_at, 'kind': a.kind, 'local': a.local, 'dual': a.dual, 'step_bytes': KINDS[a.kind][1], 'rows': []}
     import sim_gate
     rounded = (lanes+31)//32*32
     for s in sizes:
         n0 = s // KINDS[a.kind][1]
         trips = max(2, a.instr // n0)
-        b, n, lb = body(s, trips, a.kind, a.dual, tag=True, select=a.select, pad=a.pad)
+        b, n, lb = body(s, trips, a.kind, a.dual, tag=True, select=a.select, pad=a.pad, shift_at=a.shift_at)
         want = oracle(n, trips, a.kind)
         code = drm.build_main(b)
-        gate = sim_gate.require(drm.build_main(body(s, 3, a.kind, a.dual, select=a.select, pad=a.pad)[0]), lanes, oracle(n, 3, a.kind), regs=24)   # same body, 3 trips
+        gate = sim_gate.require(drm.build_main(body(s, 3, a.kind, a.dual, select=a.select, pad=a.pad, shift_at=a.shift_at)[0]), lanes, oracle(n, 3, a.kind), regs=24)   # same body, 3 trips
         (out/'c.bin').write_bytes(code+bytes(16))
         r = subprocess.run([str(exe), '/dev/dri/renderD128', str(out/'c.bin'), str(lanes), str(out/'rb'), str(a.repeats), '24'],
                            capture_output=True, timeout=300, env={'PATH': '/usr/bin', 'AGX_LOCAL_X': str(a.local)})
