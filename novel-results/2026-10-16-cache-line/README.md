@@ -3,6 +3,9 @@
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, compute, AC power, GPU clock held at
 its top state (`scripts/clock_keeper.py`). Simulator task safe-03 step 1.
 
+> **Correction 2026-10-20:** the 64 B step is confirmed without the keeper. The absolute L2 / 64 MiB costs below include a
+> keeper (other-context) penalty: 164 / 217 and 256 / 407 ns without it ([cross-context latency](../2026-10-20-cross-context-latency/README.md)).
+
 ## Claim and scope
 
 **Test ("is the neighbour free?"):**

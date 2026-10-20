@@ -3,6 +3,10 @@
 Status: confirmed on one device (driver-reported M2 Max G14C B1), direct DRM, compute, AC power, GPU clock held by the
 long-command `clock_keeper.py`. Simulator task safe-03 steps 2-3.
 
+> **Caution 2026-10-20:** measured with the clock keeper, which adds ~190 ns to far-memory loads
+> ([cross-context latency](../2026-10-20-cross-context-latency/README.md)). The far-latency values, and possibly the TLB
+> reach / miss cost, need re-measurement without the keeper.
+
 ## Claim and scope
 
 All runs are random single-cycle pointer chases by one SIMD group (`scripts/run_drm_compute.py --kind chase`). Every

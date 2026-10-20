@@ -580,3 +580,10 @@ values (in-cache 0.744 ns per iadd; intermediate plateaus at 1.075 / 1.287 ns ar
 Also record SR20 in the output so placement is visible. Earlier single-group probes that ran with the keeper
 (`run_drm_linesize.py`, `run_drm_neighbour.py`, `probe_fence_contention.py`) may have shared a core with it in some runs.
 Their results should be re-checked for core collisions before they are used for fine-grained conclusions.
+
+### The clock keeper also inflates memory latency (another GPU context), 2026-10-20
+
+Even when it does not share the probe's core, a running `clock_keeper.py` (a separate process and GPU context) adds ~190 ns
+to far-memory (64 MiB span) loads and 6-15 ns at L2 (more with short keeper commands). The cause is not process churn or
+command boundaries. Do not use the keeper for latency measurements; use back-to-back multi-millisecond dispatches and the
+minimum or settled median. Evidence: `novel-results/2026-10-20-cross-context-latency`.

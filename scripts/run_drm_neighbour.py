@@ -19,6 +19,7 @@ import agx_loop, gpu_safety, sim_gate  # noqa: E402
 import run_drm_compute as drm  # noqa: E402
 
 ELEM = 1024  # bytes between elements
+ALU_MULT = 6  # --busy: ALU trips per chase hop (~37 ns each: ~223 ns, just under a far-memory hop)
 
 
 def table(n, d, seed=1):
@@ -41,15 +42,29 @@ def oracle(t, hops, d):
     return x
 
 
-def body(trips, d):
+def body(trips, d, busy_want=None):
+    """busy_want: lanes >= 32 (the second workgroup) skip the chase and run an ALU-only delay loop of ALU_MULT x the trip count (~87% of a 256 ns far-memory chase),
+    then write busy_want (the chase oracle) so every lane checks the same value."""
     enc, mov = agx_loop.encode, agx_loop.chains.mov_imm
-    head = mov(3, 0)+mov(4, trips)+mov(2, 0)+mov(7, d//4)+enc('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
+    head = mov(3, 0)+mov(4, trips)+mov(2, 0)+mov(7, d//4)
+    if busy_want is not None:
+        alu = mov(9, 0)+mov(10, trips*ALU_MULT)+enc('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
+        aloop = b''.join(enc(f'iadd r{8+k%2}, r{8+k%2}, 1') for k in range(0)) + enc('iadd r11, r11, 1')*8
+        aloop += enc('iadd r9, 1, r9.sx')+enc('while_icmp r0l, ult, r9, r10, 1')
+        alu += aloop + enc(f'jmp_exec_any pc-{len(aloop)}', f'jmp_exec_any pc-{len(aloop)}') + enc('pop_exec r0l, 1') + mov(2, busy_want)
+    head += enc('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
     loop = enc('device_load 0, i32, x, r5, u8_u9, r2, unsigned')+enc('wait 0')
     loop += enc('iadd r6, r2, r5')+enc('iadd r6, r6, r7')
     loop += enc('device_load 0, i32, x, r2, u8_u9, r6, unsigned')+enc('wait 0')
     loop += enc('iadd r3, 1, r3.sx')+enc('while_icmp r0l, ult, r3, r4, 1')
     jump = enc(f'jmp_exec_any pc-{len(loop)}', f'jmp_exec_any pc-{len(loop)}')
-    return head+loop+jump+enc('pop_exec r0l, 1')
+    chase = head+loop+jump+enc('pop_exec r0l, 1')
+    if busy_want is None:
+        return chase
+    # if (r1 < 32) chase else alu  (Mesa's structured if/else; r1 = global thread index)
+    sel = mov(12, 32) + mov(13, 31) + enc('if_icmp r0l, ult, r1, r12, 1') + enc(f'jmp_exec_none pc+{6+len(chase)}', f'jmp_exec_none pc+{6+len(chase)}') + chase
+    sel += enc('else_icmp r0l, ugt, r1, r13, 1') + enc(f'jmp_exec_none pc+{6+len(alu)}', f'jmp_exec_none pc+{6+len(alu)}') + alu + enc('pop_exec r0l, 1')
+    return sel
 
 
 def main():
@@ -57,6 +72,8 @@ def main():
     p.add_argument('--elements', default='64,1024,65536')
     p.add_argument('--offsets', default='4,16,32,48,60,64,96,124,128,192,256,384,508,512')
     p.add_argument('--hops', type=int, default=200000)
+    p.add_argument('--lanes', type=int, default=32, help='64: a second 32-lane workgroup (another core) runs alongside')
+    p.add_argument('--busy', action='store_true', help='with --lanes 64: the second workgroup runs an ALU delay loop instead of the chase')
     p.add_argument('--repeats', type=int, default=4)
     p.add_argument('--device', default='/dev/dri/renderD128')
     p.add_argument('--output', type=Path)
@@ -73,24 +90,24 @@ def main():
                        capture_output=True, timeout=60)
     if r.returncode:
         sys.exit('build failed: '+r.stderr.decode()[-400:])
-    state = {'utc': stamp, 'hops': a.hops, 'repeats': a.repeats, 'elem_bytes': ELEM,
+    state = {'utc': stamp, 'lanes': a.lanes, 'busy': a.busy, 'hops': a.hops, 'repeats': a.repeats, 'elem_bytes': ELEM,
              'power_ac': Path('/sys/class/power_supply/macsmc-ac/online').read_text().strip(), 'runs': []}
     save = lambda: (out/'record.json').write_text(json.dumps(state, indent=1)+'\n')
     for n in els:
         for d in offs:
             t = table(n, d); tp = out/'t.bin'; tp.write_bytes(t.tobytes())
-            code = drm.build_main(body(a.hops, d)); want = oracle(t, a.hops, d)
-            gate = sim_gate.require(code, 32, want, regs=16, table=tp)
+            want = oracle(t, a.hops, d); code = drm.build_main(body(a.hops, d, want if a.busy else None))
+            gate = sim_gate.require(code, a.lanes, want, regs=16, table=tp)
             gpu_safety.require_budget(1)
             (out/'k.bin').write_bytes(code+bytes(16))
             try:
-                res = subprocess.run([str(exe), a.device, str(out/'k.bin'), '32', str(out/'rb'), str(a.repeats), '16', str(tp)],
+                res = subprocess.run([str(exe), a.device, str(out/'k.bin'), str(a.lanes), str(out/'rb'), str(a.repeats), '16', str(tp)],
                                      capture_output=True, timeout=120)
             except subprocess.TimeoutExpired:
                 gpu_safety.record(f'run_drm_neighbour {n}/{d}: timeout'); save(); sys.exit('timeout: stopping')
             reps = [json.loads(l) for l in res.stdout.decode().splitlines() if l.startswith('{"rep"')]
             w = len((out/'rb').read_bytes())//4 if (out/'rb').exists() else 0
-            ok = res.returncode == 0 and w and sim_gate.oracle_ok(list(struct.unpack(f'<{w}I', (out/'rb').read_bytes())), 32, want)
+            ok = res.returncode == 0 and w and sim_gate.oracle_ok(list(struct.unpack(f'<{w}I', (out/'rb').read_bytes())), a.lanes, want)
             fw = [q['fw_ts'][1]-q['fw_ts'][0] for q in reps]
             state['runs'].append({'elements': n, 'offset': d, 'oracle_ok': bool(ok), 'fw_ns': fw, 'simulator': gate}); save()
             print(json.dumps({'elements': n, 'offset': d, 'ok': bool(ok), 'ns_per_hop': [round(x/a.hops, 1) for x in fw]}), flush=True)
