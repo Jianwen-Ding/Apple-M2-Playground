@@ -782,3 +782,7 @@ verify-nested-divergent:
 .PHONY: verify-nested-early-return
 verify-nested-early-return:
 	$(PYTHON) -B scripts/verify_nested_early_return.py
+
+.PHONY: verify-nested-partial-outer
+verify-nested-partial-outer:
+	$(PYTHON) -B scripts/verify_nested_partial_outer.py

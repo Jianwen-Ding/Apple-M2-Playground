@@ -34,3 +34,17 @@ Restoring r1 before they reconverge only changes nonmatching lanes, so the
 final r1 payload must retain inner links in matching lanes. Exact no-call
 controls construct that full trace. Start direct/A/seed17/one pop; inspect every
 word and recovery before the zero-pop case or broader target/form variation.
+
+Full-group early returns also match. `probe_nested_partial_outer.py` now
+excludes an original prefix from the outer call, preinitializing every saved
+r29 to the newly computed **valid outer continuation** before divergence.
+Original excluded r1 remains its initialized ID and is observed before link
+restoration. Only originally admitted lanes execute outer entry/save and inner
+call; a nonempty inner return may reactivate excluded depth-1 lanes anyway.
+All restored transfer operands are therefore initialized in-program values.
+Insertion consumes STOP padding and repatches only the direct outer displacement
+and its expected link; function addresses and inner link stay fixed. Complete
+actual/control/three-winner paths must match scalar oracles. First direct,
+k1/A/seed17/two pops, inspect full recovery, then one/zero pop cases separately
+before extending first positions, outer form, winner and seed. Stop further
+submissions for any failed recovery or blocked process; preserve diagnostics.
