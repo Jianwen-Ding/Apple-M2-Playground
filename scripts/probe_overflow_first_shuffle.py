@@ -14,7 +14,7 @@ import probe_push_overflow as B
 
 P,E,CF=B.P,B.E,B.CF
 DATA=E.ROOT/'results/2026-10-20-overflow-first-shuffle'
-KINDS=('repeat','repeat2','repeat4','wait1','wait2','wait4','seed1234','seed5678','payload','half','integer','alu','sync','down','up','xor','rotate')
+KINDS=('repeat','repeat2','repeat4','wait1','wait2','wait4','seed1234','seed5678','payload','half','integer','alu','sync','down','up','xor','rotate','postwait','postalu','postsync','payload-no-and','postmove')
 
 
 def build(kind,n=1,cached=False,rotate=0):
@@ -24,7 +24,16 @@ def build(kind,n=1,cached=False,rotate=0):
     push=e(f'if_fcmp r0l, eq, 0.0, 0.0, {n}',f'push_exec r0l, {n}')
     assert code[at:at+len(push)]==push
     first=e('simd_shuffle r28, r0, 0');assert code[at+len(push):at+len(push)+len(first)]==first
-    if kind=='integer':code=code[:at]+e(f'if_icmp r0l, ueq, r10, r10, {n}')+code[at+len(push):]
+    if kind=='payload-no-and':
+        assert rotate==0
+        pos=at+len(push);mask=e('and r28, r28, r29')
+        assert code[pos+len(first):pos+len(first)+len(mask)]==mask
+        code=code[:pos]+e('simd_shuffle r28, r10, 0')+code[pos+len(first)+len(mask):]
+    elif kind=='postmove':
+        pos=at+len(push)+len(first);mask=e('and r28, r28, r29')
+        assert code[pos:pos+len(mask)]==mask
+        code=code[:pos]+e('mov r28, r28l')+code[pos+len(mask):]
+    elif kind=='integer':code=code[:at]+e(f'if_icmp r0l, ueq, r10, r10, {n}')+code[at+len(push):]
     elif kind in ('payload','half','down','up','xor','rotate'):
         texts=dict(payload='simd_shuffle r28, r10, 0',half='simd_shuffle r28l, r0l, 0',
                    down='simd_shuffle_down r28, r0, 0',up='simd_shuffle_up r28, r0, 0',
@@ -34,6 +43,9 @@ def build(kind,n=1,cached=False,rotate=0):
     elif kind.startswith('seed'):
         seed=int(kind[4:],16);write=e('mov r0l, r10l');assert code.count(write)==1
         pos=code.index(write);insert=P.RS.mov(28,seed);code=code[:pos]+insert+code[pos:];at+=len(insert)
+    elif kind in ('postwait','postalu','postsync'):
+        insert=e('wait 0') if kind=='postwait' else P.RS.mov(27,0xabcdef01) if kind=='postalu' else e('pop_exec r0l, 0')
+        pos=at+len(push)+len(first);code=code[:pos]+insert+code[pos:]
     elif kind!='repeat':
         insert=first*(int(kind[6:])-1) if kind.startswith('repeat') else e('wait 0')*int(kind[4:]) if kind.startswith('wait') else P.RS.mov(27,0xabcdef01) if kind=='alu' else e('pop_exec r0l, 0')
         pos=at+len(push);code=code[:pos]+insert+code[pos:]

@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+"""Isolate the first cross-lane read after 0xffff increment reactivation.
+
+Each option changes one surrounding instruction/source detail. The original
+whole-program oracle is unchanged. The base record's failed prediction stays
+retained; this wrapper records all disagreement without relabelling it exact.
+"""
+import argparse
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import probe_push_overflow as B
+
+P,E,CF=B.P,B.E,B.CF
+DATA=E.ROOT/'results/2026-10-20-overflow-first-shuffle'
+KINDS=('repeat','repeat2','repeat4','wait1','wait2','wait4','seed1234','seed5678','payload','half','integer','alu','sync','down','up','xor','rotate')
+
+
+def build(kind,n=1,cached=False,rotate=0):
+    assert kind in KINDS
+    assert n in (1,2,3)
+    p=B.build(65535,n,cached,rotate);code=p['code'];e=P.RS.e;at=p['gate']['push_pc']
+    push=e(f'if_fcmp r0l, eq, 0.0, 0.0, {n}',f'push_exec r0l, {n}')
+    assert code[at:at+len(push)]==push
+    first=e('simd_shuffle r28, r0, 0');assert code[at+len(push):at+len(push)+len(first)]==first
+    if kind=='integer':code=code[:at]+e(f'if_icmp r0l, ueq, r10, r10, {n}')+code[at+len(push):]
+    elif kind in ('payload','half','down','up','xor','rotate'):
+        texts=dict(payload='simd_shuffle r28, r10, 0',half='simd_shuffle r28l, r0l, 0',
+                   down='simd_shuffle_down r28, r0, 0',up='simd_shuffle_up r28, r0, 0',
+                   xor='simd_shuffle_xor r28, r0, 0',rotate='simd_shuffle_rotate_up r28, r0, 0')
+        op=e(texts[kind])
+        pos=at+len(push);code=code[:pos]+op+code[pos+len(first):]
+    elif kind.startswith('seed'):
+        seed=int(kind[4:],16);write=e('mov r0l, r10l');assert code.count(write)==1
+        pos=code.index(write);insert=P.RS.mov(28,seed);code=code[:pos]+insert+code[pos:];at+=len(insert)
+    elif kind!='repeat':
+        insert=first*(int(kind[6:])-1) if kind.startswith('repeat') else e('wait 0')*int(kind[4:]) if kind.startswith('wait') else P.RS.mov(27,0xabcdef01) if kind=='alu' else e('pop_exec r0l, 0')
+        pos=at+len(push);code=code[:pos]+insert+code[pos:]
+    P.cov.gate(code);bounds=[];pc=0
+    while pc<len(code):
+        info=P.cov.ASMB.info(code[pc:pc+16]);assert info and info[1]>0
+        bounds.append(pc);pc+=info[1]
+    assert pc==len(code) and len(code)<1024*1024 and at in bounds
+    with E.measured_model():assert P.cov.simulate(code,32,32,64,0,p['table'])==B.oracle(p['table'],cached)
+    p.update(code=code,data_dir=DATA)
+    p['gate']=dict(kind=kind,push_n=n,cached=cached,rotate=rotate,push_pc=at,boundaries=bounds,actual_measured_model_exact=True,base_gate=p['gate'],
+                   base_builder_sha256=hashlib.sha256(Path(B.__file__).read_bytes()).hexdigest(),
+                   builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
+    return p
+
+
+def main():
+    ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('kind',choices=KINDS);ap.add_argument('--hardware',action='store_true')
+    ap.add_argument('--n',type=int,choices=(1,2,3),default=1);ap.add_argument('--cached',action='store_true')
+    ap.add_argument('--rotate',type=int,choices=(0,1),default=0)
+    a=ap.parse_args();p=build(a.kind,a.n,a.cached,a.rotate);print(json.dumps(dict(kind=a.kind,push_n=a.n,cached=a.cached,rotate=a.rotate,gates=True,bytes=len(p['code']))),flush=True)
+    if not a.hardware:return
+    name='overflow-first-shuffle-'+a.kind+(f'-n{a.n}'+('-cached' if a.cached else '-synced')+f'-r{a.rotate}' if a.n!=1 or a.cached or a.rotate else '')
+    r=CF.hardware(name,p);v=r.get('variant',{})
+    if v.get('ok'):
+        want=B.oracle(p['table'],a.cached)
+        r['first_shuffle_analysis']=dict(exact=(v['out'],v['table_after'])==want,
+            first_new_writer=v['table_after'][B.BASE+B.PHASE_WORDS+next(i for i,d in enumerate(p['table'][:32]) if d and (d+a.n)&65535==0)],
+            differences=[dict(word=i,actual=x,expected=y) for i,(x,y) in enumerate(zip(v['table_after'],want[1])) if x!=y])
+    with gzip.GzipFile(filename=str(DATA/f'{name}.json.gz'),mode='wb',mtime=0) as f:f.write((json.dumps(r,sort_keys=True)+'\n').encode())
+    print(json.dumps(dict(analysis=r.get('first_shuffle_analysis'),recovery=r.get('recovery_control_passed'),halted=r.get('halted'),budget=r['after']['budget_used'])),flush=True)
+    if r.get('halted'):raise SystemExit(2)
+    if not r.get('first_shuffle_analysis',{}).get('exact'):raise SystemExit(3)
+
+
+if __name__=='__main__':main()

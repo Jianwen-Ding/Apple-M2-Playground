@@ -1,8 +1,8 @@
 {
- "cases": 23,
+ "cases": 27,
  "independent_hardware_checks_passed": true,
- "model_counterexamples": 15,
- "model_exact": 8,
+ "model_counterexamples": 18,
+ "model_exact": 9,
  "records": {
   "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-alu.json.gz": {
    "model_exact": false,
@@ -48,9 +48,52 @@
     }
    ]
   },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-payload-no-and.json.gz": {
+   "model_exact": false,
+   "sha256": "6de0b6550568a3131669e3d0d3fae1b21108651b2a9f391704ba26052147c566",
+   "table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 76
+    },
+    {
+     "actual": 3452816845,
+     "predicted": 0,
+     "word": 2188
+    }
+   ]
+  },
   "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-payload.json.gz": {
    "model_exact": false,
    "sha256": "862e5c884e1e58789a2e27f33daecb2107b1ed033e13312d9575c9e868d93569",
+   "table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ]
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-postmove.json.gz": {
+   "model_exact": false,
+   "sha256": "1b8045749558094f941f81fe5ed3ded2c4939e0c2dd54711a28a4bd4f9ea4cb7",
+   "table_differences": [
+    {
+     "actual": 64,
+     "predicted": 0,
+     "word": 2188
+    }
+   ]
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-postsync.json.gz": {
+   "model_exact": true,
+   "sha256": "58f1ac3ceb59623da4c26e87d194af35fb6de8508bf029fad2fff7e83596e97e",
+   "table_differences": []
+  },
+  "results/2026-10-20-overflow-first-shuffle/overflow-first-shuffle-postwait.json.gz": {
+   "model_exact": false,
+   "sha256": "4f6dbe1cda986c57c56e5be24c4ae804cf8ef19d5aa5e2e81758f1b0033a725e",
    "table_differences": [
     {
      "actual": 64,
@@ -217,5 +260,5 @@
   "rust/src/isa/exec.rs": "7e4c6be36a1315294689b08bd1a9f19cbb2499ff6d8dac25e1b50cf8f04e041f",
   "rust/src/isa/mod.rs": "8ff481114dfc430730c61e25bb23ccb60ddff461b1a45c37441d448fa1481f56"
  },
- "utc": "2026-10-20T03:50:07.049180+00:00"
+ "utc": "2026-10-20T03:54:16.296853+00:00"
 }

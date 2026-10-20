@@ -1,7 +1,7 @@
 # First shuffle retains its destination after counter overflow reactivation
 
 M2 Max G14C B1, direct DRM compute, 2026-10-20, recorded AC-online 0.
-**23 programs / 69 dispatches** including the three base overflow cases.
+**27 programs / 81 dispatches** including the three base overflow cases.
 Every dispatch completed, all independent pre/post controls pass, zero faults
 or hangs. These are functional traces, not calibrated timing measurements.
 
@@ -51,13 +51,25 @@ shader is below the harness limit and uses the already measured unrolled
 pop3 drain. Exact source versions, complete readbacks, timestamps, watchdog,
 kernel, memory, power, boot and recovery metadata remain in the records.
 
-**Simulator c7e50f7 has 15 retained counterexamples** across this family:
-the original high-boundary case and 14 diagnostics. Eight other complete
+**Simulator c7e50f7 has 18 retained counterexamples** across this family:
+the original high-boundary case and 17 diagnostics. Nine other complete
 programs match. `make verify-overflow-first-shuffle` independently verifies
 all buffers and explicitly requires the known mismatches rather than calling
 them model passes. Its diagnostic manifest binds binary/source and record
 hashes. The earlier 2,403-program exact corpus is unchanged and separate.
 
-Next discriminators should directly read masked destination registers after
+Further isolation: wait0 **after** the first shuffle does not fix its retained
+readback; pop0 at that position does. Replacing the following AND with a
+half-to-full move still fails. Removing the AND while using a fully defined
+payload source changes the result further: the intended word 2188 is untouched
+and table word 76 receives 0x40, consistent with the preinitialized index left
+from an earlier load. Both addresses are inside the owned table. This is not
+an out-of-bounds access, fault or hang. It also means the initial readback
+cannot yet be attributed solely to an annulled shuffle destination write.
+Register visibility, execution updates and intervening address calculations
+need separation. The original observations/classifications remain intact.
+
+Next discriminators should use output indices prepared before divergence and
+directly read masked destination registers after
 the first shuffle and distinguish which operation updates its execution mask.
 Broader overflow matrices remain pending. [Evidence](../../results/2026-10-20-overflow-first-shuffle/README.md).

@@ -46,7 +46,7 @@ def main():
         with D.E.measured_model():prediction=D.P.cov.simulate(p['code'],32,32,64,0,p['table'])
         assert prediction==want;retain(path,r,prediction)
     # Explicit retained diagnostics, rather than requiring unrun plan options.
-    simple=('repeat','wait1','seed1234','payload','half','integer','alu','sync','seed5678','repeat2','down','up','xor','rotate')
+    simple=('repeat','wait1','seed1234','payload','half','integer','alu','sync','seed5678','repeat2','down','up','xor','rotate','postwait','postsync','payload-no-and','postmove')
     names={'overflow-first-shuffle-'+k+'.json.gz' for k in simple}
     names|={f'overflow-first-shuffle-{k}-n{n}-synced-r0.json.gz' for k in ('repeat','wait1') for n in (2,3)}
     names|={'overflow-first-shuffle-repeat-n1-cached-r0.json.gz','overflow-first-shuffle-repeat-n1-synced-r1.json.gz'}
@@ -59,7 +59,7 @@ def main():
         require_source(D.B.__file__,g['base_builder_sha256'])
         want=expected(p['table'],n,cached)
         for phase in ('control_before','control_after'):assert (r[phase]['out'],r[phase]['table_after'])==want,(path.name,phase)
-        settled=cached or kind in ('repeat2','repeat4','sync','wait1','wait2','wait4')
+        settled=cached or kind in ('repeat2','repeat4','sync','postsync','wait1','wait2','wait4')
         hardware=(want[0],want[1].copy())
         if settled:exact+=1
         else:
@@ -69,6 +69,9 @@ def main():
             # Explicit destination seeds isolate retention of their low halves.
             observed=int(kind[4:],16) if kind.startswith('seed') else 0x40
             hardware[1][128+2048+lane]=observed
+            if kind=='payload-no-and':
+                hardware[1][128+2048+lane]=0xcdcdcdcd
+                hardware[1][64+lane]=64
         assert (r['variant']['out'],r['variant']['table_after'])==hardware,path.name
         assert r['first_shuffle_analysis']['exact']==settled
         assert r['variant']['table_after'][8352:]==[0xcdcdcdcd]*16
@@ -76,16 +79,16 @@ def main():
         assert prediction==want
         assert (prediction==hardware)==settled
         retain(path,r,prediction)
-    assert (exact,counterexamples)==(6,14)
-    print('PASS 20 diagnostics / 60 dispatches: every full buffer/guard/control and recovery record verified; zero faults')
-    print('PASS 6 complete model matches and 14 explicit first-shuffle counterexamples retained; no claim of an implemented hazard model')
+    assert (exact,counterexamples)==(7,17)
+    print('PASS 24 diagnostics / 72 dispatches: every full buffer/guard/control and recovery record verified; zero faults')
+    print('PASS 7 complete model matches and 17 explicit counterexamples retained; no claim of an implemented hazard model')
     print('PASS n1/n2/n3, all five native forms, half/payload/integer variants, destination seeds, lane rotation and settling controls')
     assert manifest['simulator_binary_sha256']==sha(D.P.cov.RUN)
-    manifest.update(cases=23,model_exact=8,model_counterexamples=15,independent_hardware_checks_passed=True,
+    manifest.update(cases=27,model_exact=9,model_counterexamples=18,independent_hardware_checks_passed=True,
         simulator_sources={name:sha(D.E.ROOT.parent/'AGX-Performance-Simulator'/name) for name in
                            ('rust/src/func.rs','rust/src/isa/exec.rs','rust/src/isa/compiled.rs','rust/src/isa/mod.rs')})
     if args.result:args.result.write_text(json.dumps(manifest,indent=1,sort_keys=True)+'\n')
-    print('PASS including the base family: 23 programs / 69 dispatches, 8 model matches, 15 retained model counterexamples')
+    print('PASS including the base family: 27 programs / 81 dispatches, 9 model matches, 18 retained model counterexamples')
 
 
 if __name__=='__main__':main()
