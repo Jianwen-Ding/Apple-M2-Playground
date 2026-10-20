@@ -27,3 +27,7 @@ Notes for Jianwen-Ding/ZLUDA (`master` after PR #1). Nothing here has been pushe
    `grid.sync()` emulation must cap CTAs in flight to that; non-resident workgroups start only when others exit.
 7. **Intra-warp spin deadlocks** (`results/2026-10-20-b4-simd-forward-progress`): the `if` side of a divergent
    SIMD group runs to completion before the `else` side; report pre-Volta scheduling or rewrite such spins.
+8. **Launch limits** (`results/2026-10-20-b22-launch-limits`): z block dimension can be 1,024 (agx_runtime reports
+   Metal's 64); x grids work to 2^32 - 32 threads; local sizes above 1,024 run nothing and report success, so keep
+   rejecting them on the host. Out-of-bounds stores overwrite whatever else is mapped in the VM; soft faults only
+   drop stores to unmapped addresses.
