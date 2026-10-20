@@ -109,6 +109,16 @@ zero faults, **18 simulator counterexamples** retained separately from the
 2,403-program exact corpus. Next inspect masked destination writes and which
 operation updates shuffle execution state before changing the functional model.
 
+[Prepared-index destination probes](../novel-results/2026-10-20-overflow-register-visibility/README.md)
+now separate the address calculation: immediate/copy/add also retain old
+destination values in overflow-activated lanes, persisting through wait/drain.
+Shuffle has lower/upper-half differences in the tested layouts. Four/five
+intervening moves fail; six partially fixes immediate and fully fixes shuffle;
+seven/eight fix the tested immediate. Counts are not calibrated cycles or a
+universal pipeline rule. This adds 27 programs / 81 dispatches, exact controls,
+zero faults, 17 counterexamples; combined overflow scope has 35 counterexamples
+in 54 programs / 162 dispatches. The simulator limitation is still explicit.
+
 Owner follow-up, deferred at their request: later inspect performance-simulator
 pull requests from other branches for requested behavior/support, and implement
 feasible requests with appropriate evidence and verification. Continue the

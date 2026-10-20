@@ -326,3 +326,10 @@ the tested program; one ordinary ALU instruction does not. Eighteen current
 simulator counterexamples remain explicit, separate from the exact corpus.
 Determine masked-destination writes and execution-state update conditions
 before implementing a general mask/pipeline rule.
+
+[Prepared-index overflow destinations](../novel-results/2026-10-20-overflow-register-visibility/README.md)
+extend the effect to immediate/copy/add and separate it from address ALU.
+27 programs / 81 dispatches, exact controls, zero faults. Retained values
+persist after wait/drain; spacing and lane-dependent boundaries are recorded
+without claiming calibrated cycles. There are now 35 explicit counterexamples
+across the two overflow families; the 2,403-program exact corpus is separate.

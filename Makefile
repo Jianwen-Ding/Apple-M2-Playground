@@ -822,3 +822,7 @@ verify-ret-stale-targets:
 .PHONY: verify-overflow-first-shuffle
 verify-overflow-first-shuffle:
 	$(PYTHON) -B scripts/verify_overflow_first_shuffle.py
+
+.PHONY: verify-overflow-register-visibility
+verify-overflow-register-visibility:
+	$(PYTHON) -B scripts/verify_overflow_register_visibility.py

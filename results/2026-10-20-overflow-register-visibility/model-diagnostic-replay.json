@@ -1,0 +1,205 @@
+{
+ "cases": 27,
+ "independent_hardware_checks_passed": true,
+ "model_counterexamples": 17,
+ "model_exact": 10,
+ "records": {
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m31-n1-synced-shuffle-none.json.gz": {
+   "model_exact": true,
+   "retained_destination_lanes": [],
+   "sha256": "fc27c7d67148dd676d170b94d8edbd28dbe9f5081370fd43accea793da098102"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-cached-imm-none.json.gz": {
+   "model_exact": true,
+   "retained_destination_lanes": [],
+   "sha256": "08bc31e5cade80a7d135e8b278beefa9f63f708fcbe670cd51ae5b8d4577ea33"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-cached-shuffle-none.json.gz": {
+   "model_exact": true,
+   "retained_destination_lanes": [],
+   "sha256": "80f1b24aa4b464da74f6506a5de7a4b90c6bde48d5d2d37f6ce5a5cb23a89098"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-add-none.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9,
+    19,
+    29
+   ],
+   "sha256": "9a382b7c2fe4ed04c77d0aadb0ca63d220b2990f33e33bf07c7e0d1969658adf"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-copy-none.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9,
+    19,
+    29
+   ],
+   "sha256": "4ee3c5597535047401b8c6d4909cdf0636c6d90f38c69945154999f2d7ce83da"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov1.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9,
+    19,
+    29
+   ],
+   "sha256": "78f60f3c1c6a4dc8a42daf532b1b545817d88f62cb788d50eadcb9b4fbfd5132"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov2.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9,
+    19,
+    29
+   ],
+   "sha256": "a31686dd4acbd78010ffcca54a9e999a307f25663d89485fbb08e35d8f6648b5"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov4.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9,
+    19,
+    29
+   ],
+   "sha256": "13549e4fe4e8ebc9b7404fdac630007b3619a50f3d79805268ae21ef7f9886ef"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov5.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9,
+    19,
+    29
+   ],
+   "sha256": "2593ac325aaf9fa8e0a955d100aace5471823c6ab1d0666100745fa97d217cab"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov6.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    19,
+    29
+   ],
+   "sha256": "da179b6392b708115bedf0b513d66ac069681ce234769ebe773b80280e79b8b5"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov7.json.gz": {
+   "model_exact": true,
+   "retained_destination_lanes": [],
+   "sha256": "f5ec6f75d7f50e1c076d05d7586d686e602ba883d209c8789a61c93ba470b2bf"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-mov8.json.gz": {
+   "model_exact": true,
+   "retained_destination_lanes": [],
+   "sha256": "7cee449bb536e5709781f50a75f1dc4ad2b873f5d9f06f4cd2c47994f8f466d7"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-imm-none.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9,
+    19,
+    29
+   ],
+   "sha256": "6587ff1de95acecd72bbe57e66b52aca3bd8ef32abf77577706bf8aadc9f6a6c"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov2.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9
+   ],
+   "sha256": "a915c1cf17ce0f980cd45ddeedfa9cf1c3bf0d0e193c08e9897ed7de9a7ca9bc"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov4.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9
+   ],
+   "sha256": "9f46a9ba548c7a00ffe54a4c5175f38cd69c3032b435c11ccfaff2c594487373"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov5.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9
+   ],
+   "sha256": "9ed493d504a0a2db7ae63ecb5ee4c0573b3b0b1945887a64f7d06915ef270b8b"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov6.json.gz": {
+   "model_exact": true,
+   "retained_destination_lanes": [],
+   "sha256": "479f53bc9bcb9784cc9eda9e5516190b01f6a95d56357ea9e2892a7cfb526e56"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov7.json.gz": {
+   "model_exact": true,
+   "retained_destination_lanes": [],
+   "sha256": "15b881bd670df51deea9b9b6b477c93b0a6f2649425d8b565e144f3a04d4a5ff"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-mov8.json.gz": {
+   "model_exact": true,
+   "retained_destination_lanes": [],
+   "sha256": "a091bf5d8173c5bb8524c74adc4581fdd26ce40d22c44433224c095562129710"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-none-highonly.json.gz": {
+   "model_exact": true,
+   "retained_destination_lanes": [],
+   "sha256": "b060d15f0a2e7eac3eac3adc118b5f5a277c883a58f1ea3b9a7c6c9c5b7f4c09"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-none-low8.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    7,
+    15
+   ],
+   "sha256": "5ade459f41a4f4302c55e8781da265782e6eca8151641b876ca9fad26168e810"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-none.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    9
+   ],
+   "sha256": "a5f87d61b5f911692370c75c984a46cd4c8dd99da9b3e47ea788dfd0f4361151"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n1-synced-shuffle-wait.json.gz": {
+   "model_exact": true,
+   "retained_destination_lanes": [],
+   "sha256": "ca65c759e873d097674cfe554e389750c5109361af17c6264f8961cf6c5ebce7"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n2-synced-imm-none.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    8,
+    18,
+    28
+   ],
+   "sha256": "4627f706c8d77e1b4cf5f396409d7802e0d4f6f89a35a25577617816fb568a97"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n2-synced-shuffle-none.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    8
+   ],
+   "sha256": "f403a4ea2369ea2c1339737915fe61d6edf764bb0186b2a24bcbda1ceadf9a9f"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n3-synced-imm-none.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    7,
+    17,
+    27
+   ],
+   "sha256": "51d390ad39597505702f8f4c4a73ca3a02088533450e9840859652e5460b4a8c"
+  },
+  "results/2026-10-20-overflow-register-visibility/overflow-visibility-m65535-n3-synced-shuffle-none.json.gz": {
+   "model_exact": false,
+   "retained_destination_lanes": [
+    7
+   ],
+   "sha256": "06f9bde9fb37e11237760d7e1b451a098f5104eece41baaf0ca63bb1aa01cee9"
+  }
+ },
+ "simulator_binary_sha256": "1adb55e2816bc5c4938316b107197d717d9d1329191714d1394b703cf94d9c29",
+ "simulator_sources": {
+  "rust/src/func.rs": "c471f7dbba5c4576358aa73945d359c216ece70208071b478b4c3d0fe2b8bcbf",
+  "rust/src/isa/compiled.rs": "61191cb856995cfcdb43893693d237392239e6cdbf3f8b74eb27fdfd56b42f9c",
+  "rust/src/isa/exec.rs": "7e4c6be36a1315294689b08bd1a9f19cbb2499ff6d8dac25e1b50cf8f04e041f",
+  "rust/src/isa/mod.rs": "8ff481114dfc430730c61e25bb23ccb60ddff461b1a45c37441d448fa1481f56"
+ },
+ "utc": "2026-10-20T04:43:34.983631+00:00"
+}
