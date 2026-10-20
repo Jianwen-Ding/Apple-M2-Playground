@@ -70,6 +70,14 @@ mis = sum(g != r for g, r in zip(mo, ref_f))
 check(f'Mesa a * rcp(b): misrounded on {mis}/131,072 in-domain lanes, max error {float(worst):.3f} ulp vs exact (< 2: within div.approx/div.full on this sample)',
       mis > 10000 and worst < 2)
 
+# rcp.rn.f32: the refined reciprocal directly on hardware (scripts/run_drm_frcp32.py)
+rc = json.load(gzip.open(D/'rcp.json.gz'))
+check('rcp.rn: 3-op Newton rcp correctly rounded on all 8,388,608 mantissas on hardware, and 16,515,072 swept inputs (all exponents, both signs)',
+      rc['hw-newton-binade']['compared'] == 1 << 23 and rc['hw-newton-binade']['wrong'] == 0 and
+      rc['hw-newton-sweep']['compared'] == 16_515_072 and rc['hw-newton-sweep']['wrong'] == 0)
+check('raw hardware rcp on hardware: misrounded on exactly the table-derived count (1,619,725 of 2^23), always by 1 ulp',
+      rc['hw-raw-binade']['wrong'] == raw_bad and set(rc['hw-raw-binade']['hist']) <= {'1', '-1'})
+
 cost = json.load(gzip.open(D/'cost.json.gz'))
 med = lambda k: st.median(x['fw_ns'] for x in cost['cost-keeper/'+k]['runs'])
 sl = lambda op, lo, hi: (med(f'{op}-k{hi}')-med(f'{op}-k{lo}'))/(hi-lo)

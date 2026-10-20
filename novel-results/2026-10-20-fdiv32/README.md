@@ -49,6 +49,15 @@ stays on the fast path; one integer select fixes the sign of 0/b, which the fma 
 
 A first sweep without the keeper is retained. It was about 2× slower with the same ordering.
 
+## `rcp.rn.f32` (follow-up, hardware)
+
+`y0 = rcp(b); y1 = fma(fma(-b, y0, 1), y0, y0)`, 3 native ops, is **correctly rounded on all 8,388,608 mantissas** on
+the GPU (`scripts/run_drm_frcp32.py --data binade`). It is also exact on **16,515,072 swept inputs**: all 256 exponents ×
+32,768 mantissas × both signs, with the 262,144 cases whose reciprocal is subnormal, inf or NaN excluded. The bare `rcp`
+(`rcp.approx`) is misrounded by 1 ulp on exactly 1,619,725 mantissas on hardware, the same count as the offline proof
+derived from the simulator's table, which independently confirms that table. Out-of-range inputs use the division hybrid
+with a = 1.
+
 ## Compiler implications (ZLUDA)
 
 - `div.approx.f32` / `div.full.f32` (and `__fdividef`): Mesa's `a * rcp(b)` measured ≤ 1.82 ulp in range. Subnormal and
@@ -66,5 +75,5 @@ over its full range, and the cost of a constant-divisor specialization.
 ## Reproduce
 
 `python3 -B scripts/run_drm_fdiv32.py offline|hardware --op soft|fast|hybrid|mesa [--round MODE] [--data edge|fast|normal|sparse] [--chain K]`.
-Offline: `make verify-fdiv32` (13 checks, including the 8.4M-mantissa reciprocal proof; it needs the simulator repo's
+Offline: `make verify-fdiv32` (15 checks, including the 8.4M-mantissa reciprocal proof; it needs the simulator repo's
 `testsuite/transcendental/rcp.bin.gz`). Evidence: [results/2026-10-20-fdiv32](../../results/2026-10-20-fdiv32).
