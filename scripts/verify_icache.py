@@ -109,5 +109,11 @@ nj, un, tk, nx = J('jk-nojump'), J('jk-untaken6'), J('jk-taken6'), J('jk-next')
 check('every jmp_exec_* costs ~35 cycles for a lone group, taken or not: exact-line blocks cost 8.3 ns with no jump, 34 ns with a '
       'never-taken jmp_exec_none (flat to 128 blocks), 34 ns with a taken jump to pc+6 (which also hits the 32-jump limit)',
       max(nj.values()) < 10 and all(32 < v < 36 for v in un.values()) and tk[16] < 35 and tk[34] > 45 and nx[34] > 45 and un[128] < 36)
+JL = lambda k: {x['blocks']: x['ns_per_block'] for x in rec['jumpL/'+k]['rows']}
+first_slow = lambda d: min(n for n in d if n > 8 and d[n] > min(d.values())*1.12)
+fs = {L: first_slow(JL(k)) for L, k in ((3, 'cap-L3'), (5, 'cap-L5'), (7, 'nL7'), (8, 'nL8'), (9, 'cap-L9'), (10, 'nL10'))}
+print('  first block count that slows, by block length in lines:', fs)
+check('taken-jump capacity depends on jump spacing: 32 jumps when blocks are 3-5 lines (<= 320 B apart), 16 when 7-10 lines (448-640 B)',
+      fs[3] == 33 and fs[5] == 33 and all(fs[L] == 17 for L in (7, 8, 9, 10)) and max(JL('cap-L6').values()) < min(JL('cap-L6').values())*1.12)
 print(f'{sum(ok)}/{len(ok)} icache checks passed')
 sys.exit(0 if all(ok) else 1)

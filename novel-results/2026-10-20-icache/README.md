@@ -43,6 +43,12 @@ A loop of n blocks joined by taken `jmp_exec_any` (`scripts/probe_icache_assoc.p
 | **Sharing** | **per core**: two SIMD groups running different jump chains slow from 17 jumps each (16 + 16 = 32 fit); a shared chain still fits 32 |
 | Cache associativity | no set aliasing: 4-line blocks at strides of 256 B, 4, 8 and 16 KB behave identically (32 blocks fit, 48 blocks = 192 lines miss). A plainly indexed cache would put 32 blocks into the same few sets, so the cache is highly associative or uses a hashed index |
 
+**The capacity depends on jump spacing.** Loops of n blocks of L contiguous lines (each block ends in a taken jump to the
+next): with L = 3-6 (jumps ≤ 384 B apart) 32 jumps fit and the 33rd costs more; with **L = 7-10 (448-640 B apart) only 16
+fit** (17 is the first slow count at L = 7, 8, 9 and 10, whatever the total line count). For longer blocks the line
+capacity limits first, at about 170-180 lines once jumps are involved. The mechanism (an address-indexed structure, or
+entries that cover a window of lines after each target) is not established.
+
 **What the structure counts, and what any jump costs.** Exact 64-byte blocks of 8 ALU instructions plus a 6-byte slot:
 
 | Slot | ns per block (1 group) | 32-jump limit |
@@ -57,7 +63,8 @@ jump resolves, with no prediction or fetch-ahead past it. This is the ~38-cycle 
 [fp32-ieee layout probes](../2026-10-20-fp32-ieee/README.md) measured about 1 instruction of throughput). A **taken** jump
 also occupies the 32-entry structure, whatever its distance, and costs throughput.
 
-Compiler implication: keep the taken branches of a hot loop, across all code resident on a core, at **≤ 32**.
+Compiler implication: keep the taken branches of a hot loop, across all code resident on a core, at **≤ 32**,
+and **≤ 16** when they are more than ~6 lines (384 B) apart.
 At low occupancy every `jmp_exec_*`, taken or not, is a ~35-cycle bubble, so merge guards and prefer predication
 (`icmpsel` / `fcmpsel`) over short structured ifs. Fully unrolled
 branchy code (unrolled `switch` dispatch, many guards) pays up to about 166 cycles per taken jump beyond that.
@@ -73,11 +80,12 @@ branchy code (unrolled `switch` dispatch, many guards) pays up to about 166 cycl
 
 ## Not established
 
-The mechanism behind the 1.19× crossing cost (perhaps per-chunk pre-decode storage), the replacement policies,
+Miss latency (jump-target lines streamed at about 33 ns per line, but partial retention spoils a clean fit), the
+mechanism behind the 1.19× crossing cost (perhaps per-chunk pre-decode storage), the replacement policies,
 the jump structure's exact role (target buffer or fetch redirect),  miss latency, whether prefetch is sequential, and the cause of the two-group anomaly.
 
 ## Reproduce
 
 `python3 -B scripts/probe_icache.py [--sizes ...] [--pad P] [--kind iadd8|and6|mov4] [--shift-at F] [--groups G --local L] [--dual]`
-(do not run `clock_keeper.py` at the same time). Offline: `make verify-icache` (18 checks against
+(do not run `clock_keeper.py` at the same time). Offline: `make verify-icache` (19 checks against
 [results/2026-10-20-icache](../../results/2026-10-20-icache)).
