@@ -774,3 +774,7 @@ verify-stopped-native-shuffle:
 .PHONY: verify-native-dead-index-or
 verify-native-dead-index-or:
 	$(PYTHON) -B scripts/verify_native_dead_index_or.py
+
+.PHONY: verify-nested-divergent
+verify-nested-divergent:
+	$(PYTHON) -B scripts/verify_nested_divergent.py

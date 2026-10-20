@@ -225,7 +225,7 @@ scattered masks, and call-r1 write-before-select ordering are now measured.
 Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
 depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
 while masked survivors continue. Simulator d90cdcd models these semantics;
-all 1,595 retained original programs replay exactly after native shuffle
+all 1,607 retained original programs replay exactly after native shuffle
 liveness correction 4dd68e9.
 
 [Masked-r0 shuffles](../novel-results/2026-10-20-masked-r0/README.md) directly
@@ -243,3 +243,9 @@ stopped-source fallback and exclusion of stopped low-index bits. Their 480
 programs and 1,440 dispatches completed with exact controls, no faults.
 [Native finding](../novel-results/2026-10-20-native-dead-index-or/README.md),
 [model integration](../results/2026-10-20-native-shuffle-model/README.md).
+
+[Nested divergent calls](../novel-results/2026-10-20-nested-divergent/README.md):
+direct/indirect full-group outer calls with three-way divergent inner calls
+complete exact round trips after explicit two-pop reconvergence and saved-link
+restoration. Twelve programs / 36 dispatches, exact no-call controls, no faults.
+Partial outer masks and fewer inner pops remain separate work.
