@@ -60,16 +60,15 @@ return baselines already match that model. The non-snapshot words, full main
 output, input planes, guards, tails, recovery and kernel/memory diagnostics are
 retained and checked independently.
 
-The simulator has not yet been changed for this rule. Correcting return alone
-would expose its separate group-wide stop shortcut; those semantics need to be
-updated together after further checks. The existing 480 post-pop call/return
-cases still replay exactly because their traces did not observe this state.
+The [combined return/stop correction](../../results/2026-10-20-ret-stop-model/README.md)
+now models this rule and per-lane stop termination together. All 570 retained
+programs replay exactly. The original 45 rejected hypotheses and source bytes
+remain preserved, alongside independent hardware oracles.
 
 Measured here: a **nonempty** issuing mask, full physical SIMD group, valid
-uniform or three-way r30 targets, depths through four. Empty-mask return,
-deeper states, direct reads of masked counters and permanent partial-stop
-termination remain follow-ups. Do not generalize the transformation to an
-unmeasured empty issuing mask.
+uniform or three-way r30 targets, depths through four. [Empty-mask return](../2026-10-20-empty-ret-state/README.md) preserves state and
+falls through. Deeper states, direct reads of masked counters and permanent partial-stop
+termination remain follow-ups. Apply the transformation only to a nonempty issuing mask.
 
 ```sh
 python3 -B scripts/probe_ret_prepop.py --first 1 --winner C --hardware

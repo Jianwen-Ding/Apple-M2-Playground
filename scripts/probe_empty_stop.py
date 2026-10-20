@@ -52,21 +52,17 @@ def depths(case):
     return [b if i % 2 == 0 else a for i in range(N)]
 
 
-def oracle(case, stop=False, kills=True):
+def oracle(case, stop=False):
     tab = TABLE.copy()
     tab[:N] = [PRE]*N
     tab[N:2*N] = [CHECKPOINT if live else SENT for live in first_mask(case)]
     state = depths(case)
-    ended = stop and 0 in state
-    if stop and not ended and kills and any(d >= 2 for d in state):
-        state = [0xffff if d == 1 else d for d in state]
+    live = [not (stop and d == 0) for d in state]
     for k, marker in enumerate(MARKS):
-        if not ended:
-            state = [max(d-1, 0) for d in state]
-            tab[(2+k)*N:(3+k)*N] = [marker if d == 0 else SENT for d in state]
-    if not ended:
-        tab[5*N:6*N] = [0 if d == 0 else SENT for d in state]
-    payload = [0x12345678 if not ended and d == 0 else SENT for d in state]
+        state = [max(d-1, 0) for d in state]
+        tab[(2+k)*N:(3+k)*N] = [marker if alive and d == 0 else SENT for d,alive in zip(state,live)]
+    tab[5*N:6*N] = [0 if alive and d == 0 else SENT for d,alive in zip(state,live)]
+    payload = [0x12345678 if alive and d == 0 else SENT for d,alive in zip(state,live)]
     out = [SENT]*8+payload+[SENT]*8+[0xa5a50000+i for i in range(16)]
     return out, tab
 
@@ -128,7 +124,7 @@ def build(case):
                           expected_depths=depths(case), decoded=decoded,
                           expected_variant=expected_var,
                           builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-                          limitation='stop depth-1 kill is a hardware hypothesis, not an established rule'))
+                          limitation='measured stop ends issuing lanes and preserves masked survivors'))
 
 
 def main():
@@ -148,8 +144,7 @@ def main():
     r['stop_analysis'] = dict(variant_completed=v.get('ok', False))
     if v.get('ok'):
         got = (v.get('out'), v.get('table_after'))
-        r['stop_analysis'].update(matches_kill_model=got == oracle(a.case, stop=True),
-                                  matches_no_kill_model=got == oracle(a.case, stop=True, kills=False),
+        r['stop_analysis'].update(matches_measured_model=got == oracle(a.case, stop=True),
                                   checkpoint_lanes=[[i for i in range(N) if v['table_after'][(2+k)*N+i] == marker]
                                                     for k, marker in enumerate(MARKS)])
     path = DATA/f'empty-stop-{a.case}-r{a.repeat}.json.gz'

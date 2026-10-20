@@ -13,9 +13,10 @@ output has its usual eight guards before/after payload and 16 patterned words.
 
 `scripts/verify_empty_stop.py` independently derives checkpoint membership
 sets, reconstructs the exact code, checks every hardware word and replays the
-simulator hypothesis. Six records intentionally differ from the simulator;
-the check requires those specific counterexamples and keeps them distinct
-from faults and unspecified readback. All three dispatch phases passed.
+measured simulator model. Six records contradicted the original simulator;
+the corrected return/stop model now reproduces all 17 exactly. Original
+hypothesis source bytes remain archived under ret-prepop/source-before-model.
+All three dispatch phases passed.
 
 The shared unsafe harness imports `run_bench` from the adjacent simulator;
 its C harness is **AGX-Performance-Simulator/tests/drm_compute.c**. Its actual

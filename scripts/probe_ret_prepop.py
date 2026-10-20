@@ -34,7 +34,7 @@ def relocate(code):
 
 def hypothesis(table,target,link,jump=False):
     out,tab=R.oracle('ret',table,target,link,'jump' if jump else 'actual')
-    tab[224:256]=[0 if jump and table[32+i] else E.SENT for i in range(32)]
+    tab[224:256]=[0 if bool(table[32+i])==jump else E.SENT for i in range(32)]
     return out,tab
 
 
@@ -57,7 +57,7 @@ def build(first,winner,seed):
     assert pc==len(p['code']) and all(any(row[0]==addr-0x2000 for row in decoded) for addr in p['gate']['targets'].values())
     p['data_dir']=DATA
     p['gate'].update(prepop_r0_snapshot=True,decoded=decoded,
-                     hypothesis='no lane active at return landing before pop',
+                     hypothesis='original depth-1 lanes active at return landing before pop',
                      base_builder_sha256=p['gate']['builder_sha256'],
                      builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
     return p

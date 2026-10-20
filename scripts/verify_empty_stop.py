@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Check empty/partial-mask stop evidence and its return-context counterexample.
 
-Rebuilds exact programs and simulator hypothesis gates, then checks every
-hardware word against separate per-lane checkpoint sets. Some retained probes
-intentionally contradict the simulator; this verifier reports that scope.
+Rebuilds exact programs and measured-model gates, then checks every hardware
+word against separate per-lane checkpoint sets. Archived sources retain the
+original contradicted simulator hypotheses.
 """
 import gzip
 import hashlib
@@ -12,6 +12,7 @@ from pathlib import Path
 
 import probe_empty_stop as E
 import probe_ret_stop_context as R
+from verify_probe_sources import require_source
 
 PLAIN = {'all1':(range(32),range(32),range(32)),
          'all2':((),range(32),range(32)), 'all3':((),(),range(32)),
@@ -55,7 +56,7 @@ def main():
             p = E.build(g['case'])
             want = hardware_oracle(case=g['case'])
             builder = Path(E.__file__)
-            sim_matches = g['case'] not in ('mix12','mix13','mix01')
+            sim_matches = True
         else:
             p = R.build(g['stops'])
             want = hardware_oracle(stops=g['stops'])
@@ -72,7 +73,7 @@ def main():
         assert rec['recovery_control_passed']
         assert rec['code'] == p['code'].hex() and rec['control_code'] == p['control'].hex()
         assert rec['table_in'] == E.TABLE
-        assert g['builder_sha256'] == hashlib.sha256(builder.read_bytes()).hexdigest()
+        require_source(builder,g['builder_sha256'])
         assert rec['harness_sha256'] == hashlib.sha256((E.P.bench.REPO/'tests/drm_compute.c').read_bytes()).hexdigest()
         for phase in ('control_before','variant','control_after'):
             v = rec[phase]
@@ -88,8 +89,8 @@ def main():
         assert (pred == want) == sim_matches, 'simulator mismatch scope changed'
         mismatches += not sim_matches
         print('PASS',path.name,'exact hardware oracle;', 'simulator exact' if sim_matches else 'known simulator counterexample')
-    assert mismatches == 6
-    print(f'PASS {len(paths)} variants / {len(paths)*3} total dispatches, exact controls and guards, zero faults; 6 simulator counterexamples isolated')
+    assert mismatches == 0
+    print(f'PASS {len(paths)} variants / {len(paths)*3} total dispatches, exact controls and guards, zero faults; all simulator replays exact')
 
 
 if __name__ == '__main__':

@@ -94,13 +94,13 @@ def build(maximum,rotate,known=False,desired_model='swap'):
     with E.measured_model():
         assert P.cov.simulate(original,32,32,64,0,table)==oracle(table,'original')
         assert P.cov.simulate(desired,32,32,64,0,table)==oracle(table,desired_model)
-        assert P.cov.simulate(actual,32,32,64,0,table)==oracle(table,'legacy'), 'current ret-depth hypothesis failed'
+        assert P.cov.simulate(actual,32,32,64,0,table)==oracle(table,'swap'), 'measured ret-depth gate failed'
     return dict(code=desired if known else actual,control=original,table=table,n=32,wg=32,regs=64,
                 expected=oracle(table,'original'),data_dir=DATA,
                 gate=dict(maximum=maximum,rotate=rotate,known_surrogate=known,ret_pc=pc,
                           target=0x2000+P.drm.control_main()[1]+LANDING,decoded=desired_decoded if known else decoded,
                           desired_model=desired_model,selected_transfer_pc=desired_pc if known else pc,
-                          actual_legacy_hypothesis_exact=True,original_jump_exact=True,desired_jump_exact=True,
+                          actual_measured_model_exact=True,original_jump_exact=True,desired_jump_exact=True,
                           actual_ret_code=actual.hex(),desired_surrogate_code=desired.hex(),
                           builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()))
 

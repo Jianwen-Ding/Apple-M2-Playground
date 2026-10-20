@@ -45,7 +45,6 @@ def common(rec,p,builder):
 def main():
     names={f'ret-prepop-k{k}-{w}-s{seed}.json.gz' for k in (0,1,5,8,16,24) for w in ('A','B','C') for seed in (103,809)}
     paths=sorted(R.DATA.glob('*.json.gz'));assert {p.name for p in paths}==names
-    counters=0
     for path in paths:
         rec=json.load(gzip.open(path));g=rec['gate'];p=R.build(g['first'],g['winner'],g['seed'])
         common(rec,p,R);require_source(R.R.__file__,g['base_builder_sha256'])
@@ -55,8 +54,7 @@ def main():
         assert rec['prepop_analysis']['writers']==[i for i,x in enumerate(p['table'][32:64]) if not x]
         assert set(rec['prepop_analysis']['values'].values())=={0}
         with R.E.measured_model():prediction=R.P.cov.simulate(p['code'],32,32,64,0,p['table'])
-        assert prediction!=(rec['variant']['out'],rec['variant']['table_after'])
-        counters+=1
+        assert prediction==(rec['variant']['out'],rec['variant']['table_after'])
     names={f'ret-levels-{m}-r{rot}-hswap-{kind}.json.gz' for m in range(5) for rot in (0,1) for kind in ('actual','surrogate')}
     names.add('ret-levels-3-r0-actual.json.gz')
     paths=sorted(L.DATA.glob('*.json.gz'));assert {p.name for p in paths}==names
@@ -69,13 +67,11 @@ def main():
             assert (rec[phase]['out'],rec[phase]['table_after'])==want,(path.name,phase)
         with R.E.measured_model():prediction=R.P.cov.simulate(p['code'],32,32,64,0,p['table'])
         mismatch=prediction!=(rec['variant']['out'],rec['variant']['table_after'])
-        assert mismatch==(not g['known_surrogate'] and g['maximum']>0)
-        counters+=mismatch
-    assert counters==45
+        assert not mismatch
     print('PASS 36 shallow cases: only originally inactive lanes run before pop and read r0l=0')
     print('PASS 21 depth cases including ten hardware-tested known-op state surrogates and a full-group repeat')
     print('PASS nonempty ret map through incoming depth 4: 0 -> 2, 1 -> 0, deeper unchanged')
-    print('PASS 57 variants / 171 dispatches: all words/guards/controls exact, no faults; 45 legacy-model counterexamples retained')
+    print('PASS 57 variants / 171 dispatches: all words/guards/controls exact, no faults; all measured-model replays exact; original rejected hypotheses retained')
 
 
 if __name__=='__main__':main()

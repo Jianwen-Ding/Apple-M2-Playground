@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Does a uniform partial-mask return change empty-mask stop semantics?
+"""Observe stop after a uniform partial-mask return.
 
 The return targets in-program decoded landing instructions. A no-return direct
-jump surrogate reconstructs the same depths (even=1, odd=2), validates every
+jump surrogate constructs control depths (even=1, odd=2), validates every
 landing/checkpoint and acts as the exact recovery control. Default is offline.
 """
 import argparse
@@ -74,7 +74,7 @@ def build(stops):
     P.cov.gate(control)
     with E.measured_model():
         assert P.cov.simulate(control, 32, 32, 64, 0, E.TABLE) == oracle(), 'landing surrogate failed'
-        assert P.cov.simulate(code, 32, 32, 64, 0, E.TABLE) == oracle(kills=bool(stops)), 'legacy model gate failed'
+        assert P.cov.simulate(code, 32, 32, 64, 0, E.TABLE) == oracle(kills=bool(stops)), 'measured return/stop gate failed'
     try:
         P.cov.simulate(code, 32, 32, 64, 0, E.TABLE)
     except RuntimeError as exc:
@@ -94,7 +94,7 @@ def build(stops):
                 expected=oracle(), data_dir=DATA,
                 gate=dict(stops=stops, ret_pc=ret_pc, target=0x2000+site+LANDING,
                           landing_pc=site+LANDING, decoded=decoded,
-                          known_jump_surrogate_exact=True, actual_legacy_hypothesis_exact=True,
+                          known_jump_surrogate_exact=True, actual_measured_model_exact=True,
                           default_ret_rejected=True, predicted_variant=oracle(kills=bool(stops)),
                           builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()))
 

@@ -45,8 +45,11 @@ unsupported result for this measured scope. `verify_probe_sources.py` resolves
 old recorded hashes against these archived source bytes, while every shader
 and input is still reconstructed and checked independently.
 
-The model update does not change stop semantics. The six independently measured
-conditional/partial-stop counterexamples remain explicit under
-`make verify-empty-stop`. Additional return state, nested divergent calls,
-more target addresses, scattered/empty alias masks and other alias forms
-remain separate probing work.
+The initial integration left stop unchanged. The later
+[return/stop correction](../2026-10-20-ret-stop-model/README.md) removes its six
+conditional/partial-stop counterexamples and 45 return-arrival/depth
+counterexamples. All **570** original hardware programs now replay exactly,
+including three targets, call-r1 alias, direct pre-pop return reads, depths
+through four and empty-issued return controls. Historical manifests and source
+versions remain preserved. Nested divergent call composition, deeper counters,
+masked counter reads and timing remain follow-ups.
