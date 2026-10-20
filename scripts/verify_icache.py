@@ -105,5 +105,9 @@ check('4-line blocks at strides 256 B .. 16 KB behave identically (32 blocks fit
 du, s2 = J('dual'), J('same2')
 check('the jump-target structure is shared per core: two groups with different chains slow from 17 jumps each (16+16 = 32 fit), the same chain shared from 33',
       du[16] < 36 and du[17] > 45 and s2[32] < 36 and s2[34] > 45)
+nj, un, tk, nx = J('jk-nojump'), J('jk-untaken6'), J('jk-taken6'), J('jk-next')
+check('every jmp_exec_* costs ~35 cycles for a lone group, taken or not: exact-line blocks cost 8.3 ns with no jump, 34 ns with a '
+      'never-taken jmp_exec_none (flat to 128 blocks), 34 ns with a taken jump to pc+6 (which also hits the 32-jump limit)',
+      max(nj.values()) < 10 and all(32 < v < 36 for v in un.values()) and tk[16] < 35 and tk[34] > 45 and nx[34] > 45 and un[128] < 36)
 print(f'{sum(ok)}/{len(ok)} icache checks passed')
 sys.exit(0 if all(ok) else 1)

@@ -18,7 +18,7 @@ REGS = (5, 6, 7, 8)
 WAIT = agx_loop.encode('wait 0')
 
 
-def body(stride, nblocks, trips, tag=True, lines=1, dual=False):
+def body(stride, nblocks, trips, tag=True, lines=1, dual=False, jkind='any'):
     e, mov = agx_loop.encode, chains.mov_imm
     head = mov(3, 0)+mov(4, trips)+b''.join(mov(r, 0) for r in REGS)
     head += e('if_fcmp r0l, eq, 0.0, 0.0, 1', 'push_exec r0l, 1')
@@ -32,12 +32,26 @@ def body(stride, nblocks, trips, tag=True, lines=1, dual=False):
         for i, s_ in enumerate(starts):
             code += WAIT*((s_ - len(code))//2)                 # filler up to the block start
             assert len(code) == s_
-            k_n = (64*lines - 8) // 8                            # iadds per block: the block plus its jump fits in `lines` lines
-            blk = b''.join(e(f'iadd r{REGS[(i*k_n+k) % 4]}, r{REGS[(i*k_n+k) % 4]}, 1') for k in range(k_n))
+            if jkind in ('taken6', 'untaken6', 'nojump'):     # exact 64-byte line, no filler: 6 iadd + mov_imm + and + 6-byte slot
+                k_n = 6
+                blk = b''.join(e(f'iadd r{REGS[(i*k_n+k) % 4]}, r{REGS[(i*k_n+k) % 4]}, 1') for k in range(k_n))
+                blk += e('mov_imm r9l, 1') + e('and r9, r9, r9')
+            else:
+                k_n = (64*lines - 8) // 8                        # iadds per block: the block plus its jump fits in `lines` lines
+                blk = b''.join(e(f'iadd r{REGS[(i*k_n+k) % 4]}, r{REGS[(i*k_n+k) % 4]}, 1') for k in range(k_n))
             n_iadd += k_n
             if i < nblocks-1:
                 off = starts[i+1] - (s_ + len(blk))
-                blk += e(f'jmp_exec_any pc+{off}', f'jmp_exec_any pc+{off}')
+                if jkind == 'any':                     # taken (lanes active) to the next block
+                    blk += e(f'jmp_exec_any pc+{off}', f'jmp_exec_any pc+{off}')
+                elif jkind == 'none':                  # never taken (lanes active): falls through the filler
+                    blk += e(f'jmp_exec_none pc+{off}', f'jmp_exec_none pc+{off}')
+                elif jkind in ('next', 'taken6'):       # taken, to the instruction right after the jump
+                    blk += e('jmp_exec_any pc+6', 'jmp_exec_any pc+6')
+                elif jkind == 'untaken6':               # never taken (lanes active), same bytes otherwise
+                    blk += e('jmp_exec_none pc+6', 'jmp_exec_none pc+6')
+                else:                                   # 'nojump': a 6-byte ALU op in the jump's place
+                    blk += e('and r9, r9, r9')
             else:
                 blk += e('iadd r3, 1, r3.sx') + e('while_icmp r0l, ult, r3, r4, 1')
                 back = s_ + len(blk) - starts[0]
@@ -82,6 +96,7 @@ def main():
     p.add_argument('--stride', type=int, required=True)
     p.add_argument('--blocks', default='1,2,3,4,5,6,8,12,16')
     p.add_argument('--lines', type=int, default=1, help='64-byte lines per block (sequential code after each jump)')
+    p.add_argument('--jkind', default='any', choices=['any', 'none', 'next', 'taken6', 'untaken6', 'nojump'], help='forward jumps: taken to the next block, never taken, or taken to the next instruction')
     p.add_argument('--dual', action='store_true', help='two separate jump chains; the second SIMD group of a 64-lane workgroup runs chain B')
     p.add_argument('--local', type=int, default=32)
     p.add_argument('--trips', type=int, default=0, help='0: ~2M iadds per run')
@@ -94,7 +109,7 @@ def main():
     blocks = [int(x) for x in a.blocks.split(',')]
     import sim_gate
     for nb in blocks:                                           # emulator gate (2 trips) on the untagged program
-        b, n = body(a.stride, nb, 2, tag=False, lines=a.lines, dual=a.dual)
+        b, n = body(a.stride, nb, 2, tag=False, lines=a.lines, dual=a.dual, jkind=a.jkind)
         stt = agx_loop.emulate(b, 32, max_steps=50*n*2+5000)
         if stt['r2'] != [(n*2) & 0xffffffff]*32:
             sys.exit(f'emulator gate failed: blocks {nb}')
@@ -104,11 +119,11 @@ def main():
     out = a.output; out.mkdir(parents=True, exist_ok=True)
     exe = out/'drm_compute'
     subprocess.run(['cc', '-std=c11', '-O2', str(REPO/'tests/drm_compute.c'), '-o', str(exe)], check=True)
-    rec = {'stride': a.stride, 'lines': a.lines, 'dual': a.dual, 'local': a.local, 'rows': []}
+    rec = {'stride': a.stride, 'lines': a.lines, 'jkind': a.jkind, 'dual': a.dual, 'local': a.local, 'rows': []}
     for nb in blocks:
         trips = a.trips or max(2, 2_000_000 // (7*a.lines*nb))
-        b, n = body(a.stride, nb, trips, lines=a.lines, dual=a.dual)
-        sim_gate.require(drm.build_main(body(a.stride, nb, 3, tag=False, lines=a.lines, dual=a.dual)[0]), a.local, (n*3) & 0xffffffff, regs=24)
+        b, n = body(a.stride, nb, trips, lines=a.lines, dual=a.dual, jkind=a.jkind)
+        sim_gate.require(drm.build_main(body(a.stride, nb, 3, tag=False, lines=a.lines, dual=a.dual, jkind=a.jkind)[0]), a.local, (n*3) & 0xffffffff, regs=24)
         (out/'c.bin').write_bytes(drm.build_main(b)+bytes(16))
         r = subprocess.run([str(exe), '/dev/dri/renderD128', str(out/'c.bin'), str(a.local), str(out/'rb'), str(a.repeats), '24'],
                            capture_output=True, timeout=300, env={'PATH': '/usr/bin', 'AGX_LOCAL_X': str(a.local)})
