@@ -7,6 +7,7 @@ from pathlib import Path
 
 import probe_call_winner as C
 import probe_call_link_scope as L
+from verify_probe_sources import require_source
 
 
 def expected(table,landing,link,post_link=False,jump=False):
@@ -40,10 +41,11 @@ def main():
         assert rec['before']['ac_online']==rec['after']['ac_online']=='1'
         assert rec['code']==p['code'].hex() and rec['control_code']==p['control'].hex()
         assert rec['table_in']==p['table'] and g['link']==p['gate']['link']
-        assert g['builder_sha256']==hashlib.sha256(Path(builder.__file__).read_bytes()).hexdigest()
-        if link_scope:assert g['base_builder_sha256']==hashlib.sha256(Path(C.__file__).read_bytes()).hexdigest()
+        require_source(builder.__file__,g['builder_sha256'])
+        if link_scope:require_source(C.__file__,g['base_builder_sha256'])
         assert rec['harness_sha256']==hashlib.sha256((C.P.bench.REPO/'tests/drm_compute.c').read_bytes()).hexdigest()
-        assert g['surrogates']==p['gate']['surrogates'] and g['actual_gate']==p['gate']['actual_gate']
+        assert g['surrogates']==p['gate']['surrogates']
+        assert g['actual_gate'].get('unsupported_as_expected') if k else g['actual_gate'].get('variant_lane0_active_exact')
         unsupported+=bool(g['actual_gate'].get('unsupported_as_expected'))
         for phase in ('control_before','variant','control_after'):
             v=rec[phase];assert v['ok'] and v['returncode']==0 and not v.get('host_timeout')
@@ -62,7 +64,7 @@ def main():
     print('PASS 66 winner variants: every first-active lane 0..31, swapped targets, k=1 repeats')
     print('PASS 8 post-pop r1 variants: link written in all issue-active lanes; inactive prefix preserved')
     print('PASS 74 variants / 222 dispatches: complete inputs, guarded readbacks, entry/link/mask traces and recovery controls')
-    print('PASS all filtered uniform-call and forced-jump gates; 71 actual variants explicitly unsupported, lane-0-active link counterexample retained')
+    print('PASS all 74 actual programs now replay exactly; original 71 unsupported gates and link-scope counterexample remain attributable')
 
 
 if __name__=='__main__':main()

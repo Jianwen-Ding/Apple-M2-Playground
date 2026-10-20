@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""Replay original hardware shader/input bytes through the measured call/ret model.
+
+No shader regeneration and no GPU access. Exact complete main/table buffers
+are compared for every case, including inactive writes and untouched tails.
+"""
+import argparse
+from datetime import datetime,timezone
+import gzip
+import hashlib
+import json
+from pathlib import Path
+
+import probe_empty_stop as E
+
+ROOT=E.ROOT
+GROUPS={'2026-10-20-ret-winner':64,'2026-10-20-call-winner':74,'2026-10-20-sparse-control':248}
+
+
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--result',type=Path)
+    args=parser.parse_args()
+    summary=dict(utc=datetime.now(timezone.utc).isoformat(),groups={},cases=0,passed=False,
+                 simulator_binary_sha256=sha(E.P.cov.RUN),
+                 simulator_func_sha256=sha(ROOT.parent/'AGX-Performance-Simulator/rust/src/func.rs'),
+                 records={})
+    E.P.cov.install()
+    with E.measured_model():
+        for group,count in GROUPS.items():
+            paths=sorted((ROOT/'results'/group).glob('*.json.gz'))
+            assert len(paths)==count,'missing/extra corpus records: '+group
+            for path in paths:
+                r=json.load(gzip.open(path))
+                assert r['variant']['ok'] and r['recovery_control_passed'] and not r.get('halted')
+                assert r['n']==r['wg']==32 and r['regs']==64
+                code=bytes.fromhex(r['code'])
+                assert code[-2:]==bytes.fromhex('8800')
+                out,table=E.P.cov.simulate(code,r['n'],r['wg'],r['regs'],0,r['table_in'])
+                assert (out,table)==(r['variant']['out'],r['variant']['table_after']),str(path)
+                summary['records'][str(path.relative_to(ROOT))]=sha(path)
+            summary['groups'][group]=count;summary['cases']+=count
+            print('PASS original shader/input/readback replay:',group,count)
+    assert summary['cases']==386
+    assert summary['simulator_binary_sha256']==sha(E.P.cov.RUN), 'simulator changed during replay'
+    summary['passed']=True
+    if args.result:
+        args.result.write_text(json.dumps(summary,indent=1,sort_keys=True)+'\n')
+    print('PASS 386 exact hardware cases; model opt-in required, no GPU used')
+
+
+if __name__=='__main__':main()

@@ -93,8 +93,8 @@ try:
 finally:
     del os.environ['AGX_EXPERIMENTAL_RET']
 
-# Divergent targets with lane 0 masked out remain unmodelled and must be
-# rejected for both register calls and returns.
+# Divergent targets with lane 0 masked out now use the measured lowest-active
+# winner (2026-10-20), for both register calls and returns.
 import run_drm_compute as _drm
 import record_suite as _RS
 _e, _mov, _st = _RS.e, _RS.mov, _RS.agx_loop.store
@@ -130,12 +130,9 @@ def _neg_case(kind):
 os.environ['AGX_EXPERIMENTAL_RET'] = 'buffer-pop2'
 try:
     for kind in ('call', 'ret'):
-        try:
-            P.cov.simulate(_neg_case(kind), 32, 32, 64, 0, [0] * 128)
-        except RuntimeError as exc:
-            assert 'lane 0 inactive' in str(exc), f"{kind}: {exc}"
-            print(f'PASS divergent {kind} with lane 0 masked stays rejected')
-        else:
-            raise AssertionError(f'divergent {kind} with lane 0 masked unexpectedly accepted')
+        out,tab=P.cov.simulate(_neg_case(kind), 32, 32, 64, 0, [0] * 128)
+        assert out==[0xcdcdcdcd]*48+[0xa5a50000+i for i in range(16)]
+        assert tab==[0xBBBB0002]*32+[0]*96
+        print(f'PASS divergent {kind} with lane 0 masked selects active lane 1 target A')
 finally:
     del os.environ['AGX_EXPERIMENTAL_RET']

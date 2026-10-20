@@ -1,5 +1,7 @@
 # A divergent return selects the lowest active lane's target
 
+**Simulator integration, later 2026-10-20:** the measured model now replays this full corpus exactly; current probes require actual-program equality. [Validation, original source provenance and remaining limits](../../results/2026-10-20-control-simulator/README.md). Earlier gate descriptions below record what was known before hardware.
+
 Confirmed in the tested scope on M2 Max G14C B1, compute, direct DRM, AC power,
 2026-10-20. **64 variants / 192 dispatches including controls, zero faults.**
 This resolves the case the current functional simulator deliberately rejects:

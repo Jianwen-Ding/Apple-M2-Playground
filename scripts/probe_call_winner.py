@@ -93,13 +93,10 @@ def build(first,winner):
         gates[name] = dict(uniform_exact=True,jump_exact=True,uniform_code=uniform.hex(),jump_code=jump.hex())
         if name == 'B':control = jump
     with E.measured_model():
-        try:prediction = P.cov.simulate(code,N,N,64,0,table)
-        except RuntimeError as exc:
-            assert first != 0 and 'divergent targets with lane 0 inactive not modelled' in str(exc),str(exc)
-            actual_gate = dict(unsupported_as_expected=True,diagnostic=str(exc))
-        else:
-            assert first == 0 and prediction == oracle(table,winner,link)
-            actual_gate = dict(variant_lane0_active_exact=True)
+        prediction = P.cov.simulate(code,N,N,64,0,table)
+        assert prediction == oracle(table,winner,link), 'measured actual-call gate failed'
+        actual_gate = (dict(variant_lane0_active_exact=True) if first == 0 else
+                       dict(variant_lowest_active_case_exact=True))
     P.cov.gate(code,allow=('call',))
     decoded,pc = [],0
     while pc < len(code):
@@ -112,7 +109,7 @@ def build(first,winner):
                 gate=dict(first=first,winner=winner,call_pc=call_pc,link=link,decoded=decoded,
                           surrogates=gates,actual_gate=actual_gate,
                           builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-                          limitation='divergent call selection unknown; candidate landings and empty fallthrough gated'))
+                          limitation='measured two-target scope; actual program, landings and empty fallthrough gated'))
 
 
 def main():

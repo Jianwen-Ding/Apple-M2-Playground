@@ -7,6 +7,7 @@ from pathlib import Path
 
 import probe_sparse_control as S
 import verify_call_winner as C
+from verify_probe_sources import require_source
 
 
 def ret_expected(table,landing,jump=False):
@@ -35,10 +36,11 @@ def main():
         assert g['sparse_mask']==S.mask_for(k,seed)
         assert g['sparse_mask']&((1<<k)-1)==0 and g['sparse_mask']&(1<<k)
         if k<30:assert not g['sparse_mask']&(1<<(k+1))
-        assert g['builder_sha256']==hashlib.sha256(Path(S.__file__).read_bytes()).hexdigest()
+        require_source(S.__file__,g['builder_sha256'])
         base=S.R if kind=='ret' else S.L
-        assert g['base_builder_sha256']==hashlib.sha256(Path(base.__file__).read_bytes()).hexdigest()
-        assert g['surrogates']==p['gate']['surrogates'] and g['sparse_actual_gate']==p['gate']['sparse_actual_gate']
+        require_source(base.__file__,g['base_builder_sha256'])
+        assert g['surrogates']==p['gate']['surrogates']
+        assert g['sparse_actual_gate'].get('uniform_active_case_exact') if kind=='ret' and k==31 else g['sparse_actual_gate'].get('unsupported_as_expected')
         assert g['sparse_surrogates_exact']
         assert rec['harness_sha256']==hashlib.sha256((S.P.bench.REPO/'tests/drm_compute.c').read_bytes()).hexdigest()
         unsupported+=bool(g['sparse_actual_gate'].get('unsupported_as_expected'))
@@ -57,7 +59,7 @@ def main():
     print('PASS 248 variants / 744 dispatches: call and ret, every first-active position 1..31, swapped targets, two seeded masks')
     print('PASS inactive holes: ret pop-1 membership, call entry partition, all-active call link write and inactive r1 preservation')
     print('PASS exact programs/inputs, all surrogate paths, guards/tails and recovery controls; zero recorded faults')
-    print('PASS 244 actual-model rejections retained separately from surrogate gates; four single-active returns simulate exactly')
+    print('PASS all 248 actual programs now replay exactly; 244 original rejections retain recorded source provenance')
 
 
 if __name__=='__main__':main()

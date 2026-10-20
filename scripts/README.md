@@ -198,3 +198,10 @@ changes only participation input bits while re-gating every surrogate with the
 exact scattered table; `--hardware` adds bracketed submission and diagnostics.
 `make verify-sparse-control` checks 248 retained variants and all inactive-hole
 membership/link results independently without a GPU.
+
+`make verify-control-model` directly replays all 386 original call/return
+hardware shader/input buffers through the measured simulator and compares full
+readbacks. The updated builders require an exact actual-program gate for this
+measured scope. `verify_probe_sources.py` preserves provenance for earlier
+records using archived builder sources; original unsupported diagnostics remain
+unchanged. The separate stop counterexamples remain unresolved.

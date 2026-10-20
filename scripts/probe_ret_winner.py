@@ -3,7 +3,8 @@
 
 Every target is an in-program decoded landing. Both uniform-return operand
 substitutions and direct-jump substitutions validate complete traces. The
-actual unsupported-model rejection is retained, never bypassed. Default offline.
+original unsupported diagnostics remain archived; current actual programs must
+match the measured model. Default offline.
 """
 import argparse
 import gzip
@@ -81,14 +82,10 @@ def build(first, winner):
         if name == 'A':
             control = jump
     with E.measured_model():
-        try:
-            predicted = P.cov.simulate(code,N,N,64,0,table)
-        except RuntimeError as exc:
-            assert first != 31 and 'divergent active lanes with lane 0 inactive not modelled' in str(exc), str(exc)
-            actual_gate = {'unsupported_as_expected':True,'diagnostic':str(exc)}
-        else:
-            assert first == 31 and predicted == oracle(table,first,winner)
-            actual_gate = {'variant_uniform_active_case_exact':True}
+        predicted = P.cov.simulate(code,N,N,64,0,table)
+        assert predicted == oracle(table,first,winner), 'measured actual-return gate failed'
+        actual_gate = ({'variant_uniform_active_case_exact':True} if first == 31 else
+                       {'variant_lowest_active_case_exact':True})
     P.cov.gate(code, allow=('ret',))
     decoded, pc = [], 0
     while pc < len(code):
@@ -105,7 +102,7 @@ def build(first, winner):
                           targets={'A':0x2000+site+A,'B':0x2000+site+B}, decoded=decoded,
                           surrogates=gates,actual_gate=actual_gate,
                           builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-                          limitation='unknown divergent target selection; both bounded landing paths gated'))
+                          limitation='measured two-target scope; actual program and both landing paths gated'))
 
 
 def main():

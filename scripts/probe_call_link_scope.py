@@ -35,6 +35,13 @@ def oracle(table,landing,link,jump=False,fall=False):
     return out,tab
 
 
+def hardware_oracle(table,landing,link):
+    """Measured link write before filtering, unlike the filtered surrogates."""
+    out,tab=oracle(table,landing,link)
+    tab[224:256]=[link if table[32+i] else INITIAL_LINK for i in range(32)]
+    return out,tab
+
+
 def build(first,winner):
     p = C.build(first,winner)
     p['code'],p['control'] = patch(p['code']),patch(p['control'])
@@ -48,11 +55,8 @@ def build(first,winner):
             assert P.cov.simulate(bytes.fromhex(g['uniform_code']),32,32,64,0,p['table']) == oracle(p['table'],name,p['gate']['link'],fall=not eligible)
             assert P.cov.simulate(bytes.fromhex(g['jump_code']),32,32,64,0,p['table']) == oracle(p['table'],name,p['gate']['link'],jump=True)
     with E.measured_model():
-        try:predicted = P.cov.simulate(p['code'],32,32,64,0,p['table'])
-        except RuntimeError as exc:
-            assert first != 0 and 'divergent targets with lane 0 inactive not modelled' in str(exc)
-        else:
-            assert first == 0 and predicted == oracle(p['table'],winner,p['gate']['link'])
+        predicted = P.cov.simulate(p['code'],32,32,64,0,p['table'])
+        assert predicted == hardware_oracle(p['table'],winner,p['gate']['link']), 'measured link-write gate failed'
     p['gate'].update(plane7='post-pop-r1',old_snapshot=OLD,new_snapshot=NEW,
                      base_builder_sha256=p['gate']['builder_sha256'],
                      builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
@@ -71,7 +75,8 @@ def main():
     name=f'call-link-k{a.first}-{a.winner}-r{a.repeat}'
     r=CF.hardware(name,p);v=r.get('variant',{})
     if v.get('ok'):
-        r['link_analysis']=dict(matches_partition_oracle=(v.get('out'),v.get('table_after'))==oracle(p['table'],a.winner,p['gate']['link']),
+        r['link_analysis']=dict(matches_measured_oracle=(v.get('out'),v.get('table_after'))==hardware_oracle(p['table'],a.winner,p['gate']['link']),
+                                matches_partition_oracle=(v.get('out'),v.get('table_after'))==oracle(p['table'],a.winner,p['gate']['link']),
                                 link_lanes=[i for i in range(32) if v['table_after'][224+i]==p['gate']['link']],
                                 initial_lanes=[i for i in range(32) if v['table_after'][224+i]==INITIAL_LINK])
     with gzip.GzipFile(filename=str(DATA/f'{name}.json.gz'),mode='wb',mtime=0) as f:

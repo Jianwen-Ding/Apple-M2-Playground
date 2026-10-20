@@ -1,5 +1,7 @@
 # Lowest-active call/return selection and call links also hold with inactive holes
 
+**Simulator integration, later 2026-10-20:** the measured model now replays this full corpus exactly; current probes require actual-program equality. [Validation, original source provenance and remaining limits](../../results/2026-10-20-control-simulator/README.md). Earlier gate descriptions below record what was known before hardware.
+
 Confirmed in this matrix on M2 Max G14C B1, direct DRM, compute, AC power,
 2026-10-20. **248 variants / 744 dispatches including exact controls, zero
 faults, every recovery passed.** This extends the contiguous-suffix findings

@@ -35,6 +35,11 @@ zero faults. Return pop-1 membership follows all inactive holes, while call r1
 writes follow the original active bitmap. `make verify-sparse-control` checks
 the exact sparse-table gates and readbacks. Simulator integration is next.
 
+Later 2026-10-20: [simulator integration](../results/2026-10-20-control-simulator/README.md)
+now replays all 386 measured call/return cases exactly. Current builders require
+full actual-program equality before hardware; original rejected diagnostics and
+source versions remain archived. The six stop counterexamples are still open.
+
 ## Established scope and files
 
 Measured with one full 32-lane SIMD group on M2 Max G14C:

@@ -1,5 +1,7 @@
 # Indirect call uses the lowest active target and writes links before filtering
 
+**Simulator integration, later 2026-10-20:** the measured model now replays this full corpus exactly; current probes require actual-program equality. [Validation, original source provenance and remaining limits](../../results/2026-10-20-control-simulator/README.md). Earlier gate descriptions below record what was known before hardware.
+
 Observed on M2 Max G14C B1, direct DRM, compute, AC power, 2026-10-20.
 **74 variants / 222 dispatches including exact before/after controls, zero
 faults, every recovery control passed.** Both target selection and the scope

@@ -3,7 +3,8 @@
 
 Keeps the established winner program bytes; changes only initialized input
 active bits. Every uniform and direct-jump path is re-simulated with the exact
-new table. Actual unsupported diagnostics remain explicit. Default offline.
+new table. Original unsupported diagnostics remain archived. Current actual programs must
+match the measured simulator before submission. Default offline.
 """
 import argparse
 import gzip
@@ -62,15 +63,12 @@ def build(kind,first,winner,seed):
             want_jump=call_oracle(p['table'],name,p['gate']['link'],jump=True)
         assert uniform==want_uniform and jump==want_jump,'exact sparse-table surrogate gate failed'
     with E.measured_model():
-        try:predicted=P.cov.simulate(p['code'],32,32,64,0,p['table'])
-        except RuntimeError as exc:
-            phrase=('divergent active lanes with lane 0 inactive not modelled' if kind=='ret'
-                    else 'divergent targets with lane 0 inactive not modelled')
-            assert phrase in str(exc)
-            actual=dict(unsupported_as_expected=True,diagnostic=str(exc))
-        else:
-            assert kind=='ret' and first==31 and predicted==ret_oracle(p['table'],winner)
-            actual=dict(uniform_active_case_exact=True)
+        predicted=P.cov.simulate(p['code'],32,32,64,0,p['table'])
+        want=(ret_oracle(p['table'],winner) if kind=='ret' else
+              call_oracle(p['table'],winner,p['gate']['link']))
+        assert predicted==want, 'measured actual sparse-control gate failed'
+        actual=(dict(uniform_active_case_exact=True) if kind=='ret' and first==31 else
+                dict(variant_measured_case_exact=True))
     p['expected']=(ret_oracle(p['table'],'A',jump=True) if kind=='ret' else
                    call_oracle(p['table'],'B',p['gate']['link'],jump=True))
     p['data_dir']=DATA

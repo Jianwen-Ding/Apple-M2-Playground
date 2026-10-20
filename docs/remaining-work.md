@@ -1,5 +1,12 @@
 # Task 1: remaining work, safe and unsafe (2026-10-17)
 
+> **Later 2026-10-20:** suffix and scattered-mask call/return winner rules plus
+> all-issue-active call links are measured and integrated into the simulator:
+> [386 exact hardware replays](../results/2026-10-20-control-simulator/README.md),
+> `make verify-control-model`. The six independent stop counterexamples remain
+> open. Next control probes: source/link register aliases, more target addresses,
+> deeper/nested divergence and the extra return state behind the stop difference.
+
 > **Update 2026-10-20 (owner-authorized unsafe probing):** isolated empty/partial-mask
 > stops and return context now measured: [finding](../novel-results/2026-10-20-empty-stop/README.md),
 > `make verify-empty-stop`. 17 variants / 51 dispatches, zero faults, exact recovery controls.
