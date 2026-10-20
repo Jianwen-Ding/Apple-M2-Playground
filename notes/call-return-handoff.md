@@ -24,7 +24,7 @@ Current evidence and integration:
   contribute to the source quad's low-index OR. All five native simd shuffle
   forms have independent paired-index and poisoned-index hardware matrices.
   [Native shuffle integration](../results/2026-10-20-native-shuffle-model/README.md).
-- Simulator **4dd68e9** replays all **2,209** original control programs exactly.
+- Simulator **4dd68e9** replays all **2,243** original control programs exactly.
   Return/register call still require `AGX_EXPERIMENTAL_RET=buffer-pop2`;
   default rejection and target checks remain. Both interpreter paths have
   source-liveness fixtures; 42 library tests pass. Historical source and
@@ -64,7 +64,12 @@ programs / 48 dispatches, exact controls and both lane rotations, zero faults.
 the issuing mask until pop1 synchronizes from written counters (34 programs /
 102 dispatches, four forms, exact controls and zero faults).
 
-Next useful control questions: zero-count synchronization and larger values,
+[Zero-count synchronization](../novel-results/2026-10-20-r0-pop0/README.md)
+now selects only written zero-counter lanes after an ordinary write. All 34
+programs / 102 dispatches have controls without pop0, exact buffers and zero
+faults. Numeric masked post-pop0 counters are not directly read in that matrix.
+
+Next useful control questions: RET with stale issuing mask and larger values,
 permanent termination through other mask operations, quad/other cross-lane
 forms and precise timing. Earlier quiet out-of-program return observations
 remain unmodelled; do not rerun invalid targets. New probes must retain actual

@@ -18,3 +18,13 @@ All indices are prepared before r0 writes; input lows are initialized and
 small; no call/ret/loop/barrier/invalid target/uninitialized source occurs.
 Drain depths are bounded before final marker/stop. Retain watchdog/kernel/
 memory diagnostics and stop submissions if recovery is not established.
+
+Ordinary writes defer execution updates in all 34 cases. Next `probe_r0_pop0.py`
+replaces the first pop1 with pop0. It gates the actual complete shader against
+zero-count synchronization, preserving every written counter. Its independent
+recovery control replaces that operation with waits after known IF construction,
+so control correctness does not assume pop0 behavior. If hardware skips the
+zero-count operation, every lane will still store its nonzero counter at the
+second checkpoint; true synchronization lets only zero-counter lanes write.
+Start mixed mov-half 0..3 and inspect exact recovery before extending forms.
+No transfer/loop/barrier is introduced and the known bounded drain remains.

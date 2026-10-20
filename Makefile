@@ -802,3 +802,7 @@ verify-deep-ret-counters:
 .PHONY: verify-r0-write-mask
 verify-r0-write-mask:
 	$(PYTHON) -B scripts/verify_r0_write_mask.py
+
+.PHONY: verify-r0-pop0
+verify-r0-pop0:
+	$(PYTHON) -B scripts/verify_r0_pop0.py

@@ -225,7 +225,7 @@ scattered masks, and call-r1 write-before-select ordering are now measured.
 Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
 depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
 while masked survivors continue. Simulator d90cdcd models these semantics;
-all 2,209 retained original programs replay exactly after native shuffle
+all 2,243 retained original programs replay exactly after native shuffle
 liveness correction 4dd68e9.
 
 [Masked-r0 shuffles](../novel-results/2026-10-20-masked-r0/README.md) directly
@@ -289,3 +289,9 @@ Pop1 then decrements the written counters and updates execution. Thirty-four
 programs / 102 dispatches cover four write forms and mixed/uniform depths to 31,
 exact controls and zero faults. Zero-count synchronization and larger values
 remain next questions; simulator 4dd68e9 already matches.
+
+[Zero-count synchronization](../novel-results/2026-10-20-r0-pop0/README.md):
+pop_exec 0 synchronizes the issuing mask after ordinary r0 writes, selecting
+only zero counters. Thirty-four programs / 102 dispatches, controls without
+pop0, all words exact, zero faults. Numeric masked counters after pop0 and RET
+with deliberately stale execution remain follow-ups.
