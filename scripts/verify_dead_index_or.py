@@ -32,10 +32,11 @@ def main():
         distinction=expected(p['table'],g['seed'],g['index'],True)!=expected(p['table'],g['seed'],g['index'],True,True)
         assert a['retained_dead_bits']==(not distinction);decisive+=distinction
         with B.E.measured_model():pred=B.P.cov.simulate(p['code'],32,32,64,0,p['table'])
-        counterexamples+=pred!=(r['variant']['out'],r['variant']['table_after'])
-    assert decisive>0 and counterexamples>0
+        assert pred==(r['variant']['out'],r['variant']['table_after'])
+        counterexamples+=(B.oracle(p['table'],g['seed'],g['index'],True,False,False)!=(r['variant']['out'],r['variant']['table_after']))
+    assert decisive==88 and counterexamples==184
     print(f'PASS 256 variants / 768 dispatches: dead lanes do not contribute low index bits; {decisive} distinguish retained bits')
-    print(f'PASS all words/guards/controls exact, zero faults; {counterexamples} legacy simulator counterexamples retained')
+    print(f'PASS all words/guards/controls exact, zero faults; {counterexamples} original simulator counterexamples retained; all current model replays exact')
 
 
 if __name__=='__main__':main()

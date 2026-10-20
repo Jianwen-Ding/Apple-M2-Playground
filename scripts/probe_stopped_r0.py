@@ -62,12 +62,12 @@ def build(maximum,rotate,payload="depth"):
     code,pc=construct(table,True,payload);control,_=construct(table,False,payload)
     with E.measured_model():
         assert P.cov.simulate(control,32,32,64,0,table)==oracle(table,payload=payload)
-        assert P.cov.simulate(code,32,32,64,0,table)==oracle(table,True,payload=payload)
+        assert P.cov.simulate(code,32,32,64,0,table)==oracle(table,True,payload=payload,fallback='self')
     return dict(code=code,control=control,table=table,n=32,wg=32,regs=64,
                 expected=oracle(table,payload=payload),data_dir=DATA,
                 gate=dict(maximum=maximum,rotate=rotate,stop_pc=pc,payload=payload,
-                          wait_control_exact=True,actual_storage_hypothesis_exact=True,
-                          hypothesis='stopped lanes stay dead and retain low r0 = 0 across pop',
+                          wait_control_exact=True,actual_measured_model_exact=True,
+                          hypothesis='stopped source selects issuing lane own value; dead storage unobserved',
                           builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                           base_builder_sha256=hashlib.sha256(Path(B.__file__).read_bytes()).hexdigest()))
 
@@ -83,7 +83,7 @@ def main():
     if not a.hardware:return
     name=f'stopped-r0-{a.depth}-r{a.rotate}'+('-lane' if a.payload=='lane' else '');r=CF.hardware(name,p);v=r.get('variant',{})
     if v.get('ok'):
-        got=(v['out'],v['table_after']);want=oracle(p['table'],True,payload=a.payload)
+        got=(v['out'],v['table_after']);want=oracle(p['table'],True,payload=a.payload,fallback='self')
         r['stopped_r0_analysis']=dict(models={str(x):got==oracle(p['table'],True,x,a.payload) for x in (0,1,2,0xffff)},
              quad_first_live_payload=got==oracle(p['table'],True,0,a.payload,'quad'),
              stopped_source_self=got==oracle(p['table'],True,0,a.payload,'self'),

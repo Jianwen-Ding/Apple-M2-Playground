@@ -46,3 +46,8 @@ make verify-stopped-shuffle-index
 ```
 
 [Full evidence](../../results/2026-10-20-stopped-shuffle-index/README.md).
+
+The later [shuffle-liveness simulator correction](../../results/2026-10-20-shuffle-liveness-model/README.md)
+implements both measured rules in commit bf03118. Every original program here
+now replays exactly. Initial hypotheses, diagnostics and source bytes remain
+unchanged; current builders require the measured model before new submission.

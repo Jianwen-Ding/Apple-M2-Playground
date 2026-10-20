@@ -14,7 +14,7 @@ from pathlib import Path
 import probe_empty_stop as E
 
 ROOT=E.ROOT
-GROUPS={'2026-10-20-ret-winner':64,'2026-10-20-call-winner':74,'2026-10-20-sparse-control':248,'2026-10-20-call-r1':22,'2026-10-20-three-targets':72,'2026-10-20-empty-stop':17,'2026-10-20-ret-prepop':36,'2026-10-20-ret-levels':21,'2026-10-20-empty-ret-state':16,'2026-10-20-masked-r0':24}
+GROUPS={'2026-10-20-ret-winner':64,'2026-10-20-call-winner':74,'2026-10-20-sparse-control':248,'2026-10-20-call-r1':22,'2026-10-20-three-targets':72,'2026-10-20-empty-stop':17,'2026-10-20-ret-prepop':36,'2026-10-20-ret-levels':21,'2026-10-20-empty-ret-state':16,'2026-10-20-masked-r0':24,'2026-10-20-stopped-r0':9,'2026-10-20-stopped-shuffle-index':256,'2026-10-20-dead-index-or':256}
 
 
 def sha(path):
@@ -29,7 +29,7 @@ def main():
                  simulator_binary_sha256=sha(E.P.cov.RUN),
                  simulator_func_sha256=sha(ROOT.parent/'AGX-Performance-Simulator/rust/src/func.rs'),
                  simulator_sources={name:sha(ROOT.parent/'AGX-Performance-Simulator'/name) for name in
-                                    ('rust/src/func.rs','rust/src/isa/exec.rs','rust/src/isa/compiled.rs')},
+                                    ('rust/src/func.rs','rust/src/isa/exec.rs','rust/src/isa/compiled.rs','rust/src/isa/mod.rs')},
                  records={})
     E.P.cov.install()
     with E.measured_model():

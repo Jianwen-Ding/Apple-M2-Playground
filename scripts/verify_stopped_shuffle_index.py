@@ -34,12 +34,12 @@ def main():
         assert a['legacy_exact']==(source!=0)
         with B.E.measured_model():pred=B.P.cov.simulate(p['code'],32,32,64,0,p['table'])
         mismatch=pred!=(r['variant']['out'],r['variant']['table_after'])
-        assert mismatch==(source==0)
-        counterexamples+=mismatch;source_depths[source]=source_depths.get(source,0)+1
+        assert not mismatch
+        counterexamples+=(source==0);source_depths[source]=source_depths.get(source,0)+1
     assert counterexamples==82
     print('PASS 256 variants / 768 dispatches: all 32 indices, four depth patterns, two rotations, paired immediate/register forms')
     print('PASS stopped sources return own value; masked living sources remain readable; source-depth counts:',source_depths)
-    print('PASS all words/guards/controls exact, zero faults; 82 simulator source-liveness counterexamples retained')
+    print('PASS all words/guards/controls exact, zero faults; all model replays exact; 82 original source-liveness counterexamples retained')
 
 
 if __name__=='__main__':main()

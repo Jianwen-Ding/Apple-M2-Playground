@@ -35,9 +35,9 @@ def main():
         for phase in ('control_before','variant','control_after'):
             assert (rec[phase]['out'],rec[phase]['table_after'])==expected(p['table'],payload,phase=='variant'),(path.name,phase)
         with B.E.measured_model():pred=B.P.cov.simulate(p['code'],32,32,64,0,p['table'])
-        assert pred!=(rec['variant']['out'],rec['variant']['table_after'])
+        assert pred==(rec['variant']['out'],rec['variant']['table_after'])
     print('PASS stopped-source immediate shuffle returns own value, while masked live sources remain readable')
-    print('PASS nine variants / 27 dispatches, all words/guards/recovery exact, zero faults; nine simulator counterexamples retained')
+    print('PASS nine variants / 27 dispatches, all words/guards/recovery exact, zero faults; all measured-model replays exact; original counterexamples retained')
     print('PASS stopped lanes stay absent after five pops; their stored r0 value is not observable through this fallback')
 
 
