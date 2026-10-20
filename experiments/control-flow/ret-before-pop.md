@@ -60,3 +60,14 @@ candidate and control. Gate against retained-zero storage in the simulator,
 classify hardware against low dead values 0/1/2/ffff without assuming any is
 architecturally required. First depth-3 case only, inspect recovery before
 extension. No source contains another dispatch's or uninitialized data.
+
+Stopped-source gathers fit per-issuing-lane self fallback and cannot expose the
+dead source's storage. `probe_stopped_shuffle_index.py` compares immediate and
+register-index forms with the same target, seeding index r15 in every physical
+lane before divergence/termination. Record both before STOP and after pop 1;
+retain an exact wait control and final four-pop survival marker. Start M=1,
+rotate 0, source 0 (dead); inspect, then separately source 1 (live active) and
+M=3 source 2 (live masked). Only extend to other indices after exact recovery.
+The complete actual shader is gated against the simulator's current retained
+source hypothesis and hardware must fit a full independent self-fallback
+oracle; preserve any discrepancy rather than widening the batch.

@@ -758,3 +758,7 @@ verify-masked-r0:
 .PHONY: verify-stopped-r0
 verify-stopped-r0:
 	$(PYTHON) -B scripts/verify_stopped_r0.py
+
+.PHONY: verify-stopped-shuffle-index
+verify-stopped-shuffle-index:
+	$(PYTHON) -B scripts/verify_stopped_shuffle_index.py
