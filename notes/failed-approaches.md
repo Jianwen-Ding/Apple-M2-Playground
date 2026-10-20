@@ -566,3 +566,17 @@ keep-unless-NaN gate (it must be `sel(..., a[0], hi)`). With nb = 0 in the commo
 was overwritten with a's bits, then the na gate overwrote it with b's: min and max always
 returned b. The DSL's own Python interpreter (`Prog.run`) on three operand pairs catches this
 before the simulator or hardware runs; use it first for every new builder.
+
+### The clock keeper can share a core with a single-group probe, 2026-10-20
+
+`clock_keeper.py` runs a 64-lane delay kernel continuously to hold the top clock. A one-workgroup probe lands on core 0
+of a rotating cluster (SR20 0x00 / 0x10 / 0x20 / 0x30), and so does the keeper's workgroup. When the two share a core
+they compete for that core's instruction cache and issue slots. The instruction-cache probe
+(`scripts/probe_icache.py`) then gave non-monotonic capacity edges: a bisection found "fits" at 15,072 bytes for one
+alignment and 9,856 bytes for another, and a dense scan found every size slow on core 0x10.
+**Fix:** for one or a few SIMD groups, do not run the keeper. Run 8 back-to-back dispatches of several milliseconds each
+in one process and take the minimum: the first 2-3 run while the clock ramps up, and the rest settle at the top-clock
+values (in-cache 0.744 ns per iadd; intermediate plateaus at 1.075 / 1.287 ns are lower clock levels, not cache effects).
+Also record SR20 in the output so placement is visible. Earlier single-group probes that ran with the keeper
+(`run_drm_linesize.py`, `run_drm_neighbour.py`, `probe_fence_contention.py`) may have shared a core with it in some runs.
+Their results should be re-checked for core collisions before they are used for fine-grained conclusions.
