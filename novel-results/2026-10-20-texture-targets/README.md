@@ -1,12 +1,12 @@
 # Texture targets and filter precision: 3D, arrays, cubes, buffers; 1/256 weights, fp16 LOD, 1/64 level weight
 
 Status: confirmed on one device (driver-reported M2 Max G14C B1), Mesa GLES compute. Mesa builds every texture,
-sampler and image state word; nothing was hand-encoded. 24 GLSL ES 3.2 compute cases, all guards intact,
+sampler and image state word; nothing was hand-encoded. 27 GLSL ES 3.2 compute cases, all guards intact,
 0 faults. AGX listings captured from Mesa's shader cache. This closes most of the safe-05 remainder
 ([remaining-work](../../docs/remaining-work.md) row 9).
 
 Reproduce: `python3 -B scripts/run_gles_texture_targets.py` (GPU, safe: Mesa-compiled only), then
-`make verify-texture-targets` (offline, 35 checks against `results/2026-10-20-texture-targets`).
+`make verify-texture-targets` (offline, 38 checks against `results/2026-10-20-texture-targets`).
 The harness (`tests/gles_compute.c`) now takes `GLES_TEX_TARGET=2d|3d|2darray|cube|buffer` and `GLES_TEX_D`.
 
 ## Correction to an earlier finding
@@ -50,6 +50,14 @@ Out-of-range `texelFetch` returns zero **in the stored format**, and then the fo
 rgba8 OOB = (0,0,0,0), but r8 OOB = (0,0,0,1). CUDA's border/`tex1Dfetch` OOB contract is all zeros. For
 single-channel textures CUDA returns a scalar, so the alpha=1 fill does not reach CUDA code.
 
+## Follow-ups (same day)
+
+| Question | Result |
+|---|---|
+| Buffer of 70000 texels (wider than one 16384 row) | 176/176 exact across every 16384-texel row boundary; OOB tail returns 0 |
+| Mipmapped 2D array (4 levels x 4 layers) | level = `ceil(lod-0.5)` clamped, chosen per layer: 64/64 |
+| Linear cube filtering at a face edge (+X/+Z, faces solid 20 / 180) | **seamless**: exactly 100 (50/50) on the edge, then linear to the face value over half a texel (65/65) |
+
 ## Simulator update
 
 `AGX-Performance-Simulator/rust/src/texture.rs`: `sample_linear` now quantizes weights with `filter_weight`
@@ -60,8 +68,7 @@ single-channel textures CUDA returns a scalar, so the alpha=1 fill does not reac
 ## Not established
 
 - The 3D 8-tap accumulation residual (5/448 near-tie lanes).
-- Mipmapped arrays, cube arrays, and seamless cube filtering across faces (only nearest was tested on cubes).
+- Cube arrays, and cube corners (three faces meeting at one point).
 - Anisotropic filtering, integer-format filtering (GL forbids it), and 1D textures (GLES has no 1D target;
   Mesa would use a 2D or buffer path).
-- Buffer views larger than 16384 texels: the y path was not exercised at runtime. The listing shows the 2D split.
 - Gradient-derived LOD precision (`textureGrad`) beyond the 8 earlier points.

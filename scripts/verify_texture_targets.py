@@ -180,5 +180,17 @@ check('3D image store/load r32ui: 512/512', all(x == (i*2654435761) & 0xffffffff
 check('2D-array image store/load r32ui: 384/384', all(x == (i*2246822519+7) & 0xffffffff for i, x in enumerate(out('imagearray_r32ui'))))
 check('3D/array image_write encodings use tex_3d / tex_2d_array', 'image_write' in listing('image3d_r32ui') and 'tex_3d' in listing('image3d_r32ui') and 'tex_2d_array' in listing('imagearray_r32ui'))
 
+# follow-ups: wide buffers, mipmapped arrays, seamless cube filtering
+c, o = C['buffer_wide_r32ui'], out('buffer_wide_r32ui')
+check('buffer wider than 16384 (70000 texels): 176/176 across every 16384-texel row boundary, OOB tail returns 0',
+      all(x == (c['vals'][k] if k < 70000 else 0) for k, x in zip(c['idx'], o)))
+o = out('mip_array_r8')
+check('mipmapped 2D array: level = ceil(lod-0.5) clamped, per layer, 64/64',
+      all(x == 10+40*min(max(math.ceil((i % 16)*0.25-0.5), 0), 3)+i//16 for i, x in enumerate(o)))
+o = [f(x)*255 for x in out('cube_seam_r8')]
+exp = [100-10*min(k, 8) for k in range(33)] + [100+10*min(k, 8) for k in range(1, 33)]
+check('cube linear filtering is seamless: 50/50 blend of +X and +Z at the shared edge, linear over half a texel, 65/65',
+      all(abs(g-e) < 1e-4 for g, e in zip(o, exp)))
+
 print(f'{sum(ok)}/{len(ok)} texture-target checks passed')
 sys.exit(0 if all(ok) else 1)

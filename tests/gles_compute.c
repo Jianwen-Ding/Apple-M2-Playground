@@ -261,7 +261,8 @@ int main(int argc, char **argv) {
         for (unsigned k = 0; k < sizeof fmts / sizeof *fmts; k++) if (!strcmp(fn, fmts[k].name)) fi = (int)k;
         if (fi < 0) fail("tex-format");
         unsigned tw = (unsigned)atoi(getenv("GLES_TEX_W") ? getenv("GLES_TEX_W") : "16"), th = (unsigned)atoi(getenv("GLES_TEX_H") ? getenv("GLES_TEX_H") : "16");
-        if (!tw || !th || tw > 4096 || th > 4096) fail("tex-size");
+        int wide_ok = getenv("GLES_TEX_TARGET") && !strcmp(getenv("GLES_TEX_TARGET"), "buffer");
+        if (!tw || !th || (tw > 4096 && !(wide_ok && tw <= (1u << 26))) || th > 4096) fail("tex-size");
         unsigned levels = (unsigned)atoi(getenv("GLES_TEX_LEVELS") ? getenv("GLES_TEX_LEVELS") : "1");
         if (!levels || levels > 13) fail("tex-levels");
         /* Multi-level data layout: level 0 (tw x th) first, then each subsequent level halving (min 1x1),

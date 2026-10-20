@@ -156,6 +156,24 @@ def cases():
     out['bilinear_random_r8'] = dict(fmt='r8', w=16, h=16, data=bytes(v2r), count=len(p2), filt='linear', vals=v2r, pts=p2,
         glsl=HEAD+"layout(binding=0) uniform highp sampler2D tex;\nconst vec2 P[%d] = vec2[](%s);\n" % (len(p2), ",".join(f"vec2({x!r},{y!r})" for x, y in p2)) +
              "void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ data[8u+i]=floatBitsToUint(textureLod(tex, P[i]/16.0, 0.0).r); } }\n")
+    # 20. wide buffer: 70000 r32ui texels (rows y = i >> 14 up to 4); sample lanes across the 16384 boundaries + OOB tail
+    vw = [(k*2654435761 + 12345) & 0xffffffff for k in range(70000)]
+    idx = [k for b in (0, 16384, 32768, 49152, 65536) for k in range(b-16, b+16) if k >= 0] + list(range(69984, 70016))
+    out['buffer_wide_r32ui'] = dict(target='buffer', fmt='r32ui', w=70000, h=1, data=U32(vw), count=len(idx), filt='nearest', vals=vw, idx=idx,
+        glsl=HEAD+"layout(binding=0) uniform highp usamplerBuffer tex;\nconst int I[%d] = int[](%s);\n" % (len(idx), ",".join(map(str, idx))) +
+             "void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ data[8u+i]=texelFetch(tex, I[i]).r; } }\n")
+    # 21. mipmapped 2D array: 8x8x4 levels 0..3; level l of layer L solid = 10 + 40*l + L; nearest_mipmap, explicit lod and layer
+    ma = b''.join(bytes([10+40*l+L])*((8 >> l)**2) for l in range(4) for L in range(4))
+    # layout per level: all layers of the level back to back (glTexSubImage3D per level)
+    out['mip_array_r8'] = dict(target='2darray', fmt='r8', w=8, h=8, d=4, levels=4, data=ma, count=64, filt='nearest_mipmap',
+        glsl=HEAD+"layout(binding=0) uniform highp sampler2DArray tex;\nvoid main(){ uint i=gl_GlobalInvocationID.x; if(i<count){"
+             " float lod=float(i%16u)*0.25; float L=float(i/16u); data[8u+i]=uint(textureLod(tex, vec3(0.4, 0.6, L), lod).r*255.0+0.5); } }\n")
+    # 22. linear cube filtering across a face edge: 4x4 faces, face f solid value 40*f+20 (r8); directions sweep across the +X/+Z edge
+    cf = b''.join(bytes([40*f+20])*16 for f in range(6))
+    dirs2 = [(1.0, 0.1, 1.0 - k/32) for k in range(33)] + [(1.0 - k/32, 0.1, 1.0) for k in range(1, 33)]
+    out['cube_seam_r8'] = dict(target='cube', fmt='r8', w=4, h=4, data=cf, count=len(dirs2), filt='linear', dirs=dirs2,
+        glsl=HEAD+"layout(binding=0) uniform highp samplerCube tex;\nconst vec3 D[%d] = vec3[](%s);\n" % (len(dirs2), ",".join(f"vec3({x!r},{y!r},{z!r})" for x, y, z in dirs2)) +
+             "void main(){ uint i=gl_GlobalInvocationID.x; if(i<count){ data[8u+i]=floatBitsToUint(textureLod(tex, D[i], 0.0).r); } }\n")
     return out
 
 
