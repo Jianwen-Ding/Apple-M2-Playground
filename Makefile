@@ -871,3 +871,7 @@ test-integer-geometry-cost:
 .PHONY: verify-observed-core-map-replay
 verify-observed-core-map-replay:
 	$(PYTHON) -B scripts/verify_observed_core_map_replay.py
+
+.PHONY: verify-observed-core-map-tracing
+verify-observed-core-map-tracing:
+	$(PYTHON) -B scripts/verify_observed_core_map_tracing.py

@@ -13,8 +13,13 @@ Retain watchdog/kernel/memory diagnostics and exact recovery controls. A failed
 recovery or blocked probe stops GPU submissions. Commit and push each completed
 piece. The deferred performance-simulator PR review remains a later task.
 
-Current next implementation: carry the optional observed M2 core-map context
-into prepared functional tracing, then assess cost-path integration carefully.
+Current next implementation: add an explicit observed-map cost path with real
+core partitions; see notes/observed-core-map-cost-integration.md for the audit
+and required host-only gates.
+Prepared functional tracing now accepts an immutable borrowed map and is checked
+against per-lane address oracles across all 80 retained maps and fresh memory
+snapshots; see results/2026-10-20-observed-core-map-tracing. This does not supply
+slots, concurrency or timing.
 Functional execution now supports --m2-core-map / run_with_m2_core_map: all 80
 retained maps replay literal complete hardware buffers, with 64 default cases
 matching the archived model and independent oracles. Preserve default core-zero

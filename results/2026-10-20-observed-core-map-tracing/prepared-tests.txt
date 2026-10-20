@@ -1,0 +1,45 @@
+warning: unused variable: `f`
+    --> src/func.rs:1811:49
+     |
+1811 | fn image_write(g: &mut Group, mem: &mut Memory, f: &Fields, args: &TexOp) -> Result<(), String> {
+     |                                                 ^ help: if this is intentional, prefix it with an underscore: `_f`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+   --> src/isa/fma.rs:326:13
+    |
+326 |         let mut pick = |r: u64| -> u64 {
+    |             ----^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `0` is never read
+   --> src/isa/exec.rs:126:7
+    |
+126 |     F(f64),
+    |     - ^^^
+    |     |
+    |     field in this variant
+    |
+    = note: `Val` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+help: consider changing the field to be of unit type to suppress this warning while preserving the field numbering, or remove the field
+    |
+126 -     F(f64),
+126 +     F(()),
+    |
+
+warning: `agx-sim` (lib test) generated 3 warnings (run `cargo fix --lib -p agx-sim --tests` to apply 2 suggestions)
+    Finished `release` profile [optimized] target(s) in 0.01s
+     Running unittests src/lib.rs (rust/target/release/deps/agx_sim-c4048a8e34710476)
+
+running 3 tests
+test func::tests::m2_core_map_prepared_validation_rejects_before_tracing ... ok
+test func::tests::prepared_tracing_preserves_data_geometry_and_memory_isolation ... ok
+test func::tests::m2_core_map_prepared_traces_resolve_core_and_loaded_addresses_per_snapshot ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 49 filtered out; finished in 0.00s
+

@@ -1,5 +1,9 @@
 # New hardware findings
 
+- [2026-10-20 Prepared functional traces replay 80 supplied core maps: 69,624 SIMD traces match independent addresses across fresh memory snapshots (host-only)](2026-10-20-observed-core-map-tracing/README.md)
+- [2026-10-20 Supplied core maps reproduce 80 retained full hardware buffers; historical defaults preserved (host-only)](2026-10-20-observed-core-map-replay/README.md)
+- [2026-10-20 Ordinary integer geometry: eight-workgroup cluster blocks across four sizes; frequency and timing variation unresolved](2026-10-20-integer-geometry-cost/README.md)
+
 - [2026-10-19 Device atomic gap bits inert in all 10 pairs: u-field is padding (owner-approved unsafe, 0 faults)](2026-10-19-atomic-pairs/README.md)
 - [2026-10-19 Mesa fuse_ubfe unsound for variable shifts (verdict A, hardware-decided; NOT reported upstream per owner instruction)](2026-10-19-bfeil-verdict/README.md)
 - [2026-10-19 Threadgroup ending opcode 11 ends the whole workgroup: cross-group litmus all-sentinel, explicit re-assertion absent, no fault, recovery exact (owner-approved unsafe)](2026-10-19-tg-end-scope/README.md)

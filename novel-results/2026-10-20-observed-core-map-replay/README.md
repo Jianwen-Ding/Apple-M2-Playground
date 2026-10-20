@@ -45,8 +45,8 @@ submissions. These are host-only rechecks, not new hardware dispatches.
 The supplied map is explicit scheduling state. This does not predict placement,
 reconstruct SR17 slots, replay concurrent execution, infer operating frequency
 or calibrate timing. The existing zero-core default and synthetic stress mode
-remain available. Functional prepared traces and `agx_dispatch` do not yet
-accept this map; carrying the context into functional tracing is the next
-implementation step. No hardware was submitted for this change.
+remain available. Prepared functional traces now accept this map in the
+[subsequent tracing extension](../2026-10-20-observed-core-map-tracing/README.md).
+`agx_dispatch` does not yet accept complete core maps. No hardware was submitted for this change.
 
 [Replay evidence and commands](../../results/2026-10-20-observed-core-map-replay/README.md).
