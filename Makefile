@@ -798,3 +798,7 @@ verify-deep-call-reserve:
 .PHONY: verify-deep-ret-counters
 verify-deep-ret-counters:
 	$(PYTHON) -B scripts/verify_deep_ret_counters.py
+
+.PHONY: verify-r0-write-mask
+verify-r0-write-mask:
+	$(PYTHON) -B scripts/verify_r0_write_mask.py
