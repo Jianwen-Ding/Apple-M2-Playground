@@ -225,7 +225,7 @@ scattered masks, and call-r1 write-before-select ordering are now measured.
 Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
 depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
 while masked survivors continue. Simulator d90cdcd models these semantics;
-all 1,775 retained original programs replay exactly after native shuffle
+all 1,967 retained original programs replay exactly after native shuffle
 liveness correction 4dd68e9.
 
 [Masked-r0 shuffles](../novel-results/2026-10-20-masked-r0/README.md) directly
@@ -264,3 +264,10 @@ at inner return with their original r1 ID intact. Every saved transfer link
 was explicitly initialized. All cases match the model with exact controls,
 no faults. Balanced per-call counter reservation is the next compiler-convention
 question; unreserved nested pops do not implicitly preserve the outer mask.
+
+[Balanced call-mask reserve](../novel-results/2026-10-20-call-mask-reserve/README.md):
+push_exec 2 before **each** nested call, balanced by its return/pop2, preserves
+the enclosing mask at two levels. Either missing reserve allows excluded
+lanes at the outer caller. The 192-program / 576-dispatch four-way contrast
+reads masked counters 0/3/5 directly and checks preserved r1 IDs. Every word
+and recovery control is exact, no faults. Deeper balanced nesting is next.

@@ -786,3 +786,7 @@ verify-nested-early-return:
 .PHONY: verify-nested-partial-outer
 verify-nested-partial-outer:
 	$(PYTHON) -B scripts/verify_nested_partial_outer.py
+
+.PHONY: verify-call-mask-reserve
+verify-call-mask-reserve:
+	$(PYTHON) -B scripts/verify_call_mask_reserve.py

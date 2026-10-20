@@ -24,7 +24,7 @@ Current evidence and integration:
   contribute to the source quad's low-index OR. All five native simd shuffle
   forms have independent paired-index and poisoned-index hardware matrices.
   [Native shuffle integration](../results/2026-10-20-native-shuffle-model/README.md).
-- Simulator **4dd68e9** replays all **1,775** original control programs exactly.
+- Simulator **4dd68e9** replays all **1,967** original control programs exactly.
   Return/register call still require `AGX_EXPERIMENTAL_RET=buffer-pop2`;
   default rejection and target checks remain. Both interpreter paths have
   source-liveness fixtures; 42 library tests pass. Historical source and
@@ -46,8 +46,12 @@ are now measured with initialized saved links: 144 programs / 432 dispatches,
 exact controls and zero faults. Excluded depth-1 lanes reactivate at inner
 return and preserve original r1 IDs until restoration.
 
-Next useful control questions: balanced per-call counter reservations to
-preserve enclosing masks, deeper counters,
+[Balanced two-level reserves](../novel-results/2026-10-20-call-mask-reserve/README.md)
+now preserve the outer mask: push_exec 2 before **each** call, paired with
+return/pop2. Either missing reserve fails the caller-mask check. 192 programs /
+576 dispatches, exact controls, direct masked counters 0/3/5, zero faults.
+
+Next useful control questions: deeper balanced nesting and counters,
 permanent termination through other mask operations, quad/other cross-lane
 forms and precise timing. Earlier quiet out-of-program return observations
 remain unmodelled; do not rerun invalid targets. New probes must retain actual

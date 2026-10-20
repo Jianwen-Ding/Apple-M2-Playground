@@ -48,3 +48,17 @@ actual/control/three-winner paths must match scalar oracles. First direct,
 k1/A/seed17/two pops, inspect full recovery, then one/zero pop cases separately
 before extending first positions, outer form, winner and seed. Stop further
 submissions for any failed recovery or blocked process; preserve diagnostics.
+
+Unreserved partial-outer cases are exact. Test a compiler-oriented balanced
+wrapper with `probe_call_mask_reserve.py`: immediately before each call,
+`push_exec r0l, 2` increments only masked counters; normal RET/pop2 balances
+that call's reserve. Vary outer and inner reserve independently (0/2 each).
+Keep saved transfer operands initialized, all functions/links decoded in-program,
+and add a final original-IF pop plus full-group markers before termination.
+Eight further bounded pops after diagnostics drain alternative depth hypotheses
+without changing earlier observations. Read initialized masked lane 0's low
+r0 via immediate shuffle at inner return arrival: predicted 0/3/5 for total
+reserve 0/2/4. Separate known-op controls write exact scalar traces; gate every
+actual/three-winner/control path. First both reserves 2, direct/k1/A/seed17;
+inspect all words and recovery before outer-only, inner-only, neither, or a
+matrix. The convention is a hypothesis until those hardware contrasts agree.
