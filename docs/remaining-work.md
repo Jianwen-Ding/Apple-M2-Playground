@@ -317,3 +317,12 @@ RET chooses the lowest cached issuer before conditional counter updates.
 all words/controls exact, zero faults. Sixty cases differ from zero-counter
 selection, 66 updated participation, 36 both. The unchanged model is exact;
 already-masked writes and increment overflow remain independent questions.
+
+[Overflow first-shuffle anomaly](../novel-results/2026-10-20-overflow-first-shuffle/README.md):
+23 programs / 69 dispatches including the base family, zero faults and exact
+controls. Increment overflow reactivates a masked lane, but its first native
+shuffle retains the destination value. Wait0/pop0/a second shuffle fixes
+the tested program; one ordinary ALU instruction does not. Fifteen current
+simulator counterexamples remain explicit, separate from the exact corpus.
+Determine masked-destination writes and execution-state update conditions
+before implementing a general mask/pipeline rule.

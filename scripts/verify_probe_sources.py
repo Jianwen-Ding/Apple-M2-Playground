@@ -14,7 +14,8 @@ ARCHIVES=(ROOT/'results/2026-10-20-control-simulator/source-before-model',
           ROOT/'results/2026-10-20-ret-prepop/source-before-model',
           ROOT/'results/2026-10-20-stopped-r0/source-before-model',
           ROOT/'results/2026-10-20-ret-stale-exec/source-before-model',
-          ROOT/'results/2026-10-20-push-overflow/source-versions')
+          ROOT/'results/2026-10-20-push-overflow/source-versions',
+          ROOT/'results/2026-10-20-overflow-first-shuffle/source-versions')
 
 
 def require_source(path,recorded_sha):

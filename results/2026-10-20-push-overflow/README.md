@@ -24,3 +24,10 @@ explain its first-word discrepancy independently and retain any model limit.
 Next: isolated padding, initialized destination seeds, source/destination width
 and payload-source controls. Each uses the bounded complete program, no
 unknown target, no loop/barrier, exact recovery and independent readback oracle.
+
+The [first-shuffle diagnostic follow-up](../2026-10-20-overflow-first-shuffle/README.md)
+now preserves 20 additional programs, 60 dispatches, zero faults and exact
+controls. Destination seeds show retention; wait0/pop0/duplicate-shuffle
+controls distinguish it. The combined 23-program verifier and diagnostic
+manifest retain 15 explicit simulator counterexamples, without changing the
+earlier exact corpus or fitting a premature timing rule.

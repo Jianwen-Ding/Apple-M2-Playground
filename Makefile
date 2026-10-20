@@ -818,3 +818,7 @@ verify-wide-r0:
 .PHONY: verify-ret-stale-targets
 verify-ret-stale-targets:
 	$(PYTHON) -B scripts/verify_ret_stale_targets.py
+
+.PHONY: verify-overflow-first-shuffle
+verify-overflow-first-shuffle:
+	$(PYTHON) -B scripts/verify_overflow_first_shuffle.py

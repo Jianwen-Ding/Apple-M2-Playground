@@ -100,6 +100,14 @@ after 0xffff plus push1. Lane 12 stores 0x40 where source-0 counter zero was
 predicted; every later word matches. Three programs / nine dispatches, exact
 controls, zero faults/hangs, clean recovery. Do not treat this as an explained
 overflow or timing rule yet; original evidence and source hashes are retained.
+The [20 diagnostic follow-ups](../novel-results/2026-10-20-overflow-first-shuffle/README.md)
+show first-shuffle destination retention across n1/n2/n3 and all five native
+forms. A destination seed survives; wait0/pop0/a second shuffle fixes the
+tested program, while one ordinary ALU instruction does not. Already-issuing
+lanes behave normally. Combined 23 programs / 69 dispatches, exact controls,
+zero faults, **15 simulator counterexamples** retained separately from the
+2,403-program exact corpus. Next inspect masked destination writes and which
+operation updates shuffle execution state before changing the functional model.
 
 Owner follow-up, deferred at their request: later inspect performance-simulator
 pull requests from other branches for requested behavior/support, and implement
