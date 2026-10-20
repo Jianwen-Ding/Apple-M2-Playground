@@ -30,6 +30,9 @@ def split(b_lo, b_hi, half=128):
 def split_variants(pairs):
     v = [('split-6800-6800', split(bytes([0x68, 0]), bytes([0x68, 0])))]
     v += [(f'split-6800-{b:04x}', split(bytes([0x68, 0]), bytes([0x68, b >> 8 if b > 0xff else 0]) if False else bytes([0x68, b & 0xff]))) for b in pairs]
+    # positive control: 0x78 synchronizes aligned blocks of 4 SIMD groups = exactly the two halves, i.e. two separate barriers;
+    # cross-half readers (groups 3 and 7) must show errors, so the split test can detect a barrier-ID separation
+    v += [('split-7809-7809', split(bytes([0x78, 0x09]), bytes([0x78, 0x09])))]
     v += [('split-6800-6800-after', split(bytes([0x68, 0]), bytes([0x68, 0])))]
     return v
 

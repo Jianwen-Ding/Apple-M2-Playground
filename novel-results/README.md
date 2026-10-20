@@ -1,6 +1,6 @@
 # New hardware findings
 
-- [2026-10-20 threadgroup_barrier 0x68 byte-1 bits inert with 2-8 SIMD groups, no barrier-ID field: PTX named barriers need emulation (owner-approved unsafe, 46 submissions, 0 faults)](2026-10-20-barrier-bits/README.md)
+- [2026-10-20 Barrier byte-1 bits inert: 0x68 has no ID/count field (with and without fences, tg and device memory, positive-controlled), 0x78's byte 1 does not change its 4-group scope (owner-approved unsafe, 340 submissions, 0 faults)](2026-10-20-barrier-bits/README.md)
 - [2026-10-20 A kernel in another GPU context adds ~190 ns to far-memory loads (256 -> 448 ns); the clock keeper inflated earlier absolute latencies (cache-line step unchanged; memory-parameters needs re-measurement)](2026-10-20-cross-context-latency/README.md)
 - [2026-10-20 Instruction cache: 12 KiB per core, 64-byte lines, shared by a core's SIMD groups; instructions crossing 8-byte boundaries cost 1.19x capacity (161 lines usable); two groups on one loop show a bistable 2-3.5x slowdown; a 32-entry per-core taken-jump structure (33+ jumps per loop cost up to +127 cycles each)](2026-10-20-icache/README.md)
 - [2026-10-20 fp64 add/mul/fma .rz/.rm/.rp: all 9 directed-rounding PTX forms bit-exact on hardware (soft-fp64, +8-13 instructions over rn)](2026-10-18-fp64/README.md#update-2026-10-20-directed-rounding-for-add--mul--fma)

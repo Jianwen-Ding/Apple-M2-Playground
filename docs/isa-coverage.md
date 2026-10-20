@@ -154,7 +154,7 @@ Top-level 7-bit opcodes that applegpu cannot decode are all classified in
 | `TODO.unk40C0` | 6/6 | 0 |  | [fails fast in compute](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `TODO.unkC0000000` | 4/4 | 0 |  | [inert](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `TODO.unk51` | 4/4 | 1 |  | [ends the SIMD group (= no_var with u=0)](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
-| `TODO.unkE800` | 2/2 | 0 |  | [0x68 + bit 7: no observable effect with one SIMD group; scope effects untested](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
+| `TODO.unkE800` | 2/2 | 0 |  | [0x68 + bit 7: no observable effect with one SIMD group; 0x68/0x78 byte-1 bits inert with several groups (2026-10-20-barrier-bits)](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `TODO.unk0C00` | 2/2 | 0 |  | [hangs; last before wedge](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `doorbell` | 2/2 | 0 |  | [inert](../novel-results/2026-10-11-mem-control-gap-bits/README.md) |
 | `jmp_if_skipping_doorbell` | 4/4 | 0 |  | open: not run: may loop on itself |
