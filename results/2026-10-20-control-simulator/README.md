@@ -2,6 +2,8 @@
 
 Simulator commit: `753616b` in AGX-Performance-Simulator.
 
+Later alias probing [found `call r1` falls through after writing the link](../../novel-results/2026-10-20-call-r1/README.md). The operand-before-write implementation below is a new alias counterexample; the 386 non-alias replays remain exact. Alias correction follows separately.
+
 The functional simulator's opt-in `AGX_EXPERIMENTAL_RET=buffer-pop2` now:
 
 - selects the lowest active operand for both register calls and returns;

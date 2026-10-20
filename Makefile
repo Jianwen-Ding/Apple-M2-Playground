@@ -640,6 +640,10 @@ verify-sparse-control:
 verify-control-model:
 	$(PYTHON) -B scripts/verify_measured_control_model.py
 
+.PHONY: verify-call-r1
+verify-call-r1:
+	$(PYTHON) -B scripts/verify_call_r1.py
+
 verify-occupancy2:
 	$(PYTHON) -B scripts/verify_occupancy2.py
 

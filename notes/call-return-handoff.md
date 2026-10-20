@@ -265,3 +265,11 @@ and coverage status, then update simulator semantics only within measured scope.
 Run the call verifier, relevant retained control cases, Rust tests and any new
 scope's exact replay. Report unmodeled cases explicitly. Commit and push both
 affected repositories before handing work off or stopping.
+
+2026-10-20 alias follow-up: [`call r1`](../novel-results/2026-10-20-call-r1/README.md)
+fails to use its original target. Thirteen variants / 39 dispatches, no faults,
+show fallthrough and the link in every issue-active r1; inactive r1 values stay
+unchanged. Exact no-call controls verify the target copy. The current simulator
+consumes the old operand and is wrong for this alias; `make verify-call-r1`
+retains all counterexamples and nine refined known-op link/fallthrough gates.
+Do not allocate an intended indirect target to r1. Model correction is next.

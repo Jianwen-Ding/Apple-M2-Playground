@@ -9,11 +9,15 @@ import hashlib
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
-ARCHIVE=ROOT/'results/2026-10-20-control-simulator/source-before-model'
+ARCHIVES=(ROOT/'results/2026-10-20-control-simulator/source-before-model',
+          ROOT/'results/2026-10-20-call-r1/source-before-model')
 
 
 def require_source(path,recorded_sha):
     path=Path(path)
-    candidates=(path,ARCHIVE/(path.name+'.txt'))
+    candidates=[path]
+    for archive in ARCHIVES:
+        candidates.append(archive/(path.name+'.txt'))
+        candidates.extend(archive.glob('*--'+path.name+'.txt'))
     assert any(p.exists() and hashlib.sha256(p.read_bytes()).hexdigest()==recorded_sha for p in candidates), \
         'recorded probe source unavailable or changed: '+path.name

@@ -205,3 +205,9 @@ readbacks. The updated builders require an exact actual-program gate for this
 measured scope. `verify_probe_sources.py` preserves provenance for earlier
 records using archived builder sources; original unsupported diagnostics remain
 unchanged. The separate stop counterexamples remain unresolved.
+
+`probe_call_r1.py` tests the source/link alias with unchanged code length and
+addresses. `probe_call_r1_link.py` snapshots r1 at fallback and gates both a
+no-call control and the refined link-write/fallthrough surrogate. Both accept
+`--first K --winner A|B [--hardware] [--repeat N]`. `make verify-call-r1` checks
+13 retained counterexamples and every complete guarded readback without a GPU.
