@@ -34,10 +34,10 @@ def main():
         # all-false initial classification and check the readback independently.
         if 'counter-stale' in r['stale_ret_analysis']['models']:assert r['stale_ret_analysis']['models']['counter-stale']
         with B.E.measured_model():pred=B.P.cov.simulate(p['code'],32,32,64,0,p['table'])
-        assert pred!=(r['variant']['out'],r['variant']['table_after'])
+        assert pred==(r['variant']['out'],r['variant']['table_after'])
     print('PASS nonempty RET conditionally updates counter 0/1 and their execution bits; deeper stale execution is preserved')
     print('PASS uniform nonzero counters still transfer, with no zero-counter issuer required')
-    print('PASS 34 variants / 102 dispatches: exact words/guards/no-RET controls, zero faults; 34 simulator counterexamples retained')
+    print('PASS 34 variants / 102 dispatches: exact words/guards/no-RET controls, zero faults; all measured-model replays exact; 34 original counterexamples retained')
 
 
 if __name__=='__main__':main()

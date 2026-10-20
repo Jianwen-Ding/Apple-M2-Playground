@@ -225,7 +225,7 @@ scattered masks, and call-r1 write-before-select ordering are now measured.
 Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
 depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
 while masked survivors continue. Simulator d90cdcd models these semantics;
-all 2,243 retained original programs replay exactly after native shuffle
+all 2,277 retained original programs replay exactly after native shuffle
 liveness correction 4dd68e9.
 
 [Masked-r0 shuffles](../novel-results/2026-10-20-masked-r0/README.md) directly
@@ -295,3 +295,10 @@ pop_exec 0 synchronizes the issuing mask after ordinary r0 writes, selecting
 only zero counters. Thirty-four programs / 102 dispatches, controls without
 pop0, all words exact, zero faults. Numeric masked counters after pop0 and RET
 with deliberately stale execution remain follow-ups.
+
+[Stale-execution RET](../novel-results/2026-10-20-ret-stale-exec/README.md)
+corrects the cached-issue model: nonempty RET conditionally maps stored counter
+0 -> masked 2, 1 -> active 0, leaving deeper counters and execution unchanged.
+All 34 hardware counterexamples (102 dispatches, exact controls, zero faults)
+now replay in simulator c7e50f7. Uniform nonzero counters still transfer.
+Target disagreement in stale execution and wider counter values remain open.

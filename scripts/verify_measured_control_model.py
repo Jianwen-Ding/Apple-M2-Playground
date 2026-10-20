@@ -14,7 +14,7 @@ from pathlib import Path
 import probe_empty_stop as E
 
 ROOT=E.ROOT
-GROUPS={'2026-10-20-ret-winner':64,'2026-10-20-call-winner':74,'2026-10-20-sparse-control':248,'2026-10-20-call-r1':22,'2026-10-20-three-targets':72,'2026-10-20-empty-stop':17,'2026-10-20-ret-prepop':36,'2026-10-20-ret-levels':21,'2026-10-20-empty-ret-state':16,'2026-10-20-masked-r0':24,'2026-10-20-stopped-r0':9,'2026-10-20-stopped-shuffle-index':256,'2026-10-20-dead-index-or':256,'2026-10-20-stopped-native-shuffle':160,'2026-10-20-native-dead-index-or':320,'2026-10-20-nested-divergent':12,'2026-10-20-nested-early-return':24,'2026-10-20-nested-partial-outer':144,'2026-10-20-call-mask-reserve':192,'2026-10-20-deep-call-reserve':192,'2026-10-20-deep-ret-counters':16,'2026-10-20-r0-write-mask':34,'2026-10-20-r0-pop0':34}
+GROUPS={'2026-10-20-ret-winner':64,'2026-10-20-call-winner':74,'2026-10-20-sparse-control':248,'2026-10-20-call-r1':22,'2026-10-20-three-targets':72,'2026-10-20-empty-stop':17,'2026-10-20-ret-prepop':36,'2026-10-20-ret-levels':21,'2026-10-20-empty-ret-state':16,'2026-10-20-masked-r0':24,'2026-10-20-stopped-r0':9,'2026-10-20-stopped-shuffle-index':256,'2026-10-20-dead-index-or':256,'2026-10-20-stopped-native-shuffle':160,'2026-10-20-native-dead-index-or':320,'2026-10-20-nested-divergent':12,'2026-10-20-nested-early-return':24,'2026-10-20-nested-partial-outer':144,'2026-10-20-call-mask-reserve':192,'2026-10-20-deep-call-reserve':192,'2026-10-20-deep-ret-counters':16,'2026-10-20-r0-write-mask':34,'2026-10-20-r0-pop0':34,'2026-10-20-ret-stale-exec':34}
 
 
 def sha(path):

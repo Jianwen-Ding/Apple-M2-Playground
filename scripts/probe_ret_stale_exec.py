@@ -59,7 +59,7 @@ def build(op,maximum,rotate=0,uniform=False):
     P.cov.gate(code,allow=('ret',));P.cov.gate(control)
     with E.measured_model():
         assert P.cov.simulate(control,32,32,64,0,table)==oracle(table,'issue'),'known depth-two jump control failed'
-        assert P.cov.simulate(code,32,32,64,0,table)==oracle(table,'issue'),'current issue-active RET hypothesis failed'
+        assert P.cov.simulate(code,32,32,64,0,table)==oracle(table,'counter-stale'),'measured conditional RET update gate failed'
     boundaries=[];pc=0
     while pc<len(code):
         info=P.cov.ASMB.info(code[pc:pc+16]);assert info and info[1]>0
@@ -68,7 +68,7 @@ def build(op,maximum,rotate=0,uniform=False):
     return dict(code=code,control=control,table=table,n=32,wg=32,regs=64,expected=oracle(table,'issue'),data_dir=DATA,
         gate=dict(op=op,maximum=maximum,rotate=rotate,uniform=uniform,write=write,ret_pc=ret_pc,
                   target=0x2000+P.drm.control_main()[1]+LANDING,boundaries=boundaries,
-                  actual_issue_hypothesis_exact=True,no_ret_control_exact=True,
+                  actual_measured_model_exact=True,no_ret_control_exact=True,
                   base_builder_sha256=hashlib.sha256(Path(B.__file__).read_bytes()).hexdigest(),
                   builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest()))
 

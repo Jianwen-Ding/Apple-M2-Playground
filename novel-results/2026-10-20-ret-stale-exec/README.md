@@ -54,3 +54,9 @@ make verify-ret-stale-exec
 ```
 
 [Full evidence](../../results/2026-10-20-ret-stale-exec/README.md).
+
+The [conditional RET model correction](../../results/2026-10-20-ret-stale-model/README.md)
+in simulator c7e50f7 now reproduces all 34 original programs. Counter 0/1
+transitions consult stored depth, deeper execution remains untouched, and the
+existing empty-issue/target guards remain. Original diagnostics and sources
+are preserved; current builders require the measured complete-program result.
