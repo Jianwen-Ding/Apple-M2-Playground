@@ -13,10 +13,12 @@ Retain watchdog/kernel/memory diagnostics and exact recovery controls. A failed
 recovery or blocked probe stops GPU submissions. Commit and push each completed
 piece. The deferred performance-simulator PR review remains a later task.
 
-Current next question: repeat identical ordinary arithmetic programs across
-allocations and run order to characterize timing-state variability. The
-matched immediate-1/3 study retains the eight-chain 3.6x model gap, while
-identical one-chain shaders vary by over 2x across trials. Immediate value
-alone cannot explain the observed gap. Keep small positive values, full
-scalar/simulator gates, and serialized bounded submissions. No function
-transfers or execution-counter manipulation beyond the standard harness prefix.
+Current next question: compare ordinary arithmetic program lengths under the
+controlled 1000 us host-gap protocol. The immediate-1/3 study retains the
+eight-chain 3.6x slope gap. The controlled-gap study finds timing transitions
+within one process using the same objects, ruling out a fixed allocation
+effect alone. Its late 1000 us-gap medians agree within 1.1% across six trials,
+but early quarters can be faster. Keep both distributions and do not infer
+actual frequency. Keep small positive values, full scalar/simulator gates,
+and serialized bounded submissions. No function transfers or execution-counter
+manipulation beyond the standard harness prefix.

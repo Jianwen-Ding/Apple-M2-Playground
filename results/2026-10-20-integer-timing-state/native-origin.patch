@@ -1,0 +1,23 @@
+--- AGX-Performance-Simulator/tests/drm_compute.c
++++ experiments/arithmetic/drm_integer_timing.c
+@@ -128,6 +128,9 @@
+     char *end;
+     unsigned long count = strtoul(argv[3], &end, 10); require(*end == 0 && count >= 1 && count <= (1ul << 24), "count");
+     unsigned long reps = strtoul(argv[5], &end, 10); require(*end == 0 && reps >= 1 && reps <= 64, "repeats");
++    unsigned long timing_gap_us = env("AGX_REPEAT_GAP_US", 0);
++    require(timing_gap_us <= 10000, "timing-gap-bound");
++    printf("{\"timing_gap_us\":%lu}\n", timing_gap_us);
+     unsigned long gprs = argc >= 7 ? strtoul(argv[6], &end, 10) : 8;
+     require(gprs >= 8 && gprs <= 256, "gprs");
+ 
+@@ -323,6 +326,10 @@
+         require(r == 0, "syncobj-wait");
+         struct drm_syncobj_array reset = {.handles = (uint64_t)(uintptr_t)&sc.handle, .count_handles = 1};
+         io(DRM_IOCTL_SYNCOBJ_RESET, &reset, "syncobj-reset");
++        if (rep + 1 < reps && timing_gap_us) {
++            struct timespec delay = {.tv_sec = 0, .tv_nsec = timing_gap_us * 1000};
++            while (nanosleep(&delay, &delay) != 0 && errno == EINTR) {}
++        }
+     }
+     if (cw && *cw) {
+         atomic_store(&clock_run, 0); pthread_join(clock_tid, NULL);

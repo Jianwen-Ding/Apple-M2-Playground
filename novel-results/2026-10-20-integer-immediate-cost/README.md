@@ -51,3 +51,8 @@ simulator cost changed; the current model predicts equal cost for both values
 and does not reproduce these variable hardware timing states.
 
 [Evidence and offline verifier](../../results/2026-10-20-integer-immediate-cost/README.md).
+
+The [controlled host-gap follow-up](../2026-10-20-integer-timing-state/README.md)
+finds timing changes within one process using the same objects. Longer host
+delays produce closely matching late medians in that batch, while early
+quarters can still be faster; a fixed allocation effect alone is insufficient.
