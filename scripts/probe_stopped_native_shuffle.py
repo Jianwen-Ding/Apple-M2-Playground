@@ -52,10 +52,10 @@ def build(maximum,rotate,kind,offset):
         p[key]=code;P.cov.gate(code)
     with E.measured_model():
         assert P.cov.simulate(p['control'],32,32,64,0,p['table'])==oracle(p['table'],kind,offset)
-        assert P.cov.simulate(p['code'],32,32,64,0,p['table'])==oracle(p['table'],kind,offset,True)
+        assert P.cov.simulate(p['code'],32,32,64,0,p['table'])==oracle(p['table'],kind,offset,True,True)
     p['expected']=oracle(p['table'],kind,offset);p['data_dir']=DATA
     p['gate']=dict(maximum=maximum,rotate=rotate,kind=kind,offset=offset,stop_pc=p['gate']['stop_pc'],
-                  actual_legacy_hypothesis_exact=True,wait_control_exact=True,index_seeded_all_lanes=True,
+                  actual_measured_model_exact=True,wait_control_exact=True,index_seeded_all_lanes=True,
                   base_builder_sha256=hashlib.sha256(Path(B.__file__).read_bytes()).hexdigest(),
                   builder_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
     return p

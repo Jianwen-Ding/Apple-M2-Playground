@@ -38,3 +38,8 @@ make verify-stopped-native-shuffle
 ```
 
 [Full evidence](../../results/2026-10-20-stopped-native-shuffle/README.md).
+
+The [native-form simulator correction](../../results/2026-10-20-native-shuffle-model/README.md)
+in commit 4dd68e9 now reproduces every original program here. Initial hypotheses,
+readbacks and source bytes remain unchanged. Current builders require complete
+actual-program equality with the measured model before further submission.

@@ -1,44 +1,40 @@
 # Remaining G14C call/return work: agent handoff
 
-Updated 2026-10-17. This is the current plan for the unfinished call/return
-investigation. Read the [hardware finding](../novel-results/2026-10-17-call-ret/README.md)
-and [hang/memory procedure](hang-memory-followup.md) first. Earlier task plans
-and the early sections of the finding retain historical hypotheses, not the
-current target formula or recovery policy.
+Updated 2026-10-20. Use the latest measured rules below. The older A–G sections
+retain useful construction/evidence history, with corrected mask and link rules;
+old hypotheses in evidence records remain unchanged. The owner has authorized
+higher-risk probing with close simulator gates, retained diagnostics and exact
+recovery controls. Continue after a fault only if recovery is established;
+persistent unresponsiveness stops further GPU submission.
 
-2026-10-20 follow-up: [isolated stop probes](../novel-results/2026-10-20-empty-stop/README.md)
-confirm the old stop heuristic in return context and contradict it for masks
-constructed only from conditionals. Partial stops terminate issuing lanes
-while masked lanes resume. `make verify-empty-stop` preserves 17 exact variants,
-including six known simulator counterexamples. A qualified model and the
-additional return state remain open; no simulator semantics were changed.
+Current evidence and integration:
 
-The subsequent [divergent-ret winner matrix](../novel-results/2026-10-20-ret-winner/README.md)
-tests genuine disagreement among active lanes with lane 0 excluded. Every
-first-active lane 1..31 and both target assignments select the lowest active
-lane's target (64 variants / 192 dispatches, no faults). Scattered masks and
-the simulator winner extension remain open; `make verify-ret-winner` retains
-the actual model rejection and checks both landing surrogates separately.
+- Lowest-active call/return target selection holds for suffix and scattered
+  masks, two/three target addresses and both assignments. Register call writes
+  r1 in every issue-active lane **before** operand selection and matching.
+  `call r1` therefore falls through with the issuing mask unchanged.
+  [Call/return model](../results/2026-10-20-control-simulator/README.md).
+- Nonempty return maps low counters **0 -> 2, 1 -> 0, deeper unchanged** through
+  depth 4. Original depth-1 lanes are already active at landing before any pop.
+  Empty-issued return falls through with unchanged counters. Stop terminates
+  issuing lanes and preserves masked survivors; an empty stop is a no-op.
+  [Return/stop integration](../results/2026-10-20-ret-stop-model/README.md).
+- Immediate shuffles directly read initialized low r0 of masked living sources.
+  Stopped sources instead self-fallback and stopped index bits cease to
+  contribute to the source quad's low-index OR. All five native simd shuffle
+  forms have independent paired-index and poisoned-index hardware matrices.
+  [Native shuffle integration](../results/2026-10-20-native-shuffle-model/README.md).
+- Simulator **4dd68e9** replays all **1,595** original control programs exactly.
+  Return/register call still require `AGX_EXPERIMENTAL_RET=buffer-pop2`;
+  default rejection and target checks remain. Both interpreter paths have
+  source-liveness fixtures; 42 library tests pass. Historical source and
+  diagnostic hashes resolve through preserved source-before-model archives.
 
-The [indirect-call follow-up](../novel-results/2026-10-20-call-winner/README.md)
-also selects the lowest active target for every suffix start 0..31. Only
-matching lanes enter, but **r1 is written in every issue-active lane**, including
-nonmatching lanes, as shown by a new post-pop snapshot. This corrects the older
-entry-only inference and exposes a supported-model link-write bug. 74 variants /
-222 dispatches, no faults; `make verify-call-winner`. Scattered masks and
-simulator extensions remain open.
-
-The [scattered-mask matrix](../novel-results/2026-10-20-sparse-control/README.md)
-extends both rules through inactive holes for every first-active position 1..31,
-both address assignments and two seeded masks: 248 variants / 744 dispatches,
-zero faults. Return pop-1 membership follows all inactive holes, while call r1
-writes follow the original active bitmap. `make verify-sparse-control` checks
-the exact sparse-table gates and readbacks. Simulator integration is next.
-
-Later 2026-10-20: [simulator integration](../results/2026-10-20-control-simulator/README.md)
-now replays all 386 measured call/return cases exactly. Current builders require
-full actual-program equality before hardware; original rejected diagnostics and
-source versions remain archived. The six stop counterexamples are still open.
+Next useful control questions: nested divergent composition, deeper counters,
+permanent termination through other mask operations, quad/other cross-lane
+forms and precise timing. Earlier quiet out-of-program return observations
+remain unmodelled; do not rerun invalid targets. New probes must retain actual
+program gates, independent complete-buffer oracles and bounded watchdogs.
 
 ## Established scope and files
 
@@ -50,18 +46,19 @@ Measured with one full 32-lane SIMD group on M2 Max G14C:
   r1 = shader-buffer code offset + call PC + 2.
 - Return consumes a shader-buffer-relative byte address. Leave the code offset
   in the link. The default harness code offset is 0x2000.
-- At the return destination, `pop_exec r0l, 2` reactivates the measured lanes.
-  Two pops of one also work; intervening stores and stops remain masked.
-  This is an effective mask-depth observation, not a general stack model.
+- At the return destination, original issuing lanes need two pops, while
+  original depth-1 lanes are already active and can execute stores or stop.
+  Deeper live counters retain their values through the measured depth 4.
+  A stop ends only lanes active there. This is not a general hardware stack.
 - Two nested direct calls work when the outer link is saved in r29 and restored
   to r1 before the outer return. Timing is not calibrated.
 
 The simulator's measured opt-in is `AGX_EXPERIMENTAL_RET=buffer-pop2`.
 `AGX_EXPERIMENTAL_RET=1` enables a contradicted historical hypothesis and must
-never gate a new hardware probe. The measured model rejects partial active
-returns and partial/divergent register calls. Its empty-mask return fallthrough
-is **not hardware evidence**. Uniform direct calls being accepted under a
-partial mask is also not proof of hardware behavior in that scope.
+never gate a new hardware probe. The measured model supports the documented partial/divergent scope and empty
+issue fallthrough. Hardware evidence, rather than acceptance by the simulator,
+establishes those measured rules. New compositions still need independent
+oracles and direct hardware checks.
 
 Useful files in the playground:
 
@@ -148,11 +145,11 @@ unchanged. Evidence: `ret-r30-vs-r1.json.gz`.
 ### B. Partial masks and return reconvergence — DONE (unified mask-depth rule)
 
 Direct call under a partial mask: odd lanes active, callee stores link +
-marker on odd lanes only. Partial ret: unified rule now measured — ret sets
-r0l = 2 on lanes active at issue and leaves inactive lanes' r0l unchanged;
-every lane transfers to the winning target (no fallthrough ever). Landing
-pop1/M1/pop2/M2 discriminates depth: active lanes skip M1 (need 2 pops),
-dragged lanes store M1 (need 1 pop). A single `pop_exec r0l, 2` reconverges
+marker on odd lanes only. Partial nonempty ret: the later direct reads correct the original inference —
+ret maps `0 -> 2, 1 -> 0, deeper unchanged`, and transfers to the lowest active
+operand. Empty-issued ret falls through unchanged. At landing, original
+issuing lanes skip M1 (need 2 pops), while original depth-1 lanes already run
+before pop 1. A single `pop_exec r0l, 2` reconverges
 all cases. Evidence: `partial-mask-call.json.gz`, `partial-mask-ret*.json.gz`,
 `partial-mask-callret.json.gz`, `ret-depth-*.json.gz`.
 
@@ -169,10 +166,11 @@ three hardware outcomes exactly.
 
 ### D. Two divergent register-call targets — DONE
 
-Measured 2026-10-17: lane 0's target wins (parity, swapped parity, and
-lane-0-alone-vs-31 all agree). Only lanes addressed to lane 0's target enter
-the callee (link set for those lanes only); the rest skip the call and run
-the caller post-call. Both partitions reconverge (CONT2 everywhere).
+Measured 2026-10-17: the lowest active target wins (lane 0 in the original parity/swapped/alone
+patterns, extended to every first-active lane and scattered masks). Only issue-active lanes addressed to the lowest-active target enter the
+callee. Later post-pop reads establish that r1 is written in **every original
+issue-active lane**, including nonmatching ones. Nonmatching lanes travel
+masked and can resume after reconvergence. Both partitions reconverge (CONT2 everywhere).
 Evidence: `divergent-callreg[-swap|-lane0b].json.gz`.
 
 ### E. Divergent return targets — DONE

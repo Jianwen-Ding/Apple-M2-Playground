@@ -45,12 +45,12 @@ def main():
         different=got!=retained;assert a['retained_dead_bits']==(not different);decisive[g['kind']]+=different
         old=expected(p['table'],g['kind'],g['seed'],g['index'],True,True,False)
         with B.E.measured_model():prediction=B.P.cov.simulate(p['code'],32,32,64,0,p['table'])
-        assert prediction==old;gaps[g['kind']]+=prediction!=got
+        assert prediction==got;gaps[g['kind']]+=old!=got
     assert all(n>0 for n in decisive.values()) and all(n>0 for n in gaps.values())
     print('PASS 320 variants / 960 dispatches: four native forms, all low seeds, ten boundary offsets, both alternating stop masks')
     print('PASS stopped index bits excluded; all words/guards/controls exact, zero faults')
     print('PASS decisive index-OR cases by kind:',decisive)
-    print('PASS original simulator counterexamples by kind:',gaps)
+    print('PASS all current model replays exact; original counterexamples by kind:',gaps)
 
 
 if __name__=='__main__':main()

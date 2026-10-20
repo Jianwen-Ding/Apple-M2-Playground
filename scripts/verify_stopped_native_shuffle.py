@@ -37,11 +37,11 @@ def main():
         gap=any(d==1 and p['table'][source(g['kind'],lane,g['offset'])]==0 for lane,d in enumerate(p['table'][:32]))
         assert a['legacy_exact']==(not gap)
         with B.E.measured_model():prediction=B.P.cov.simulate(p['code'],32,32,64,0,p['table'])
-        assert (prediction!=(rec['variant']['out'],rec['variant']['table_after']))==gap
+        assert prediction==(rec['variant']['out'],rec['variant']['table_after'])
         mismatches[g['kind']]+=gap
     print('PASS 160 variants / 480 dispatches: down/up/xor/rotate-up, immediate/register forms, ten boundary offsets, two depths and rotations')
     print('PASS stopped sources self-fallback; living masked sources readable; exact words/guards/controls, zero faults')
-    print('PASS original simulator counterexamples by kind:',mismatches)
+    print('PASS all current model replays exact; original counterexamples by kind:',mismatches)
 
 
 if __name__=='__main__':main()

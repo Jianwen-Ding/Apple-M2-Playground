@@ -225,8 +225,8 @@ scattered masks, and call-r1 write-before-select ordering are now measured.
 Nonempty return maps low counters `0 -> 2, 1 -> 0, deeper unchanged` through
 depth 4; empty-issued return falls through unchanged. Stop ends issuing lanes
 while masked survivors continue. Simulator d90cdcd models these semantics;
-all 1,115 retained original programs replay exactly after shuffle-liveness
-correction bf03118.
+all 1,595 retained original programs replay exactly after native shuffle
+liveness correction 4dd68e9.
 
 [Masked-r0 shuffles](../novel-results/2026-10-20-masked-r0/README.md) directly
 read initialized low counters from masked lanes and corroborate the return
@@ -234,6 +234,12 @@ map. [Stopped-source follow-ups](../novel-results/2026-10-20-dead-index-or/READM
 now distinguish terminated from masked lanes: stopped sources self-fallback
 and their index bits no longer contribute to the quad OR. Their underlying
 register storage remains unobserved. Remaining questions include deeper
-counters, other native shuffle forms,
+counters, quad shuffle and other cross-lane termination effects,
 nested divergent composition and calibrated control-flow costs. The current
 probe boot has zero recorded faults; earlier boot budgets above are historical.
+
+The four relative/xor/rotate native shuffle forms now separately reproduce
+stopped-source fallback and exclusion of stopped low-index bits. Their 480
+programs and 1,440 dispatches completed with exact controls, no faults.
+[Native finding](../novel-results/2026-10-20-native-dead-index-or/README.md),
+[model integration](../results/2026-10-20-native-shuffle-model/README.md).
