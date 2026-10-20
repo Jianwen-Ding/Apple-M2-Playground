@@ -34,10 +34,12 @@ def split_variants(pairs):
     return v
 
 
-def variants(bits):
-    v = [('wait', BS.WAIT), ('6800', bytes([0x68, 0]))]
-    v += [(f'68{1 << b:02x}', bytes([0x68, 1 << b])) for b in bits]
-    v += [('6800-after', bytes([0x68, 0]))]          # control repeated after the sweep: the device still behaves
+def variants(bits, op=0x68, extra=()):
+    base = bytes([op, 0x09 if op == 0x78 else 0])          # 0x78's known form is 7809 (7800 behaves the same)
+    v = [('wait', BS.WAIT), (base.hex(), base)]
+    v += [(f'{op:02x}{1 << b:02x}', bytes([op, 1 << b])) for b in bits]
+    v += [(f'{op:02x}{x:02x}', bytes([op, x])) for x in extra]
+    v += [(base.hex()+'-after', base)]               # control repeated after the sweep: the device still behaves
     return v
 
 
@@ -49,6 +51,11 @@ def main():
     p.add_argument('--total', type=int, default=2048)
     p.add_argument('--timeout', type=int, default=20)
     p.add_argument('--sim-only', action='store_true')
+    p.add_argument('--pre', default='wait+mb', choices=['none', 'wait', 'mb', 'wait+mb'], help='sequence before barrier A (none: the barrier alone must order memory)')
+    p.add_argument('--mem', default='tg', choices=['tg', 'dev'])
+    p.add_argument('--repeats', type=int, default=1)
+    p.add_argument('--op', default='0x68', help='0x68 or 0x78')
+    p.add_argument('--extra', default='', help='extra byte-1 values (comma separated), e.g. 0xff')
     p.add_argument('--split', default=None, help='comma-separated byte-1 values: groups 4-7 use 68XX, groups 0-3 6800 (barrier-ID test)')
     p.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/drm-compute/barrier-bits'))
     p.add_argument('--result', type=Path)
@@ -57,14 +64,23 @@ def main():
     sys.path.insert(0, '/save/workspace/AGX-Performance-Simulator/scripts')
     import coverage as cov
     jobs = []
-    vs = split_variants([int(x, 0) for x in a.split.split(',')]) if a.split else variants(bits)
+    op = int(a.op, 0); assert op in (0x68, 0x78)
+    extra = [int(x, 0) for x in a.extra.split(',') if x]
+    vs = split_variants([int(x, 0) for x in a.split.split(',')]) if a.split else variants(bits, op, extra)
     for name, enc_bar in vs:
-        BS.BARRIERS[name] = enc_bar
-        body = BS.body('tg', name, 'wait+mb' if name != 'wait' else 'none', a.size, a.trips, a.total)
+        # 0x78 with an unknown byte 1: pad with five 2-byte waits so a longer-than-2-byte decoding swallows padding, not code
+        pad78 = op == 0x78 and name not in ('wait',) and enc_bar[:1] == b'\x78'
+        BS.BARRIERS[name] = enc_bar + (BS.WAIT*5 if pad78 else b'')
+        body = BS.body(a.mem, name, a.pre if name != 'wait' else 'none', a.size, a.trips, a.total)
         code = drm.build_main(body)
         # simulator layout / termination check (one workgroup); the bits themselves are not modelled
+        sim_code = code
+        if pad78 and enc_bar != bytes([0x78, 0x09]):          # the simulator only decodes 7809: gate the identical layout with 7809
+            BS.BARRIERS[name+'-gate'] = bytes([0x78, 0x09]) + BS.WAIT*5
+            sim_code = drm.build_main(BS.body(a.mem, name+'-gate', a.pre, a.size, a.trips, a.total))
+            assert len(sim_code) == len(code)
         try:
-            o, t = cov.simulate(code, a.size, a.size, BS.GPRS, BS.SHARED_32K, [BS.SENT]*(2*a.total))
+            o, t = cov.simulate(sim_code, a.size, a.size, BS.GPRS, BS.SHARED_32K, [BS.SENT]*((8*a.total if a.mem == 'dev' else 0)+2*a.total))
             sim = 'ok'
         except Exception as e:                                # an undecodable gap bit is reported, not fatal
             sim = f'simulator: {type(e).__name__}: {str(e)[:120]}'
@@ -77,24 +93,27 @@ def main():
     out = a.output; out.mkdir(parents=True, exist_ok=True)
     exe = out/'drm_compute'
     subprocess.run(['cc', '-std=c11', '-O2', str(REPO/'tests/drm_compute.c'), '-o', str(exe)], check=True)
-    words = 2*a.total
-    rec = {'size': a.size, 'trips': a.trips, 'total': a.total, 'results': []}
+    words = (8*a.total if a.mem == 'dev' else 0)+2*a.total
+    base = 8*a.total if a.mem == 'dev' else 0
+    rec = {'size': a.size, 'trips': a.trips, 'total': a.total, 'pre': a.pre, 'mem': a.mem, 'repeats': a.repeats, 'op': a.op, 'results': []}
     save = lambda: a.result and a.result.write_text(json.dumps(rec)+'\n')
     for jb in jobs:
         gpu_safety.require_budget(1)
         (out/'code.bin').write_bytes(jb['code']+bytes(16))
         (out/'table.bin').write_bytes(struct.pack('<I', BS.SENT)*words)
-        env = dict(os.environ, AGX_LOCAL_X=str(a.size), AGX_SHARED_WORD=str(BS.SHARED_32K), AGX_TABLE_OUT=str(out/'table.out'))
+        env = dict(os.environ, AGX_LOCAL_X=str(a.size), AGX_TABLE_OUT=str(out/'table.out'))
+        if a.mem == 'tg':
+            env['AGX_SHARED_WORD'] = str(BS.SHARED_32K)
         r = {'name': jb['name'], 'sim': jb['sim']}
         try:
-            res = subprocess.run([str(exe), '/dev/dri/renderD128', str(out/'code.bin'), str(a.total), str(out/'rb'), '1', str(BS.GPRS), str(out/'table.bin')],
+            res = subprocess.run([str(exe), '/dev/dri/renderD128', str(out/'code.bin'), str(a.total), str(out/'rb'), str(a.repeats), str(BS.GPRS), str(out/'table.bin')],
                                  capture_output=True, timeout=a.timeout, env=env)
             smp = [json.loads(l) for l in res.stdout.decode(errors='replace').splitlines() if l.startswith('{"rep"')]
-            ok = res.returncode == 0 and len(smp) == 1 and all(smp[0]['fw_ts'])
-            r['fw_ms'] = (smp[0]['fw_ts'][1]-smp[0]['fw_ts'][0])/1e6 if ok else None
+            ok = res.returncode == 0 and len(smp) == a.repeats and all(all(x['fw_ts']) for x in smp)
+            r['fw_ms'] = (smp[-1]['fw_ts'][1]-smp[-1]['fw_ts'][0])/1e6 if ok else None
             if ok:
                 t = struct.unpack(f'<{words}I', (out/'table.out').read_bytes())
-                cnt = t[:a.total]
+                cnt = t[base:base+a.total]     # counts are from the last submission (the table persists across repeats)
                 r['mismatches'] = sum(cnt); r['lanes_with_errors'] = sum(c > 0 for c in cnt)
                 n = a.size
                 r['err_lanes_by_group'] = [sum(1 for i, c in enumerate(cnt) if c and (i % n)//32 == g) for g in range(n//32)]
