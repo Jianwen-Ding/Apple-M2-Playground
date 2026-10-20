@@ -18,3 +18,7 @@ Notes for Jianwen-Ding/ZLUDA (`master` after PR #1). Nothing here has been pushe
 4. **Uniform words can carry 64 halves, not 32** (`agx_runtime/src/lib.rs` `UNIFORM_WORD_HALVES = 32`), and halves
    256..511 need the 0x3d "Uniform high" tag (`usc_words` asserts start < 256). Measured on the M2 Max:
    `results/2026-10-20-b9-uniform-preload` (the full 512-half file works).
+5. **Faulting kernels report success.** Instruction faults (undecoded opcode, jump into unmapped USC space) complete
+   with sync-file status 1; only the command timestamps stay 0. `agx_runtime` should zero the timestamp slots before
+   each submit and turn "fence ok but start == end == 0" into `CUDA_ERROR_LAUNCH_FAILED`
+   (`results/2026-10-20-b20-failed-jobs`). Out-of-bounds stores are silently dropped (soft faults).

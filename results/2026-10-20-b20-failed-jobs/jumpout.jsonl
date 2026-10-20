@@ -1,0 +1,7 @@
+{"mode":"jumpout","features":1}
+{"step":"control_before","ok":true,"fw_ticks":7667,"host_ms":0.49,"output_ok":true}
+{"step":"fault","ok":true,"fw_ticks":0,"host_ms":0.98}
+{"step":"control_same_queue","ok":true,"fw_ticks":7542,"host_ms":0.12,"output_ok":true}
+{"step":"control_new_queue_same_vm","ok":true,"fw_ticks":5875,"host_ms":0.34,"output_ok":true}
+{"step":"control_new_vm","ok":true,"fw_ticks":7583,"host_ms":0.50,"output_ok":true}
+{"step":"back_to_back","fault_fence":"ok","control_fence":"ok","control_output_ok":true}

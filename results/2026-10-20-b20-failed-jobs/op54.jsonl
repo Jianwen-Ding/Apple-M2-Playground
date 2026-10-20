@@ -1,0 +1,7 @@
+{"mode":"op54","features":1}
+{"step":"control_before","ok":true,"fw_ticks":7709,"host_ms":0.50,"output_ok":true}
+{"step":"fault","ok":true,"fw_ticks":0,"host_ms":1.01}
+{"step":"control_same_queue","ok":true,"fw_ticks":8000,"host_ms":0.51,"output_ok":true}
+{"step":"control_new_queue_same_vm","ok":true,"fw_ticks":6042,"host_ms":0.16,"output_ok":true}
+{"step":"control_new_vm","ok":true,"fw_ticks":7500,"host_ms":0.51,"output_ok":true}
+{"step":"back_to_back","fault_fence":"ok","control_fence":"ok","control_output_ok":true}
