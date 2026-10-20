@@ -42,5 +42,10 @@ print('  us per dependent sqrt (clock held, 131,072 lanes):', {k: round(v/1000, 
 check('cost runs exact on checked lanes; exact sequence <= 2x Mesa; hybrid 3-8x; soft 60-150x',
       all(all(r['bad'] in (0, None) for r in rec['cost/'+k]['runs']) for k in ('one-k256', 'one-k512', 'hybrid-k16', 'hybrid-k32', 'soft-k16', 'soft-k32')) and
       sl['one']/sl['mesa'] <= 2 and 3 <= sl['hybrid']/sl['mesa'] <= 8 and 60 <= sl['soft']/sl['mesa'] <= 150)
+lm = lambda k: st.median(r['fw_ns'] for r in rec['layout/'+k]['runs'])
+L = {k: (lm(f'{k}-k64')-lm(f'{k}-k32'))/32 for k in ('hybrid', 'hybrid3', 'one')}
+print('  layout, us per sqrt:', {k: round(v/1000, 3) for k, v in L.items()})
+check('out-of-line sqrt hybrid3: bit-exact on all 16,777,216 sweep inputs on hardware and >= 1.6x faster than the if-skip hybrid',
+      rec['hw-hybrid3-sweep']['inputs'] == 1 << 24 and rec['hw-hybrid3-sweep']['wrong'] == 0 and L['hybrid']/L['hybrid3'] >= 1.6)
 print(f'{sum(ok)}/{len(ok)} fsqrt32 checks passed')
 sys.exit(0 if all(ok) else 1)

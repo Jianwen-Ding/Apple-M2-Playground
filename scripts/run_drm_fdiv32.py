@@ -56,25 +56,29 @@ def program(op, mode):
     chk, loc, u2 = S.emit(P, {'a': 8, 'b': 9}, [ok], first=16)
     soft, u3 = soft_lines('rn', 16)
     L = chk + [f'iadd r15, r{loc[ok.id]}, 0'] + FAST + zl
+    if op == 'hybrid3':                         # out-of-line soft path: the common case falls through an untaken jump
+        L += ['if_icmp r0l, ueq, r15, 0, 1', ('JANY', 'ool'), ('LABEL', 'ret'), 'pop_exec r0l, 1']
+        return L, max(u1, u2, u3), [('LABEL', 'ool')] + soft + [('JANY', 'ret')]
     L += ['if_icmp r0l, ueq, r15, 0, 1', ('JMP', soft), 'pop_exec r0l, 1']
     return L, max(u1, u2, u3)
 
 
 def build(op, n, mode, chain=1):
-    one, used = program(op, mode)
-    lines = []
-    for _ in range(chain):                     # x = x / b: the quotient (r13) becomes the next numerator (r8)
-        lines += one + ['iadd r8, r13, 0']
+    import agx_asm
+    pr = program(op, mode)
+    one, used = pr[0], pr[1]
+    lines, ool = [], []
+    for i in range(chain):                     # x = x / b: the quotient (r13) becomes the next numerator (r8)
+        rn = lambda l: (l[0], f'{l[1]}{i}') if isinstance(l, tuple) and l[0] in ('LABEL', 'JANY') else l
+        lines += [rn(l) for l in one] + ['iadd r8, r13, 0']
+        if len(pr) > 2:
+            ool += [rn(l) for l in pr[2]]
+    if ool:
+        lines += [('JANY', 'tail')] + ool + [('LABEL', 'tail')]
     e = agx_loop.encode; mov = chains.mov_imm
-    ins = [load(8, 1, True), mov(6, n), e('iadd r7, r1, r6'), load(9, 7, True), e('wait 0')]
-    for l in lines:
-        if isinstance(l, tuple):
-            then = b''.join(e(x) for x in l[1])
-            ins += [e(f'jmp_exec_none pc+{6+len(then)}', f'jmp_exec_none pc+{6+len(then)}'), then]
-        else:
-            ins.append(e(l))
+    ins = [load(8, 1, True), mov(6, n), e('iadd r7, r1, r6'), load(9, 7, True), e('wait 0'), agx_asm.assemble(lines)]
     ins += [mov(6, 2*n), e('iadd r7, r1, r6'), agx_loop.store(13, 8, 7), e('wait 0'), mov(2, 0)]
-    ninstr = sum(len(l[1])+1 if isinstance(l, tuple) else 1 for l in lines)
+    ninstr = agx_asm.count(lines)
     return b''.join(ins), ninstr, used
 
 
@@ -111,7 +115,7 @@ def dataset(kind, n=0, seed=4):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=['offline', 'hardware'])
-    p.add_argument('--op', default='hybrid', choices=['soft', 'fast', 'hybrid', 'mesa'])
+    p.add_argument('--op', default='hybrid', choices=['soft', 'fast', 'hybrid', 'hybrid3', 'mesa'])
     p.add_argument('--round', default='rn', choices=['rn', 'rz', 'rm', 'rp'])
     p.add_argument('--data', default='edge', choices=['edge', 'fast', 'normal', 'sparse'])
     p.add_argument('--lanes', type=int, default=131072)

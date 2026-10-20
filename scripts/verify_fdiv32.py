@@ -87,5 +87,10 @@ print('  us per dependent division (clock held, 131,072 lanes):', {k: round(v/10
 check('every cost run exact on its checked lanes (fast/hybrid/soft)', all(all(r['bad'] == 0 for r in v['runs']) for k, v in cost.items() if '/mesa' not in k))
 check('cost order mesa < fast < hybrid < soft < hybrid-sparse; hybrid 8-16x mesa; soft 50-110x mesa',
       s['mesa'] < s['fast'] < s['hybrid'] < s['soft'] < s['hybrid-sparse'] and 8 <= s['hybrid']/s['mesa'] <= 16 and 50 <= s['soft']/s['mesa'] <= 110)
+lm = lambda k: st.median(x['fw_ns'] for x in cost['layout/'+k]['runs'])
+h, h3 = (lm('hybrid-normal-k64')-lm('hybrid-normal-k32'))/32, (lm('hybrid3-normal-k64')-lm('hybrid3-normal-k32'))/32
+print('  layout: if-skip hybrid %.2f us, out-of-line hybrid3 %.2f us per division' % (h/1000, h3/1000))
+check('out-of-line slow path: div hybrid3 bit-exact on the edge set (hardware) and >= 1.15x faster than the if-skip hybrid; exact under sparse subnormals',
+      ex['hw-hybrid3-edge']['out'] == ref_e['rn'] and h/h3 >= 1.15 and all(all(x['bad'] == 0 for x in cost[f'layout/hybrid3-sparse-k{K}']['runs']) for K in (16, 32)))
 print(f'{sum(ok)}/{len(ok)} fdiv32 checks passed')
 sys.exit(0 if all(ok) else 1)

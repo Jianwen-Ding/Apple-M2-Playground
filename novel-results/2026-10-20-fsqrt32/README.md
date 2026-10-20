@@ -36,6 +36,12 @@ integer-`isqrt` reference.
 | hybrid (range check + `if` around the soft path) | 0.84 | 5.3 |
 | soft alone | 16.1 | ≈ 100 |
 
+## Out-of-line slow path (follow-up)
+
+With the soft sqrt moved behind an untaken `jmp_exec_any` ([layout rule](../2026-10-20-fp32-ieee/README.md)), the exact
+sqrt costs **0.64 µs per step against 1.43 µs for the if-skip hybrid (2.2×)** and 0.25 µs for the bare 5-op sequence.
+It is bit-exact on all 16,777,216 sweep inputs on hardware.
+
 ## Compiler implications (ZLUDA)
 
 - `sqrt.rn.f32`: use the 5-op sequence wherever the input is known to be ≥ 2^-79 or the kernel is `.ftz`. Otherwise use

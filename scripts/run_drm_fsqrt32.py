@@ -41,6 +41,9 @@ def program(seq):
         return soft
     P = S.Prog(); a = P.input('a'); ok = S.sqrt_fast_ok(P, a)
     chk, loc, _ = S.emit(P, {'a': 8}, [ok], first=16)
+    if seq == 'hybrid3':
+        return (chk + [f'iadd r11, r{loc[ok.id]}, 0'] + SEQ['one'] + ['if_icmp r0l, ueq, r11, 0, 1', ('JANY', 'ool'), ('LABEL', 'ret'), 'pop_exec r0l, 1'],
+                [('LABEL', 'ool')] + soft + [('JANY', 'ret')])
     return chk + [f'iadd r11, r{loc[ok.id]}, 0'] + SEQ['one'] + ['if_icmp r0l, ueq, r11, 0, 1', ('JMP', soft), 'pop_exec r0l, 1']
 
 
@@ -83,14 +86,18 @@ def sweep_inputs(chunk):
 
 
 def build(seq, n, chain=1):
+    import agx_asm
     e = agx_loop.encode; mov = chains.mov_imm
-    ins = [load(8, 1, True), e('wait 0')]
-    for l in (program(seq) + ['iadd r8, r13, 0'])*chain:
-        if isinstance(l, tuple):
-            then = b''.join(e(x) for x in l[1])
-            ins += [e(f'jmp_exec_none pc+{6+len(then)}', f'jmp_exec_none pc+{6+len(then)}'), then]
-        else:
-            ins.append(e(l))
+    pr = program(seq)
+    one, extra = (pr if isinstance(pr, tuple) else (pr, []))
+    lines, ool = [], []
+    for i in range(chain):
+        rn = lambda l: (l[0], f'{l[1]}{i}') if isinstance(l, tuple) and l[0] in ('LABEL', 'JANY') else l
+        lines += [rn(l) for l in one] + ['iadd r8, r13, 0']
+        ool += [rn(l) for l in extra]
+    if ool:
+        lines += [('JANY', 'tail')] + ool + [('LABEL', 'tail')]
+    ins = [load(8, 1, True), e('wait 0'), agx_asm.assemble(lines)]
     ins += [mov(6, n), e('iadd r7, r1, r6'), agx_loop.store(13, 8, 7), e('wait 0'), mov(2, 0)]
     return b''.join(ins)
 
@@ -110,7 +117,7 @@ def exact(xbits):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('mode', choices=['offline', 'hardware'])
-    p.add_argument('--seq', default='coupled', choices=sorted(SEQ)+['soft', 'hybrid'])
+    p.add_argument('--seq', default='coupled', choices=sorted(SEQ)+['soft', 'hybrid', 'hybrid3'])
     p.add_argument('--data', default='binades', choices=['binades', 'sweep'], help='binades: every input in [1, 4); sweep: all 256 exponents x 65,536 mantissas')
     p.add_argument('--chunks', type=int, default=16)
     p.add_argument('--output', type=Path, default=Path('/scratch/apple-m2-playground/drm-compute/fsqrt32'))
@@ -118,7 +125,7 @@ def main():
     p.add_argument('--chain', type=int, default=0, help='cost mode: x = sqrt(x) chained K times over 131,072 lanes of x in [1, 4); output = timings only')
     p.add_argument('--repeats', type=int, default=5)
     a = p.parse_args()
-    rec = {'seq': a.seq, 'data': a.data, 'instructions': sum(len(l[1])+1 if isinstance(l, tuple) else 1 for l in program(a.seq)), 'by_exponent': {}, 'inputs': 0, 'wrong': 0, 'ulp_hist': {}, 'first_wrong': [], 'chunks': []}
+    rec = {'seq': a.seq, 'data': a.data, 'instructions': None, 'by_exponent': {}, 'inputs': 0, 'wrong': 0, 'ulp_hist': {}, 'first_wrong': [], 'chunks': []}
 
     def tally(xs, outs):
         for x, g in zip(xs, outs):

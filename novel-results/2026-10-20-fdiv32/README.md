@@ -58,6 +58,12 @@ the GPU (`scripts/run_drm_frcp32.py --data binade`). It is also exact on **16,51
 derived from the simulator's table, which independently confirms that table. Out-of-range inputs use the division hybrid
 with a = 1.
 
+## Out-of-line slow path (follow-up)
+
+With the [layout rule from the fma finding](../2026-10-20-fp32-ieee/README.md) applied (soft divider behind an untaken
+`jmp_exec_any`), the exact division runs at **1.39 µs per step against 1.76 µs for the if-skip hybrid (1.27×)**, clock
+held, K = 32 → 64. It is bit-exact on the 22,912-lane edge set on hardware and under one subnormal numerator per group.
+
 ## Compiler implications (ZLUDA)
 
 - `div.approx.f32` / `div.full.f32` (and `__fdividef`): Mesa's `a * rcp(b)` measured ≤ 1.82 ulp in range. Subnormal and
