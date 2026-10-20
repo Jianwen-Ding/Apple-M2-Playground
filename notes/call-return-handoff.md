@@ -95,6 +95,17 @@ forms and precise timing. Earlier quiet out-of-program return observations
 remain unmodelled; do not rerun invalid targets. New probes must retain actual
 program gates, independent complete-buffer oracles and bounded watchdogs.
 
+Current overflow follow-up: [one first-shuffle mismatch](../results/2026-10-20-push-overflow/README.md)
+after 0xffff plus push1. Lane 12 stores 0x40 where source-0 counter zero was
+predicted; every later word matches. Three programs / nine dispatches, exact
+controls, zero faults/hangs, clean recovery. Do not treat this as an explained
+overflow or timing rule yet; original evidence and source hashes are retained.
+
+Owner follow-up, deferred at their request: later inspect performance-simulator
+pull requests from other branches for requested behavior/support, and implement
+feasible requests with appropriate evidence and verification. Continue the
+current probe investigation before that PR review.
+
 ## Established scope and files
 
 Measured with one full 32-lane SIMD group on M2 Max G14C:
