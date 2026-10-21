@@ -1,0 +1,5 @@
+{"gap": 0, "runs": 200, "all_zero": 3, "other_wrong": 0}
+{"gap": 1, "runs": 200, "all_zero": 0, "other_wrong": 0}
+{"gap": 2, "runs": 200, "all_zero": 2, "other_wrong": 0}
+{"gap": 4, "runs": 200, "all_zero": 3, "other_wrong": 0}
+{"gap": 8, "runs": 200, "all_zero": 0, "other_wrong": 0}
