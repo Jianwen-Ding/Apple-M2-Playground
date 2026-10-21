@@ -1,0 +1,4 @@
+{"layout":"vms","case":"none","a":null,"b_correct":20,"b_wait_errors":0,"b_first_us":Some((317, 324)),"b_last_us":Some((885, 892)),"done_after_us":982}
+{"layout":"vms","case":"op54","a":{"wait":Ok(()),"ts_us":[0,0]},"b_correct":20,"b_wait_errors":0,"b_first_us":Some((1118, 1125)),"b_last_us":Some((1597, 1603)),"done_after_us":1739}
+{"layout":"vms","case":"deadlock","a":{"wait":Ok(()),"ts_us":[0,0]},"b_correct":20,"b_wait_errors":0,"b_first_us":Some((483, 490)),"b_last_us":Some((940, 946)),"done_after_us":502980}
+{"layout":"vms","case":"none","a":null,"b_correct":20,"b_wait_errors":0,"b_first_us":Some((219, 223)),"b_last_us":Some((919, 922)),"done_after_us":964}
