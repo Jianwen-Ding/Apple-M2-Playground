@@ -1,0 +1,188 @@
+diff --git a/llvm_zluda/src/compile_agx.rs b/llvm_zluda/src/compile_agx.rs
+index e5ae689..6d12dd1 100644
+--- a/llvm_zluda/src/compile_agx.rs
++++ b/llvm_zluda/src/compile_agx.rs
+@@ -326,7 +326,7 @@ fn init_globals() -> Result<(), String> {
+     INIT_AGX
+         .get_or_init(|| {
+             let options = [c"llvm_zluda"];
+-            let ptrs: Vec<*const i8> = options.iter().map(|s| s.as_ptr()).collect();
++            let ptrs: Vec<*const std::ffi::c_char> = options.iter().map(|s| s.as_ptr()).collect();
+             let mut err_msg = std::ptr::null_mut();
+             let success = unsafe {
+                 LLVMZludaParseCommandLineOptions(ptrs.len() as i32, ptrs.as_ptr(), &mut err_msg)
+diff --git a/llvm_zluda/src/ffi.rs b/llvm_zluda/src/ffi.rs
+index b2125cc..f03f186 100644
+--- a/llvm_zluda/src/ffi.rs
++++ b/llvm_zluda/src/ffi.rs
+@@ -46,7 +46,7 @@ extern "C" {
+         B: LLVMBuilderRef,
+         Ty: LLVMTypeRef,
+         AddrSpace: u32,
+-        Name: *const i8,
++        Name: *const std::ffi::c_char,
+     ) -> LLVMValueRef;
+ 
+     pub fn LLVMZludaBuildArrayAlloca(
+@@ -55,7 +55,7 @@ extern "C" {
+         AddrSpace: u32,
+         ArraySize: LLVMValueRef,
+         Align: u32,
+-        Name: *const i8,
++        Name: *const std::ffi::c_char,
+     ) -> LLVMValueRef;
+ 
+     pub fn LLVMZludaBuildAtomicRMW(
+@@ -63,7 +63,7 @@ extern "C" {
+         op: LLVMZludaAtomicRMWBinOp,
+         PTR: LLVMValueRef,
+         Val: LLVMValueRef,
+-        scope: *const i8,
++        scope: *const std::ffi::c_char,
+         ordering: LLVMAtomicOrdering,
+     ) -> LLVMValueRef;
+ 
+@@ -72,7 +72,7 @@ extern "C" {
+         Ptr: LLVMValueRef,
+         Cmp: LLVMValueRef,
+         New: LLVMValueRef,
+-        scope: *const i8,
++        scope: *const std::ffi::c_char,
+         SuccessOrdering: LLVMAtomicOrdering,
+         FailureOrdering: LLVMAtomicOrdering,
+     ) -> LLVMValueRef;
+@@ -82,28 +82,28 @@ extern "C" {
+     pub fn LLVMZludaBuildFence(
+         B: LLVMBuilderRef,
+         ordering: LLVMAtomicOrdering,
+-        scope: *const i8,
+-        Name: *const i8,
++        scope: *const std::ffi::c_char,
++        Name: *const std::ffi::c_char,
+     ) -> LLVMValueRef;
+ 
+     pub fn LLVMZludaSetAtomic(
+         AtomicInst: LLVMValueRef,
+         Ordering: LLVMAtomicOrdering,
+-        SSID: *const i8,
++        SSID: *const std::ffi::c_char,
+     );
+ 
+     #[cfg(feature = "amdgpu")]
+     pub fn LLVMZludaLinkWithLLD(
+         inputs: u32,
+-        input_paths: *const *const i8,
+-        output_path: *const i8,
+-        error_message: *mut *mut i8,
++        input_paths: *const *const std::ffi::c_char,
++        output_path: *const std::ffi::c_char,
++        error_message: *mut *mut std::ffi::c_char,
+     ) -> i32;
+ 
+     pub fn LLVMZludaParseCommandLineOptions(
+         argc: i32,
+-        argv: *const *const i8,
+-        error_message: *mut *mut i8,
++        argv: *const *const std::ffi::c_char,
++        error_message: *mut *mut std::ffi::c_char,
+     ) -> bool;
+ 
+     pub fn LLVMZludaUpgradeFunctionAttributes(module: LLVMModuleRef);
+@@ -114,7 +114,7 @@ extern "C" {
+ 
+     pub fn LLVMZludaAgxKeepGlobals(module: LLVMModuleRef);
+ 
+-    pub fn LLVMZludaAgxLowerClusters(module: LLVMModuleRef, error: *mut *mut i8) -> i32;
++    pub fn LLVMZludaAgxLowerClusters(module: LLVMModuleRef, error: *mut *mut std::ffi::c_char) -> i32;
+ }
+ 
+ // The AGX target is not part of upstream LLVM, so llvm-sys has no bindings
+diff --git a/llvm_zluda/src/utils.rs b/llvm_zluda/src/utils.rs
+index 72c4fa9..7469af8 100644
+--- a/llvm_zluda/src/utils.rs
++++ b/llvm_zluda/src/utils.rs
+@@ -51,7 +51,7 @@ impl Module {
+     }
+ 
+     pub fn try_from_bitcode(ctx: &Context, bitcode: &[u8], name: Option<&CStr>) -> Option<Self> {
+-        let bitcode: Vec<i8> = bitcode.iter().map(|&v| i8::from_ne_bytes([v])).collect();
++        let bitcode: Vec<std::ffi::c_char> = bitcode.iter().map(|&v| v as std::ffi::c_char).collect();
+         let memory_buffer: LLVMMemoryBufferRef = unsafe {
+             LLVMCreateMemoryBufferWithMemoryRangeCopy(
+                 bitcode.as_ptr(),
+diff --git a/ptx/src/pass/llvm/emit.rs b/ptx/src/pass/llvm/emit.rs
+index ed1c4f9..f4a710f 100644
+--- a/ptx/src/pass/llvm/emit.rs
++++ b/ptx/src/pass/llvm/emit.rs
+@@ -4978,7 +4978,7 @@ impl<'a> MethodEmitContext<'a> {
+                 LLVMBuilderRef,
+                 LLVMValueRef,
+                 LLVMValueRef,
+-                *const i8,
++                *const std::ffi::c_char,
+             ) -> LLVMValueRef,
+         ) = match data.kind {
+             ptx_parser::RightShiftKind::Logical => {
+@@ -5030,7 +5030,7 @@ impl<'a> MethodEmitContext<'a> {
+             LLVMBuilderRef,
+             LLVMValueRef,
+             LLVMValueRef,
+-            *const i8,
++            *const std::ffi::c_char,
+         ) -> LLVMValueRef,
+     ) -> Result<(), TranslateError> {
+         let src1 = self.resolver.value(src1)?;
+@@ -5599,7 +5599,7 @@ impl<'a> MethodEmitContext<'a> {
+                 unsafe { LLVMBuildShl(self.builder, res_hi, shift_number, LLVM_UNNAMED.as_ptr()) };
+ 
+             self.resolver
+-                .with_result(arguments.dst, |dst: *const i8| unsafe {
++                .with_result(arguments.dst, |dst: *const std::ffi::c_char| unsafe {
+                     LLVMBuildOr(self.builder, res_lo_shr, res_hi_shl, dst)
+                 });
+         }
+@@ -8160,7 +8160,7 @@ fn get_pointer_type<'ctx>(
+ }
+ 
+ // https://llvm.org/docs/AMDGPUUsage.html#memory-scopes
+-fn get_scope(scope: ast::MemScope) -> Result<*const i8, TranslateError> {
++fn get_scope(scope: ast::MemScope) -> Result<*const std::ffi::c_char, TranslateError> {
+     Ok(match scope {
+         ast::MemScope::Cta => c"workgroup-one-as",
+         ast::MemScope::Gpu => c"agent-one-as",
+@@ -8170,7 +8170,7 @@ fn get_scope(scope: ast::MemScope) -> Result<*const i8, TranslateError> {
+     .as_ptr())
+ }
+ 
+-fn get_scope_membar(scope: ast::MemScope) -> Result<*const i8, TranslateError> {
++fn get_scope_membar(scope: ast::MemScope) -> Result<*const std::ffi::c_char, TranslateError> {
+     Ok(match scope {
+         ast::MemScope::Cta => c"workgroup",
+         ast::MemScope::Gpu => c"agent",
+@@ -8416,7 +8416,7 @@ impl ResolveIdent {
+         self.get_or_ad_impl(word, |x| x)
+     }
+ 
+-    fn get_or_add_raw(&mut self, word: SpirvWord) -> *const i8 {
++    fn get_or_add_raw(&mut self, word: SpirvWord) -> *const std::ffi::c_char {
+         self.get_or_add(word).as_ptr().cast()
+     }
+ 
+@@ -8434,7 +8434,7 @@ impl ResolveIdent {
+     fn with_result(
+         &mut self,
+         word: SpirvWord,
+-        fn_: impl FnOnce(*const i8) -> LLVMValueRef,
++        fn_: impl FnOnce(*const std::ffi::c_char) -> LLVMValueRef,
+     ) -> LLVMValueRef {
+         let t = self.get_or_ad_impl(word, |dst| fn_(dst.as_ptr().cast()));
+         self.register(word, t);
+@@ -8444,7 +8444,7 @@ impl ResolveIdent {
+     fn with_result_option(
+         &mut self,
+         word: Option<SpirvWord>,
+-        fn_: impl FnOnce(*const i8) -> LLVMValueRef,
++        fn_: impl FnOnce(*const std::ffi::c_char) -> LLVMValueRef,
+     ) -> LLVMValueRef {
+         match word {
+             Some(word) => self.with_result(word, fn_),

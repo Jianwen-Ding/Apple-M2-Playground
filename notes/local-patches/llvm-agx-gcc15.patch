@@ -1,0 +1,49 @@
+diff --git a/llvm/lib/Target/AGX/AGXISelLowering.cpp b/llvm/lib/Target/AGX/AGXISelLowering.cpp
+index 7e31fdc9d..fa888b56f 100644
+--- a/llvm/lib/Target/AGX/AGXISelLowering.cpp
++++ b/llvm/lib/Target/AGX/AGXISelLowering.cpp
+@@ -20,6 +20,8 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "AGXISelLowering.h"
++#include "llvm/IR/IRBuilder.h"
++#include <cmath>
+ #include "AGX.h"
+ #include "AGXMachineFunctionInfo.h"
+ #include "AGXRegisterInfo.h"
+diff --git a/llvm/lib/Target/AGX/AGXStrictFP.cpp b/llvm/lib/Target/AGX/AGXStrictFP.cpp
+index eb6945980..b98929a18 100644
+--- a/llvm/lib/Target/AGX/AGXStrictFP.cpp
++++ b/llvm/lib/Target/AGX/AGXStrictFP.cpp
+@@ -33,6 +33,7 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
++#include <cmath>
+ #include "AGX.h"
+ #include "AGXSoftF64.h"
+ #include "AGXSubtarget.h"
+diff --git a/llvm/lib/Target/AGX/MCTargetDesc/AGXInstPrinter.cpp b/llvm/lib/Target/AGX/MCTargetDesc/AGXInstPrinter.cpp
+index bbc1a4ed2..e742fa9c3 100644
+--- a/llvm/lib/Target/AGX/MCTargetDesc/AGXInstPrinter.cpp
++++ b/llvm/lib/Target/AGX/MCTargetDesc/AGXInstPrinter.cpp
+@@ -15,6 +15,7 @@
+ 
+ #include "AGXInstPrinter.h"
+ #include "MCTargetDesc/AGXMCTargetDesc.h"
++#include "llvm/ADT/StringExtras.h"
+ #include "llvm/ADT/bit.h"
+ #include "llvm/MC/MCAsmInfo.h"
+ #include "llvm/MC/MCExpr.h"
+diff --git a/mlir/lib/Dialect/AGX/Utils/ChipInfo.cpp b/mlir/lib/Dialect/AGX/Utils/ChipInfo.cpp
+index 2e95e3194..75eca1a19 100644
+--- a/mlir/lib/Dialect/AGX/Utils/ChipInfo.cpp
++++ b/mlir/lib/Dialect/AGX/Utils/ChipInfo.cpp
+@@ -7,6 +7,7 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "mlir/Dialect/AGX/Utils/ChipInfo.h"
++#include "llvm/ADT/SmallVector.h"
+ 
+ using namespace mlir;
+ using namespace mlir::agx;
