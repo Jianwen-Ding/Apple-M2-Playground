@@ -1,0 +1,50 @@
+{
+ "rcp": {
+  "inputs": 8388608,
+  "max_ulp": 0.7496,
+  "max_ulp_input": "3fdfa046",
+  "max_ulp_result": "3f1287c4",
+  "max_rel": 8.923872485411266e-08,
+  "max_rel_log2": -23.418,
+  "max_rel_input": "3fffe6b2",
+  "not_correctly_rounded": 1619725,
+  "delta_vs_correctly_rounded": {
+   "-1": 19587,
+   "0": 6768883,
+   "1": 1600138
+  },
+  "within_2^-19.7_rel": true
+ },
+ "rsqrt": {
+  "inputs": 16777216,
+  "max_ulp": 0.8177,
+  "max_ulp_input": "3f89f038",
+  "max_ulp_result": "3f769af5",
+  "max_rel": 8.94215230764187e-08,
+  "max_rel_log2": -23.415,
+  "max_rel_input": "407fe000",
+  "not_correctly_rounded": 3323275,
+  "delta_vs_correctly_rounded": {
+   "-1": 4,
+   "0": 13453941,
+   "1": 3323271
+  },
+  "within_2^-19.7_rel": true
+ },
+ "rsqrt_special": {
+  "inputs": 16777216,
+  "max_ulp": 0.8177,
+  "max_ulp_input": "3f89f038",
+  "max_ulp_result": "3f769af5",
+  "max_rel": 8.94215230764187e-08,
+  "max_rel_log2": -23.415,
+  "max_rel_input": "407fe000",
+  "not_correctly_rounded": 3323275,
+  "delta_vs_correctly_rounded": {
+   "-1": 4,
+   "0": 13453941,
+   "1": 3323271
+  },
+  "within_2^-19.7_rel": true
+ }
+}

@@ -1,0 +1,37 @@
+{
+ "rcp": {
+  "normal_predicted_ok": 516097,
+  "normal_mismatch": 0,
+  "denormal_input_results": {
+   "7f800000": 65537,
+   "ff800000": 1
+  },
+  "result_outside_normal_range": {
+   "exp253+:00000000": 1024,
+   "exp253-:80000000": 1024,
+   "exp254+:00000000": 1025,
+   "exp254-:80000000": 1024
+  },
+  "specials": {
+   "00000000": "7f800000",
+   "80000000": "ff800000",
+   "7f7fffff": "00000000",
+   "00800000": "7e800000"
+  }
+ },
+ "rsqrt": {
+  "normal_predicted_ok": 260098,
+  "normal_mismatch": 0,
+  "denormal_input_results": {
+   "7f800000": 65537,
+   "ff800000": 1
+  },
+  "result_outside_normal_range": {},
+  "specials": {
+   "00000000": "7f800000",
+   "80000000": "ff800000",
+   "7f7fffff": "1f800000",
+   "00800000": "5f000000"
+  }
+ }
+}
