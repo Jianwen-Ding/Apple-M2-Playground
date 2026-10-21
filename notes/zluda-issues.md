@@ -31,3 +31,8 @@ Notes for Jianwen-Ding/ZLUDA (`master` after PR #1). Nothing here has been pushe
    Metal's 64); x grids work to 2^32 - 32 threads; local sizes above 1,024 run nothing and report success, so keep
    rejecting them on the host. Out-of-bounds stores overwrite whatever else is mapped in the VM; soft faults only
    drop stores to unmapped addresses.
+9. **dma-buf export / import for IPC (B36, `results/2026-10-21-b36-b45-shared-memory`).** `agx-runtime-dmabuf.patch`
+   there adds `Bo::export_dmabuf` (PRIME_HANDLE_TO_FD) and `Vm::import_dmabuf` (PRIME_FD_TO_HANDLE + the usual bind,
+   without zeroing the imported memory). Verified across two processes on the M2 Max. Cross-VM / cross-queue order
+   needs an explicit syncobj wait (B45). There is no user-pointer import, so `cuMemHostRegister` must copy.
+   Also: if the same fd imports its own export, the kernel returns the same GEM handle, so only one `Bo` may close it.

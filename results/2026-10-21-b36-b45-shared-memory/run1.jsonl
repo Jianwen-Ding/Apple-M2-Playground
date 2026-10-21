@@ -1,0 +1,5 @@
+{"b36_child":true,"import_va":"0x1100400000","cpu_view_ok":4096,"gpu_read_ok":4088,"of":4088}
+{"b36_parent":true,"writer_ok":4096,"child_status":0,"child_gpu_writes_seen_by_parent_cpu":4096,"of":4096}
+{"b45":"host_wait","vm_a":1,"vm_b":2,"b_saw_writes":4088,"of":4088,"a_us":[0,7805.4],"b_us":[8224.1,8230.1]}
+{"b45":"fence_wait","vm_a":1,"vm_b":2,"b_saw_writes":4088,"of":4088,"a_us":[0,8273.2],"b_us":[8403.5,8409.6]}
+{"b45":"unordered","vm_a":1,"vm_b":2,"b_saw_writes":0,"of":4088,"a_us":[0,8316.0],"b_us":[124.0,130.8]}
