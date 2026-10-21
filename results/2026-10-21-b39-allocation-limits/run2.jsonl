@@ -1,0 +1,14 @@
+{"vm_start":"0x4000","vm_end":"0x7fffff8000","vm_kernel_min_size":"0x20000000","usc_base":"0x1000000000","mem_avail_gib":52.3}
+{"single_gib":16,"va":"0x1100400000","alloc_and_zero_s":1.91,"last_page_ok":Ok(64),"mem_avail_before":52.3,"mem_avail_with":36.0}
+{"single_gib":32,"va":"0x1100400000","alloc_and_zero_s":3.72,"last_page_ok":Ok(64),"mem_avail_before":52.0,"mem_avail_with":20.4}
+{"total_gib":4,"last_ok":Ok(64),"mem_avail":48.4}
+{"total_gib":8,"last_ok":Ok(64),"mem_avail":44.4}
+{"total_gib":12,"last_ok":Ok(64),"mem_avail":40.4}
+{"total_gib":16,"last_ok":Ok(64),"mem_avail":36.4}
+{"total_gib":20,"last_ok":Ok(64),"mem_avail":32.4}
+{"total_gib":24,"last_ok":Ok(64),"mem_avail":28.4}
+{"total_gib":28,"last_ok":Ok(64),"mem_avail":24.4}
+{"total_gib":32,"last_ok":Ok(64),"mem_avail":20.6}
+{"total_gib":36,"last_ok":Ok(64),"mem_avail":16.2}
+{"total_gib":40,"last_ok":Ok(64),"mem_avail":12.1}
+{"total_gib":40,"stopped":"MemAvailable 12.1 GiB"}

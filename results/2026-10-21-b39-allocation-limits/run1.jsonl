@@ -1,0 +1,5 @@
+{"vm_start":"0x4000","vm_end":"0x7fffff8000","vm_kernel_min_size":"0x20000000","usc_base":"0x1000000000","mem_avail_gib":52.1}
+{"single_gib":1,"va":"0x1100400000","alloc_and_zero_s":0.12,"last_page_ok":Ok(64),"mem_avail_before":52.1,"mem_avail_with":51.1}
+{"single_gib":4,"va":"0x1100400000","alloc_and_zero_s":0.46,"last_page_ok":Ok(64),"mem_avail_before":52.1,"mem_avail_with":48.2}
+{"total_gib":4,"last_ok":Ok(64),"mem_avail":48.2}
+{"total_gib":4,"stopped":"MemAvailable 48.2 GiB"}
