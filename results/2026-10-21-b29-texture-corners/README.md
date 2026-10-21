@@ -29,10 +29,13 @@ Blocker B29 of `AGX-Performance-Simulator/tasks/ptx-re-blockers.md`. M2 Max (G14
 
 The LOD-bias order (bias is not available in GLES compute) was not tested.
 
-## Not run yet (prepared)
+## Vulkan probes 4 and 9 (`scripts/run_vk_b29.py`, `tests/vulkan_texture.c`; `vk-record.json`)
 
-Probes **4** (unnormalized coordinates with clamp / border) and **9** (pitch-linear images at explicit row pitches) need
-Vulkan: `tests/vulkan_texture.c` + `scripts/run_vk_b29.py` are written and build, not run. From Mesa's descriptor
-definitions: a linear texture's stride field is 18 bits in 16-byte units (minus 1 encoded), so any 16-byte-multiple
-pitch up to 4 MiB, which covers CUDA's 32-byte pitch alignment; the sampler has a "Pixel coordinates" bit for
-unnormalized coordinates.
+| Probe | Result |
+| --- | --- |
+| 4, unnormalized (pixel) coordinates, clamp-to-edge / clamp-to-border, nearest / linear | **exact CUDA semantics**: 88 / 88 points each (x = -3 .. 18.75 on a 16-texel row; nearest = texel floor(x) clamped or border; linear = (x - 0.5) with 1/256 weights; border = opaque white) |
+| 9, pitch-linear images (LINEAR DRM modifier with an explicit row pitch, 33x8 r32f, row padding filled with junk) | **every 16-byte-multiple pitch works**: 144, 160, 192, 256 bytes give 264 / 264 exact fetches and bilinear samples across row boundaries; 132 and 136 bytes (not multiples of 16) are accepted by the driver but sample wrong rows (231 / 264 wrong). Mesa's own linear pitch for 132-byte rows is 256 |
+
+So CUDA pitched textures (pitch a multiple of 32 bytes) can use the native path; the descriptor's 16-byte stride field is
+the only constraint. The LOD-bias order relative to MIN/MAX_LOD stays untested (no bias in GLES compute; Vulkan would need
+an explicit-LOD-plus-bias form).
