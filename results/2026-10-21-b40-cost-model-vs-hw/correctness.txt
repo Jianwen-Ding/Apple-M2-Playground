@@ -1,0 +1,11 @@
+blas: 182 ok, 0 not ok
+blasc: 242 ok, 0 not ok
+conv: 36 ok, 0 not ok
+dnn: 81 ok, 0 not ok
+epilogue: 10 ok, 0 not ok
+fft: 24 ok, 0 not ok
+hgemm: 8 ok, 0 not ok
+rand: 8 ok, 0 not ok
+sgemm: 8 ok, 2 not ok
+solver: 18 ok, 0 not ok
+sparse: 200 ok, 0 not ok

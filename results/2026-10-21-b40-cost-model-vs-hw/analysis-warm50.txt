@@ -1,0 +1,28 @@
+launches 1540 usable 1538
+lib            n med warm us  med pred med ratio    p10    p90 cold/warm
+blas         224        15.0       7.8      2.08   1.17   3.71      1.32
+blasc        278        23.8       8.9      2.26   1.27   7.09      1.32
+conv          36        34.1      11.3      3.04   2.69   3.79      1.18
+dnn          136        16.7       6.8      2.50   2.00   3.81      1.32
+epilogue      10         7.4       6.5      1.16   1.14   1.21      1.52
+fft           76        11.3       6.7      1.69   1.04   4.98      1.50
+hgemm          8        30.9      11.6      2.27   1.37   3.17      1.27
+rand          10        10.2       6.1      1.67   1.35  11.07      1.48
+sgemm          8        24.5      10.0      1.95   1.38   3.50      1.26
+solver       424        13.2       7.0      1.87   1.04   5.75      1.35
+sparse       328        11.5       7.5      1.55   1.05   3.65      1.37
+ALL median 2.02 p10 1.08 p90 4.97
+warm 0-10 us: n=397 median ratio 1.15
+warm 10-50 us: n=797 median ratio 2.05
+warm 50-1000000000.0 us: n=344 median ratio 4.63
+worst (warm > 20 us):
+  rand 2cca23c3e0 32,1,1 32,1,1 warm 252.8 pred 22.8 ratio 11.07
+  blasc 860548da60 16,8,1 16,4,1 warm 232.5 pred 26.0 ratio 8.94
+  blasc 860548da60 16,8,1 16,4,1 warm 233.7 pred 26.3 ratio 8.89
+  blasc 860548da60 16,8,1 16,4,1 warm 233.1 pred 26.3 ratio 8.87
+  blasc 860548da60 16,8,1 16,4,1 warm 232.4 pred 26.3 ratio 8.82
+  blasc 860548da60 16,8,1 16,4,1 warm 229.5 pred 26.0 ratio 8.82
+  blasc 860548da60 16,8,1 16,4,1 warm 231.9 pred 26.3 ratio 8.8
+  blasc 860548da60 16,8,1 16,4,1 warm 232.4 pred 26.6 ratio 8.75
+  blasc 860548da60 16,8,1 16,4,1 warm 231.0 pred 26.6 ratio 8.7
+  blasc 860548da60 16,8,1 16,4,1 warm 160.3 pred 19.5 ratio 8.24
