@@ -8,7 +8,7 @@ in cycles from an in-dispatch reference, so the clock state cancels). 0 faults; 
 `coverage.py record --area fmadd_lane_b18,fmadd_lane_b18_masked`: 28 of the 34 catalog forms recorded deterministic
 (k = 1..15 in the default 16-lane mode for fmadd32 and fmadd16, fmadd16 in 4-lane segments with k = 1, partial masks);
 **`suite_check`: fmadd_lane_b18 20 / 20, fmadd_lane_b18_masked 8 / 8 exact** (plus the earlier fmadd_lane 16 / 16 and
-fmadd_lane_masked 8 / 8). 6 names coincide with the earlier `fmadd_lane` area's.
+fmadd_lane_masked 8 / 8).
 
 The other **6 forms** were refused by agx_run's gate, because the simulator does not model them: the segment modes with
 k >= 2, and fmadd32 in any segment mode (a segment's first lanes read outside it). They ran through
