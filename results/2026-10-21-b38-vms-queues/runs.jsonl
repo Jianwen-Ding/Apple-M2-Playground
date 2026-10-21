@@ -1,0 +1,24 @@
+{"want_vms":1,"want_queues_per_vm":1,"vms":1,"queues":1,"create_error":None,"launch_error":None,"ok":0,"wrong":1,"wait_failed":0,"distinct_sr21":1,"sr21":[0],"vms_with_several_slots":0,"wall_ms":1.7}
+{"want_vms":2,"want_queues_per_vm":1,"vms":2,"queues":2,"create_error":None,"launch_error":None,"ok":0,"wrong":2,"wait_failed":0,"distinct_sr21":1,"sr21":[0],"vms_with_several_slots":0,"wall_ms":3.2}
+{"want_vms":4,"want_queues_per_vm":1,"vms":4,"queues":4,"create_error":None,"launch_error":None,"ok":0,"wrong":4,"wait_failed":0,"distinct_sr21":1,"sr21":[0],"vms_with_several_slots":0,"wall_ms":5.1}
+{"want_vms":1,"want_queues_per_vm":16,"vms":1,"queues":16,"create_error":None,"launch_error":None,"ok":0,"wrong":16,"wait_failed":0,"distinct_sr21":1,"sr21":[0],"vms_with_several_slots":0,"wall_ms":16.1}
+{"want_vms":16,"want_queues_per_vm":1,"vms":16,"queues":16,"create_error":None,"launch_error":None,"ok":0,"wrong":16,"wait_failed":0,"distinct_sr21":1,"sr21":[0],"vms_with_several_slots":0,"wall_ms":18.1}
+{"want_vms":4,"want_queues_per_vm":16,"vms":4,"queues":64,"create_error":None,"launch_error":None,"ok":0,"wrong":64,"wait_failed":0,"distinct_sr21":1,"sr21":[0],"vms_with_several_slots":0,"wall_ms":55.9}
+{"want_vms":16,"want_queues_per_vm":1,"vms":16,"queues":16,"create_error":None,"launch_error":None,"ok":16,"wrong":0,"wait_failed":0,"distinct_sr21":16,"vms_with_several_slots":0,"wall_ms":14.1}
+avail 51
+{"want_vms":64,"want_queues_per_vm":1,"vms":64,"queues":64,"create_error":None,"launch_error":None,"ok":64,"wrong":0,"wait_failed":0,"distinct_sr21":63,"vms_with_several_slots":0,"wall_ms":75.7}
+avail 51
+{"want_vms":1,"want_queues_per_vm":256,"vms":1,"queues":256,"create_error":None,"launch_error":None,"ok":256,"wrong":0,"wait_failed":0,"distinct_sr21":1,"vms_with_several_slots":0,"wall_ms":212.9}
+avail 51
+{"want_vms":16,"want_queues_per_vm":16,"vms":16,"queues":256,"create_error":None,"launch_error":None,"ok":256,"wrong":0,"wait_failed":0,"distinct_sr21":16,"vms_with_several_slots":0,"wall_ms":225.8}
+avail 52
+{"want_vms":128,"want_queues_per_vm":1,"vms":128,"queues":128,"create_error":None,"launch_error":None,"ok":128,"wrong":0,"wait_failed":0,"distinct_sr21":62,"vms_with_several_slots":0,"wall_ms":106.7}
+avail 51
+{"want_vms":1,"want_queues_per_vm":1024,"vms":1,"queues":1024,"create_error":None,"launch_error":None,"ok":1024,"wrong":0,"wait_failed":0,"distinct_sr21":1,"vms_with_several_slots":0,"wall_ms":798.9}
+avail 49
+{"want_vms":512,"want_queues_per_vm":1,"vms":512,"queues":512,"create_error":None,"launch_error":None,"ok":512,"wrong":0,"wait_failed":0,"distinct_sr21":63,"vms_with_several_slots":0,"wall_ms":422.8}
+avail 50
+{"want_vms":2048,"want_queues_per_vm":1,"vms":2048,"queues":2048,"create_error":None,"launch_error":None,"ok":2048,"wrong":0,"wait_failed":0,"distinct_sr21":63,"vms_with_several_slots":0,"wall_ms":1711.4}
+avail 52
+{"want_vms":1,"want_queues_per_vm":2048,"vms":1,"queues":2048,"create_error":None,"launch_error":None,"ok":2048,"wrong":0,"wait_failed":0,"distinct_sr21":1,"vms_with_several_slots":0,"wall_ms":1562.0}
+avail 45
