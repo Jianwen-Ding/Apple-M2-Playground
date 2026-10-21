@@ -1,0 +1,59 @@
+ok   copy-in-bounds agx-g14c | no error
+FAIL copy-in-bounds agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   off-by-one-store agx-g14c | out of bounds store of 4 bytes at 0x2000080, thread (32, 0, 0) threadgroup (0, 0, 0), site 2 (store 4	k)
+FAIL off-by-one-store agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   null-out agx-g14c | null store of 4 bytes at 0x0, thread (0, 0, 0) threadgroup (0, 0, 0), site 2 (store 4	k)
+FAIL null-out agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   misaligned-load agx-g14c | misaligned load of 4 bytes at 0x1000002, thread (0, 0, 0) threadgroup (0, 0, 0), site 1 (load 4	k)
+FAIL misaligned-load agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   shared-in-bounds agx-g14c | no error
+FAIL shared-in-bounds agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   shared-out-of-bounds agx-g14c | threadgroup out of bounds store of 4 bytes at 0x80, thread (32, 0, 0) threadgroup (0, 0, 0), site 1 (store 4	k)
+FAIL shared-out-of-bounds agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   dynamic-shared-in-bounds agx-g14c | no error
+FAIL dynamic-shared-in-bounds agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   dynamic-shared-out-of-bounds agx-g14c | threadgroup out of bounds store of 4 bytes at 0x40, thread (16, 0, 0) threadgroup (0, 0, 0), site 1 (store 4	k)
+FAIL dynamic-shared-out-of-bounds agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   atomic-in-bounds agx-g14c | no error
+FAIL atomic-in-bounds agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   atomic-out-of-bounds agx-g14c | out of bounds atomic of 4 bytes at 0x100007c, thread (31, 0, 0) threadgroup (0, 0, 0), site 1 (atomic 4	k)
+FAIL atomic-out-of-bounds agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   struct-pointer-in-bounds agx-g14c | no error
+FAIL struct-pointer-in-bounds agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   struct-pointer-off-by-one agx-g14c | out of bounds store of 4 bytes at 0x1000080, thread (32, 0, 0) threadgroup (0, 0, 0), site 1 (store 4	k)
+FAIL struct-pointer-off-by-one agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   second-block agx-g14c | out of bounds load of 4 bytes at 0x1000080, thread (0, 0, 0) threadgroup (1, 0, 0), site 1 (load 4	k)
+FAIL second-block agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   grid-in-bounds agx-g14c | no error
+FAIL grid-in-bounds agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   source-location agx-g14c | out of bounds store of 4 bytes at 0x100007c, thread (31, 0, 0) threadgroup (0, 0, 0), site 1 (store 4	put put.h:3:7	k inl.cu:12:5)
+FAIL source-location agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   pointer-chase-in-bounds agx-g14c | no error
+FAIL pointer-chase-in-bounds agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   pointer-chase-past-end agx-g14c | out of bounds load of 4 bytes at 0x1000080, thread (31, 0, 0) threadgroup (0, 0, 0), site 2 (load 4	k)
+FAIL pointer-chase-past-end agx-g13g strict agx_run failed: {"error":"unknown option --agx-strict"}
+
+ok   control: off-by-one-store unchecked reports nothing
+ok   control: atomic-out-of-bounds unchecked reports nothing
+ok   control: shared-out-of-bounds unchecked reports nothing
+ok   control: copy-in-bounds checked and unchecked outputs are identical
+ok   control: shared-in-bounds checked and unchecked outputs are identical
+ok   control: atomic-in-bounds checked and unchecked outputs are identical
+ok   control: struct-pointer-in-bounds checked and unchecked outputs are identical
+17 failures

@@ -1,0 +1,48 @@
+{
+ "mode": "hw",
+ "item3_second_launch_after_error": {
+  "off-by-one-store": {
+   "claimed_after": 1,
+   "buffers_unchanged": true,
+   "record_kind": 0
+  },
+  "atomic-out-of-bounds": {
+   "claimed_after": 1,
+   "buffers_unchanged": true,
+   "record_kind": 0
+  },
+  "shared-out-of-bounds": {
+   "claimed_after": 1,
+   "buffers_unchanged": true,
+   "record_kind": 0
+  },
+  "second-block": {
+   "claimed_after": 1,
+   "buffers_unchanged": true,
+   "record_kind": 0
+  },
+  "struct-pointer-off-by-one": {
+   "claimed_after": 1,
+   "buffers_unchanged": true,
+   "record_kind": 0
+  }
+ },
+ "item2_grid_copy_threads": 4194304,
+ "item2_firmware_ms": {
+  "unchecked": [
+   0.287,
+   0.2868,
+   0.2861,
+   0.2842,
+   0.2871
+  ],
+  "checked": [
+   0.2538,
+   0.4468,
+   0.2655,
+   0.4642,
+   0.447
+  ]
+ },
+ "item2_ratio_median": 1.5576694452869788
+}
