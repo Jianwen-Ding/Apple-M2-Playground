@@ -1,0 +1,885 @@
+{
+"mode": "gpu",
+"fadd32_neg": {
+"bits_model": 12,
+"arith_model": 24,
+"n": 24,
+"rows": [
+{
+"x": "00000000",
+"got": "80000000",
+"bits": true,
+"arith": true
+},
+{
+"x": "80000000",
+"got": "00000000",
+"bits": true,
+"arith": true
+},
+{
+"x": "3f800000",
+"got": "bf800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "bf800000",
+"got": "3f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "00000001",
+"got": "80000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "80000001",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "00400000",
+"got": "80000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "807fffff",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "007fffff",
+"got": "80000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "00800000",
+"got": "80800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "80800000",
+"got": "00800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7f7fffff",
+"got": "ff7fffff",
+"bits": true,
+"arith": true
+},
+{
+"x": "7f800000",
+"got": "ff800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "ff800000",
+"got": "7f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7fc00000",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "ffc00000",
+"got": "7fc00000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7fc00001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7fffffff",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "ffc12345",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7f800001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "ff800001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7fa00000",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "40490fdb",
+"got": "c0490fdb",
+"bits": true,
+"arith": true
+},
+{
+"x": "c0490fdb",
+"got": "40490fdb",
+"bits": true,
+"arith": true
+}
+]
+},
+"fadd32_abs": {
+"bits_model": 13,
+"arith_model": 24,
+"n": 24,
+"rows": [
+{
+"x": "00000000",
+"got": "00000000",
+"bits": true,
+"arith": true
+},
+{
+"x": "80000000",
+"got": "00000000",
+"bits": true,
+"arith": true
+},
+{
+"x": "3f800000",
+"got": "3f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "bf800000",
+"got": "3f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "00000001",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "80000001",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "00400000",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "807fffff",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "007fffff",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "00800000",
+"got": "00800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "80800000",
+"got": "00800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7f7fffff",
+"got": "7f7fffff",
+"bits": true,
+"arith": true
+},
+{
+"x": "7f800000",
+"got": "7f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "ff800000",
+"got": "7f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7fc00000",
+"got": "7fc00000",
+"bits": true,
+"arith": true
+},
+{
+"x": "ffc00000",
+"got": "7fc00000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7fc00001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7fffffff",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "ffc12345",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7f800001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "ff800001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7fa00000",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "40490fdb",
+"got": "40490fdb",
+"bits": true,
+"arith": true
+},
+{
+"x": "c0490fdb",
+"got": "40490fdb",
+"bits": true,
+"arith": true
+}
+]
+},
+"fmul32_neg": {
+"bits_model": 12,
+"arith_model": 24,
+"n": 24,
+"rows": [
+{
+"x": "00000000",
+"got": "80000000",
+"bits": true,
+"arith": true
+},
+{
+"x": "80000000",
+"got": "00000000",
+"bits": true,
+"arith": true
+},
+{
+"x": "3f800000",
+"got": "bf800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "bf800000",
+"got": "3f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "00000001",
+"got": "80000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "80000001",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "00400000",
+"got": "80000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "807fffff",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "007fffff",
+"got": "80000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "00800000",
+"got": "80800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "80800000",
+"got": "00800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7f7fffff",
+"got": "ff7fffff",
+"bits": true,
+"arith": true
+},
+{
+"x": "7f800000",
+"got": "ff800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "ff800000",
+"got": "7f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7fc00000",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "ffc00000",
+"got": "7fc00000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7fc00001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7fffffff",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "ffc12345",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7f800001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "ff800001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7fa00000",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "40490fdb",
+"got": "c0490fdb",
+"bits": true,
+"arith": true
+},
+{
+"x": "c0490fdb",
+"got": "40490fdb",
+"bits": true,
+"arith": true
+}
+]
+},
+"fmul32_abs": {
+"bits_model": 13,
+"arith_model": 24,
+"n": 24,
+"rows": [
+{
+"x": "00000000",
+"got": "00000000",
+"bits": true,
+"arith": true
+},
+{
+"x": "80000000",
+"got": "00000000",
+"bits": true,
+"arith": true
+},
+{
+"x": "3f800000",
+"got": "3f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "bf800000",
+"got": "3f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "00000001",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "80000001",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "00400000",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "807fffff",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "007fffff",
+"got": "00000000",
+"bits": false,
+"arith": true
+},
+{
+"x": "00800000",
+"got": "00800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "80800000",
+"got": "00800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7f7fffff",
+"got": "7f7fffff",
+"bits": true,
+"arith": true
+},
+{
+"x": "7f800000",
+"got": "7f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "ff800000",
+"got": "7f800000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7fc00000",
+"got": "7fc00000",
+"bits": true,
+"arith": true
+},
+{
+"x": "ffc00000",
+"got": "7fc00000",
+"bits": true,
+"arith": true
+},
+{
+"x": "7fc00001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7fffffff",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "ffc12345",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7f800001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "ff800001",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "7fa00000",
+"got": "7fc00000",
+"bits": false,
+"arith": true
+},
+{
+"x": "40490fdb",
+"got": "40490fdb",
+"bits": true,
+"arith": true
+},
+{
+"x": "c0490fdb",
+"got": "40490fdb",
+"bits": true,
+"arith": true
+}
+]
+},
+"fadd16_neg": {
+"bits_model": 15,
+"arith_model": 22,
+"n": 22,
+"rows": [
+{
+"x": "0000",
+"got": "8000",
+"bits": true,
+"arith": true
+},
+{
+"x": "8000",
+"got": "0000",
+"bits": true,
+"arith": true
+},
+{
+"x": "3c00",
+"got": "bc00",
+"bits": true,
+"arith": true
+},
+{
+"x": "bc00",
+"got": "3c00",
+"bits": true,
+"arith": true
+},
+{
+"x": "0001",
+"got": "8001",
+"bits": true,
+"arith": true
+},
+{
+"x": "8001",
+"got": "0001",
+"bits": true,
+"arith": true
+},
+{
+"x": "03ff",
+"got": "83ff",
+"bits": true,
+"arith": true
+},
+{
+"x": "83ff",
+"got": "03ff",
+"bits": true,
+"arith": true
+},
+{
+"x": "0200",
+"got": "8200",
+"bits": true,
+"arith": true
+},
+{
+"x": "0400",
+"got": "8400",
+"bits": true,
+"arith": true
+},
+{
+"x": "7bff",
+"got": "fbff",
+"bits": true,
+"arith": true
+},
+{
+"x": "7c00",
+"got": "fc00",
+"bits": true,
+"arith": true
+},
+{
+"x": "fc00",
+"got": "7c00",
+"bits": true,
+"arith": true
+},
+{
+"x": "7e00",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "fe00",
+"got": "7e00",
+"bits": true,
+"arith": true
+},
+{
+"x": "7e01",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "7fff",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "fe55",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "7c01",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "fc01",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "7d00",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "4248",
+"got": "c248",
+"bits": true,
+"arith": true
+}
+]
+},
+"fadd16_abs": {
+"bits_model": 16,
+"arith_model": 22,
+"n": 22,
+"rows": [
+{
+"x": "0000",
+"got": "0000",
+"bits": true,
+"arith": true
+},
+{
+"x": "8000",
+"got": "0000",
+"bits": true,
+"arith": true
+},
+{
+"x": "3c00",
+"got": "3c00",
+"bits": true,
+"arith": true
+},
+{
+"x": "bc00",
+"got": "3c00",
+"bits": true,
+"arith": true
+},
+{
+"x": "0001",
+"got": "0001",
+"bits": true,
+"arith": true
+},
+{
+"x": "8001",
+"got": "0001",
+"bits": true,
+"arith": true
+},
+{
+"x": "03ff",
+"got": "03ff",
+"bits": true,
+"arith": true
+},
+{
+"x": "83ff",
+"got": "03ff",
+"bits": true,
+"arith": true
+},
+{
+"x": "0200",
+"got": "0200",
+"bits": true,
+"arith": true
+},
+{
+"x": "0400",
+"got": "0400",
+"bits": true,
+"arith": true
+},
+{
+"x": "7bff",
+"got": "7bff",
+"bits": true,
+"arith": true
+},
+{
+"x": "7c00",
+"got": "7c00",
+"bits": true,
+"arith": true
+},
+{
+"x": "fc00",
+"got": "7c00",
+"bits": true,
+"arith": true
+},
+{
+"x": "7e00",
+"got": "7e00",
+"bits": true,
+"arith": true
+},
+{
+"x": "fe00",
+"got": "7e00",
+"bits": true,
+"arith": true
+},
+{
+"x": "7e01",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "7fff",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "fe55",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "7c01",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "fc01",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "7d00",
+"got": "7e00",
+"bits": false,
+"arith": true
+},
+{
+"x": "4248",
+"got": "4248",
+"bits": true,
+"arith": true
+}
+]
+}
+}
