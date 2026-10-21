@@ -5,11 +5,26 @@ in cycles from an in-dispatch reference, so the clock state cancels). 0 faults; 
 
 ## Recorded
 
-`coverage.py record --area fmadd_lane_b18,fmadd_lane_b18_masked`: all 34 catalog forms (k = 1..15 for fmadd32 and
-fmadd16, segments of 4 and 2 lanes for both widths, partial masks) recorded deterministic on the first run. 28 new
-files (6 names coincide with the earlier `fmadd_lane` area). **`suite_check`: fmadd_lane_b18 20 / 20, fmadd_lane_b18_masked
-8 / 8 exact** (plus the earlier fmadd_lane 16 / 16 and fmadd_lane_masked 8 / 8). The simulator's model of the form is
-confirmed for everything `agx.fma_lane_shift` emits, so the native G14 lowering can be enabled.
+`coverage.py record --area fmadd_lane_b18,fmadd_lane_b18_masked`: 28 of the 34 catalog forms recorded deterministic
+(k = 1..15 in the default 16-lane mode for fmadd32 and fmadd16, fmadd16 in 4-lane segments with k = 1, partial masks);
+**`suite_check`: fmadd_lane_b18 20 / 20, fmadd_lane_b18_masked 8 / 8 exact** (plus the earlier fmadd_lane 16 / 16 and
+fmadd_lane_masked 8 / 8). 6 names coincide with the earlier `fmadd_lane` area's.
+
+The other **6 forms** were refused by agx_run's gate, because the simulator does not model them: the segment modes with
+k >= 2, and fmadd32 in any segment mode (a segment's first lanes read outside it). They ran through
+`probe_variants.py` instead (`b18_variants.py`: the surrogate is the default-mode k = 1 form, so the whole program was
+checked in agx_run and only the k / mode fields differ; lane i loads A = i + 1, then `fmadd_lane(A, 1.0, 0)`), 2 runs
+each, 0 faults (`variants.json`):
+
+| Form | Lanes whose source lane i - k is in the same segment | Lanes whose source is outside the segment |
+| --- | --- | --- |
+| fmadd16, 4-lane segments, k = 2, 3 | read lane i - k (exact) | **0**, deterministic |
+| fmadd32, 4-lane segments, k = 1, 2, 3 | read lane i - k (exact) | **undefined**: garbage that changes between runs |
+| fmadd32, 2-lane segments, k = 1 | read lane i - 1 (exact) | **undefined** |
+
+So every k works inside a segment; for **fmadd32 in the segment modes the boundary lanes' results must be discarded or
+masked** (as a segmented scan does with its select), while fmadd16 gives 0 there. The simulator can model the
+in-segment lanes for all k and the fp16 zeros; the fp32 boundary lanes stay unmodelled (undefined).
 
 ## Cost (`run_bench.py`, cycles; `bench.json`)
 
