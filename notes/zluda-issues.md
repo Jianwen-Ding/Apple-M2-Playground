@@ -36,3 +36,10 @@ Notes for Jianwen-Ding/ZLUDA (`master` after PR #1). Nothing here has been pushe
    without zeroing the imported memory). Verified across two processes on the M2 Max. Cross-VM / cross-queue order
    needs an explicit syncobj wait (B45). There is no user-pointer import, so `cuMemHostRegister` must copy.
    Also: if the same fd imports its own export, the kernel returns the same GEM handle, so only one `Bo` may close it.
+10. **HIGH: destroyed contexts leak their memory in the kernel past process exit (B42,
+    `results/2026-10-21-b42-context-teardown`).** Field drop order destroys the VM before the objects bound in it
+    (`agx_runtime::Context`, `zluda_agx::Driver`); `Queue::drop` never unbinds its timestamp object. ~5 MiB per context,
+    held until reboot. Fix: `zluda-teardown-fix.patch` there (VM declared last, timestamp unbind).
+11. **HIGH: 45+ queued launches fault without the USC invalidate (B42).** Pipeline words staged back to back in the
+    USC ring are read stale while earlier commands run. Emit the USC barrier on every command (as Mesa), i.e. make
+    `ZLUDA_AGX_USC_BARRIER=1` the default; ~1.8 us per launch (B8).

@@ -1,0 +1,67 @@
+diff --git a/agx_runtime/src/context.rs b/agx_runtime/src/context.rs
+index 24f50a2..c20329f 100644
+--- a/agx_runtime/src/context.rs
++++ b/agx_runtime/src/context.rs
+@@ -73,12 +73,14 @@ fn find<T>(allocs: &BTreeMap<u64, T>, va: u64, len: u64, size: impl Fn(&T) -> u6
+     (va.checked_add(len)? <= start + size(a)).then_some(start)
+ }
+ 
++/// Fields drop in declaration order: the allocations and the queue must be unbound before the VM is destroyed (a VM
++/// destroyed with objects still bound strands their memory in the kernel, also past process exit; B42).
+ pub struct Context {
+-    pub device: Device,
+-    pub props: DeviceProps,
+-    pub vm: Vm,
+-    pub stream: Queue,
+     allocs: BTreeMap<u64, (Bo, u64)>,
++    pub stream: Queue,
++    pub vm: Vm,
++    pub props: DeviceProps,
++    pub device: Device,
+ }
+ 
+ fn invalid(m: impl Into<String>) -> io::Error {
+diff --git a/agx_runtime/src/lib.rs b/agx_runtime/src/lib.rs
+index 3ba40f9..39927ec 100644
+--- a/agx_runtime/src/lib.rs
++++ b/agx_runtime/src/lib.rs
+@@ -930,6 +930,17 @@ impl Queue {
+ 
+ impl Drop for Queue {
+     fn drop(&mut self) {
++        let mut unbind = drm_asahi_gem_bind_object {
++            op: DRM_ASAHI_BIND_OBJECT_OP_UNBIND as u32,
++            flags: 0,
++            handle: 0,
++            vm_id: 0,
++            offset: 0,
++            range: 0,
++            object_handle: self.ts_handle,
++            pad: 0,
++        };
++        let _ = self.dev.ioctl(DRM_IOCTL_ASAHI_GEM_BIND_OBJECT as u64, &mut unbind, "unbind-timestamps");
+         let mut qd = drm_asahi_queue_destroy { queue_id: self.id, pad: 0 };
+         let _ = self.dev.ioctl(DRM_IOCTL_ASAHI_QUEUE_DESTROY as u64, &mut qd, "queue-destroy");
+         let mut sd = drm_syncobj_destroy { handle: self.timeline, pad: 0 };
+diff --git a/zluda_agx/src/driver.rs b/zluda_agx/src/driver.rs
+index aae9267..0dc9b58 100644
+--- a/zluda_agx/src/driver.rs
++++ b/zluda_agx/src/driver.rs
+@@ -40,7 +40,6 @@ enum Op {
+ }
+ 
+ pub(crate) struct Driver {
+-    pub(crate) ctx: Context,
+     default_waits: Vec<Fence>,
+     modules: HashMap<usize, LoadedModule>,
+     functions: HashMap<usize, (usize, String)>,
+@@ -65,6 +64,9 @@ pub(crate) struct Driver {
+     /// Per (module, kernel) built in checked mode, its first launch since the last synchronisation and how many
+     /// followed: the launches a reported bad access may come from.
+     checked_launches: HashMap<(usize, String), (String, u32)>,
++    /// Last: fields drop in order, and the modules' and streams' objects must be unbound before the context's VM is
++    /// destroyed (B42).
++    pub(crate) ctx: Context,
+ }
+ 
+ /// A launch: its kernel, geometry and argument bytes (task description), kept until its command has finished.

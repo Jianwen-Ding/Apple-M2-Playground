@@ -1,0 +1,11 @@
+{"phase0_200_queued_then_sync":Some(0)}
+{"p1_cycle":0,"mem_avail_mib":48592,"rss_mib":2,"fds":5,"cgroup_shmem_mib":4434}
+{"p1_cycle":10,"mem_avail_mib":48592,"rss_mib":2,"fds":5,"cgroup_shmem_mib":4416}
+{"p1_cycle":500,"mem_avail_mib":48582,"rss_mib":2,"fds":5,"cgroup_shmem_mib":4416}
+{"p1_cycle":999,"mem_avail_mib":48554,"rss_mib":2,"fds":5,"cgroup_shmem_mib":4416}
+{"phase1_cycles":1000,"wrong":0,"failed":0,"ms_per_cycle":2.00}
+{"p1_end":1000,"mem_avail_mib":48554,"rss_mib":2,"fds":5,"cgroup_shmem_mib":4416}
+{"phase2_destroy_with_200_queued":100,"failed":0,"destroy_ms_mean":1.76,"destroy_ms_max":2.25}
+{"p2_end":100,"mem_avail_mib":48539,"rss_mib":3,"fds":5,"cgroup_shmem_mib":4435}
+{"phase3_primary_reset_with_200_queued":100,"failed":0,"wrong_after_reset":0}
+{"p3_end":100,"mem_avail_mib":48516,"rss_mib":3,"fds":5,"cgroup_shmem_mib":4415}

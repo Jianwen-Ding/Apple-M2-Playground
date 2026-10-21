@@ -1,0 +1,310 @@
+{"p1_cycle":0,"mem_avail_mib":50776,"rss_mib":2,"fds":5,"cgroup_shmem_mib":2402}
+{"p1_cycle":10,"mem_avail_mib":50755,"rss_mib":2,"fds":5,"cgroup_shmem_mib":2453}
+{"p1_cycle":100,"mem_avail_mib":50310,"rss_mib":2,"fds":5,"cgroup_shmem_mib":2892}
+{"p1_cycle":199,"mem_avail_mib":49808,"rss_mib":2,"fds":5,"cgroup_shmem_mib":3374}
+{"phase1_cycles":200,"wrong":0,"failed":0,"ms_per_cycle":1.84}
+{"p1_end":200,"mem_avail_mib":49803,"rss_mib":2,"fds":5,"cgroup_shmem_mib":3379}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 94, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 5, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 6, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 56, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 5, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 6, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 75, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 26, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 16, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 5, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 9, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 14, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 41, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 15, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 10, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 90, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 14, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 23, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 6, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 59, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 83, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 5, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 6, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 6, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 65, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 6, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 69, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 14, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 6, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 13, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 16, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 15, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 17, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 16, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 11, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+{"error":"cuCtxDestroy: 719"}
+{"phase2_destroy_with_200_queued":100,"failed":100,"destroy_ms_mean":492.65,"destroy_ms_max":501.47}
+{"p2_end":100,"mem_avail_mib":49349,"rss_mib":3,"fds":5,"cgroup_shmem_mib":3900}
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 14, arguments [0x1100400000, 0x1100434000, 0x1100468000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 13, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 15, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 14, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 14, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 16, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 16, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 14, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 14, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 9, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 6, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 9, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 15, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 13, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 9, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 19, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 15, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 13, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 15, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 17, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 16, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 13, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 14, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 16, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 9, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 15, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 17, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 15, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 8, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 12, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+zluda_agx: GPU job failed: Bad address (os error 14): kernel _Z9vectorAddPKfS0_Pfi grid (196, 1, 1) block (256, 1, 1) shared 0 bytes, stream 0, command 7, arguments [0x110049c000, 0x11004d0000, 0x1100504000, 0xc350]
+{"phase3_primary_reset_with_200_queued":100,"failed":0,"wrong_after_reset":0}
+{"p3_end":100,"mem_avail_mib":48704,"rss_mib":3,"fds":5,"cgroup_shmem_mib":4450}
