@@ -1,0 +1,13 @@
+{"global":[1, 1, 1],"local":[32, 1, 1],"ok":true,"fw_us":12.9,"ts_valid":true,"counter":1,"written":1,"last_gid":0,"wrong":0}
+{"global":[33, 1, 1],"local":[32, 1, 1],"ok":true,"fw_us":8.4,"ts_valid":true,"counter":33,"written":33,"last_gid":32,"wrong":0}
+{"global":[100, 1, 1],"local":[64, 1, 1],"ok":true,"fw_us":9.0,"ts_valid":true,"counter":100,"written":100,"last_gid":99,"wrong":0}
+{"global":[100, 1, 1],"local":[128, 1, 1],"ok":true,"fw_us":9.4,"ts_valid":true,"counter":100,"written":100,"last_gid":99,"wrong":0}
+{"global":[10, 1, 1],"local":[1024, 1, 1],"ok":true,"fw_us":8.3,"ts_valid":true,"counter":10,"written":10,"last_gid":9,"wrong":0}
+{"global":[1000, 1, 1],"local":[1024, 1, 1],"ok":true,"fw_us":13.4,"ts_valid":true,"counter":1000,"written":1000,"last_gid":999,"wrong":0}
+{"global":[1025, 1, 1],"local":[1024, 1, 1],"ok":true,"fw_us":13.4,"ts_valid":true,"counter":1025,"written":1025,"last_gid":1024,"wrong":0}
+{"global":[40, 3, 1],"local":[32, 2, 1],"ok":true,"fw_us":9.3,"ts_valid":true,"counter":120,"written":40,"last_gid":39,"wrong":0}
+{"global":[32, 5, 1],"local":[32, 2, 1],"ok":true,"fw_us":8.9,"ts_valid":true,"counter":160,"written":32,"last_gid":31,"wrong":0}
+{"global":[32, 1, 5],"local":[32, 1, 4],"ok":true,"fw_us":9.5,"ts_valid":true,"counter":160,"written":32,"last_gid":31,"wrong":0}
+{"global":[7, 7, 7],"local":[4, 4, 4],"ok":true,"fw_us":9.3,"ts_valid":true,"counter":343,"written":7,"last_gid":6,"wrong":0}
+{"global":[65, 1, 1],"local":[64, 1, 1],"ok":true,"fw_us":9.1,"ts_valid":true,"counter":65,"written":65,"last_gid":64,"wrong":0}
+{"global":[50000, 1, 1],"local":[256, 1, 1],"ok":true,"fw_us":140.8,"ts_valid":true,"counter":50000,"written":50000,"last_gid":49999,"wrong":0}
