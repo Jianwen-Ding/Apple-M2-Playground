@@ -69,6 +69,7 @@
  X(PFNGLTEXBUFFERPROC, glTexBuffer) \
  X(PFNGLTEXPARAMETERIPROC, glTexParameteri) \
  X(PFNGLTEXPARAMETERFVPROC, glTexParameterfv) \
+ X(PFNGLTEXPARAMETERFPROC, glTexParameterf) \
  X(PFNGLTEXPARAMETERIIVPROC, glTexParameterIiv) \
  X(PFNGLACTIVETEXTUREPROC, glActiveTexture) \
  X(PFNGLBINDIMAGETEXTUREPROC, glBindImageTexture) \
@@ -255,7 +256,10 @@ int main(int argc, char **argv) {
             {"r32f", GL_R32F, GL_RED, GL_FLOAT, 4}, {"rgba32f", GL_RGBA32F, GL_RGBA, GL_FLOAT, 16},
             {"r8ui", GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, 1}, {"r32ui", GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, 4},
             {"r16", GL_R16_EXT, GL_RED, GL_UNSIGNED_SHORT, 2}, {"r16snorm", GL_R16_SNORM_EXT, GL_RED, GL_SHORT, 2},
-            {"r16ui", GL_R16UI, GL_RED_INTEGER, GL_UNSIGNED_SHORT, 2}};
+            {"r16ui", GL_R16UI, GL_RED_INTEGER, GL_UNSIGNED_SHORT, 2},
+            {"d32f", GL_DEPTH_COMPONENT32F, GL_DEPTH_COMPONENT, GL_FLOAT, 4},
+            {"rgba8ui", GL_RGBA8UI, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, 4}, {"rgba8i", GL_RGBA8I, GL_RGBA_INTEGER, GL_BYTE, 4},
+            {"rgba16ui", GL_RGBA16UI, GL_RGBA_INTEGER, GL_UNSIGNED_SHORT, 8}, {"rgba16i", GL_RGBA16I, GL_RGBA_INTEGER, GL_SHORT, 8}};
         const char *fn = getenv("GLES_TEX_FORMAT");
         int fi = -1;
         for (unsigned k = 0; k < sizeof fmts / sizeof *fmts; k++) if (!strcmp(fn, fmts[k].name)) fi = (int)k;
@@ -324,6 +328,19 @@ int main(int argc, char **argv) {
             if (sscanf(getenv("GLES_TEX_BORDER"), "%f,%f,%f,%f", bc, bc+1, bc+2, bc+3) != 4) fail("tex-border-parse");
             p_glTexParameterfv(tgt, GL_TEXTURE_BORDER_COLOR, bc);
         }
+        /* GLES_TEX_COMPARE (never less equal lequal greater notequal gequal always): depth compare (sampler2DShadow);
+         * GLES_TEX_MINLOD / GLES_TEX_MAXLOD (floats): GL_TEXTURE_MIN_LOD / MAX_LOD. B29. */
+        if (getenv("GLES_TEX_COMPARE")) {
+            static const struct { const char *n; GLenum f; } cf[] = {{"never", GL_NEVER}, {"less", GL_LESS}, {"equal", GL_EQUAL},
+                {"lequal", GL_LEQUAL}, {"greater", GL_GREATER}, {"notequal", GL_NOTEQUAL}, {"gequal", GL_GEQUAL}, {"always", GL_ALWAYS}};
+            int ci = -1;
+            for (unsigned k = 0; k < sizeof cf / sizeof *cf; k++) if (!strcmp(getenv("GLES_TEX_COMPARE"), cf[k].n)) ci = (int)k;
+            if (ci < 0) fail("tex-compare");
+            p_glTexParameteri(tgt, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+            p_glTexParameteri(tgt, GL_TEXTURE_COMPARE_FUNC, (GLint)cf[ci].f);
+        }
+        if (getenv("GLES_TEX_MINLOD")) p_glTexParameterf(tgt, GL_TEXTURE_MIN_LOD, (GLfloat)atof(getenv("GLES_TEX_MINLOD")));
+        if (getenv("GLES_TEX_MAXLOD")) p_glTexParameterf(tgt, GL_TEXTURE_MAX_LOD, (GLfloat)atof(getenv("GLES_TEX_MAXLOD")));
         if (getenv("GLES_TEX_IBORDER")) {
             unsigned bcu[4] = {0, 0, 0, 0};
             if (sscanf(getenv("GLES_TEX_IBORDER"), "%u,%u,%u,%u", bcu, bcu+1, bcu+2, bcu+3) != 4) fail("tex-iborder-parse");

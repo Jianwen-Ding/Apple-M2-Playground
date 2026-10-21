@@ -141,6 +141,9 @@ def run_cases(all_cases, out, only=None):
             env['GLES_TEX_BORDER'] = c['border']
         if c.get('iborder'):
             env['GLES_TEX_IBORDER'] = c['iborder']
+        for k, e in (('compare', 'GLES_TEX_COMPARE'), ('minlod', 'GLES_TEX_MINLOD'), ('maxlod', 'GLES_TEX_MAXLOD')):
+            if c.get(k) is not None:
+                env[e] = str(c[k])
         r = subprocess.run([str(out/'gles_compute'), 'index', str(c['count']), '/dev/dri/renderD128'], cwd=d, capture_output=True, timeout=300, env=env)
         (d/'stdout.txt').write_bytes(r.stdout)
         res = {'run_ok': r.returncode == 0 and (d/'output.bin').exists(), 'count': c['count']}

@@ -1,0 +1,21 @@
+shadow nearest never ref OP texel: 64 /64  texel OP ref: 64 /64
+shadow nearest less ref OP texel: 64 /64  texel OP ref: 16 /64
+shadow nearest equal ref OP texel: 64 /64  texel OP ref: 64 /64
+shadow nearest lequal ref OP texel: 64 /64  texel OP ref: 16 /64
+shadow nearest greater ref OP texel: 64 /64  texel OP ref: 16 /64
+shadow nearest notequal ref OP texel: 64 /64  texel OP ref: 64 /64
+shadow nearest gequal ref OP texel: 64 /64  texel OP ref: 16 /64
+shadow nearest always ref OP texel: 64 /64  texel OP ref: 64 /64
+shadow linear lequal distinct values [0.0, 0.0625, 0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375, 0.5, 0.5625, 0.625, 0.6875]
+shadow linear greater distinct values [0.0, 0.0625, 0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375, 0.5, 0.5625, 0.625, 0.6875]
+grad_iso max|got-lod| 0.0078
+grad_aniso max|got-maxaxis| 0.0078
+grad_diag max|got-len| 0.008  max|got-maxcomp| 0.508
+lod clamp trilinear min 1.5 max 3.25
+lod clamp nearest_mipmap min 1.0 max 3.0
+store_unorm8 RNE 3072 half-up 3072 /3072
+store_snorm8 clamp[-127,127] RNE 2560 /2560
+store_u8 saturate 1024 wrap 41
+store_i8 saturate 1024 wrap 258
+store_u16 saturate 1024 wrap 676
+store_i16 saturate 1024 wrap 675
