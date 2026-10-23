@@ -104,3 +104,22 @@ fixture still checks a side-effecting void leaf. Separate callee stack frames,
 larger signatures, and hardware validation are outstanding. The backend
 rejects a non-kernel stack frame under this option to avoid overlapping the
 caller's saved values.
+
+### Wider ABI, masked calls and separate leaf frame follow-up
+
+The opt-in ABI now uses r2..r29 for up to 28 legalized 32-bit argument slots.
+i64 values take an aligned pair; arrays are split into their scalar parts.
+An aggregate fixture passes i64, `[3 x i32]` and i32 and returns `[3 x i32]`;
+the simulator checks 15, 23 and 31. A 32-lane fixture calls a divergent
+multi-block leaf from a masked caller and checks every output across the
+call/skip split. The backend no longer resets r0l at callable entry, keeps
+the return-side `pop_exec r0l, 2` immediately after `call` through scheduling
+and register allocation, and waits for pending loads before the call.
+
+One non-nested leaf may now use its own 4 KiB scratch region starting at byte
+offset 4096, while the kernel uses offsets below 4096. The kernel reserves
+both regions with `stack_adjust`; larger caller or callee frames are rejected.
+A compiled caller/callee-spill fixture uses offsets 8 and 4096 respectively,
+and the simulator returns 127 from input 42. These are offline functional
+results. The earlier hardware fault is still unexplained, and call timing
+remains uncalibrated in AGX-Performance-Simulator.

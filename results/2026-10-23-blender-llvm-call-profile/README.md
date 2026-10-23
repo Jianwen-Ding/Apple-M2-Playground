@@ -52,3 +52,37 @@ The ZLUDA PTX translation passes visible in the log each took under 0.5 s;
 the run reached `module.opt.ll` and was stopped before it emitted assembly.
 It does not isolate one LLVM pass as the cost of the long compilation. The
 earlier headless Blender attempt still exceeded 600 s in `zoc` with no render.
+
+## Register ABI coverage estimate
+
+The newer opt-in AGX call ABI accepts 28 32-bit register slots for arguments
+and returns. Counting i32/f32 as one slot, i64/pointers as aligned pairs, and
+`[N x i32]` as N slots, 371 of the 372 optimized LLVM definitions fit that
+argument window. The lone 36-slot definition is a kernel, which uses the
+separate uniform-register entry convention. All observed returns fit within
+eight slots. This is an IR signature estimate; it does not prove that all
+functions can safely stay uninlined.
+
+A conservative offline scan found at most 195 non-kernel leaf definitions
+with one return, no dynamic alloca and a fitting signature, appearing at 597
+direct call sites in the optimized IR. The actual compiler also excludes
+functions that need implicit uniforms or global data and rejects frames above
+4 KiB. Thus 195 and 597 are upper bounds for the current opt-in selection,
+not measured outlined-function or compile-speed counts.
+
+## Whole-module compile probe
+
+The optimized Cycles IR was passed to the updated AGX `llc` with
+`-mtriple=agx -mcpu=agx-g14c -agx-experimental-leaf-calls -filetype=obj`.
+An initial run exposed a non-kernel callee with spills, which led to separate
+4 KiB caller and callee frame regions in the experimental backend. After that
+change, a 240-second `llc` run reached the timeout without an LLVM diagnostic
+or a completed object. Its resident memory rose to about 8 GiB. This probe
+does not demonstrate a compile-time improvement, a working Blender render,
+or a performance gain.
+
+ZLUDA currently compiles the entire PTX image inside `cuModuleLoadData` via
+`load_image` and `compile_ptx`; `cuModuleGetFunction` only looks up an already
+compiled kernel. This means Blender's first module load pays for every Cycles
+kernel. Per-kernel compilation or caching may reduce that cost, but has not
+been implemented or measured here.
