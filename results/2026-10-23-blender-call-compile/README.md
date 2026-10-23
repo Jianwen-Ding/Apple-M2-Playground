@@ -54,3 +54,29 @@ call argument and return-value placement, r1 link preservation, per-call stack
 frames, register liveness, mask reserve/reconvergence, and tests against the
 retained hardware corpus before enabling codegen. Call timing remains
 uncalibrated in the performance simulator.
+
+## Opt-in LLVM leaf-call code generation, 2026-10-23 follow-up
+
+LLVM now has `-agx-experimental-leaf-calls` for a deliberately narrow case:
+a direct call from an AGX kernel to a `noinline`, argument-free, void leaf
+function. The callee may use intrinsics but has no ordinary calls or allocas.
+The compiler reserves r1 for the link, emits a direct `call`, and follows it
+with `pop_exec r0l, 2`. The leaf emits `ret r1`. The default inlining path is
+unchanged; the flag is required. This is the first LLVM IR call that reaches
+AGX instructions rather than being inlined or rejected.
+
+The fixture `llvm/test/CodeGen/AGX/experimental-leaf-call.ll` builds with
+`-verify-machineinstrs`. Its `.text` begins `10c01e000000` (`call leaf`),
+`521600000000` (`pop_exec r0l, 2`), `8800` (`stop`). The leaf return is
+`1402`. `AGX-Performance-Simulator/scripts/verify_llvm_leaf_call.py`
+compiles that IR to an object, checks the bytes and target offset, then
+replays the exact code with `AGX_EXPERIMENTAL_RET=buffer-pop2`; it executes
+nine instructions and stores the expected `7` at address 4096. This is an
+offline functional check, not a hardware validation or timing result.
+
+The emitted call still has no pre-call mask reserve, full register-preservation
+ABI, nested-link save, or separate per-function stack frames. Only the
+full-mask, entry-call fixture has been checked in the simulator. Do not enable
+the flag for Blender or Geekbench benchmarks: a successful compile would not
+establish correctness. The earlier bare hardware call fault remains
+unexplained. No additional hardware call sequence was submitted.
