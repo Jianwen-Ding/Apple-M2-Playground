@@ -74,9 +74,33 @@ replays the exact code with `AGX_EXPERIMENTAL_RET=buffer-pop2`; it executes
 nine instructions and stores the expected `7` at address 4096. This is an
 offline functional check, not a hardware validation or timing result.
 
-The emitted call still has no pre-call mask reserve, full register-preservation
+That first emitted call had no pre-call mask reserve, full register-preservation
 ABI, nested-link save, or separate per-function stack frames. Only the
 full-mask, entry-call fixture has been checked in the simulator. Do not enable
 the flag for Blender or Geekbench benchmarks: a successful compile would not
 establish correctness. The earlier bare hardware call fault remains
 unexplained. No additional hardware call sequence was submitted.
+
+### Balanced mask reserve follow-up
+
+The next compiler iteration now emits `if_fcmp r0l, eq, 0.0, 0.0, 2`
+(`push_exec r0l, 2`) immediately before the direct call, followed by the
+existing `pop_exec r0l, 2` after return. The initial six bytes are
+`421000000000`; the compiler-generated sequence passes the same simulator
+store check in ten instructions. This matches the measured balanced reserve rule for masked
+callers. The entry-only call restriction remains, and this offline check
+still does not establish hardware safety or general ABI correctness.
+
+### Scalar ABI and caller liveness follow-up
+
+The opt-in path now also passes one i32 argument and one i32 result in r2
+for single-block leaf functions.
+Calls carry an empty preserved-register mask so LLVM spills caller values
+that remain live across the call. AGXInsertWaits drains pending asynchronous
+loads before the call. The retained scalar fixture loads 42, calls a leaf
+that adds 5, then adds the original 42 to the returned 47. The simulator
+checks the final 89, including a caller spill and reload. The no-argument
+fixture still checks a side-effecting void leaf. Separate callee stack frames,
+larger signatures, and hardware validation are outstanding. The backend
+rejects a non-kernel stack frame under this option to avoid overlapping the
+caller's saved values.
