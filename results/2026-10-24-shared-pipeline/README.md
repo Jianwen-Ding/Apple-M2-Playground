@@ -85,11 +85,22 @@ The post-inline InstCombine/SimplifyCFG experiment was discarded: it left
 the camera live code unchanged and the surface compile timed out after
 150 seconds both ways. No unvalidated cleanup pass remains enabled.
 
-At this checkpoint, a third Geekbench run with both compiler changes and
-the cache fix is active, writing `geekbench-pipeline.*` in scratch. Next:
-finish that comparison, investigate loop-exit normalization/structurization
+The third Geekbench run with both compiler changes and the cache fix also
+reaches upload, with 2,026 compilations, 153.323 aggregate compiler-process
+seconds and a 129.684-second API-recorded interval (`geekbench-pipeline.json`).
+This still does not establish an application speedup. A later attempt to
+update individual operand uses in loop-exit SSA repair produces identical
+IR but no improvement (31.612/31.935 seconds); it was discarded, including
+its source changes (`loop-use-comparison.json`).
+
+The next shared runtime finding and its measurements are documented in
+[cached batched dispatch ordering](../2026-10-24-cdm-batch-ordering/README.md).
+The missing barrier is fixed, but batching remains opt-in because its
+Qwen prompt/generation tradeoff is mixed. The completed Geekbench comparison
+halves graph-launch host time but shifts time into synchronization and
+leaves overall runtime nearly unchanged. Next: investigate the remaining
+loop-exit normalization/structurization cost
 on the large Blender shader, and look for shared runtime/GPU execution
-improvements. Graph batching stays disabled by default because the earlier
-Qwen correctness tests demonstrated corruption with it enabled. The goal
+improvements. Graph batching stays disabled by default. The goal
 remains active; faster full Blender rendering and gains for every workload
 are not established here.

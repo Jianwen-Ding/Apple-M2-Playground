@@ -1,0 +1,20 @@
+[
+  {
+    "prompt": "What is 2 + 3? Answer with just the number.",
+    "exit": 0,
+    "wall_seconds": 1.648044817000482,
+    "cpu_match": true
+  },
+  {
+    "prompt": "Name the first three days of the week.",
+    "exit": 0,
+    "wall_seconds": 1.6904571550003311,
+    "cpu_match": true
+  },
+  {
+    "prompt": "Write a short sentence about the ocean.",
+    "exit": 0,
+    "wall_seconds": 1.9265676739996707,
+    "cpu_match": true
+  }
+]

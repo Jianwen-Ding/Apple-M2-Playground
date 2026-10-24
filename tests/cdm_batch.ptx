@@ -1,0 +1,47 @@
+.version 7.0
+.target sm_80
+.address_size 64
+
+// Authored dependency probe for agx_runtime's agx_cdm_batch runner.
+// Repeated inc dispatches and inc -> twice must observe preceding stores.
+.visible .entry inc(.param .u64 buffer, .param .u32 count) {
+    .reg .pred %outside;
+    .reg .b32 %lane, %group, %width, %index, %n, %value;
+    .reg .b64 %base, %offset, %address;
+    ld.param.u64 %base, [buffer];
+    ld.param.u32 %n, [count];
+    mov.u32 %lane, %tid.x;
+    mov.u32 %group, %ctaid.x;
+    mov.u32 %width, %ntid.x;
+    mad.lo.u32 %index, %group, %width, %lane;
+    setp.ge.u32 %outside, %index, %n;
+    @%outside ret;
+    mul.wide.u32 %offset, %index, 4;
+    add.u64 %address, %base, %offset;
+    ld.global.u32 %value, [%address];
+    add.u32 %value, %value, 1;
+    st.global.u32 [%address], %value;
+    ret;
+}
+
+.visible .entry twice(.param .u64 source, .param .u64 output, .param .u32 count) {
+    .reg .pred %outside;
+    .reg .b32 %lane, %group, %width, %index, %n, %value;
+    .reg .b64 %src, %dst, %offset, %source_address, %output_address;
+    ld.param.u64 %src, [source];
+    ld.param.u64 %dst, [output];
+    ld.param.u32 %n, [count];
+    mov.u32 %lane, %tid.x;
+    mov.u32 %group, %ctaid.x;
+    mov.u32 %width, %ntid.x;
+    mad.lo.u32 %index, %group, %width, %lane;
+    setp.ge.u32 %outside, %index, %n;
+    @%outside ret;
+    mul.wide.u32 %offset, %index, 4;
+    add.u64 %source_address, %src, %offset;
+    add.u64 %output_address, %dst, %offset;
+    ld.global.u32 %value, [%source_address];
+    shl.b32 %value, %value, 1;
+    st.global.u32 [%output_address], %value;
+    ret;
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "variant": "before",
+    "exit": 0,
+    "wall_seconds": 31.612289108001278,
+    "ir_bytes": 1185361815,
+    "sha256": "18ce910b75f8c7d6a151d3aee1dd32099df11f77e45219633241a2db3b56a9b8"
+  },
+  {
+    "variant": "after",
+    "exit": 0,
+    "wall_seconds": 31.935451355002442,
+    "ir_bytes": 1185361815,
+    "sha256": "18ce910b75f8c7d6a151d3aee1dd32099df11f77e45219633241a2db3b56a9b8"
+  }
+]

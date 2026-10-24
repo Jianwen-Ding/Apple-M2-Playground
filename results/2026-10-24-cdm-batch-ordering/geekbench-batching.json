@@ -1,0 +1,54 @@
+[
+  {
+    "batching": false,
+    "exit": 255,
+    "wall_seconds": 134.5719434579987,
+    "workloads": [
+      "Background Blur",
+      "Face Tracking",
+      "Super Resolution",
+      "Horizon Detection",
+      "Photo Filter",
+      "Video Filter",
+      "RAW",
+      "Feature Matching",
+      "Path Tracer",
+      "Particle Physics",
+      "Fluid Simulation"
+    ],
+    "compiler_invocations": 279,
+    "graph_calls": 8770,
+    "graph_host_seconds": 12.865897432,
+    "synchronize_host_seconds": 29.330529182,
+    "upload_failed": true,
+    "cuda_errors": {
+      "701": 11
+    }
+  },
+  {
+    "batching": true,
+    "exit": 255,
+    "wall_seconds": 134.1747390060009,
+    "workloads": [
+      "Background Blur",
+      "Face Tracking",
+      "Super Resolution",
+      "Horizon Detection",
+      "Photo Filter",
+      "Video Filter",
+      "RAW",
+      "Feature Matching",
+      "Path Tracer",
+      "Particle Physics",
+      "Fluid Simulation"
+    ],
+    "compiler_invocations": 196,
+    "graph_calls": 8770,
+    "graph_host_seconds": 6.485662608,
+    "synchronize_host_seconds": 35.01026041,
+    "upload_failed": true,
+    "cuda_errors": {
+      "701": 11
+    }
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "workloads_started": [
+    "Background Blur",
+    "Face Tracking",
+    "Super Resolution",
+    "Horizon Detection",
+    "Photo Filter",
+    "Video Filter",
+    "RAW",
+    "Feature Matching",
+    "Path Tracer",
+    "Particle Physics",
+    "Fluid Simulation"
+  ],
+  "compilations": 2026,
+  "compile_process_seconds_sum": 153.323,
+  "compiler_seconds_median": 0.07,
+  "api_elapsed_seconds": 129.684,
+  "module_load_seconds": 2.883170059,
+  "gpu_launches_profiled": 318836,
+  "gpu_seconds_sum": 26.186,
+  "tuning_rejections_701": 11,
+  "upload_failed": true
+}

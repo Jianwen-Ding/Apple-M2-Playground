@@ -1,0 +1,4 @@
+{
+  "cpu_match": true,
+  "output": "user\nList the integers from 1 to 5, separated by commas.\nassistant\n1, 2, 3, 4, 5\n\n> EOF by user\n\n\n"
+}

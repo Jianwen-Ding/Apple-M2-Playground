@@ -1,0 +1,38 @@
+[
+  {
+    "threads": 65536,
+    "dispatches": 64,
+    "cdm_barriers": 64,
+    "wrong_separate": 0,
+    "wrong_batched": 0,
+    "wrong_chain": 0,
+    "host_us_separate": 2274.0,
+    "host_us_batched": 83.3,
+    "fw_us_separate": 1841.5,
+    "fw_us_batched": 455.1
+  },
+  {
+    "threads": 65536,
+    "dispatches": 64,
+    "cdm_barriers": 64,
+    "wrong_separate": 0,
+    "wrong_batched": 0,
+    "wrong_chain": 0,
+    "host_us_separate": 1944.9,
+    "host_us_batched": 32.5,
+    "fw_us_separate": 1632.7,
+    "fw_us_batched": 455.1
+  },
+  {
+    "threads": 65536,
+    "dispatches": 64,
+    "cdm_barriers": 64,
+    "wrong_separate": 0,
+    "wrong_batched": 0,
+    "wrong_chain": 0,
+    "host_us_separate": 2438.2,
+    "host_us_batched": 87.2,
+    "fw_us_separate": 2037.4,
+    "fw_us_batched": 449.9
+  }
+]
