@@ -1,0 +1,65 @@
+      Peephole Optimizations
+      Remove dead machine instructions
+      AGX Fold Operands
+      MachineDominator Tree Construction
+      AGX Hoist From Else Flow Blocks
+      Detect Dead Lanes
+      Init Undef Pass
+      Process Implicit Definitions
+      Remove unreachable machine basic blocks
+      Live Variable Analysis
+      Slot index numbering
+      Live Interval Analysis
+      Eliminate PHI nodes for register allocation
+      Two-Address instruction pass
+      Register Coalescer
+      Rename Disconnected Subregister Components
+      Machine Instruction Scheduler
+      Debug Variable Analysis
+      Live Stack Slot Analysis
+      Virtual Register Map
+      Live Register Matrix
+      Bundle Machine CFG Edges
+      Spill Code Placement Analysis
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Greedy Register Allocator
+      Virtual Register Rewriter
+      Register Allocation Pass Scoring
+      Stack Slot Coloring
+      Machine Copy Propagation Pass
+      Machine Loop Invariant Code Motion
+      Remove Redundant DEBUG_VALUE analysis
+      Fixup Statepoint Caller Saved
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Prologue/Epilogue Insertion & Frame Finalization
+      Machine Late Instructions Cleanup Pass
+      Machine Cycle Info Analysis
+      Machine Block Frequency Analysis
+      Control Flow Optimizer
+      Machine Copy Propagation Pass
+      Post-RA pseudo instruction expansion pass
+      MachineDominator Tree Construction
+      Machine Natural Loop Construction
+      Post RA top-down list latency scheduler
+      Analyze Machine Code For Garbage Collection
+      Insert fentry calls
+      Insert XRay ops
+      AGX Lower Control Flow
+      AGX Insert Waits
+      Remove Loads Into Fake Uses
+      Live DEBUG_VALUE analysis
+      Machine Sanitizer Binary Metadata
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Stack Frame Layout Analysis
+      AGX Assembly Printer
+      Free MachineFunction
+[2026-10-24 08:16:10.775038852] 0x10c9e8fc0   Executing Pass 'Function Pass Manager' on Module '/scratch/agx-region-cache/surface-after.mir'...
+[2026-10-24 08:16:10.775120269] 0x10c9eb690     Executing Pass 'Dominator Tree Construction' on Function 'kernel_gpu_integrator_shade_surface'...
+[2026-10-24 08:16:10.815665164] 0x10c9eb690     Executing Pass 'Natural Loop Information' on Function 'kernel_gpu_integrator_shade_surface'...
+[2026-10-24 08:16:10.850296156] 0x10c9eb690     Executing Pass 'AGX annotate control flow' on Function 'kernel_gpu_integrator_shade_surface'...
+[2026-10-24 08:16:10.946171470] 0x10c9eb690     Made Modification 'AGX annotate control flow' on Function 'kernel_gpu_integrator_shade_surface'...
+[2026-10-24 08:16:10.946192012] 0x10c9eb690      Freeing Pass 'AGX annotate control flow' on Function 'kernel_gpu_integrator_shade_surface'...
+[2026-10-24 08:16:10.946204387] 0x10c9eb690     Executing Pass 'AGX Sink Addresses' on Function 'kernel_gpu_integrator_shade_surface'...

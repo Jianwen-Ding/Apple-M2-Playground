@@ -1,0 +1,12 @@
+[
+  {
+    "variant": "before",
+    "exit": -6,
+    "first_error": "LLVM ERROR: Cannot select: t4: i32 = addrspacecast[0 -> 5] Constant:i64<-1408>"
+  },
+  {
+    "variant": "after",
+    "exit": -6,
+    "first_error": "LLVM ERROR: Cannot select: t4: i32 = addrspacecast[0 -> 5] Constant:i64<-1408>"
+  }
+]

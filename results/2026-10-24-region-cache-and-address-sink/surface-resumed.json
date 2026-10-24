@@ -1,0 +1,16 @@
+{
+  "wall_seconds": 240.06670998000118,
+  "exit": "timeout",
+  "command": [
+    "/scratch/llvm-agx-build/bin/llc",
+    "-mtriple=agx",
+    "-mcpu=agx-g14c",
+    "-start-after=structurizecfg",
+    "-filetype=obj",
+    "-time-passes",
+    "-debug-pass=Executions",
+    "-o",
+    "/scratch/agx-region-cache/surface-resumed.o",
+    "/scratch/agx-region-cache/surface-after.mir"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "wall_seconds": 150.0677542529993,
+  "exit": "timeout",
+  "command": [
+    "/scratch/llvm-agx-build/bin/llc",
+    "-mtriple=agx",
+    "-mcpu=agx-g14c",
+    "-filetype=obj",
+    "-time-passes",
+    "-o",
+    "/scratch/agx-region-cache/surface-full-timing.o",
+    "/scratch/blender-ir-profile/module.surface-only.ll"
+  ],
+  "first_error": null
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "variant": "before",
+    "wall_seconds": 0.46451375400283723,
+    "exit": 0,
+    "command": [
+      "/scratch/agx-region-cache/llc-before-sink",
+      "-mtriple=agx",
+      "-mcpu=agx-g14c",
+      "-O0",
+      "-stop-after=agx-sink-addresses",
+      "-time-passes",
+      "-o",
+      "/dev/null",
+      "/scratch/agx-region-cache/reject-addresses.ll"
+    ]
+  },
+  {
+    "variant": "after",
+    "wall_seconds": 0.21439781499793753,
+    "exit": 0,
+    "command": [
+      "/scratch/llvm-agx-build/bin/llc",
+      "-mtriple=agx",
+      "-mcpu=agx-g14c",
+      "-O0",
+      "-stop-after=agx-sink-addresses",
+      "-time-passes",
+      "-o",
+      "/dev/null",
+      "/scratch/agx-region-cache/reject-addresses.ll"
+    ]
+  }
+]

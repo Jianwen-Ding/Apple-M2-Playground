@@ -1,0 +1,24 @@
+[==========] Running 8 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 8 tests from RegionCacheTest
+[ RUN      ] RegionCacheTest.RepeatedGlobalInvalidation
+[       OK ] RegionCacheTest.RepeatedGlobalInvalidation (1 ms)
+[ RUN      ] RegionCacheTest.LocalInvalidationPreservesOtherCaches
+[       OK ] RegionCacheTest.LocalInvalidationPreservesOtherCaches (0 ms)
+[ RUN      ] RegionCacheTest.DestroyCachedDetachedRegion
+[       OK ] RegionCacheTest.DestroyCachedDetachedRegion (0 ms)
+[ RUN      ] RegionCacheTest.ClearThenDestroyDetachedRegion
+[       OK ] RegionCacheTest.ClearThenDestroyDetachedRegion (0 ms)
+[ RUN      ] RegionCacheTest.MovePopulatedAnalysis
+[       OK ] RegionCacheTest.MovePopulatedAnalysis (0 ms)
+[ RUN      ] RegionCacheTest.MoveAssignmentReleasesPreviousCaches
+[       OK ] RegionCacheTest.MoveAssignmentReleasesPreviousCaches (0 ms)
+[ RUN      ] RegionCacheTest.MoveWithDetachedCachedRegion
+[       OK ] RegionCacheTest.MoveWithDetachedCachedRegion (0 ms)
+[ RUN      ] RegionCacheTest.ReleaseAndRecalculate
+[       OK ] RegionCacheTest.ReleaseAndRecalculate (0 ms)
+[----------] 8 tests from RegionCacheTest (3 ms total)
+
+[----------] Global test environment tear-down
+[==========] 8 tests from 1 test suite ran. (3 ms total)
+[  PASSED  ] 8 tests.

@@ -1,0 +1,214 @@
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find split-file in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ar in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-as in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-addr2line in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cgdata in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dis in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfdump in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-link in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto2 in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-nm in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profdata in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ranlib in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-size in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strings in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxfilt in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml2obj in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find verify-uselistorder in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-symbolizer in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /scratch/llvm-agx-build/bin
+llvm-lit: /scratch/llvm-agx/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /scratch/llvm-agx-build/bin
+-- Testing: 136 tests, 12 workers --
+PASS: LLVM :: Analysis/RegionInfo/mix_1.ll (1 of 136)
+PASS: LLVM :: CodeGen/AGX/atomics-noret.ll (2 of 136)
+PASS: LLVM :: Analysis/RegionInfo/block_sort.ll (3 of 136)
+PASS: LLVM :: CodeGen/AGX/keep-denormals.ll (4 of 136)
+PASS: LLVM :: CodeGen/AGX/checked.ll (5 of 136)
+PASS: LLVM :: CodeGen/AGX/hoist-guarded-loads.ll (6 of 136)
+PASS: LLVM :: Analysis/RegionInfo/infinite_loop_3.ll (7 of 136)
+PASS: LLVM :: CodeGen/AGX/atomics.ll (8 of 136)
+PASS: LLVM :: CodeGen/AGX/strict-fp.ll (9 of 136)
+PASS: LLVM :: CodeGen/AGX/wide-atomics.ll (10 of 136)
+PASS: LLVM :: CodeGen/AGX/generic-addresses.ll (11 of 136)
+PASS: LLVM :: CodeGen/AGX/atomics-g14.ll (12 of 136)
+PASS: LLVM :: Analysis/RegionInfo/condition_complicated.ll (13 of 136)
+PASS: LLVM :: CodeGen/AGX/block-barrier.ll (14 of 136)
+PASS: LLVM :: Analysis/RegionInfo/cond_loop.ll (15 of 136)
+PASS: LLVM :: Analysis/RegionInfo/nested_loops.ll (16 of 136)
+PASS: LLVM :: Analysis/RegionInfo/loops_1.ll (17 of 136)
+PASS: LLVM :: Analysis/RegionInfo/next.ll (18 of 136)
+PASS: LLVM :: CodeGen/AGX/recursion.ll (19 of 136)
+PASS: LLVM :: CodeGen/AGX/fptoi-sat.ll (20 of 136)
+PASS: LLVM :: CodeGen/AGX/mesa-isa.ll (21 of 136)
+PASS: LLVM :: CodeGen/AGX/mesa-isa-errors.ll (22 of 136)
+PASS: LLVM :: CodeGen/AGX/global-data-uniform.ll (23 of 136)
+PASS: LLVM :: CodeGen/AGX/else-flow-hoist.ll (24 of 136)
+PASS: LLVM :: CodeGen/AGX/byref-large.ll (25 of 136)
+PASS: LLVM :: Analysis/RegionInfo/infinite_loop_2.ll (26 of 136)
+PASS: LLVM :: CodeGen/AGX/threadgroup-address-offsets.ll (27 of 136)
+PASS: LLVM :: CodeGen/AGX/fp-env.ll (28 of 136)
+PASS: LLVM :: Analysis/RegionInfo/condition_simple.ll (29 of 136)
+PASS: LLVM :: Analysis/RegionInfo/exit_in_condition.ll (30 of 136)
+PASS: LLVM :: CodeGen/AGX/fpext-fold.ll (31 of 136)
+PASS: LLVM :: CodeGen/AGX/vector-memory.ll (32 of 136)
+PASS: LLVM :: CodeGen/AGX/checked-limits.ll (33 of 136)
+PASS: LLVM :: Analysis/RegionInfo/condition_same_exit.ll (34 of 136)
+PASS: LLVM :: Analysis/RegionInfo/condition_forward_edge.ll (35 of 136)
+PASS: LLVM :: CodeGen/AGX/texture-sample.ll (36 of 136)
+PASS: LLVM :: Analysis/RegionInfo/paper.ll (37 of 136)
+PASS: LLVM :: CodeGen/AGX/approx-intrinsics.ll (38 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/nested-loop-subregion.ll (39 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/workarounds/needs-fr-ule.ll (40 of 136)
+PASS: LLVM :: CodeGen/AGX/kernel-args-byref.ll (41 of 136)
+PASS: LLVM :: CodeGen/AGX/skip-jumps.ll (42 of 136)
+PASS: LLVM :: CodeGen/AGX/experimental-leaf-call-scalar.ll (43 of 136)
+PASS: LLVM :: CodeGen/AGX/shuffle-divergent.ll (44 of 136)
+PASS: LLVM :: CodeGen/AGX/kernel-cluster-record.ll (45 of 136)
+PASS: LLVM :: CodeGen/AGX/matrix-fma-lane-inputs.ll (46 of 136)
+PASS: LLVM :: Analysis/RegionInfo/condition_complicated_2.ll (47 of 136)
+PASS: LLVM :: CodeGen/AGX/matrix-fma.ll (48 of 136)
+PASS: LLVM :: CodeGen/AGX/prune-before-inline.ll (49 of 136)
+PASS: LLVM :: CodeGen/AGX/experimental-call-auto-outline.ll (50 of 136)
+PASS: LLVM :: Analysis/RegionInfo/two_loops_same_header.ll (51 of 136)
+PASS: LLVM :: CodeGen/AGX/kernel-args.ll (52 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/rebuild-ssa-infinite-loop.ll (53 of 136)
+PASS: LLVM :: CodeGen/AGX/experimental-call-aggregate.ll (54 of 136)
+PASS: LLVM :: Analysis/RegionInfo/infinite_loop.ll (55 of 136)
+PASS: LLVM :: CodeGen/AGX/experimental-leaf-call.ll (56 of 136)
+PASS: LLVM :: Analysis/RegionInfo/loops_2.ll (57 of 136)
+PASS: LLVM :: Analysis/RegionInfo/loop_with_condition.ll (58 of 136)
+PASS: LLVM :: CodeGen/AGX/fences.ll (59 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/nested-loop-order.ll (60 of 136)
+PASS: LLVM :: CodeGen/AGX/entry-points.ll (61 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/infinite-loop.ll (62 of 136)
+PASS: LLVM :: CodeGen/AGX/checked-sites.ll (63 of 136)
+PASS: LLVM :: CodeGen/AGX/indirect-calls.ll (64 of 136)
+PASS: LLVM :: CodeGen/AGX/experimental-nested-call.ll (65 of 136)
+PASS: LLVM :: CodeGen/AGX/control-flow.ll (66 of 136)
+PASS: LLVM :: Analysis/RegionInfo/infinite_loop_4.ll (67 of 136)
+PASS: LLVM :: CodeGen/AGX/structurize-analysis-lazy.ll (68 of 136)
+PASS: LLVM :: CodeGen/AGX/memory.ll (69 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/structurizecfg-debug-loc.ll (70 of 136)
+PASS: LLVM :: CodeGen/AGX/simd.ll (71 of 136)
+PASS: LLVM :: CodeGen/AGX/sink-divergent.ll (72 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/switch.ll (73 of 136)
+PASS: LLVM :: CodeGen/AGX/sink-addresses.ll (74 of 136)
+PASS: LLVM :: CodeGen/AGX/occupancy.ll (75 of 136)
+PASS: LLVM :: CodeGen/AGX/float-misc.ll (76 of 136)
+PASS: LLVM :: CodeGen/AGX/host-coherent.ll (77 of 136)
+PASS: LLVM :: CodeGen/AGX/divrem32.ll (78 of 136)
+PASS: LLVM :: CodeGen/AGX/experimental-call-masked.ll (79 of 136)
+PASS: LLVM :: CodeGen/AGX/threadgroup-offset.ll (80 of 136)
+PASS: LLVM :: CodeGen/AGX/half-denormals.ll (81 of 136)
+PASS: LLVM :: CodeGen/AGX/experimental-call-frames.ll (82 of 136)
+PASS: LLVM :: CodeGen/AGX/byte-to-float.ll (83 of 136)
+PASS: LLVM :: CodeGen/AGX/errors.ll (84 of 136)
+PASS: LLVM :: CodeGen/AGX/address-space-aa.ll (85 of 136)
+PASS: LLVM :: CodeGen/AGX/always-inline.ll (86 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/loop-break-phi.ll (87 of 136)
+PASS: LLVM :: CodeGen/AGX/constrained-fp.ll (88 of 136)
+PASS: LLVM :: CodeGen/AGX/kernel-hidden-record.ll (89 of 136)
+PASS: LLVM :: CodeGen/AGX/shuffle-analysis-lazy.ll (90 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/simple-structurizecfg-crash.ll (91 of 136)
+PASS: LLVM :: CodeGen/AGX/imm-operands.ll (92 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/branch-on-argument.ll (93 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/loop-multiple-exits.ll (94 of 136)
+PASS: LLVM :: CodeGen/AGX/i64.ll (95 of 136)
+PASS: LLVM :: CodeGen/AGX/experimental-call-dead-dce.ll (96 of 136)
+PASS: LLVM :: CodeGen/AGX/fp.ll (97 of 136)
+PASS: LLVM :: CodeGen/AGX/trap-exit.ll (98 of 136)
+PASS: LLVM :: CodeGen/AGX/errors-f64.ll (99 of 136)
+PASS: LLVM :: Analysis/RegionInfo/outgoing_edge_1.ll (100 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/interleaved-loop-order.ll (101 of 136)
+PASS: LLVM :: CodeGen/AGX/strict-bf16.ll (102 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/workarounds/needs-unified-loop-exits.ll (103 of 136)
+PASS: LLVM :: CodeGen/AGX/neg-offset.ll (104 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/one-loop-multiple-backedges.ll (105 of 136)
+PASS: LLVM :: Analysis/RegionInfo/multiple_exiting_edge.ll (106 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/bug36015.ll (107 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/post-order-traversal-bug.ll (108 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/invert-constantexpr.ll (109 of 136)
+PASS: LLVM :: Analysis/RegionInfo/infinite_loop_5_b.ll (110 of 136)
+UNSUPPORTED: LLVM :: Transforms/StructurizeCFG/AMDGPU/backedge-id-bug.ll (111 of 136)
+UNSUPPORTED: LLVM :: Transforms/StructurizeCFG/AMDGPU/loop-subregion-misordered.ll (112 of 136)
+PASS: LLVM :: CodeGen/AGX/global-relocs.ll (113 of 136)
+PASS: LLVM :: Analysis/RegionInfo/outgoing_edge.ll (114 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/rebuild-ssa-infinite-loop-inseltpoison.ll (115 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/hoist-zerocost.ll (116 of 136)
+PASS: LLVM :: CodeGen/AGX/threadgroup-layout.ll (117 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/loop-continue-phi.ll (118 of 136)
+PASS: LLVM :: Analysis/RegionInfo/unreachable_bb.ll (119 of 136)
+PASS: LLVM :: Analysis/RegionInfo/20100809_bb_not_in_domtree.ll (120 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/hoist-zerocost-nested.ll (121 of 136)
+PASS: LLVM :: Analysis/RegionInfo/infinite_loop_5_c.ll (122 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/structurizer-keep-perf-md.ll (123 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/workarounds/needs-fix-reducible.ll (124 of 136)
+PASS: LLVM :: Analysis/RegionInfo/bad_node_traversal.ll (125 of 136)
+PASS: LLVM :: Analysis/RegionInfo/infinite_loop_5_a.ll (126 of 136)
+PASS: LLVM :: CodeGen/AGX/checked-aggregate.ll (127 of 136)
+PASS: LLVM :: CodeGen/AGX/else-flow-body.mir (128 of 136)
+PASS: LLVM :: CodeGen/AGX/global-data.ll (129 of 136)
+PASS: LLVM :: CodeGen/AGX/repeated-barrier.ll (130 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/callbr.ll (131 of 136)
+PASS: LLVM :: Transforms/StructurizeCFG/invert-condition.ll (132 of 136)
+UNSUPPORTED: LLVM :: Transforms/StructurizeCFG/AMDGPU/uniform-regions.ll (133 of 136)
+PASS: LLVM :: CodeGen/AGX/region-cache-nested.ll (134 of 136)
+PASS: LLVM :: CodeGen/AGX/matrix-fma-native.ll (135 of 136)
+PASS: LLVM :: CodeGen/AGX/soft-f64.ll (136 of 136)
+
+Testing Time: 0.46s
+
+Total Discovered Tests: 136
+  Unsupported:   3 (2.21%)
+  Passed     : 133 (97.79%)

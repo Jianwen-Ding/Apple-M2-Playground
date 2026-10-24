@@ -1,0 +1,14 @@
+{
+  "wall_seconds": 105.88195329500013,
+  "exit": 0,
+  "command": [
+    "/scratch/llvm-agx-build/bin/llc",
+    "-mtriple=agx",
+    "-mcpu=agx-g14c",
+    "-stop-after=structurizecfg",
+    "-time-passes",
+    "-o",
+    "/scratch/agx-region-cache/surface-after.mir",
+    "/scratch/blender-ir-profile/module.surface-only.ll"
+  ]
+}

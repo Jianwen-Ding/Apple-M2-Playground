@@ -1,0 +1,12 @@
+[
+  {
+    "variant": "before",
+    "bytes": 7718641,
+    "sha256": "004996700c63dd74634db534456dc00dde5e8ff6e2a0a848ea1f2a2d31d5bd32"
+  },
+  {
+    "variant": "after",
+    "bytes": 7718641,
+    "sha256": "004996700c63dd74634db534456dc00dde5e8ff6e2a0a848ea1f2a2d31d5bd32"
+  }
+]

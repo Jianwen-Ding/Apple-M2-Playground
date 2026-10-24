@@ -1,0 +1,30 @@
+[
+  {
+    "name": "before_region_cache",
+    "path": "/scratch/agx-region-cache/llc-before",
+    "checkpoint": "2f73959ea7b7",
+    "bytes": 92942120,
+    "sha256": "f43eb9b98519f76fa39ce6919f82726307886103ff84a65e008077eb2f6a8c04"
+  },
+  {
+    "name": "before_address_compaction",
+    "path": "/scratch/agx-region-cache/llc-before-sink",
+    "checkpoint": "46aff3aba735",
+    "bytes": 92943336,
+    "sha256": "7092109f9416ee39b0e56cd9d3556c2bde28b9210f3a96a35f4e57d88c608950"
+  },
+  {
+    "name": "current_llc",
+    "path": "/scratch/llvm-agx-build/bin/llc",
+    "checkpoint": "c1a33023280a",
+    "bytes": 92943448,
+    "sha256": "30e337815d1f8d1293bc6c2c52504b0e9c6d247586d9833aea65cf777517a707"
+  },
+  {
+    "name": "current_zoc",
+    "path": "/scratch/geekbench-extract/cargo-target/release/zoc",
+    "checkpoint": "ZLUDA 4db02c1 linked against LLVM c1a33023280a",
+    "bytes": 75813056,
+    "sha256": "907596cf9ffc1b35cbcfbef00e5b5001f4b054804b19a0126f9eba8b4088f975"
+  }
+]

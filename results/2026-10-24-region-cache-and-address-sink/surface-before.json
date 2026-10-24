@@ -1,0 +1,18 @@
+{
+  "wall_seconds": 137.78405478700006,
+  "exit": 0,
+  "command": [
+    "/scratch/agx-region-cache/llc-before",
+    "-mtriple=agx",
+    "-mcpu=agx-g14c",
+    "-stop-after=structurizecfg",
+    "-time-passes",
+    "-o",
+    "/scratch/agx-region-cache/surface-before.mir",
+    "/scratch/blender-ir-profile/module.surface-only.ll"
+  ],
+  "before_bytes": 1192567545,
+  "before_sha256": "8120ab5a912f2d80fea5178efa4c6c4cd18ac91f838725bf628ae1a374d49e8a",
+  "after_bytes": 1192567545,
+  "after_sha256": "8120ab5a912f2d80fea5178efa4c6c4cd18ac91f838725bf628ae1a374d49e8a"
+}
