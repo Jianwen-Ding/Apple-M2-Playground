@@ -1,0 +1,34 @@
+[
+  {
+    "pruning": false,
+    "wall_seconds": 17.602,
+    "exit": 0,
+    "cpu_output_match": true,
+    "compilations": 39,
+    "compile_seconds": 14.99
+  },
+  {
+    "pruning": true,
+    "wall_seconds": 17.5639,
+    "exit": 0,
+    "cpu_output_match": true,
+    "compilations": 39,
+    "compile_seconds": 15.389
+  },
+  {
+    "pruning": true,
+    "wall_seconds": 17.8177,
+    "exit": 0,
+    "cpu_output_match": true,
+    "compilations": 39,
+    "compile_seconds": 15.411
+  },
+  {
+    "pruning": false,
+    "wall_seconds": 17.6029,
+    "exit": 0,
+    "cpu_output_match": true,
+    "compilations": 39,
+    "compile_seconds": 15.534
+  }
+]

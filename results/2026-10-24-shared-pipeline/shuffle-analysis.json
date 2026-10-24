@@ -1,0 +1,29 @@
+[
+  {
+    "cpu": "agx-g13g",
+    "matrix": "emulated",
+    "checked_elements": 64,
+    "code_bytes": 958,
+    "instructions": 150,
+    "groups": 1,
+    "preamble_uniforms": {}
+  },
+  {
+    "cpu": "agx-g14c",
+    "matrix": "emulated",
+    "checked_elements": 64,
+    "code_bytes": 958,
+    "instructions": 150,
+    "groups": 1,
+    "preamble_uniforms": {}
+  },
+  {
+    "cpu": "agx-g14c",
+    "matrix": "native",
+    "checked_elements": 64,
+    "code_bytes": 86,
+    "instructions": 12,
+    "groups": 1,
+    "preamble_uniforms": {}
+  }
+]

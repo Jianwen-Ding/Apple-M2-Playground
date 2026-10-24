@@ -1,0 +1,11 @@
+{
+  "stage": "before structurizecfg; not a complete shader compilation",
+  "before_wall_seconds": 36.864751712,
+  "after_wall_seconds": 31.689126628,
+  "before_backend_pass_wall_seconds": 21.1053,
+  "after_backend_pass_wall_seconds": 15.8864,
+  "removed_uniformity_analysis_wall_seconds": 4.5146,
+  "intermediate_ir_bytes": 1185361815,
+  "intermediate_ir_sha256": "18ce910b75f8c7d6a151d3aee1dd32099df11f77e45219633241a2db3b56a9b8",
+  "byte_identical": true
+}

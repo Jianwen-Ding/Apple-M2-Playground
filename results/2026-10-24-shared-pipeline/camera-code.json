@@ -1,0 +1,32 @@
+[
+  {
+    "file": "camera-0-False.o",
+    "text_bytes": 44222,
+    "sha256": "48252ea19c0650f3a52e3011fa461e42f44df469d7d5964a8eabb9fa17c694ba"
+  },
+  {
+    "file": "camera-1-True.o",
+    "text_bytes": 44222,
+    "sha256": "48252ea19c0650f3a52e3011fa461e42f44df469d7d5964a8eabb9fa17c694ba"
+  },
+  {
+    "file": "camera-2-True.o",
+    "text_bytes": 44222,
+    "sha256": "48252ea19c0650f3a52e3011fa461e42f44df469d7d5964a8eabb9fa17c694ba"
+  },
+  {
+    "file": "camera-3-False.o",
+    "text_bytes": 44222,
+    "sha256": "48252ea19c0650f3a52e3011fa461e42f44df469d7d5964a8eabb9fa17c694ba"
+  },
+  {
+    "file": "camera-4-False.o",
+    "text_bytes": 44222,
+    "sha256": "48252ea19c0650f3a52e3011fa461e42f44df469d7d5964a8eabb9fa17c694ba"
+  },
+  {
+    "file": "camera-5-True.o",
+    "text_bytes": 44222,
+    "sha256": "48252ea19c0650f3a52e3011fa461e42f44df469d7d5964a8eabb9fa17c694ba"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "case": "camera",
+    "cleanup": false,
+    "wall": 0.466,
+    "exit": 0
+  },
+  {
+    "case": "camera",
+    "cleanup": true,
+    "wall": 0.441,
+    "exit": 0
+  },
+  {
+    "case": "surface",
+    "cleanup": false,
+    "wall": 150.144,
+    "timeout": true
+  },
+  {
+    "case": "surface",
+    "cleanup": true,
+    "wall": 150.142,
+    "timeout": true
+  }
+]

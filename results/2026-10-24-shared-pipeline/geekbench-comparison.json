@@ -1,0 +1,50 @@
+{
+  "before": {
+    "workloads_started": [
+      "Background Blur",
+      "Face Tracking",
+      "Super Resolution",
+      "Horizon Detection",
+      "Photo Filter",
+      "Video Filter",
+      "RAW",
+      "Feature Matching",
+      "Path Tracer",
+      "Particle Physics",
+      "Fluid Simulation"
+    ],
+    "compilations": 2026,
+    "compile_process_seconds_sum": 154.734,
+    "compile_seconds_median": 0.071,
+    "api_elapsed_seconds": 128.65,
+    "gpu_launches_profiled": 318488,
+    "gpu_seconds_sum": 25.354,
+    "tuning_rejections_701": 11,
+    "upload_failed": true,
+    "module_load_seconds": 2.895528586
+  },
+  "after": {
+    "workloads_started": [
+      "Background Blur",
+      "Face Tracking",
+      "Super Resolution",
+      "Horizon Detection",
+      "Photo Filter",
+      "Video Filter",
+      "RAW",
+      "Feature Matching",
+      "Path Tracer",
+      "Particle Physics",
+      "Fluid Simulation"
+    ],
+    "compilations": 2026,
+    "compile_process_seconds_sum": 153.993,
+    "compile_seconds_median": 0.071,
+    "api_elapsed_seconds": 129.025,
+    "gpu_launches_profiled": 318512,
+    "gpu_seconds_sum": 26.041,
+    "tuning_rejections_701": 11,
+    "upload_failed": true,
+    "module_load_seconds": 2.948880847
+  }
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "enabled": false,
+    "wall": 0.6572,
+    "exit": 0
+  },
+  {
+    "enabled": true,
+    "wall": 0.4277,
+    "exit": 0
+  },
+  {
+    "enabled": true,
+    "wall": 0.4134,
+    "exit": 0
+  },
+  {
+    "enabled": false,
+    "wall": 0.6715,
+    "exit": 0
+  },
+  {
+    "enabled": false,
+    "wall": 0.6561,
+    "exit": 0
+  },
+  {
+    "enabled": true,
+    "wall": 0.4071,
+    "exit": 0
+  }
+]
