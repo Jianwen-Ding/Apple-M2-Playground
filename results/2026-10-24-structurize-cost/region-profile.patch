@@ -1,0 +1,63 @@
+--- a/llvm/lib/Analysis/RegionPass.cpp
++++ b/llvm/lib/Analysis/RegionPass.cpp
+@@ -14,6 +14,8 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "llvm/Analysis/RegionPass.h"
++#include <chrono>
++#include <array>
+ #include "llvm/Analysis/RegionInfo.h"
+ #include "llvm/IR/OptBisect.h"
+ #include "llvm/IR/PassTimingInfo.h"
+@@ -72,6 +74,14 @@
+     }
+   }
+ 
++  const bool Profile = std::getenv("AGX_REGION_PROFILE");
++  std::array<double, 4> Times{};
++  unsigned RegionCount = 0;
++  auto Phase = [&](unsigned I, auto Action) {
++    auto T = std::chrono::steady_clock::now();
++    Action();
++    Times[I] += std::chrono::duration<double>(std::chrono::steady_clock::now() - T).count();
++  };
+   // Walk Regions
+   while (!RQ.empty()) {
+ 
+@@ -97,7 +107,7 @@
+ #ifdef EXPENSIVE_CHECKS
+         uint64_t RefHash = P->structuralHash(F);
+ #endif
+-        LocalChanged = P->runOnRegion(CurrentRegion, *this);
++        Phase(0, [&] { LocalChanged = P->runOnRegion(CurrentRegion, *this); });
+ 
+ #ifdef EXPENSIVE_CHECKS
+         if (!LocalChanged && (RefHash != P->structuralHash(F))) {
+@@ -124,11 +134,11 @@
+       // enabled with the -verify-region-info option.
+       {
+         TimeRegion PassTimer(getPassTimer(P));
+-        CurrentRegion->verifyRegion();
++        Phase(1, [&] { CurrentRegion->verifyRegion(); });
+       }
+ 
+       // Then call the regular verifyAnalysis functions.
+-      verifyPreservedAnalysis(P);
++      Phase(2, [&] { verifyPreservedAnalysis(P); });
+ 
+       if (LocalChanged)
+         removeNotPreservedAnalysis(P);
+@@ -144,7 +154,12 @@
+     RQ.pop_back();
+ 
+     // Free all region nodes created in region passes.
+-    RI->clearNodeCache();
++    Phase(3, [&] { RI->clearNodeCache(); });
++    if (Profile && ++RegionCount % 1000 == 0) {
++      errs() << "AGXREGION " << RegionCount;
++      for (double T : Times) errs() << " " << T;
++      errs() << "\n";
++    }
+   }
+ 
+   // Finalization

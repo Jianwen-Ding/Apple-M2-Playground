@@ -1,0 +1,108 @@
+===-------------------------------------------------------------------------===
+                          Pass execution timing report
+===-------------------------------------------------------------------------===
+  Total Execution Time: 16.0744 seconds (16.1314 wall clock)
+
+   ---User Time---   --System Time--   --User+System--   ---Wall Time---  --- Name ---
+   4.2700 ( 26.9%)   0.0000 (  0.0%)   4.2700 ( 26.6%)   4.2829 ( 26.5%)  Fixup each natural loop to have a single exit block
+   2.1293 ( 13.4%)   0.0000 (  0.0%)   2.1293 ( 13.2%)   2.1360 ( 13.2%)  CodeGen Prepare
+   2.1209 ( 13.3%)   0.0000 (  0.0%)   2.1209 ( 13.2%)   2.1307 ( 13.2%)  Module Verifier
+   1.5617 (  9.8%)   0.1227 ( 70.4%)   1.6844 ( 10.5%)   1.6886 ( 10.5%)  AGX Lower Floating Point Environment
+   1.1592 (  7.3%)   0.0020 (  1.2%)   1.1613 (  7.2%)   1.1670 (  7.2%)  AGX CodeGen Prepare
+   0.7565 (  4.8%)   0.0110 (  6.3%)   0.7674 (  4.8%)   0.7698 (  4.8%)  Inliner for always_inline functions
+   0.6110 (  3.8%)   0.0000 (  0.0%)   0.6110 (  3.8%)   0.6146 (  3.8%)  Constant Hoisting
+   0.4562 (  2.9%)   0.0205 ( 11.8%)   0.4767 (  3.0%)   0.4778 (  3.0%)  Canonicalize Freeze Instructions in Loops
+   0.4270 (  2.7%)   0.0099 (  5.7%)   0.4369 (  2.7%)   0.4380 (  2.7%)  Loop Strength Reduction
+   0.3238 (  2.0%)   0.0000 (  0.0%)   0.3238 (  2.0%)   0.3255 (  2.0%)  MIR Printing Pass
+   0.1585 (  1.0%)   0.0000 (  0.0%)   0.1585 (  1.0%)   0.1591 (  1.0%)  Branch Probability Analysis
+   0.1581 (  1.0%)   0.0000 (  0.0%)   0.1581 (  1.0%)   0.1586 (  1.0%)  Branch Probability Analysis #2
+   0.1360 (  0.9%)   0.0030 (  1.7%)   0.1389 (  0.9%)   0.1395 (  0.9%)  AGX Soft F64
+   0.1139 (  0.7%)   0.0006 (  0.3%)   0.1145 (  0.7%)   0.1148 (  0.7%)  Natural Loop Information #3
+   0.1121 (  0.7%)   0.0000 (  0.0%)   0.1121 (  0.7%)   0.1127 (  0.7%)  AGX Strict FP
+   0.1049 (  0.7%)   0.0000 (  0.0%)   0.1049 (  0.7%)   0.1054 (  0.7%)  Scalarize Masked Memory Intrinsics
+   0.1042 (  0.7%)   0.0000 (  0.0%)   0.1042 (  0.6%)   0.1047 (  0.6%)  Verify generated machine code
+   0.1027 (  0.6%)   0.0000 (  0.0%)   0.1027 (  0.6%)   0.1032 (  0.6%)  Replace intrinsics with calls to vector library
+   0.1025 (  0.6%)   0.0000 (  0.0%)   0.1025 (  0.6%)   0.1029 (  0.6%)  Expand reduction intrinsics
+   0.1011 (  0.6%)   0.0000 (  0.0%)   0.1011 (  0.6%)   0.1016 (  0.6%)  Partially inline calls to library functions
+   0.0638 (  0.4%)   0.0000 (  0.0%)   0.0638 (  0.4%)   0.0639 (  0.4%)  Block Frequency Analysis
+   0.0636 (  0.4%)   0.0000 (  0.0%)   0.0636 (  0.4%)   0.0638 (  0.4%)  Post-Dominator Tree Construction
+   0.0630 (  0.4%)   0.0000 (  0.0%)   0.0630 (  0.4%)   0.0632 (  0.4%)  Block Frequency Analysis #2
+   0.0623 (  0.4%)   0.0000 (  0.0%)   0.0623 (  0.4%)   0.0625 (  0.4%)  Post-Dominator Tree Construction #2
+   0.0561 (  0.4%)   0.0017 (  1.0%)   0.0578 (  0.4%)   0.0580 (  0.4%)  Induction Variable Users
+   0.0564 (  0.4%)   0.0000 (  0.0%)   0.0564 (  0.4%)   0.0567 (  0.4%)  AGX Hoist Guarded Loads
+   0.0448 (  0.3%)   0.0000 (  0.0%)   0.0448 (  0.3%)   0.0449 (  0.3%)  Remove unreachable blocks from the CFG
+   0.0377 (  0.2%)   0.0000 (  0.0%)   0.0377 (  0.2%)   0.0377 (  0.2%)  Lower SwitchInst's to branches
+   0.0351 (  0.2%)   0.0001 (  0.0%)   0.0352 (  0.2%)   0.0353 (  0.2%)  Dominator Tree Construction #6
+   0.0345 (  0.2%)   0.0001 (  0.0%)   0.0346 (  0.2%)   0.0348 (  0.2%)  Canonicalize natural loops
+   0.0338 (  0.2%)   0.0000 (  0.0%)   0.0338 (  0.2%)   0.0338 (  0.2%)  Remove unreachable blocks from the CFG #2
+   0.0310 (  0.2%)   0.0010 (  0.6%)   0.0320 (  0.2%)   0.0321 (  0.2%)  AGX Always Inline
+   0.0303 (  0.2%)   0.0000 (  0.0%)   0.0303 (  0.2%)   0.0304 (  0.2%)  Natural Loop Information #4
+   0.0297 (  0.2%)   0.0000 (  0.0%)   0.0297 (  0.2%)   0.0298 (  0.2%)  Dominator Tree Construction #7
+   0.0238 (  0.1%)   0.0000 (  0.0%)   0.0238 (  0.1%)   0.0238 (  0.1%)  Natural Loop Information #5
+   0.0213 (  0.1%)   0.0000 (  0.0%)   0.0213 (  0.1%)   0.0213 (  0.1%)  Cycle Info Analysis #3
+   0.0210 (  0.1%)   0.0000 (  0.0%)   0.0210 (  0.1%)   0.0211 (  0.1%)  Cycle Info Analysis
+   0.0209 (  0.1%)   0.0000 (  0.0%)   0.0209 (  0.1%)   0.0209 (  0.1%)  Lower invoke and unwind, for unwindless code generators
+   0.0208 (  0.1%)   0.0000 (  0.0%)   0.0208 (  0.1%)   0.0208 (  0.1%)  Dead Global Elimination
+   0.0196 (  0.1%)   0.0010 (  0.6%)   0.0206 (  0.1%)   0.0207 (  0.1%)  GPU Load and Store Vectorizer
+   0.0198 (  0.1%)   0.0000 (  0.0%)   0.0198 (  0.1%)   0.0199 (  0.1%)  Cycle Info Analysis #2
+   0.0134 (  0.1%)   0.0000 (  0.0%)   0.0134 (  0.1%)   0.0135 (  0.1%)  Scalarize vector operations
+   0.0129 (  0.1%)   0.0000 (  0.0%)   0.0129 (  0.1%)   0.0130 (  0.1%)  Infer address spaces
+   0.0115 (  0.1%)   0.0001 (  0.0%)   0.0115 (  0.1%)   0.0116 (  0.1%)  Scalar Evolution Analysis #2
+   0.0108 (  0.1%)   0.0000 (  0.0%)   0.0108 (  0.1%)   0.0108 (  0.1%)  AGX Lower Generic Addresses
+   0.0070 (  0.0%)   0.0000 (  0.0%)   0.0070 (  0.0%)   0.0070 (  0.0%)  AGX Promote Kernel Arguments
+   0.0069 (  0.0%)   0.0000 (  0.0%)   0.0069 (  0.0%)   0.0069 (  0.0%)  Expand Atomic instructions
+   0.0061 (  0.0%)   0.0000 (  0.0%)   0.0061 (  0.0%)   0.0062 (  0.0%)  Dominator Tree Construction #2
+   0.0046 (  0.0%)   0.0000 (  0.0%)   0.0046 (  0.0%)   0.0046 (  0.0%)  AGX Threadgroup Addresses
+   0.0041 (  0.0%)   0.0000 (  0.0%)   0.0041 (  0.0%)   0.0041 (  0.0%)  AGX Expand Wide Atomics
+   0.0036 (  0.0%)   0.0000 (  0.0%)   0.0036 (  0.0%)   0.0036 (  0.0%)  Expand IR instructions
+   0.0035 (  0.0%)   0.0000 (  0.0%)   0.0035 (  0.0%)   0.0035 (  0.0%)  Dominator Tree Construction #4
+   0.0028 (  0.0%)   0.0007 (  0.4%)   0.0035 (  0.0%)   0.0035 (  0.0%)  Dominator Tree Construction
+   0.0032 (  0.0%)   0.0000 (  0.0%)   0.0032 (  0.0%)   0.0032 (  0.0%)  Dominator Tree Construction #3
+   0.0027 (  0.0%)   0.0000 (  0.0%)   0.0027 (  0.0%)   0.0027 (  0.0%)  Natural Loop Information #2
+   0.0026 (  0.0%)   0.0000 (  0.0%)   0.0026 (  0.0%)   0.0026 (  0.0%)  Dominator Tree Construction #5
+   0.0024 (  0.0%)   0.0000 (  0.0%)   0.0024 (  0.0%)   0.0024 (  0.0%)  Natural Loop Information
+   0.0020 (  0.0%)   0.0000 (  0.0%)   0.0020 (  0.0%)   0.0021 (  0.0%)  Lazy Value Information Analysis
+   0.0004 (  0.0%)   0.0001 (  0.0%)   0.0005 (  0.0%)   0.0005 (  0.0%)  Basic Alias Analysis (stateless AA impl)
+   0.0002 (  0.0%)   0.0001 (  0.0%)   0.0003 (  0.0%)   0.0003 (  0.0%)  Function Alias Analysis Results
+   0.0002 (  0.0%)   0.0000 (  0.0%)   0.0002 (  0.0%)   0.0002 (  0.0%)  ObjC ARC contraction
+   0.0001 (  0.0%)   0.0000 (  0.0%)   0.0001 (  0.0%)   0.0001 (  0.0%)  SROA
+   0.0001 (  0.0%)   0.0000 (  0.0%)   0.0001 (  0.0%)   0.0001 (  0.0%)  Basic Alias Analysis (stateless AA impl) #2
+   0.0001 (  0.0%)   0.0000 (  0.0%)   0.0001 (  0.0%)   0.0001 (  0.0%)  Function Alias Analysis Results #2
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Scalar Evolution Analysis
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Lazy Machine Block Frequency Analysis
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Pre-ISel Intrinsic Lowering
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Convert irreducible control-flow into natural loops
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Free MachineFunction
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Basic Alias Analysis (stateless AA impl) #3
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Basic Alias Analysis (stateless AA impl) #4
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  AGX Checked Memory Accesses
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Lazy Branch Probability Analysis
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Assumption Cache Tracker
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Machine Module Information
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Stack Frame Layout Analysis
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Instrument function entry/exit with calls to e.g. mcount() (post inlining)
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Optimization Remark Emitter
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Function Alias Analysis Results #3
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Shadow Stack GC Lowering
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Machine Optimization Remark Emitter
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Lazy Block Frequency Analysis
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Lower Garbage Collection Instructions
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Library Function Lowering Analysis
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Target Library Information
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Machine Branch Probability Analysis
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Create Garbage Collector Module Metadata
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  AGX address space alias analysis wrapper
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Target Transform Information
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Profile summary info
+   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)   0.0000 (  0.0%)  Target Pass Configuration
+  15.9000 (100.0%)   0.1744 (100.0%)  16.0744 (100.0%)  16.1314 (100.0%)  Total
+
+===-------------------------------------------------------------------------===
+                                LLVM IR Parsing
+===-------------------------------------------------------------------------===
+  Total Execution Time: 0.3139 seconds (0.3151 wall clock)
+
+   ---User Time---   --System Time--   --User+System--   ---Wall Time---  --- Name ---
+   0.3076 (100.0%)   0.0063 (100.0%)   0.3139 (100.0%)   0.3151 (100.0%)  Parse IR
+   0.3076 (100.0%)   0.0063 (100.0%)   0.3139 (100.0%)   0.3151 (100.0%)  Total
+

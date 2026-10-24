@@ -1,0 +1,14 @@
+{
+  "seconds": 120.02814402699732,
+  "returncode": "timeout",
+  "command": [
+    "/scratch/llvm-agx-build/bin/llc",
+    "-mtriple=agx",
+    "-mcpu=agx-g14c",
+    "-stop-after=structurizecfg",
+    "-time-passes",
+    "-o",
+    "/dev/null",
+    "/scratch/blender-ir-profile/module.surface-only.ll"
+  ]
+}

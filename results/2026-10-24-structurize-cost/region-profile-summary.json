@@ -1,0 +1,9 @@
+{
+  "visited_regions": 67000,
+  "transformation_seconds": 58.85573,
+  "region_verification_seconds": 0.003453039,
+  "preserved_analysis_verification_seconds": 0.0560341,
+  "node_cache_clearing_seconds": 23.48446,
+  "complete": false,
+  "observation_timeout_seconds": 100
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "threshold": 32,
+    "seconds": 31.560230738999962,
+    "returncode": 0,
+    "command": [
+      "/scratch/llvm-agx-build/bin/llc",
+      "-mtriple=agx",
+      "-mcpu=agx-g14c",
+      "-max-booleans-in-control-flow-hub=32",
+      "-stop-before=structurizecfg",
+      "-time-passes",
+      "-o",
+      "/dev/null",
+      "/scratch/blender-ir-profile/module.surface-only.ll"
+    ]
+  },
+  {
+    "threshold": 0,
+    "seconds": 31.01275959299892,
+    "returncode": 0,
+    "command": [
+      "/scratch/llvm-agx-build/bin/llc",
+      "-mtriple=agx",
+      "-mcpu=agx-g14c",
+      "-max-booleans-in-control-flow-hub=0",
+      "-stop-before=structurizecfg",
+      "-time-passes",
+      "-o",
+      "/dev/null",
+      "/scratch/blender-ir-profile/module.surface-only.ll"
+    ]
+  }
+]

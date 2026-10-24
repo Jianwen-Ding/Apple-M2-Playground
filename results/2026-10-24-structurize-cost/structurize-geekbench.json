@@ -1,0 +1,25 @@
+{
+  "exit": 255,
+  "wall_seconds": 128.7254226619989,
+  "workloads": [
+    "Background Blur",
+    "Face Tracking",
+    "Super Resolution",
+    "Horizon Detection",
+    "Photo Filter",
+    "Video Filter",
+    "RAW",
+    "Feature Matching",
+    "Path Tracer",
+    "Particle Physics",
+    "Fluid Simulation"
+  ],
+  "compiler_invocations": 2026,
+  "upload_failed": true,
+  "cuda_errors": {
+    "701": 11
+  },
+  "compiler_successes": 2026,
+  "aggregate_compiler_process_seconds": 154.843,
+  "median_compiler_process_seconds": 0.071
+}
