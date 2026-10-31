@@ -1,0 +1,17 @@
+u8x1-float-lin [--float --channels 1]: DIFF f32: 798635/4194304 differ, max abs 0.0023, max rel 0.0628, max ulp 987409, nan mismatches 0
+u16x4-float-lin [--float --format u16]: DIFF f32: 3457527/4194304 differ, max abs 0.00244, max rel 0.0125, max ulp 159015, nan mismatches 0
+s8x4-float-lin [--float --format s8]: DIFF f32: 3336551/4194304 differ, max abs 0.00313, max rel 1, max ulp 964756576, nan mismatches 0
+f16x4-lin [--format f16]: DIFF f32: 3597221/4194304 differ, max abs 138, max rel 6.12, max ulp 935409664, nan mismatches 0
+f16x1-lin [--format f16 --channels 1]: DIFF f32: 899267/4194304 differ, max abs 16.2, max rel 0.561, max ulp 6029312, nan mismatches 0
+f32x4-lin [--format f32]: DIFF f32: 1313071/4194304 differ, max abs 0.0839, max rel 0.276, max ulp 3106624, nan mismatches 0
+f32x1-lin [--format f32 --channels 1]: DIFF f32: 328863/4194304 differ, max abs 0.0667, max rel 0.0124, max ulp 139885, nan mismatches 0
+u8x4-float-lin-clamp-unnorm [--float --address clamp --unnormalized]: DIFF f32: 1455563/4194304 differ, max abs 0.000123, max rel 1, max ulp 950050977, nan mismatches 0
+f32x1-lin-1d [--format f32 --channels 1 --1d]: DIFF f32: 220758/4194304 differ, max abs 8.93e-05, max rel 0.0138, max ulp 188416, nan mismatches 0
+f32x4-lin-pitch [--format f32 --pitch]: DIFF f32: 1313071/4194304 differ, max abs 0.0839, max rel 0.276, max ulp 3106624, nan mismatches 0
+f32x1-lin-unnorm [--format f32 --channels 1 --unnormalized --address clamp]: DIFF f32: 141146/4194304 differ, max abs 7.63e-06, max rel 0.00417, max ulp 57344, nan mismatches 0
+f32x4-lin-unnorm [--format f32 --unnormalized --address clamp]: DIFF f32: 579895/4194304 differ, max abs 7.63e-06, max rel 0.000897, max ulp 8512, nan mismatches 0
+f16x1-lin-unnorm [--format f16 --channels 1 --unnormalized --address clamp]: DIFF f32: 271738/4194304 differ, max abs 16, max rel 0.261, max ulp 3473664, nan mismatches 0
+u16x4-float-lin-unnorm [--float --format u16 --unnormalized --address clamp]: DIFF f32: 1373486/4194304 differ, max abs 7.81e-06, max rel 0.0112, max ulp 128002, nan mismatches 0
+u8x1-float-lin-unnorm-small [--float --channels 1 --unnormalized --address clamp --size 64x32]: DIFF f32: 445005/4194304 differ, max abs 0.000123, max rel 0.0246, max ulp 328965, nan mismatches 0
+u8x4-float-lin-norm-small [--float --size 64x32]: DIFF f32: 3638473/4194304 differ, max abs 0.00319, max rel 0.0769, max ulp 1052688, nan mismatches 0
+f32x1-lin-norm-small [--format f32 --channels 1 --size 64x32]: DIFF f32: 382993/4194304 differ, max abs 0.118, max rel 0.0157, max ulp 188416, nan mismatches 0

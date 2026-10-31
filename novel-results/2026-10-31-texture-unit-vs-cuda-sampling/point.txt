@@ -1,0 +1,22 @@
+u8x4-float-point [--float --point]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+u8x1-float-point [--float --point --channels 1]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+u8x2-float-point [--float --point --channels 2]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+u8x1-int [--channels 1]: EXACT int: 0/4194304 values differ
+u8x2-int [--channels 2]: EXACT int: 0/4194304 values differ
+u16x4-float-point [--float --point --format u16]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+u16x1-int [--format u16 --channels 1]: EXACT int: 0/4194304 values differ
+s8x4-float-point [--float --point --format s8]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+s8x4-int [--format s8]: EXACT int: 0/4194304 values differ
+s16x2-float-point [--float --point --format s16 --channels 2]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+f16x4-point [--format f16 --point]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+f16x1-point [--format f16 --channels 1 --point]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+f32x4-point [--format f32 --point]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+f32x1-point [--format f32 --channels 1 --point]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+f32x2-point [--format f32 --channels 2 --point]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+u8x4-float-point-clamp [--float --point --address clamp]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+u8x4-float-point-mirror [--float --point --address mirror]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+u8x4-float-point-border [--float --point --address border]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+u8x4-float-point-unnorm-clamp [--float --point --unnormalized --address clamp]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+u8x4-float-point-1d [--float --point --1d]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+u8x4-float-point-pitch [--float --point --pitch]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
+f32x4-point-pitch-clamp-unnorm [--format f32 --point --pitch --address clamp --unnormalized]: EXACT f32: 0/4194304 differ, max abs 0, max rel 0, max ulp 0, nan mismatches 0
