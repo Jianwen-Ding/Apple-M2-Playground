@@ -1,0 +1,56 @@
+.version 7.0
+.target sm_75
+.address_size 64
+// One thread, HOPS dependent loads at base + i * stride + v (v the value loaded, always 0) as the first-touch-pages
+// chase, plus one store per hop. chasew stores 0 to the word after the loaded one (the same line: the next command,
+// replayed back to back, chases lines the GPU wrote in the previous command); chases (control) stores 0 to
+// out + 64 i instead (lines not chased; the chased lines are only ever read, as in chase).
+.visible .entry chasew(.param .u64 buf, .param .u32 hops, .param .u32 stride, .param .u64 out)
+{
+	.reg .u32 %r<8>;
+	.reg .u64 %rd<8>;
+	.reg .pred %p;
+	ld.param.u64 %rd1, [buf];
+	ld.param.u32 %r1, [hops];
+	ld.param.u32 %r2, [stride];
+	mov.u32 %r3, 0;
+	mov.u32 %r4, 0;
+loop:
+	mul.lo.u32 %r5, %r3, %r2;
+	add.u32 %r5, %r5, %r4;
+	cvt.u64.u32 %rd2, %r5;
+	add.u64 %rd3, %rd1, %rd2;
+	ld.global.u32 %r4, [%rd3];
+	st.global.u32 [%rd3+4], %r4;
+	add.u32 %r3, %r3, 1;
+	setp.lt.u32 %p, %r3, %r1;
+	@%p bra loop;
+	ld.param.u64 %rd4, [out];
+	st.global.u32 [%rd4], %r4;
+	ret;
+}
+.visible .entry chases(.param .u64 buf, .param .u32 hops, .param .u32 stride, .param .u64 out)
+{
+	.reg .u32 %r<8>;
+	.reg .u64 %rd<8>;
+	.reg .pred %p;
+	ld.param.u64 %rd1, [buf];
+	ld.param.u32 %r1, [hops];
+	ld.param.u32 %r2, [stride];
+	ld.param.u64 %rd4, [out];
+	mov.u32 %r3, 0;
+	mov.u32 %r4, 0;
+loop:
+	mul.lo.u32 %r5, %r3, %r2;
+	add.u32 %r5, %r5, %r4;
+	cvt.u64.u32 %rd2, %r5;
+	add.u64 %rd3, %rd1, %rd2;
+	ld.global.u32 %r4, [%rd3];
+	mul.wide.u32 %rd5, %r3, 64;
+	add.u64 %rd6, %rd4, %rd5;
+	st.global.u32 [%rd6], %r4;
+	add.u32 %r3, %r3, 1;
+	setp.lt.u32 %p, %r3, %r1;
+	@%p bra loop;
+	ret;
+}

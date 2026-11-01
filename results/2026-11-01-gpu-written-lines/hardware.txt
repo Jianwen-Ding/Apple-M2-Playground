@@ -1,0 +1,18 @@
+# M2 Max G14C, 2026-11-01. agx_bench_kernel <ptx> <kernel> ... with ZLUDA_AGX_CAPTURE, then agx_run_hw --back-to-back
+# 1000 on the capture (b2b median, ns, includes the ~2.3 us launch); 64 hops; simulator agx_dispatch --launch-profile
+# zluda (sim-L2: current default, first touch in L2; sim-SLC: AGX_FIRST_TOUCH_L2=0), ns.
+#
+# chasew.ptx: one thread; chasew stores to the line it just loaded (the next command chases lines the GPU wrote);
+# chases stores to other lines (chased lines only read). buf:1048640 u32:64 u32:STRIDE buf:4160
+chases s0     hw  9583   sim-L2  8410   sim-SLC  8660
+chases s64    hw 25000   sim-L2 12450   sim-SLC 28380
+chasew s0     hw  9292   sim-L2  8340   sim-SLC  8590
+chasew s64    hw 24875   sim-L2 12390   sim-SLC 28310
+#
+# chasev.ptx: one SIMD-group (32 lanes); hop i: lane l loads base + i*stride + l*width. buf:1048640 u32:64 u32:STRIDE
+# u32:WIDTH buf:128
+w0 s64    (1 line per hop, sequential)        hw 22167   sim-L2 12190   sim-SLC 28117
+w2 s64    (1 line, all lanes, sequential)     hw 21834   sim-L2 12190   sim-SLC 28117
+w4 s128   (2 lines per hop, sequential)       hw 23750   sim-L2 12190   sim-SLC 28117
+w4 s4096  (2 lines per hop, 4 KiB apart)      hw 25083   sim-L2 12190   sim-SLC 28117
+w8 s256   (4 lines per hop, sequential)       hw 26000   sim-L2 12241   sim-SLC 28168

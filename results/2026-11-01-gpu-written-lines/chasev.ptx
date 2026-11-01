@@ -1,0 +1,34 @@
+.version 7.0
+.target sm_75
+.address_size 64
+// One SIMD-group (32 threads), HOPS dependent loads: lane l loads base + i * stride + l * width + v (v its last
+// value, always 0), so a hop covers 32 * width bytes (width 4: 128 B, two 64-byte lines) and waits for the one before.
+.visible .entry chasev(.param .u64 buf, .param .u32 hops, .param .u32 stride, .param .u32 width, .param .u64 out)
+{
+	.reg .u32 %r<10>;
+	.reg .u64 %rd<8>;
+	.reg .pred %p;
+	ld.param.u64 %rd1, [buf];
+	ld.param.u32 %r1, [hops];
+	ld.param.u32 %r2, [stride];
+	ld.param.u32 %r6, [width];
+	mov.u32 %r7, %tid.x;
+	mul.lo.u32 %r8, %r7, %r6;
+	mov.u32 %r3, 0;
+	mov.u32 %r4, 0;
+loop:
+	mul.lo.u32 %r5, %r3, %r2;
+	add.u32 %r5, %r5, %r4;
+	add.u32 %r5, %r5, %r8;
+	cvt.u64.u32 %rd2, %r5;
+	add.u64 %rd3, %rd1, %rd2;
+	ld.global.u32 %r4, [%rd3];
+	add.u32 %r3, %r3, 1;
+	setp.lt.u32 %p, %r3, %r1;
+	@%p bra loop;
+	ld.param.u64 %rd4, [out];
+	mul.wide.u32 %rd5, %r7, 4;
+	add.u64 %rd4, %rd4, %rd5;
+	st.global.u32 [%rd4], %r4;
+	ret;
+}
