@@ -1,0 +1,23 @@
+6.19.14-400.asahi.fc42.aarch64+16k
+2026-11-01T05:44:19+00:00
+--- no CPU fill
+      4096 bytes: allocated in      23.0 us
+     65536 bytes: allocated in      18.9 us
+   1048576 bytes: allocated in      97.6 us
+  67108864 bytes: allocated in    5099.1 us
+ 536870912 bytes: allocated in   36232.6 us
+all objects of 16 rounds read as zeros
+ 536870912 bytes: allocated in   35322.7 us
+ 536870912 bytes: allocated in   34896.4 us
+ 536870912 bytes: allocated in   35616.1 us
+--- AGX_ZERO_ALLOC=1
+  67108864 bytes: allocated in   10938.0 us
+ 536870912 bytes: allocated in   57677.8 us
+  67108864 bytes: allocated in   11254.7 us
+ 536870912 bytes: allocated in   58929.4 us
+  67108864 bytes: allocated in   10823.5 us
+ 536870912 bytes: allocated in   57141.7 us
+all objects of 1 rounds read as zeros
+536870912 bytes unbound: created in 19967.5 us, every page touched in 20732.8 us
+536870912 bytes unbound: created in 19553.6 us, every page touched in 20711.9 us
+536870912 bytes unbound: created in 19930.7 us, every page touched in 20689.5 us
