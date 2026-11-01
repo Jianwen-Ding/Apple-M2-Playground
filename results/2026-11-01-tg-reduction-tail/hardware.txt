@@ -9,3 +9,11 @@ W    MODE  hw100  hw400  sim100  sim400  settle100  settle400 | per iter ns: hw 
 304  0     44000 164000  45877  174345  44242  166935        |             400  416  409
 304  1     28375 100083  33957  125146  33444  124102        |             239  304  302
 304  2     34834 127209  37457  140016  37457  140016        |             308  352  352
+#
+# shfltree.ptx: ITERS x C values reduced by a 5-step shfl.sync.bfly + add tree (tree1 / tree8); _tg: values stored to
+# shared memory, bar.sync, read back (another slice), tree, bar.sync. --grid W --block 64 u32:ITERS buf:(W*256).
+# b2b median ns at ITERS 100 -> 400, per-iteration slope.
+tree1    W 38   11708 -> 31500    66 ns/iter      W 608   27417 ->  68041   135 ns/iter
+tree8    W 38   20250 -> 68584   161 ns/iter      W 608  128500 -> 501291  1243 ns/iter
+tree1_tg W 38   29084 -> 107125  260 ns/iter      W 608   34625 -> 132959   328 ns/iter
+tree8_tg W 38   69875 -> 267417  658 ns/iter      W 608  136208 -> 531209  1317 ns/iter

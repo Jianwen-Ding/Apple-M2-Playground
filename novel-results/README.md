@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-01 Shuffle-reduction trees: ~0.7 core cycles per shuffle-or-add at full occupancy; shared-memory values cost one round trip, not a per-shuffle wait](2026-11-01-shuffle-tree-throughput/README.md)
 - [2026-11-01 A threadgroup load of two words per lane (xy) costs the same ~32 cycles as one word; broadcast no cheaper](2026-11-01-tg-xy-loads/README.md)
 - [2026-11-01 A dependent chain of first touches costs ~300 ns a hop: lines the GPU wrote in the previous command are not faster, wide or sequential hops are not prefetched (two refuted explanations)](2026-11-01-first-touch-chains/README.md)
 - [2026-11-01 A serial loop per thread loses 3-15x to the same loop per SIMD-group (QR panel, Jacobi rounds, trsm blocks, gemv): uncoalesced lanes and few threads](2026-11-01-simd-group-per-item/README.md)
