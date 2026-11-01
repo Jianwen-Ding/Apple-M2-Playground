@@ -1,0 +1,7 @@
+# agx_run_hw --back-to-back 1000 (median of the last 500, us), three runs each, M2 Max G14C, 2026-11-01
+st    grid 1 x 256 (1 KB written):        3.21 4.33 3.0
+st    grid 38 x 256 (38 KB):              3.08 3.04 4.12
+st    grid 152 x 256 (152 KB):            3.83 3.5 3.5
+st    grid 1520 x 256 (1.5 MB):           9.83 9.83 9.83
+stn4  grid 1520 x 256, 4 words (6 MB):    22.0 21.96 21.96
+stn16 grid 1520 x 256, 16 words (24 MB):  72.08 72.12 72.08
