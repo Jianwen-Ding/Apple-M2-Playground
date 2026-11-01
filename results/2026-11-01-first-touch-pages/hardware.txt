@@ -1,0 +1,5 @@
+# chase.ptx, 1 thread, 64 dependent loads at base + i*stride (+0 loaded), agx_run_hw --back-to-back 1000 (median of
+# the last 500 commands, us), M2 Max G14C, 2026-11-01; simulator: agx_dispatch --launch-profile zluda
+stride 0     (one line):            hw  8.792   sim  7.70
+stride 64    (a new line per hop):  hw 23.666   sim 27.42
+stride 16384 (a new page per hop):  hw 24.208   sim 27.42

@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-01 New 16 KiB pages cost a command no more than new lines (+8 ns per page over a 237 ns cold-line hop): no first-touch translation penalty; rules it out for small kernels' extra time](2026-11-01-first-touch-pages/README.md)
 - [2026-11-01 Stack (scratch) memory is interleaved across a SIMD group's lanes: a lane-uniform offset 5.2x faster than scattered ones at 16 groups/core; stack traffic is device-memory bandwidth (450 -> 10079 us from 1 to 64 groups/core)](2026-11-01-stack-memory/README.md)
 - [2026-11-01 agx_runtime commands: an empty kernel costs ~2.3 us back to back (3.8 isolated) + ~100 ns per workgroup per core, no per-SIMD-group or register-allocation cost (direct-DRM harness: 5.6 us, 13.6 ns/group); 30 back-to-back short commands leave the clock low (26 us kernel measures 67 us), 1000 ramp it](2026-11-01-zluda-launch-cost/README.md)
 - [2026-11-01 Asahi GEM objects are allocated and zeroed at creation (recycled pages too, 16 rounds): 512 MiB ~20 ms to create, +15 ms VM_BIND, ~0.63 us/page first CPU touch; a CPU zero fill is redundant, cuMemAlloc commits memory at once](2026-11-01-gem-zeroed-pages/README.md)
