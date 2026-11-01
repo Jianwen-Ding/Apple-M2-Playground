@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-01 A serial loop per thread loses 3-15x to the same loop per SIMD-group (QR panel, Jacobi rounds, trsm blocks, gemv): uncoalesced lanes and few threads](2026-11-01-simd-group-per-item/README.md)
 - [2026-11-01 A compute command's end timestamp is written ~30 us before its syncobj signals, and before its memory writes are visible to the CPU (completion cannot be taken from it)](2026-11-01-timestamp-before-visibility/README.md)
 - [2026-11-01 GPU-wide read throughput ~340-380 GB/s also for data in the system-level cache (8 MiB: 342, 32 MiB: 378 GB/s); copies 365 GB/s reads plus writes](2026-11-01-read-bandwidth/README.md)
 - [2026-11-01 Workgroups along grid y run as fast as along grid x (negative result; corrects a ZLUDA commit message)](2026-11-01-grid-orientation/README.md)
