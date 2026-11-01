@@ -15,6 +15,11 @@ Extends [first-touch-pages](../2026-11-01-first-touch-pages/README.md) (one thre
   or 4 KiB apart, takes 21.8-26.0 us (64 hops: ~300-370 ns each beyond the launch). Wider hops cost slightly more,
   sequential ones are not cheaper.
 
+- **Sharing a line does not shorten the wait.** 128 SIMD-groups (on 32 cores) summing the same two columns take
+  16.3 / 45.8 us at 1024 / 4096 rows, the same as 128 groups summing their own columns (16.5 / 46.8 us): every core
+  asking for a line still on its way waits its full first-touch latency. (1216 groups on the same columns: 14.8 us,
+  less than on private columns, 33.1 us, where the private data is 10 MB and bandwidth starts to count.)
+
 ## Implications
 
 - For a few groups waiting on new lines, ~300 ns per dependent wait is the number to use (about the simulator's SLC

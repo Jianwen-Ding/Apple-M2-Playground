@@ -26,3 +26,12 @@ G 128 rows  256   hw 11750   sim-L2  4168   sim-SLC  6159
 G 128 rows 1024   hw 16500   sim-L2  7582   sim-SLC 15546
 G 128 rows 4096   hw 46916   sim-L2 21241   sim-SLC 53094
 # slope, 1 group: (47125 - 18334) / 96 waits = 300 ns a wait (sim-SLC 391, sim-L2 142)
+#
+# colsum_shared (same file): every SIMD-group sums columns 0 and 1 (all groups on all cores read the same lines).
+# Grid G/4 workgroups of 128. (sim: before the simulator's in-flight rule, 2026-11-01)
+colsum        G  128 rows 1024   hw 16500   sim 13978
+colsum_shared G  128 rows 1024   hw 16291   sim  7606
+colsum        G  128 rows 4096   hw 46834   sim 46822
+colsum_shared G  128 rows 4096   hw 45791   sim 21350
+colsum        G 1216 rows 1024   hw 33125   sim 34747
+colsum_shared G 1216 rows 1024   hw 14833   sim  5938
