@@ -1,0 +1,5 @@
+# agx_run_hw --back-to-back 1000 (median of the last 500, us), M2 Max G14C, 2026-11-01; grid 38 workgroups
+tg10, 1 SIMD group per workgroup (block 32):   21.71 21.67
+tg10, 2 SIMD groups (block 64):                25.38 25.38
+tg10, 4 SIMD groups (block 128):               26.5 26.54 26.42
+tg2,  4 SIMD groups (block 128):               17.83 17.88 17.79

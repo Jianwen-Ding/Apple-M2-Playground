@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-01 Independent threadgroup loads feeding FMAs issue every ~4 cycles per SIMD group (~1.6 per core with 4 groups), not the ~21-31 of dependent or wait-separated accesses](2026-11-01-tg-load-pipelining/README.md)
 - [2026-11-01 GPU-wide store bandwidth ~365 GB/s also for writes that fit the system-level cache (1.5 / 6 / 24 MB: 9.9 / 22.0 / 72.1 us after the workgroups' launch); writing anything costs ~0.7 us over an empty kernel](2026-11-01-store-bandwidth/README.md)
 - [2026-11-01 A kernel with a stack costs ~7.5 us more per command (scratch setup at the launch; almost nothing per workgroup): avoid the stack in short kernels](2026-11-01-stack-launch/README.md)
 - [2026-11-01 Every command fetches its code cold: ~104 ns per 64-byte line of straight-line code (294 B 2.8 us -> 4134 B 9.0 us, one thread); loops and many groups hide it](2026-11-01-code-fetch/README.md)
