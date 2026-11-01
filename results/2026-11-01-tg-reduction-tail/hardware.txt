@@ -1,0 +1,11 @@
+# tail.ptx, M2 Max G14C, 2026-11-01: agx_bench_kernel tail.ptx tail --grid W --block 128 u32:ITERS u32:MODE buf:(W*512)
+# with ZLUDA_AGX_CAPTURE, agx_run_hw --back-to-back 300 (b2b median ns); simulator agx_dispatch --launch-profile zluda
+# (default, and AGX_TG_SETTLE_ON_READ=1). Per iteration = (ITERS 400 - ITERS 100) / 300.
+# MODE 0: store, bar.sync, read the 4 groups' words, add, bar.sync   1: same reads, no barriers   2: barriers, own word
+W    MODE  hw100  hw400  sim100  sim400  settle100  settle400 | per iter ns: hw  sim  settle
+38   0     41125 153750  42569  161024  39983  150727        |             375  395  369
+38   1     26250  93584  26771   97736  23739   85748        |             224  237  207
+38   2     34500 127541  33479  124680  33479  124680        |             310  304  304
+304  0     44000 164000  45877  174345  44242  166935        |             400  416  409
+304  1     28375 100083  33957  125146  33444  124102        |             239  304  302
+304  2     34834 127209  37457  140016  37457  140016        |             308  352  352
