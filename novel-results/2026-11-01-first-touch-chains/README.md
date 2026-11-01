@@ -19,8 +19,12 @@ Extends [first-touch-pages](../2026-11-01-first-touch-pages/README.md) (one thre
 
 - For a few groups waiting on new lines, ~300 ns per dependent wait is the number to use (about the simulator's SLC
   latency; its zluda profile's L2 rule gives ~120 ns and is 50% fast on all nine probes).
-- Kernels measured faster than that on new lines (ZLUDA's Jacobi round: 16 waits a group in 5.2 us of work) need
-  another explanation; neither data written by the GPU nor sequential access is it. Open.
+- The Jacobi round's read pattern (lanes down two columns, one wait per 32 rows) costs the same 300 ns a wait
+  (colsum.ptx: 6.8 / 18.3 / 47.1 us at 256 / 1024 / 4096 rows, one SIMD-group). The round only looked faster because
+  it rotates in place and skips orthogonal pairs: back-to-back replays after the first do no rotations. Measuring an
+  in-place, data-dependent kernel back to back times a different workload than its capture.
+- (Odd, unexplained: 128 groups at 256 rows took 11.8 us against 6.8 us for one group; at 1024 and 4096 rows the
+  two are equal.)
 
 ## Reproducer and evidence
 

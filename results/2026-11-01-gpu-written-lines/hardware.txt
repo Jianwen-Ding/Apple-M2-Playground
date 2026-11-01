@@ -16,3 +16,13 @@ w2 s64    (1 line, all lanes, sequential)     hw 21834   sim-L2 12190   sim-SLC 
 w4 s128   (2 lines per hop, sequential)       hw 23750   sim-L2 12190   sim-SLC 28117
 w4 s4096  (2 lines per hop, 4 KiB apart)      hw 25083   sim-L2 12190   sim-SLC 28117
 w8 s256   (4 lines per hop, sequential)       hw 26000   sim-L2 12241   sim-SLC 28168
+#
+# colsum.ptx (the read pattern of ZLUDA's agx_jacobi_round_sg): G SIMD-groups, each summing x*y over two columns of
+# ROWS floats, lanes over the rows (one wait per 32 rows). buf:(8 G ROWS + 64) u32:ROWS buf:(128 G)
+G 1   rows  256   hw  6791   sim-L2  4160   sim-SLC  6150
+G 1   rows 1024   hw 18334   sim-L2  7574   sim-SLC 15537
+G 1   rows 4096   hw 47125   sim-L2 21232   sim-SLC 53086
+G 128 rows  256   hw 11750   sim-L2  4168   sim-SLC  6159
+G 128 rows 1024   hw 16500   sim-L2  7582   sim-SLC 15546
+G 128 rows 4096   hw 46916   sim-L2 21241   sim-SLC 53094
+# slope, 1 group: (47125 - 18334) / 96 waits = 300 ns a wait (sim-SLC 391, sim-L2 142)
