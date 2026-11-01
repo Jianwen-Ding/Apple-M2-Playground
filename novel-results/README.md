@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-01 A kernel with a stack costs ~7.5 us more per command (scratch setup at the launch; almost nothing per workgroup): avoid the stack in short kernels](2026-11-01-stack-launch/README.md)
 - [2026-11-01 Every command fetches its code cold: ~104 ns per 64-byte line of straight-line code (294 B 2.8 us -> 4134 B 9.0 us, one thread); loops and many groups hide it](2026-11-01-code-fetch/README.md)
 - [2026-11-01 New 16 KiB pages cost a command no more than new lines (+8 ns per page over a 237 ns cold-line hop): no first-touch translation penalty; rules it out for small kernels' extra time](2026-11-01-first-touch-pages/README.md)
 - [2026-11-01 Stack (scratch) memory is interleaved across a SIMD group's lanes: a lane-uniform offset 5.2x faster than scattered ones at 16 groups/core; stack traffic is device-memory bandwidth (450 -> 10079 us from 1 to 64 groups/core)](2026-11-01-stack-memory/README.md)
