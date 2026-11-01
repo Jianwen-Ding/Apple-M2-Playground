@@ -1,0 +1,6 @@
+M2 Max (G14C), Asahi Linux, zluda_agx (AIR route); kernels captured with ZLUDA_AGX_CAPTURE from agx_bench_kernel and
+replayed with agx_run_hw --back-to-back 1000 (median, warm), 256-thread workgroups, 16 bytes per thread
+readx  2048 workgroups (8 MiB read)              24.5 us   -> 342 GB/s
+readx  8192 workgroups (32 MiB read)             88.7 us   -> 378 GB/s
+copyx  2048 workgroups (8 MiB read + 8 written)  46.0 us   -> 365 GB/s
+copyx  8192 workgroups (32 MiB + 32 MiB)        185.3 us   -> 362 GB/s
