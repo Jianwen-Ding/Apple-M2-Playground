@@ -1,0 +1,9 @@
+M2 Max (G14C), Asahi Linux, zluda_agx (AIR route), agx_bench_kernel --iters 500 --warmup 50, 2 runs each, us per launch
+8192 workgroups of 256 threads, 16 bytes per thread loaded and stored (64 MiB moved)
+copyx (ctaid.x, --grid 8192)      185.8 187.0
+copyy (ctaid.y, --grid 1,8192)    186.7 189.0
+tgx  (+ 4 KiB threadgroup round trips, 3 bar.sync; ctaid.x)   182.2 183.4
+tgy  (same, ctaid.y)                                          182.0 182.2
+zluda_fft_agx agx_fft_shared, fftbench 1024 x 2048 / 64 x 32768, 100 iterations, alternating builds:
+groups along x  324.0 205.1 | 254.1 230.0 | 255.2 226.0
+groups along y  254.3 253.5 | 255.1 179.6 | 312.0 180.7

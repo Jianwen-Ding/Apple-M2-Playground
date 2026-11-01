@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-01 Workgroups along grid y run as fast as along grid x (negative result; corrects a ZLUDA commit message)](2026-11-01-grid-orientation/README.md)
 - [2026-11-01 Ten independent FMA accumulator chains: ~5.2 cycles per FMA per SIMD group, the simulator charges ~21 (corrects a first claim about threadgroup loads, which the compiler had hoisted)](2026-11-01-fma-accumulator-chains/README.md)
 - [2026-11-01 GPU-wide store bandwidth ~365 GB/s also for writes that fit the system-level cache (1.5 / 6 / 24 MB: 9.9 / 22.0 / 72.1 us after the workgroups' launch); writing anything costs ~0.7 us over an empty kernel](2026-11-01-store-bandwidth/README.md)
 - [2026-11-01 A kernel with a stack costs ~7.5 us more per command (scratch setup at the launch; almost nothing per workgroup): avoid the stack in short kernels](2026-11-01-stack-launch/README.md)
