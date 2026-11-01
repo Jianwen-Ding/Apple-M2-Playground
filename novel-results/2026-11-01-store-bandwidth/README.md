@@ -10,6 +10,10 @@ the ~2.3 us fixed cost. Writes small enough for the 48 MB system-level cache are
 the same as that of writes four times as large. A kernel that writes anything at all costs ~0.7 us more than an
 empty one (3.0 against 2.3 us).
 
+With thousands of workgroups per core the launch and the stores overlap instead: Geekbench's gradient (9,672
+workgroups per core, ~967 us of launch, ~500 us of stores at 365 GB/s) takes 1036 us. The cost is the stores'
+time plus the launch up to that long (`store + min(launch, store)`), which covers both cases.
+
 ## Implications
 
 - Write traffic is a throughput cost whatever its size: a kernel writing N bytes takes at least N / 365 GB/s after
