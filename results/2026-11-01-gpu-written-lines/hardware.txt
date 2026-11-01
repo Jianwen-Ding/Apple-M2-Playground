@@ -42,3 +42,9 @@ G 128  rows 32768 (32 MiB)   hw 415875   sim 443560   per wait hw 403 sim 430
 G 128  rows 65536 (64 MiB)   hw 880541   sim 883998   per wait hw 428 sim 430
 G 1216 rows 4096  (38 MiB)   hw 119542   sim 129057
 G 1216 rows 16384 (152 MiB)  hw 442834   sim 502450   (hw ~360 GB/s streamed, sim ~317)
+#
+# colsum, rows 96 (3 waits a group), --block 64: one wave of k workgroups a core (grid 38k, b2b 4000) and 27 a core
+# x N waves (grid 1026 N, b2b 1000), ns:
+k 1 (2/core)  hw 5584   sim 4150      k 2  hw 4208  sim 4159      k 4  hw 4375  sim 4179
+k 8           hw 4875   sim 4545      k 16 hw 6209  sim 6152      k 27 hw 8500  sim 8141
+N 4 (3 waves) hw 22541  sim 23700     N 16 (11 waves) hw 78916 sim 85247     N 64 (42 waves) hw 307042 sim 332372
