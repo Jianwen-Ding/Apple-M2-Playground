@@ -1,0 +1,12 @@
+M2 Max (G14C), Asahi Linux, zluda_agx (AIR route). vis.c: 2000 iterations of a kernel writing the iteration
+number to 1 Mi words (4096 workgroups of 256 threads), cuStreamSynchronize, a DtoH copy, a check of every word.
+
+Completion latency of a one-thread kernel's command, from the start of the wait (us, the most frequent pairs):
+  end timestamp written    syncobj wait returned
+  37                       64
+  36                       63
+  30                       61
+  52                       82
+Normal wait (DRM syncobj timeline wait):               2000 iterations, 0 stale words
+Returning once the end timestamp is non-zero instead:  2000 iterations, 1,213,249,556 stale words (the previous
+                                                       iteration's values, from iteration 2 on)
