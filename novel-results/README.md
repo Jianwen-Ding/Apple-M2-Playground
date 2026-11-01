@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-01 agx_runtime commands: an empty kernel costs ~2.3 us back to back (3.8 isolated) + ~100 ns per workgroup per core, no per-SIMD-group or register-allocation cost (direct-DRM harness: 5.6 us, 13.6 ns/group); 30 back-to-back short commands leave the clock low (26 us kernel measures 67 us), 1000 ramp it](2026-11-01-zluda-launch-cost/README.md)
 - [2026-11-01 Asahi GEM objects are allocated and zeroed at creation (recycled pages too, 16 rounds): 512 MiB ~20 ms to create, +15 ms VM_BIND, ~0.63 us/page first CPU touch; a CPU zero fill is redundant, cuMemAlloc commits memory at once](2026-11-01-gem-zeroed-pages/README.md)
 - [2026-10-20 Barrier byte-1 bits inert: 0x68 has no ID/count field (with and without fences, tg and device memory, positive-controlled), 0x78's byte 1 does not change its 4-group scope (owner-approved unsafe, 340 submissions, 0 faults)](2026-10-20-barrier-bits/README.md)
 - [2026-10-20 A kernel in another GPU context adds ~190 ns to far-memory loads (256 -> 448 ns); the clock keeper inflated earlier absolute latencies (cache-line step unchanged; memory-parameters needs re-measurement)](2026-10-20-cross-context-latency/README.md)
