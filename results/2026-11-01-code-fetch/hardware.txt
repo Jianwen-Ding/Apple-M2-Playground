@@ -1,0 +1,6 @@
+# lineN.ptx: one thread, N straight-line fma (4 chains), agx_run_hw --back-to-back 1000 (median of last 500, us),
+# M2 Max G14C, 2026-11-01. sim: agx_dispatch --launch-profile zluda before / after the fetch term.
+line16    102 B   hw 3.667   sim 2.40 / 2.51
+line64    294 B   hw 2.792   sim 2.40 / 2.82
+line256  1062 B   hw 4.167   sim 2.43 / 4.07
+line1024 4134 B   hw 9.041   sim 2.73 / 9.06

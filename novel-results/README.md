@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-01 Every command fetches its code cold: ~104 ns per 64-byte line of straight-line code (294 B 2.8 us -> 4134 B 9.0 us, one thread); loops and many groups hide it](2026-11-01-code-fetch/README.md)
 - [2026-11-01 New 16 KiB pages cost a command no more than new lines (+8 ns per page over a 237 ns cold-line hop): no first-touch translation penalty; rules it out for small kernels' extra time](2026-11-01-first-touch-pages/README.md)
 - [2026-11-01 Stack (scratch) memory is interleaved across a SIMD group's lanes: a lane-uniform offset 5.2x faster than scattered ones at 16 groups/core; stack traffic is device-memory bandwidth (450 -> 10079 us from 1 to 64 groups/core)](2026-11-01-stack-memory/README.md)
 - [2026-11-01 agx_runtime commands: an empty kernel costs ~2.3 us back to back (3.8 isolated) + ~100 ns per workgroup per core, no per-SIMD-group or register-allocation cost (direct-DRM harness: 5.6 us, 13.6 ns/group); 30 back-to-back short commands leave the clock low (26 us kernel measures 67 us), 1000 ramp it](2026-11-01-zluda-launch-cost/README.md)
