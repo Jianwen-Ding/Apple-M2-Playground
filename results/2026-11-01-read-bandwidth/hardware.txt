@@ -4,3 +4,4 @@ readx  2048 workgroups (8 MiB read)              24.5 us   -> 342 GB/s
 readx  8192 workgroups (32 MiB read)             88.7 us   -> 378 GB/s
 copyx  2048 workgroups (8 MiB read + 8 written)  46.0 us   -> 365 GB/s
 copyx  8192 workgroups (32 MiB + 32 MiB)        185.3 us   -> 362 GB/s
+readx size sweep (back to back, us): 0.25 MiB 4.25, 1 MiB 6.21, 2 MiB 8.92, 4 MiB 13.62, 6 MiB 19.21, 8 MiB 24.25, 12 MiB 34.96

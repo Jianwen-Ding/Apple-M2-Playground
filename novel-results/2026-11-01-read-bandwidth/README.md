@@ -10,6 +10,12 @@ A kernel that reads 16 bytes per thread and writes nothing reads 8 MiB in 24.5 u
 ([store bandwidth](../2026-11-01-store-bandwidth/README.md)), do not get faster when the data is in the
 system-level cache: the GPU-wide path, not DRAM, sets ~350 GB/s.
 
+Size sweep, back to back (GB/s after the 2.3 us launch): 0.25 MiB 134, 1 MiB 268, 2 MiB 317, 4 MiB 371, 6 MiB 372,
+8 MiB 382, 12 MiB 385. No size at which the previous command's data becomes cache-fast (small sizes are launch- and
+ramp-bound). Inside one dispatch, by contrast, all cores re-reading a 1-16 MiB window reach 1.1-1.9 TB/s (AGX
+Performance Simulator results/2026-10-11-memory-hierarchy/stream.json): the limit applies to the first touch in a
+command, not to the cache.
+
 ## Implications
 
 - Streaming kernels (FFT passes, copies, element-wise library kernels) cost bytes / ~350 GB/s whatever their size;
