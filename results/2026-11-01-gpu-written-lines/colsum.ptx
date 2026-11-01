@@ -3,6 +3,8 @@
 .address_size 64
 // The read pattern of ZLUDA's agx_jacobi_round_sg: SIMD-group t (32 lanes) sums x*y over columns 2t and 2t + 1 of a
 // column-major ROWS x n matrix, lane l taking rows l, l + 32, ...; one partial per lane stored to out[thread].
+// colsum_overlap: SIMD-group t sums columns t and t + 1 (each column read by two neighbouring groups, usually in
+// different workgroups).
 // colsum_shared: every SIMD-group sums columns 0 and 1 (all groups, on all cores, read the same lines at once).
 .visible .entry colsum(.param .u64 a, .param .u32 rows, .param .u64 out)
 {
@@ -81,3 +83,42 @@ loop:
 	st.global.f32 [%rd8], %f1;
 	ret;
 }
+.visible .entry colsum_overlap(.param .u64 a, .param .u32 rows, .param .u64 out)
+{
+	.reg .u32 %r<13>;
+	.reg .u64 %rd<10>;
+	.reg .f32 %f<6>;
+	.reg .pred %p;
+	ld.param.u64 %rd1, [a];
+	ld.param.u32 %r1, [rows];
+	mov.u32 %r2, %ctaid.x;
+	mov.u32 %r3, %ntid.x;
+	mov.u32 %r4, %tid.x;
+	mad.lo.u32 %r5, %r2, %r3, %r4;
+	shr.u32 %r6, %r5, 5;
+	and.b32 %r7, %r5, 31;
+	mov.u32 %r8, %r6;
+	mul.lo.u32 %r9, %r8, %r1;
+	add.u32 %r10, %r9, %r1;
+	mov.f32 %f1, 0f00000000;
+	mov.u32 %r11, %r7;
+loop:
+	add.u32 %r12, %r9, %r11;
+	mul.wide.u32 %rd2, %r12, 4;
+	add.u64 %rd3, %rd1, %rd2;
+	ld.global.f32 %f2, [%rd3];
+	add.u32 %r12, %r10, %r11;
+	mul.wide.u32 %rd4, %r12, 4;
+	add.u64 %rd5, %rd1, %rd4;
+	ld.global.f32 %f3, [%rd5];
+	fma.rn.f32 %f1, %f2, %f3, %f1;
+	add.u32 %r11, %r11, 32;
+	setp.lt.u32 %p, %r11, %r1;
+	@%p bra loop;
+	ld.param.u64 %rd6, [out];
+	mul.wide.u32 %rd7, %r5, 4;
+	add.u64 %rd8, %rd6, %rd7;
+	st.global.f32 [%rd8], %f1;
+	ret;
+}
+

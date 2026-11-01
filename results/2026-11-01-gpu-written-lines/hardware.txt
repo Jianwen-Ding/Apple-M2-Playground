@@ -48,3 +48,10 @@ G 1216 rows 16384 (152 MiB)  hw 442834   sim 502450   (hw ~360 GB/s streamed, si
 k 1 (2/core)  hw 5584   sim 4150      k 2  hw 4208  sim 4159      k 4  hw 4375  sim 4179
 k 8           hw 4875   sim 4545      k 16 hw 6209  sim 6152      k 27 hw 8500  sim 8141
 N 4 (3 waves) hw 22541  sim 23700     N 16 (11 waves) hw 78916 sim 85247     N 64 (42 waves) hw 307042 sim 332372
+#
+# colsum vs colsum_overlap (group t: columns t, t + 1), rows 1024, --block 64, grid 1026 N (27 a core x N waves),
+# buffer (4 G + 4) x 1024 x 4 bytes, --back-to-back 200, ns:
+colsum         N 4  (64 MiB)   hw 196750   sim 194393
+colsum         N 16 (256 MiB)  hw 738667   sim 765684
+colsum_overlap N 4             hw 108792   sim 146688 (before dram_share) 100079 (after)
+colsum_overlap N 16            hw 383375   sim 575923 (before)            393589 (after)

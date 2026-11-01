@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-01 Lines read by neighbouring workgroups on different cores cost DRAM bandwidth once (overlapping column sums 0.52x private)](2026-11-01-shared-lines-dram/README.md)
 - [2026-11-01 Code fetch and execution overlap only partly: ~max + 0.3 x min (straight-line probe)](2026-11-01-fetch-overlap/README.md)
 - [2026-11-01 Back-to-back medians of ~7 us kernels need thousands of commands (300: +-40% between runs; 3000: ~10%)](2026-11-01-short-kernel-b2b-noise/README.md)
 - [2026-11-01 Shuffle-reduction trees: ~0.7 core cycles per shuffle-or-add at full occupancy; shared-memory values cost one round trip, not a per-shuffle wait](2026-11-01-shuffle-tree-throughput/README.md)
