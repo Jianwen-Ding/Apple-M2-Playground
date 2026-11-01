@@ -35,3 +35,10 @@ colsum        G  128 rows 4096   hw 46834   sim 46822
 colsum_shared G  128 rows 4096   hw 45791   sim 21350
 colsum        G 1216 rows 1024   hw 33125   sim 34747
 colsum_shared G 1216 rows 1024   hw 14833   sim  5938
+#
+# colsum at DRAM-resident sizes (buffer 2 x G x ROWS x 4 bytes), --back-to-back 100-200, ns:
+G 128  rows 16384 (16 MiB)   hw 177625   sim 178295   per wait hw 342 sim 343
+G 128  rows 32768 (32 MiB)   hw 415875   sim 443560   per wait hw 403 sim 430
+G 128  rows 65536 (64 MiB)   hw 880541   sim 883998   per wait hw 428 sim 430
+G 1216 rows 4096  (38 MiB)   hw 119542   sim 129057
+G 1216 rows 16384 (152 MiB)  hw 442834   sim 502450   (hw ~360 GB/s streamed, sim ~317)
