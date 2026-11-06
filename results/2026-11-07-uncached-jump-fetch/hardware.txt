@@ -1,0 +1,19 @@
+# 2026-11-06 ~21:26-21:31 UTC, M2 Max (G14C), agx_run_hw (zluda agx_runtime), one SIMD group (wg 32), --back-to-back 200 after a
+# warm-up run of 200 (first pass: --back-to-back 50, no warm-up). Slopes between N = 1024 and 8192 blocks. Two runs per kind;
+# a run is bimodal (a slow state ~1.5-2x on some sizes), the lower, repeated values are the result.
+# AGX-Performance-Simulator scripts/probe_jump_fetch.py (first version, without the trailing 16 KB of stop padding)
+straight  N=1024  72.2-78.6 us   N=8192 577.0 us (849.4 once)   -> 70 ns per 64-byte line
+seq       N=1024  333.0 us (661.6 once)  N=8192 2656.5-2658.8 us -> 324 ns per block
+rand      N=1024  242.1-244.0 us         N=8192 1923.3-1925.7 us (4863.7 in the no-warm-up pass) -> 235 ns per block
+rand4     N=1024  459.8-462.1 us         N=8192 3694.3-3696.4 us -> 451 ns per block (4 lines)
+# scripts/probe_stack_latency.py (llc -O2 kernel, no calls, 16432-byte stack, stack_load; wait; add; stack_store over P words)
+P_words  hw ns/iter   (hw us N=4000, N=20000)
+16       102.65       579.9 2222.2
+64       102.66       582.5 2225.2
+256      160.78       810.7 3383.1
+1024     160.57       810.5 3379.7
+4096     647.98       810.4 11178.2
+# GPU faults: gpu_safety.py recorded none, but the kernel log of the session sharing the GPU (Blender, llama.cpp) showed
+# ~1750 timeout/fault events 21:17-21:21 (during replays of captured Cycles call kernels, below) and single faults at
+# 21:28 and 21:29 (during this probe), unmapped reads at 0x1000004100 / 0x1100004000 (gCDM_CS) and 0x10018a0100 (UL1C).
+# Cause not established; the other session's jobs failed with "Bad address" at those times.

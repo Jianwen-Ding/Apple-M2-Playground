@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-07 A taken jump to an uncached code line costs ~235-325 ns per one-line block, straight-line code ~70 ns per line: large branchy kernels (Cycles shading, 10-17x the 12 KiB i-cache) pay it at every evicted jump target; stack loads 103 / 161 / 648 ns at L1 / L2 / 512 KB of rows](2026-11-07-uncached-jump-fetch/README.md)
 - [2026-11-01 Lines read by neighbouring workgroups on different cores cost DRAM bandwidth once (overlapping column sums 0.52x private)](2026-11-01-shared-lines-dram/README.md)
 - [2026-11-01 Code fetch and execution overlap only partly: ~max + 0.3 x min (straight-line probe)](2026-11-01-fetch-overlap/README.md)
 - [2026-11-01 Back-to-back medians of ~7 us kernels need thousands of commands (300: +-40% between runs; 3000: ~10%)](2026-11-01-short-kernel-b2b-noise/README.md)
