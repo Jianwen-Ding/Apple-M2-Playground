@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-07 Each SIMD-group slot's first stack use in a command costs ~1.15 us, serial per core, until every resident slot is used (bfs: 96 slots, ~110 us); a one-group stack kernel ~5 us of set-up; time short kernels with >= 1000 back-to-back commands](2026-11-07-stack-slot-setup/README.md)
 - [2026-11-07 A threadgroup load holds its SIMD group ~28 cycles (~24 with an immediate base) and one after ALU work issues only ~21 cycles after it: each ALU run between threadgroup loads costs ~20 cycles; 32 groups per core run x loads at nearly the 1-group rate (the earlier 2.2x was 64 groups on 4 cores from 38 workgroups)](2026-11-07-tg-load-issue-hold/README.md)
 - [2026-11-07 A taken jump to an uncached code line costs ~235-325 ns per one-line block, straight-line code ~70 ns per line: large branchy kernels (Cycles shading, 10-17x the 12 KiB i-cache) pay it at every evicted jump target; stack loads 103 / 161 / 648 ns at L1 / L2 / 512 KB of rows](2026-11-07-uncached-jump-fetch/README.md)
 - [2026-11-01 Lines read by neighbouring workgroups on different cores cost DRAM bandwidth once (overlapping column sums 0.52x private)](2026-11-01-shared-lines-dram/README.md)
