@@ -18,6 +18,16 @@ groups' work overlaps the fetch (llama.cpp's 138-line Q8_0 kernel shows no extra
   4 KB kernel that is more than its launch cost. Smaller code (less unrolling and inlining) helps such kernels.
 - The simulator's zluda launch profile models it (AGX-Performance-Simulator, fetch_line_ns).
 
+## Seen again in llama.cpp (2026-11-07)
+
+ggml's `mul_mat_vec_q` (Q5_1, 896x896, one token, clang-built through ZLUDA) runs ~845 instructions per SIMD group
+in one straight pass (k = 896 is one loop iteration), 870 distinct instructions = 110 distinct 64-byte lines per
+workgroup (`agx_run --trace-pcs`). Back to back on hardware it costs ~20 us with 1, 4 or 32 workgroups and ~23-29 us
+with 224: the time is a fixed per-launch latency, of which ~11 us is the cold fetch of those lines (110 x 104 ns),
+not throughput. The 18.6 KB kernel (6.9 bytes per instruction) is mostly the q5 high-bit merging and the dp4a
+emulation, straight-line code. Launch-time specialization of its struct arguments (the null fusion pointers fold
+their branches away) took llama.cpp token generation from ~110 to ~141 tokens/s.
+
 ## Reproducer and evidence
 
 `results/2026-11-01-code-fetch/line*.ptx`: `agx_bench_kernel lineN.ptx lineN --grid 1 --block 1 buf:64 f32:1.0001
