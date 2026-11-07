@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-07 The forward-jump scheduler hold follows the executed code, not the program size (hybridsort mergeSortFirst: 28 KB program, 4.6 KB run, +38% -> +0.4%); re-read lines are cheaper than first touches; llama.cpp kernels of 5-50 us need >= 1000 back-to-back commands on an idle GPU (Q5_1 matrix-vector 35 -> 19 us)](2026-11-07-executed-code-jump-hold/README.md)
 - [2026-11-07 Instruction cache beyond 12 KiB: misses grow gradually (48% of lines at 1.33x the capacity), close to random replacement and far from LRU; Rodinia hotspot (202 lines) is predicted within 1% once later waves keep their lines](2026-11-07-icache-replacement/README.md)
 - [2026-11-07 Each SIMD-group slot's first stack use in a command costs ~1.15 us, serial per core, until every resident slot is used (bfs: 96 slots, ~110 us); a one-group stack kernel ~5 us of set-up; time short kernels with >= 1000 back-to-back commands](2026-11-07-stack-slot-setup/README.md)
 - [2026-11-07 A threadgroup load holds its SIMD group ~28 cycles (~24 with an immediate base) and one after ALU work issues only ~21 cycles after it: each ALU run between threadgroup loads costs ~20 cycles; 32 groups per core run x loads at nearly the 1-group rate (the earlier 2.2x was 64 groups on 4 cores from 38 workgroups)](2026-11-07-tg-load-issue-hold/README.md)
