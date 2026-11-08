@@ -12,6 +12,10 @@ the fix, plus paired b32 lowerings of arbitrary 64-bit payloads.
 
 ## Why this needs care: the index is quad-granular
 
+(2026-11-08: "the quad it addresses" below is the **source** quad: the position comes from the index bits of the quad
+being read, whatever the readers ask; low bits uniform in each reading quad are not enough. See
+[2026-11-08 shuffle source quad](../2026-11-08-shuffle-source-quad/README.md).)
+
 `simd_shuffle` takes the **low two bits of the source lane from the OR over the source quad's index operands**, not from the reading lane
 (this is how the simulator already models it and why its coverage cases pass). A per-lane index is therefore exact only when its low
 two bits are the same for all four lanes of the quad it addresses. Measured negative controls (one `simd_shuffle` with a per-lane

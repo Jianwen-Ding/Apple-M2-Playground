@@ -1,0 +1,27 @@
+# split into the four quad positions (default; the model column only applies to the unsplit run)
+f=0 n=1: ok (0 wrong; 0 differ from the source-quad model)
+f=0 n=2: ok (0 wrong; 0 differ from the source-quad model)
+f=0 n=3: ok (0 wrong; 0 differ from the source-quad model)
+f=1 n=1: ok (0 wrong; 0 differ from the source-quad model)
+f=1 n=2: ok (0 wrong; 0 differ from the source-quad model)
+f=1 n=3: ok (0 wrong; 0 differ from the source-quad model)
+f=2 n=1: ok (0 wrong; 32 differ from the source-quad model)
+f=2 n=2: ok (0 wrong; 32 differ from the source-quad model)
+f=2 n=3: ok (0 wrong; 32 differ from the source-quad model)
+f=3 n=1: ok (0 wrong; 24 differ from the source-quad model)
+f=3 n=2: ok (0 wrong; 30 differ from the source-quad model)
+f=3 n=3: ok (0 wrong; 31 differ from the source-quad model)
+
+# ZLUDA_AGX_LLVM_ARGS=-agx-unsplit-shuffles: one simd_shuffle with the per-thread index
+f=0 n=1: ok (0 wrong; 0 differ from the source-quad model)
+f=0 n=2: ok (0 wrong; 0 differ from the source-quad model)
+f=0 n=3: ok (0 wrong; 0 differ from the source-quad model)
+f=1 n=1: ok (0 wrong; 0 differ from the source-quad model)
+f=1 n=2: ok (0 wrong; 0 differ from the source-quad model)
+f=1 n=3: ok (0 wrong; 0 differ from the source-quad model)
+f=2 n=1: FAIL (32 wrong; 0 differ from the source-quad model)  lane:got/want 0:908/808 1:908/808 2:908/808 3:908/808 4:1308/1208 5:1308/1208 6:1308/1208 7:1308/1208
+f=2 n=2: FAIL (32 wrong; 0 differ from the source-quad model)  lane:got/want 0:9/109 1:9/109 2:9/109 3:9/109 4:409/509 5:409/509 6:409/509 7:409/509
+f=2 n=3: FAIL (32 wrong; 0 differ from the source-quad model)  lane:got/want 0:910/810 1:910/810 2:910/810 3:910/810 4:1310/1210 5:1310/1210 6:1310/1210 7:1310/1210
+f=3 n=1: FAIL (24 wrong; 0 differ from the source-quad model)  lane:got/want 0:8/8 1:408/408 2:908/808 3:1308/1208 4:1308/1208 5:1808/1608 6:2208/2008 7:2708/2408
+f=3 n=2: FAIL (30 wrong; 0 differ from the source-quad model)  lane:got/want 0:9/9 1:1309/1209 2:3109/2509 3:909/509 4:909/509 5:2709/1809 6:409/3009 7:2209/1109
+f=3 n=3: FAIL (31 wrong; 0 differ from the source-quad model)  lane:got/want 0:10/10 1:910/510 2:10/1510 3:3110/1610 4:3110/1610 5:2210/2610 6:1310/3110 7:410/510
