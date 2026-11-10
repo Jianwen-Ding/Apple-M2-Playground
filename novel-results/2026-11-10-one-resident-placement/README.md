@@ -20,8 +20,9 @@ bytes of threadgroup memory, so that only one workgroup fits a core at a time, l
 - The second and third rounds cost ~80 us each (the workgroup's own time): no overlap between a core's rounds.
 - The same for workgroups that are alone on a core because of their size (1024 threads, no threadgroup memory,
   `place3.sh`): 1 / 34 workgroups 159 / 162 us, 35 / 38 / 39 workgroups 305-307 us.
-- Which 4 cores sit out is not known (the probe does not record the core id), nor whether large grids (hundreds of
-  rounds) also leave 4 cores out: Halide's conv_layer relu (1280 x 1024 threads) fits n / 38 rounds better.
+- Which 4 cores sit out: answered in [2026-11-10-workgroup-placement](../2026-11-10-workgroup-placement/README.md)
+  (chunks of 8 workgroups per cluster: the first round uses 8 cores of each 9-10-core cluster 0-2 and all 10 of
+  cluster 3; the extra workgroups 34-37 run after 24-27 on cluster 3, a fixed placement).
 
 ## Implications
 
