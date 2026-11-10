@@ -11,6 +11,7 @@ output in agx_run. Not reproduced yet by a synthetic probe (see below): the trig
 |---|---|
 | full kernel, store `device_store r8, r24_r25, 0, signed` (as compiled) | 32.8 - 34.3 |
 | same, store rewritten to `device_store r8, u4_u5, r26, unsigned` (same addresses) | 22.3 |
+| same, store rewritten to `device_store r8, r6_r7, r26, unsigned` (register base + 32-bit index, same addresses) | 22.3 |
 | store replaced by `iadd r9, r9, 0` | 17.4 |
 | ne0 = 512 (one trip): register form / uniform form / no store | 23.9 / 17.7 / 14.5 |
 | ne0 = 512, register form, address pair r28_r29 instead of r24_r25 (r24 is the src0 load's destination), or 64 regs | 23.4 / 23.7 |
@@ -43,3 +44,12 @@ Captures under `/scratch/sim-captures/r5/llama-pp-fa0/*k_bin_bcast*`, patched co
 `/scratch/agx-r5/r7/{k1-early,k5-ustore,k1-early-full,k5-full,k6-r28,k7-regs64,k4-row0,ne512-nost,full-nost}`
 (the store at code offset 748 moved to 710 and/or replaced). Job scripts and logs:
 [evidence](../../results/2026-11-10-store-address-form/).
+
+## Follow-up (2026-11-10): the base need not be uniform
+
+A register base with a 32-bit index (`r6_r7 + r26`, patched into the same capture, outputs identical in agx_run) is
+as fast as the uniform base: 22.3 us vs 34.6 for the whole 64-bit register address. So what is slow is the store
+with a full 64-bit register address and a zero index, not a register base. LLVM AGX now emits base + (row << 2) and
+the 32-bit column index for row + column addresses (llvm-project `claude/split-row-index-2026-11-10`,
+`-agx-split-row-index`): the recompiled llama.cpp k_bin_bcast measures 21.3 us vs 34.9 (grid 512x512) and 6.7 vs
+8.1 us (grid 64x512).
