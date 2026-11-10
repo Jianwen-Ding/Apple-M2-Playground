@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-10 The GPU clock climbs an 8-step ladder (446-1398 MHz, 3.1x) one step per ~5-7 ms of continuous work (~35 ms from cold); 50 us idle gaps pin it at the bottom; ~5 us kernels need ~800 back-to-back commands to reach the top (time them with >= 5000); CPU load does not lower it](2026-11-10-gpu-clock-ladder/README.md)
 - [2026-11-07 The forward-jump scheduler hold follows the executed code, not the program size (hybridsort mergeSortFirst: 28 KB program, 4.6 KB run, +38% -> +0.4%); re-read lines are cheaper than first touches; llama.cpp kernels of 5-50 us need >= 1000 back-to-back commands on an idle GPU (Q5_1 matrix-vector 35 -> 19 us)](2026-11-07-executed-code-jump-hold/README.md)
 - [2026-11-07 Instruction cache beyond 12 KiB: misses grow gradually (48% of lines at 1.33x the capacity), close to random replacement and far from LRU; Rodinia hotspot (202 lines) is predicted within 1% once later waves keep their lines](2026-11-07-icache-replacement/README.md)
 - [2026-11-07 Each SIMD-group slot's first stack use in a command costs ~1.15 us, serial per core, until every resident slot is used (bfs: 96 slots, ~110 us); a one-group stack kernel ~5 us of set-up; time short kernels with >= 1000 back-to-back commands](2026-11-07-stack-slot-setup/README.md)
