@@ -1,6 +1,7 @@
 # New hardware findings
 
-- [2026-11-10 llama.cpp's MMQ workgroups run ~30% slower with 34 busy cores than with 16 (Q5_K 1645 -> 2146 us; clusters 2 and 3 joining cost +195 / +254 us), not load bandwidth, not clock; cause open (stack traffic suspected)](2026-11-10-mmq-busy-cores/README.md)
+- [2026-11-10 The L2 is one GPU-wide capacity of ~6-7 MB: per-core working sets of 256 KB slow 40-60% beyond ~24 busy cores (any clusters), and the cores' stacks 6 MB apart alias at 24 (2 MB of padding removes that step); explains MMQ's busy-core slowdown (capacity, padding does not help it)](2026-11-10-l2-gpu-capacity/README.md)
+- [2026-11-10 llama.cpp's MMQ workgroups run ~30% slower with 34 busy cores than with 16 (Q5_K 1645 -> 2146 us; clusters 2 and 3 joining cost +195 / +254 us), not load bandwidth, not clock; cause: GPU-wide L2 capacity (see l2-gpu-capacity)](2026-11-10-mmq-busy-cores/README.md)
 - [2026-11-10 In llama.cpp's k_bin_bcast a device store through a 64-bit register address costs ~3x the same store as uniform base + 32-bit index (full kernel 33 -> 22 us, no store 17.4); a synthetic probe with the same addresses and form does not reproduce it](2026-11-10-store-address-form/README.md)
 - [2026-11-10 With 8+ SIMD groups per core the core issues ~2 instructions per cycle and reads ~2.4-3 32-bit registers per cycle (8 fmadd32 on 3 distinct registers: 145 cycles per trip at 16 groups); no all-core or long-run slowdown](2026-11-10-alu-issue-rate/README.md)
 - [2026-11-10 Sequential re-reads of a per-core 16 KB-2 MB region cost about the same (314 -> 418 us) and +7% from 1 to 8 cores, flat to 32: no shared-cache cliff](2026-11-10-l2-region-streaming/README.md)

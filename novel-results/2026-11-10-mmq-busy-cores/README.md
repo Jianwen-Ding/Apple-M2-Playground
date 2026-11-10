@@ -21,7 +21,7 @@ threadgroup memory, 1376 B of stack per thread).
 - Not the bandwidth below L1 for loads: [32 groups per core streaming per-core regions](../2026-11-10-l2-region-streaming/README.md)
   slow by only 7% from 1 to 34 cores at 1.8 TB/s GPU-wide (`265-l2bw` log here). Not clock: an ALU loop on 1-32
   cores is identical ([alu rate](../2026-11-10-alu-issue-rate/README.md)).
-- Open: the MMQ kernels' stack traffic (~270k stack-store lines and ~740k stack-load lines per workgroup) is the
+- (Since explained, see the update below.) The MMQ kernels' stack traffic (~270k stack-store lines and ~740k stack-load lines per workgroup) is the
   main thing they do that the probes do not; a stack probe the hardware accepts is needed.
 
 ## Implications
@@ -33,3 +33,9 @@ threadgroup memory, 1376 B of stack per thread).
 
 `gsweep.py CAPDIR 512,8,1 768,8,1 ... --hw` on the captures (`/scratch/sim-captures/r5/llama-pp-fa0/*mul_mat_q*type13*`,
 `*type14*`). [Evidence](../../results/2026-11-10-mmq-busy-cores/).
+
+## Update (2026-11-10, later)
+
+Explained by the GPU-wide L2 capacity: [l2-gpu-capacity](../2026-11-10-l2-gpu-capacity/README.md). A stack probe
+with MMQ's 1072 B per thread slows the same way (737 us at 16 busy cores, 1184 at 32) whichever clusters run it;
+MMQ itself does not change with the scratch padded between cores, so its slowdown is capacity, not aliasing.
