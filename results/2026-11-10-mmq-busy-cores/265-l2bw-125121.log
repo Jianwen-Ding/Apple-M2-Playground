@@ -1,0 +1,12 @@
+REGKB    64 N   1 T 1000  hw     280.5
+REGKB    64 N   8 T 1000  hw     292.6
+REGKB    64 N  17 T 1000  hw     295.1
+REGKB    64 N  34 T 1000  hw     299.6
+REGKB   256 N   1 T 1000  hw     282.6
+REGKB   256 N   8 T 1000  hw     293.8
+REGKB   256 N  17 T 1000  hw     302.3
+REGKB   256 N  34 T 1000  hw     304.2
+REGKB  1024 N   1 T 1000  hw     291.5
+REGKB  1024 N   8 T 1000  hw     301.7
+REGKB  1024 N  17 T 1000  hw     327.4
+REGKB  1024 N  34 T 1000  hw     321.4
