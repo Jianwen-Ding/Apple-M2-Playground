@@ -1,5 +1,7 @@
 # New hardware findings
 
+- [2026-11-10 Workgroups go to clusters in chunks of 8 (clusters 0, 1, 2, 3, 3, 0, 1, 2, ...) and to a cluster's cores round robin, fixed: at 38 one-resident workgroups 34-37 run after 24-27 on cores 48-51 (core ids 0-9, 16-24, 32-40, 48-57)](2026-11-10-workgroup-placement/README.md)
+- [2026-11-10 SIMD groups that exit early free their registers but not their group slots: 8-group workgroups with one live group run ~12 per core (96 / 8) whatever the register cap (rope: 72.6 -> 33.5 us modelled, hw 33.4)](2026-11-10-early-exit-occupancy/README.md)
 - [2026-11-10 With one resident workgroup per core a grid fills only 34 of the 38 cores per round: 35-40 workgroups take two rounds (88 -> 167 us), 70-77 three](2026-11-10-one-resident-placement/README.md)
 - [2026-11-10 The GPU clock climbs an 8-step ladder (446-1398 MHz, 3.1x) one step per ~5-7 ms of continuous work (~35 ms from cold); 50 us idle gaps pin it at the bottom; ~5 us kernels need ~800 back-to-back commands to reach the top (time them with >= 5000); CPU load does not lower it](2026-11-10-gpu-clock-ladder/README.md)
 - [2026-11-07 The forward-jump scheduler hold follows the executed code, not the program size (hybridsort mergeSortFirst: 28 KB program, 4.6 KB run, +38% -> +0.4%); re-read lines are cheaper than first touches; llama.cpp kernels of 5-50 us need >= 1000 back-to-back commands on an idle GPU (Q5_1 matrix-vector 35 -> 19 us)](2026-11-07-executed-code-jump-hold/README.md)
