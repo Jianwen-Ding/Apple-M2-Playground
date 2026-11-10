@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-10 CDM barrier bit 11 (between dispatches of one command) invalidates the instruction cache: a repeated 7 KB kernel 16.3 -> 7.0 us per dispatch without it; ordering needs bit 8 with 5 or 6 (0x7f, 0xfff00 overlap); a command ~16 us, a dispatch ~3 us](2026-11-10-cdm-barrier-bits/README.md)
 - [2026-11-10 Code beyond the i-cache streams at ~31 ns per line warm (~78 cold) for 64-384 KB bodies, shared by groups at the same code, no contention between cores; a `wait` on memory stops the stream (waits are additive)](2026-11-10-code-refetch-stream/README.md)
 - [2026-11-10 Workgroups go to clusters in chunks of 8 (clusters 0, 1, 2, 3, 3, 0, 1, 2, ...) and to a cluster's cores round robin, fixed: at 38 one-resident workgroups 34-37 run after 24-27 on cores 48-51 (core ids 0-9, 16-24, 32-40, 48-57)](2026-11-10-workgroup-placement/README.md)
 - [2026-11-10 SIMD groups that exit early free their registers but not their group slots: 8-group workgroups with one live group run ~12 per core (96 / 8) whatever the register cap (rope: 72.6 -> 33.5 us modelled, hw 33.4)](2026-11-10-early-exit-occupancy/README.md)
