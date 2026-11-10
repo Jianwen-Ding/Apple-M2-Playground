@@ -1,5 +1,8 @@
 # New hardware findings
 
+- [2026-11-10 In llama.cpp's k_bin_bcast a device store through a 64-bit register address costs ~3x the same store as uniform base + 32-bit index (full kernel 33 -> 22 us, no store 17.4); a synthetic probe with the same addresses and form does not reproduce it](2026-11-10-store-address-form/README.md)
+- [2026-11-10 With 8+ SIMD groups per core the core issues ~2 instructions per cycle and reads ~2.4-3 32-bit registers per cycle (8 fmadd32 on 3 distinct registers: 145 cycles per trip at 16 groups); no all-core or long-run slowdown](2026-11-10-alu-issue-rate/README.md)
+- [2026-11-10 Sequential re-reads of a per-core 16 KB-2 MB region cost about the same (314 -> 418 us) and +7% from 1 to 8 cores, flat to 32: no shared-cache cliff](2026-11-10-l2-region-streaming/README.md)
 - [2026-11-10 CDM barrier bit 11 (between dispatches of one command) invalidates the instruction cache: a repeated 7 KB kernel 16.3 -> 7.0 us per dispatch without it; ordering needs bit 8 with 5 or 6 (0x7f, 0xfff00 overlap); a command ~16 us, a dispatch ~3 us](2026-11-10-cdm-barrier-bits/README.md)
 - [2026-11-10 Code beyond the i-cache streams at ~31 ns per line warm (~78 cold) for 64-384 KB bodies, shared by groups at the same code, no contention between cores; a `wait` on memory stops the stream (waits are additive)](2026-11-10-code-refetch-stream/README.md)
 - [2026-11-10 Workgroups go to clusters in chunks of 8 (clusters 0, 1, 2, 3, 3, 0, 1, 2, ...) and to a cluster's cores round robin, fixed: at 38 one-resident workgroups 34-37 run after 24-27 on cores 48-51 (core ids 0-9, 16-24, 32-40, 48-57)](2026-11-10-workgroup-placement/README.md)
