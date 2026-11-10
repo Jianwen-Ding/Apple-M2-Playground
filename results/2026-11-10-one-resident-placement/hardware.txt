@@ -1,0 +1,21 @@
+wgs 1 "b2b_median_fw_ns":87792
+wgs 19 "b2b_median_fw_ns":88167
+wgs 30 "b2b_median_fw_ns":87708
+wgs 34 "b2b_median_fw_ns":88292
+wgs 36 "b2b_median_fw_ns":167416
+wgs 37 "b2b_median_fw_ns":167584
+wgs 38 "b2b_median_fw_ns":167542
+wgs 39 "b2b_median_fw_ns":167500
+wgs 40 "b2b_median_fw_ns":167625
+wgs 76 "b2b_median_fw_ns":247208
+wgs 77 "b2b_median_fw_ns":247000
+shared 40000 wgs 35 "b2b_median_fw_ns":167416
+shared 40000 wgs 36 "b2b_median_fw_ns":167625
+shared 40000 wgs 70 "b2b_median_fw_ns":247083
+shared 40000 wgs 71 "b2b_median_fw_ns":247125
+shared 40000 wgs 72 "b2b_median_fw_ns":246875
+shared 20000 wgs 35 "b2b_median_fw_ns":187750
+shared 20000 wgs 36 "b2b_median_fw_ns":187958
+shared 20000 wgs 70 "b2b_median_fw_ns":260416
+shared 20000 wgs 71 "b2b_median_fw_ns":260625
+shared 20000 wgs 72 "b2b_median_fw_ns":260500
