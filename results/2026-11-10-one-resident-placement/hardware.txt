@@ -19,3 +19,8 @@ shared 20000 wgs 36 "b2b_median_fw_ns":187958
 shared 20000 wgs 70 "b2b_median_fw_ns":260416
 shared 20000 wgs 71 "b2b_median_fw_ns":260625
 shared 20000 wgs 72 "b2b_median_fw_ns":260500
+wg1024 wgs 1 "b2b_median_fw_ns":159208
+wg1024 wgs 34 "b2b_median_fw_ns":162375
+wg1024 wgs 35 "b2b_median_fw_ns":304500
+wg1024 wgs 38 "b2b_median_fw_ns":306500
+wg1024 wgs 39 "b2b_median_fw_ns":306917

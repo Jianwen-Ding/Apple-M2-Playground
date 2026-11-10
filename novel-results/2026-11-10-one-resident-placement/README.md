@@ -1,4 +1,4 @@
-# With one resident workgroup per core, a grid fills only 34 cores per round: 35-40 workgroups take two rounds
+# With one resident workgroup per core, a grid fills only 34 cores per round: 35-40 workgroups take two rounds (memory- or size-limited alike)
 
 Status: confirmed on one device (M2 Max G14C, 38 GPU cores), 2026-11-10, our own probe kernel through agx_runtime
 (agx_run_hw `--back-to-back 1000`, firmware times at the top clock). Nothing disassembled or decompiled.
@@ -18,7 +18,10 @@ bytes of threadgroup memory, so that only one workgroup fits a core at a time, l
   busiest core gets ceil(n / 34) workgroups, not ceil(n / 38), and not the even cluster split (ceil(ceil(n/4)/9),
   which predicts one round up to 36).
 - The second and third rounds cost ~80 us each (the workgroup's own time): no overlap between a core's rounds.
-- Which 4 cores sit out is not known (the probe does not record the core id).
+- The same for workgroups that are alone on a core because of their size (1024 threads, no threadgroup memory,
+  `place3.sh`): 1 / 34 workgroups 159 / 162 us, 35 / 38 / 39 workgroups 305-307 us.
+- Which 4 cores sit out is not known (the probe does not record the core id), nor whether large grids (hundreds of
+  rounds) also leave 4 cores out: Halide's conv_layer relu (1280 x 1024 threads) fits n / 38 rounds better.
 
 ## Implications
 
