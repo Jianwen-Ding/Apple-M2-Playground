@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-12 Device atomics with colliding lanes: same-word lanes serialise (0.86 ns int / 2.5 ns float per lane-op GPU-wide), distinct words of a 32-byte sector combine, sectors of a 128-byte bank follow one another; private words share ~0.11 / 0.42 ns per op GPU-wide; Cycles' film accumulation is ~40% of shade_background](2026-11-12-atomic-collisions/README.md)
 - [2026-11-11 The stack helper needs only as many per-core allocations as the kernel's register occupancy (Cycles: 22 of Mesa's 128, alloc_max 22, 0 refused; scratch 3.57 GB -> 421 MB); GEM memory costs ~65 ms/GB to bind, ~38 ms/GB to free](2026-11-11-scratch-slots-by-occupancy/README.md)
 - [2026-11-11 Device stores add their bytes at ~365 GB/s to latency-bound kernels (rms_norm 13.0 -> 18.0 us, cpy_scalar, ZLUDA sgemm tile: the whole store time), DRAM-streaming kernels and Halide stencil stages hide ~3/4 of it, soft_max ~1/2; a fence after the store costs nothing](2026-11-11-store-time-not-overlapped/README.md)
 - [2026-11-11 Sixteen outstanding device loads are correct and 1-4% faster than the 8 the backend kept (tile GEMMs); convert / bit-field / imad share a 1-per-cycle unit, so int8 matrix code is bound by it (MMQ +22% from 14k fewer converts)](2026-11-11-pending-loads-shared-unit/README.md)

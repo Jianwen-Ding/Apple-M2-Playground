@@ -1,0 +1,4 @@
+noat-float grid         267520 hw     790.5 sim       nan ratio nan waves None wgs/core None runs [834.791, 790.459, 788.791]
+noat-float grid       12190400 hw   32704.8 sim       nan ratio nan waves None wgs/core None runs [33048.458, 32630.208, 32704.833]
+noat-all grid         267520 hw     814.2 sim       nan ratio nan waves None wgs/core None runs [803.583, 814.208, 822.125]
+noat-all grid       12190400 hw   34624.6 sim       nan ratio nan waves None wgs/core None runs [33593.0, 35473.833, 34624.583]
