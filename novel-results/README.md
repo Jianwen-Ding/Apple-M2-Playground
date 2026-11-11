@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-11 The stack helper needs only as many per-core allocations as the kernel's register occupancy (Cycles: 22 of Mesa's 128, alloc_max 22, 0 refused; scratch 3.57 GB -> 421 MB); GEM memory costs ~65 ms/GB to bind, ~38 ms/GB to free](2026-11-11-scratch-slots-by-occupancy/README.md)
 - [2026-11-11 Device stores add their bytes at ~365 GB/s to latency-bound kernels (rms_norm 13.0 -> 18.0 us, cpy_scalar, ZLUDA sgemm tile: the whole store time), DRAM-streaming kernels and Halide stencil stages hide ~3/4 of it, soft_max ~1/2; a fence after the store costs nothing](2026-11-11-store-time-not-overlapped/README.md)
 - [2026-11-11 Sixteen outstanding device loads are correct and 1-4% faster than the 8 the backend kept (tile GEMMs); convert / bit-field / imad share a 1-per-cycle unit, so int8 matrix code is bound by it (MMQ +22% from 14k fewer converts)](2026-11-11-pending-loads-shared-unit/README.md)
 - [2026-11-10 The L2 is one GPU-wide capacity of ~6-7 MB: per-core working sets of 256 KB slow 40-60% beyond ~24 busy cores (any clusters), and the cores' stacks 6 MB apart alias at 24 (2 MB of padding removes that step); explains MMQ's busy-core slowdown (capacity, padding does not help it)](2026-11-10-l2-gpu-capacity/README.md)
