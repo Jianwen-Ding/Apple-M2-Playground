@@ -57,3 +57,18 @@ core) of G SIMD groups unless noted. Numbers: GPU-wide ns per lane-operation (ti
 
 [results/2026-11-12-atomic-collisions](../../results/2026-11-12-atomic-collisions/): `atom1.txt` (int), `atom2.txt`
 (float, private words), `sbnoat.txt` (Cycles shade_background with atomics patched out), job scripts.
+
+## Follow-up (2026-11-12): aggregating same-word atomics in the compiler pays on hardware
+
+The LLVM AGX backend now combines a SIMD group's atomic additions per address before issuing them
+(llvm-project `AGXExpandWideAtomics` expandAggregate, EXPERIMENTS L15-E220): the threads on one word add a
+`simd_reduce` sum with a single atomic, one round per distinct address while a group has at least 2 threads.
+Measured through zluda_agx on the M2 Max:
+
+- Blender Cycles (monkey 1024^2, 64 spp, GPU kernel totals): 1384 -> 1254 ms (-9.5%); shade_background
+  217 -> 161 ms (its film accumulation), intersect_closest 501 -> 443 ms (queue counters). Same images (max diff 1).
+- Rounds matter even for small groups: requiring >= 4 threads per word instead of 2 left shade_background at 194 ms
+  (vs 161), so 2-3-lane collisions on one word still cost more than a ballot + shuffle + reduce round.
+- A small float-atomic microbenchmark (1M threads, 16 adds each) showed -35..-43% at 16-256 lanes per word in its
+  first runs, but repeated runs are bimodal (~0.18 vs ~0.40 ms for the same code): small single launches are not a
+  reliable A/B on this machine; use a full application batch.
