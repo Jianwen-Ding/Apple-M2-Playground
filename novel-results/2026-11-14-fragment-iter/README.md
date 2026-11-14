@@ -21,3 +21,10 @@ Fragment outputs are plain registers; the colour write is a separate driver-gene
 
 ## Simulator
 `agx_run --frag FILE` (rust/src/frag.rs, `fsem::frag_iter`): `scripts/frag_iter_check.py` replays the captured `iterproj` over 32 lanes x 4 channels, max 4.8e-7 from the hardware pixels (coefficients fitted from the same image). Open items: tasks/render-02-fragment-isa.md in AGX-Performance-Simulator.
+
+## Tile and coverage instructions (same day)
+`tests/gles_varying.c` now takes `VARY_FS` (a replacement fragment shader), `VARY_DEPTH=1` and `VARY_RGBA8=1`. Captured sequences:
+- discard: `iterproj`, `fcmpsel lt` x2 (kill mask 255 / live mask), `or` with the API sample mask (u8l), `wait_pix 1, 0`, `sample_mask r0l, r0h` (TARGET, LIVE).
+- gl_SampleMask: `get_sr r0h, sr14` (the samples being shaded) joins the same sequence; MSAA `texture_load tex_2d_ms` appears in the resolve program.
+- colour write: `st_tile rN.., u8norm, 1, xyzw, 0, 1, 18` (format, mask, pixel offset 0, sample mask 1); linear varying arithmetic is folded into the vertex shader.
+Hardware agreement (simulator vs recorded renders, 64x64): `st_tile u8norm` byte-exact (32 pixels, clamping included); discard 1446 / 1446 pixels. Detail: AGX-Performance-Simulator `tasks/render-02-fragment-isa.md`.

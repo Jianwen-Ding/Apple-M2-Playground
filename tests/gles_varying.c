@@ -124,6 +124,7 @@ int main(int argc, char **argv) {
     char vs[2048], fs[2048];
     snprintf(vs, sizeof vs, "#version 320 es\nin vec4 p;\nin vec4 q;\n%sout vec4 va;\n%sout vec2 vb;\nvoid main(){ va=q; vb=q.zw*3.0+1.0; gl_Position=p; }\n", qual, qual);
     snprintf(fs, sizeof fs, "#version 320 es\nprecision highp float;\n%sin vec4 va;\n%sin vec2 vb;\nout vec4 o;\nvoid main(){ o=vec4(va.x, va.y, vb.x, vb.y+va.w); }\n", qual, qual);
+    if (getenv("VARY_FS")) snprintf(fs, sizeof fs, "%s", getenv("VARY_FS"));   /* full replacement fragment shader */
     GLuint prog = glCreateProgram();
     glAttachShader(prog, compile(GL_VERTEX_SHADER, vs)); glAttachShader(prog, compile(GL_FRAGMENT_SHADER, fs));
     p_glBindAttribLocation(prog, 0, "p"); p_glBindAttribLocation(prog, 1, "q");
@@ -140,14 +141,16 @@ int main(int argc, char **argv) {
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 32, (void *)16); glEnableVertexAttribArray(1);
     GLuint fbo, rb, rfbo, tex; glGenFramebuffers(1, &fbo); glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glGenRenderbuffers(1, &rb); glBindRenderbuffer(GL_RENDERBUFFER, rb);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples <= 1 ? 0 : samples, GL_RGBA32F, W, H);
+    int u8 = getenv("VARY_RGBA8") != NULL;   /* RGBA8 target + byte readback: checks the tile store conversion */
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples <= 1 ? 0 : samples, u8 ? GL_RGBA8 : GL_RGBA32F, W, H);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rb);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) fail("fbo incomplete (RGBA32F)");
+    if (getenv("VARY_DEPTH")) { GLuint db; glGenRenderbuffers(1, &db); glBindRenderbuffer(GL_RENDERBUFFER, db); glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples <= 1 ? 0 : samples, GL_DEPTH24_STENCIL8, W, H); glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, db); p_glEnable(GL_DEPTH_TEST); }
     glViewport(0, 0, W, H); glClearColor(-777, -777, -777, -777); glClear(GL_COLOR_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     GLuint src = fbo;
     if (samples > 1) {
-        glGenTextures(1, &tex); glBindTexture(GL_TEXTURE_2D, tex); glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA32F, W, H);
+        glGenTextures(1, &tex); glBindTexture(GL_TEXTURE_2D, tex); glTexStorage2D(GL_TEXTURE_2D, 1, u8 ? GL_RGBA8 : GL_RGBA32F, W, H);
         glGenFramebuffers(1, &rfbo); glBindFramebuffer(GL_FRAMEBUFFER, rfbo);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo); glBindFramebuffer(GL_DRAW_FRAMEBUFFER, rfbo);
@@ -155,9 +158,9 @@ int main(int argc, char **argv) {
     }
     glBindFramebuffer(GL_READ_FRAMEBUFFER, src);
     float *img = malloc((size_t)W * H * 16);
-    glReadPixels(0, 0, W, H, GL_RGBA, GL_FLOAT, img);
+    if (u8) glReadPixels(0, 0, W, H, GL_RGBA, GL_UNSIGNED_BYTE, img); else glReadPixels(0, 0, W, H, GL_RGBA, GL_FLOAT, img);
     { GLenum e = glGetError(); if (e) { fprintf(stderr, "glError 0x%x\n", e); fail("gl error"); } }
-    FILE *f = fopen(out, "wb"); fwrite(img, 16, (size_t)W * H, f); fclose(f);
+    FILE *f = fopen(out, "wb"); fwrite(img, u8 ? 4 : 16, (size_t)W * H, f); fclose(f);
     printf("{\"W\":%d,\"H\":%d,\"mode\":%d,\"samples\":%d,\"out\":\"%s\"}\n", W, H, mode, samples, out);
     return 0;
 }
