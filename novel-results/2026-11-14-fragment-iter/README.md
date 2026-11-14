@@ -28,3 +28,11 @@ Fragment outputs are plain registers; the colour write is a separate driver-gene
 - gl_SampleMask: `get_sr r0h, sr14` (the samples being shaded) joins the same sequence; MSAA `texture_load tex_2d_ms` appears in the resolve program.
 - colour write: `st_tile rN.., u8norm, 1, xyzw, 0, 1, 18` (format, mask, pixel offset 0, sample mask 1); linear varying arithmetic is folded into the vertex shader.
 Hardware agreement (simulator vs recorded renders, 64x64): `st_tile u8norm` byte-exact (32 pixels, clamping included); discard 1446 / 1446 pixels. Detail: AGX-Performance-Simulator `tasks/render-02-fragment-isa.md`.
+
+## Coverage, depth and loop findings (same day, later)
+- 4x MSAA: with Mesa's standard sample positions (0.375,0.125) (0.875,0.375) (0.125,0.625) (0.625,0.875) (y as in the window coordinates the probe uses) the analytic coverage equals
+  the hardware's covered-sample count (resolve of a constant colour over the clear colour) on 1507 / 1507 touched pixels, and `gl_SampleMaskIn[0]` (= `get_sr sr124` and the API mask) equals the analytic per-pixel mask.
+- `zs_emit` depth test: gl_FragDepth layers under GL_LESS (clear 1) and GL_GREATER (clear 0) agree with the simulator on 1446 / 1446 pixels each; stencil is fixed function.
+- Flat varyings: `ldcf` x4 then `icmpsel ueq, rX, u9l, 0, r2, r1`: with u9l = 0 the last vertex's value (r2) is chosen, u9l = 1 selects r1; each coefficient register holds the three vertex values.
+- Dependent-ALU loops: per-iteration time on hardware is ~4.1 us (1 fmadd) / 5.5 us (2 or 4 fmadds) at 2048x2048, identical in compute and fragment shaders; see AGX-Performance-Simulator results/2026-11-14-frag-cost.
+New probes: `tests/gles_compute_alu.c`, `tests/gles_raster.c` (RASTER_VARY / RASTER_FLAT / RASTER_DISCARD / RASTER_DEPTH), `tests/gles_varying.c` (VARY_FS / VARY_FS2 / VARY_DEPTH / VARY_FMT).
