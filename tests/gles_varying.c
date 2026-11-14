@@ -38,7 +38,7 @@
  X(PFNGLDRAWARRAYSPROC, glDrawArrays) X(PFNGLENABLEPROC, glEnable) X(PFNGLDISABLEPROC, glDisable) \
  X(PFNGLBLENDFUNCPROC, glBlendFunc) X(PFNGLFINISHPROC, glFinish) \
  X(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation) X(PFNGLUNIFORM1FPROC, glUniform1f) \
- X(PFNGLREADPIXELSPROC, glReadPixels) X(PFNGLFLUSHPROC, glFlush) X(PFNGLINVALIDATEFRAMEBUFFERPROC, glInvalidateFramebuffer) X(PFNGLBLITFRAMEBUFFERPROC, glBlitFramebuffer) X(PFNGLGENTEXTURESPROC, glGenTextures) X(PFNGLBINDTEXTUREPROC, glBindTexture) X(PFNGLTEXSTORAGE2DPROC, glTexStorage2D) X(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D) X(PFNGLREADBUFFERPROC, glReadBuffer) X(PFNGLBINDATTRIBLOCATIONPROC, glBindAttribLocation) X(PFNGLGETERRORPROC, glGetError)
+ X(PFNGLREADPIXELSPROC, glReadPixels) X(PFNGLFLUSHPROC, glFlush) X(PFNGLINVALIDATEFRAMEBUFFERPROC, glInvalidateFramebuffer) X(PFNGLBLITFRAMEBUFFERPROC, glBlitFramebuffer) X(PFNGLGENTEXTURESPROC, glGenTextures) X(PFNGLBINDTEXTUREPROC, glBindTexture) X(PFNGLTEXSTORAGE2DPROC, glTexStorage2D) X(PFNGLFRAMEBUFFERTEXTURE2DPROC, glFramebufferTexture2D) X(PFNGLREADBUFFERPROC, glReadBuffer) X(PFNGLDEPTHFUNCPROC, glDepthFunc) X(PFNGLCLEARDEPTHFPROC, glClearDepthf) X(PFNGLBINDATTRIBLOCATIONPROC, glBindAttribLocation) X(PFNGLGETERRORPROC, glGetError)
 #define DECL(t, n) static t p_##n;
 EGL_FUNCS(DECL)
 GL_FUNCS(DECL)
@@ -148,8 +148,21 @@ int main(int argc, char **argv) {
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rb);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) fail("fbo incomplete (RGBA32F)");
     if (getenv("VARY_DEPTH")) { GLuint db; glGenRenderbuffers(1, &db); glBindRenderbuffer(GL_RENDERBUFFER, db); glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples <= 1 ? 0 : samples, GL_DEPTH24_STENCIL8, W, H); glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, db); p_glEnable(GL_DEPTH_TEST); }
-    glViewport(0, 0, W, H); glClearColor(-777, -777, -777, -777); glClear(GL_COLOR_BUFFER_BIT);
+    glViewport(0, 0, W, H); glClearColor(-777, -777, -777, -777); 
+    if (getenv("VARY_DEPTH")) {   /* VARY_DEPTHFUNC=less|lequal|greater|gequal|equal|notequal|always|never, VARY_DEPTHCLEAR=<float> */
+        const char *df = getenv("VARY_DEPTHFUNC"); GLenum fn = GL_LESS;
+        if (df) { if (!strcmp(df, "lequal")) fn = GL_LEQUAL; else if (!strcmp(df, "greater")) fn = GL_GREATER; else if (!strcmp(df, "gequal")) fn = GL_GEQUAL;
+                  else if (!strcmp(df, "equal")) fn = GL_EQUAL; else if (!strcmp(df, "notequal")) fn = GL_NOTEQUAL; else if (!strcmp(df, "always")) fn = GL_ALWAYS; else if (!strcmp(df, "never")) fn = GL_NEVER; }
+        p_glDepthFunc(fn); p_glClearDepthf(getenv("VARY_DEPTHCLEAR") ? (float)atof(getenv("VARY_DEPTHCLEAR")) : 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    } else glClear(GL_COLOR_BUFFER_BIT);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+    if (getenv("VARY_FS2")) {   /* second pass: the same triangle with another fragment shader (depth-test checks) */
+        GLuint p2 = glCreateProgram();
+        glAttachShader(p2, compile(GL_VERTEX_SHADER, vs)); glAttachShader(p2, compile(GL_FRAGMENT_SHADER, getenv("VARY_FS2")));
+        p_glBindAttribLocation(p2, 0, "p"); p_glBindAttribLocation(p2, 1, "q");
+        glLinkProgram(p2); glUseProgram(p2); glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
     GLuint src = fbo;
     if (samples > 1) {
         glGenTextures(1, &tex); glBindTexture(GL_TEXTURE_2D, tex); glTexStorage2D(GL_TEXTURE_2D, 1, u8 ? GL_RGBA8 : GL_RGBA32F, W, H);

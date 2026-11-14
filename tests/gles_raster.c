@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
     } else {
         o += snprintf(fs + o, sizeof fs - o,
             "#version 300 es\nprecision highp float;\nuniform float u;\nin vec2 v;\nout vec4 o;\n"
-            "void main(){ float a=v.x+u, b=v.y; for(int i=0;i<%d;i++){ a=a*b+0.5; b=b*a-0.25; } o=vec4(a,b,u,0.5); }\n", alu);
+            "void main(){ float a=v.x+u, b=v.y; for(int i=0;i<%d;i++){ a=a*b+0.5; b=b*a-0.25; } %s%s o=vec4(a,b,u,0.5); }\n", alu, getenv("RASTER_DISCARD") ? "if (a < -1.0e30) discard; " : "", getenv("RASTER_DEPTH") ? "gl_FragDepth = v.x * 0.5; " : "");
         snprintf(vs, sizeof vs, "#version 300 es\nin vec2 p;\nout vec2 v;\nvoid main(){ v=p*0.5+0.5; gl_Position=vec4(p,0.0,1.0); }\n");
     }
     GLuint prog = glCreateProgram();
@@ -151,6 +151,8 @@ int main(int argc, char **argv) {
     glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples <= 1 ? 0 : samples, GL_RGBA8, W, H);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rb);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) fail("fbo incomplete");
+    if (getenv("RASTER_DEPTH")) { GLuint db; glGenRenderbuffers(1, &db); glBindRenderbuffer(GL_RENDERBUFFER, db); glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples <= 1 ? 0 : samples, GL_DEPTH24_STENCIL8, W, H);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, db); glEnable(GL_DEPTH_TEST); }
     glViewport(0, 0, W, H);
     if (blend) { glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); } else glDisable(GL_BLEND);
 
@@ -159,7 +161,7 @@ int main(int argc, char **argv) {
     for (int r = 0; r < reps + 1; r++) {
         double t0 = now();
         for (int f = 0; f < frames; f++) {
-            glClearColor(0, 0, 0, 1); glClear(GL_COLOR_BUFFER_BIT);
+            glClearColor(0, 0, 0, 1); glClear(getenv("RASTER_DEPTH") ? (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) : GL_COLOR_BUFFER_BIT);
             for (int l = 0; l < layers; l++) glDrawArrays(GL_TRIANGLES, 0, ntri * 3);
             if (getenv("RASTER_FLUSH")) glFlush();
             if (!getenv("RASTER_KEEP")) glInvalidateFramebuffer(GL_FRAMEBUFFER, 1, &att);   /* default: tile store skipped */
