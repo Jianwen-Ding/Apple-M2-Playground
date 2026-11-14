@@ -1,0 +1,8 @@
+{"W":1024,"H":1024,"layers":1,"alu":256,"blend":0,"samples":0,"tris":2,"frames":50,"ms_best":0.4113,"ms_mean":0.4135}
+{"W":1024,"H":1024,"layers":8,"alu":256,"blend":0,"samples":0,"tris":2,"frames":50,"ms_best":0.4149,"ms_mean":0.4157}
+{"W":1024,"H":1024,"layers":1,"alu":256,"blend":1,"samples":0,"tris":2,"frames":50,"ms_best":0.4176,"ms_mean":0.4193}
+{"W":1024,"H":1024,"layers":8,"alu":256,"blend":1,"samples":0,"tris":2,"frames":50,"ms_best":3.1799,"ms_mean":3.1901}
+{"W":1024,"H":1024,"layers":1,"alu":64,"blend":0,"samples":0,"tris":2,"frames":50,"ms_best":0.1338,"ms_mean":0.1386}
+{"W":1024,"H":1024,"layers":1,"alu":1024,"blend":0,"samples":0,"tris":2,"frames":50,"ms_best":1.5137,"ms_mean":1.5173}
+{"W":1024,"H":1024,"layers":1,"alu":1,"blend":1,"samples":0,"tris":2,"frames":50,"ms_best":0.0550,"ms_mean":0.0621}
+{"W":1024,"H":1024,"layers":8,"alu":1,"blend":1,"samples":0,"tris":2,"frames":50,"ms_best":0.0915,"ms_mean":0.0995}
