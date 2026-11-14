@@ -108,11 +108,19 @@ int main(int argc, char **argv) {
     EGLContext c = p_eglCreateContext(d, cfg, EGL_NO_CONTEXT, cx); if (!c) fail("context");
     if (!p_eglMakeCurrent(d, EGL_NO_SURFACE, EGL_NO_SURFACE, c)) fail("makecurrent");
 
-    char fs[4096];
-    snprintf(fs, sizeof fs,
-        "#version 300 es\nprecision highp float;\nuniform float u;\nin vec2 v;\nout vec4 o;\n"
-        "void main(){ float a=v.x+u, b=v.y; for(int i=0;i<%d;i++){ a=a*b+0.5; b=b*a-0.25; } o=vec4(a,b,u,0.5); }\n", alu);
-    const char *vs = "#version 300 es\nin vec2 p;\nout vec2 v;\nvoid main(){ v=p*0.5+0.5; gl_Position=vec4(p,0.0,1.0); }\n";
+    /* RASTER_VARY=N: N vec4 varyings summed by the fragment shader (RASTER_FLAT=1: flat -> ldcf instead of iterproj) */
+    int nv = getenv("RASTER_VARY") ? atoi(getenv("RASTER_VARY")) : 0; const char *fq = getenv("RASTER_FLAT") ? "flat " : "";
+    char fs[8192], vs[8192]; int o = 0, q = 0;
+    if (nv > 0) {
+        o += snprintf(fs + o, sizeof fs - o, "#version 300 es\nprecision highp float;\nuniform float u;\n%sin vec4 v[%d];\nout vec4 o;\n"
+                      "void main(){ vec4 a=vec4(u); for(int i=0;i<%d;i++){ a=a*0.999+v[i]; } float b=a.x; for(int i=0;i<%d;i++){ b=b*b-0.25+a.y; } o=vec4(a.x+b,a.y,a.z,a.w); }\n", fq, nv, nv, alu);
+        q += snprintf(vs + q, sizeof vs - q, "#version 300 es\nin vec2 p;\n%sout vec4 v[%d];\nvoid main(){ for(int i=0;i<%d;i++) v[i]=vec4(p.x*float(i+1),p.y,p.x+p.y,float(i)); gl_Position=vec4(p,0.0,1.0); }\n", fq, nv, nv);
+    } else {
+        o += snprintf(fs + o, sizeof fs - o,
+            "#version 300 es\nprecision highp float;\nuniform float u;\nin vec2 v;\nout vec4 o;\n"
+            "void main(){ float a=v.x+u, b=v.y; for(int i=0;i<%d;i++){ a=a*b+0.5; b=b*a-0.25; } o=vec4(a,b,u,0.5); }\n", alu);
+        snprintf(vs, sizeof vs, "#version 300 es\nin vec2 p;\nout vec2 v;\nvoid main(){ v=p*0.5+0.5; gl_Position=vec4(p,0.0,1.0); }\n");
+    }
     GLuint prog = glCreateProgram();
     glAttachShader(prog, compile(GL_VERTEX_SHADER, vs)); glAttachShader(prog, compile(GL_FRAGMENT_SHADER, fs));
     glLinkProgram(prog); glUseProgram(prog);
