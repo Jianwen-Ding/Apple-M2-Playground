@@ -115,8 +115,8 @@ int main(int argc, char **argv) {
     EGLint cx[] = {EGL_CONTEXT_MAJOR_VERSION, 3, EGL_CONTEXT_MINOR_VERSION, 1, EGL_NONE};
     EGLContext c = p_eglCreateContext(d, cfg, EGL_NO_CONTEXT, cx); if (!c) fail("context");
     if (!p_eglMakeCurrent(d, EGL_NO_SURFACE, EGL_NO_SURFACE, c)) fail("makecurrent");
-    char cs[2048]; const char *body = getenv("COMPUTE_FAMILY_A") ? "float c=a; for(int i=0;i<%d;i++){ c=c*c-0.25+b; } a=c;" : "for(int i=0;i<%d;i++){ a=a*b+0.5; b=b*a-0.25; }";
-    char bd[512]; if (getenv("COMPUTE_BODY")) snprintf(bd, sizeof bd, "for(int i=0;i<%d;i++){ %s }", alu, getenv("COMPUTE_BODY")); else snprintf(bd, sizeof bd, body, alu);
+    char cs[16384]; const char *body = getenv("COMPUTE_FAMILY_A") ? "float c=a; for(int i=0;i<%d;i++){ c=c*c-0.25+b; } a=c;" : "for(int i=0;i<%d;i++){ a=a*b+0.5; b=b*a-0.25; }";
+    char bd[8192]; if (getenv("COMPUTE_BODY")) snprintf(bd, sizeof bd, "float c=a+1.0,p=b+2.0,q=a*3.0,r=b*0.5,s=a-4.0,t=b+7.0; for(int i=0;i<%d;i++){ %s } a=a+b+c+p+q+r+s+t;", alu, getenv("COMPUTE_BODY")); else snprintf(bd, sizeof bd, body, alu);
     snprintf(cs, sizeof cs, "#version 310 es\nlayout(local_size_x=%d, local_size_y=%d) in;\nlayout(std430, binding=0) buffer B { float d[]; };\nuniform float u;\n"
         "void main(){ uvec2 id=gl_GlobalInvocationID.xy; float a=float(id.x)*(1.0/%d.0)+u, b=float(id.y)*(1.0/%d.0); %s if (a + b == 1234.5) d[id.y*uint(%d)+id.x]=a+b; }\n", wx, wy, W, H, bd, W);
     GLuint prog = glCreateProgram(); glAttachShader(prog, compile(GL_COMPUTE_SHADER, cs)); glLinkProgram(prog); glUseProgram(prog);
