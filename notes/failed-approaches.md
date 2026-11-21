@@ -587,3 +587,9 @@ Even when it does not share the probe's core, a running `clock_keeper.py` (a sep
 to far-memory (64 MiB span) loads and 6-15 ns at L2 (more with short keeper commands). The cause is not process churn or
 command boundaries. Do not use the keeper for latency measurements; use back-to-back multi-millisecond dispatches and the
 minimum or settled median. Evidence: `novel-results/2026-10-20-cross-context-latency`.
+
+## 2026-11-21: killing a GPU process mid-flight (render work)
+- SIGKILL of drm_compute (the clock keeper) while its commands ran: gCDM_CS unmapped faults at its control stream and ~90k recovery
+  events in 3 minutes (18:13-18:16 UTC); later render replays came back incomplete. Fix: stop on a stop file, let the submit finish.
+  Guard: gpu_safety.Tripwire (kernel-log recovery count) around every GPU case.
+- Burst timestamps reading 0 after ~15 submits were a symptom of those recoveries, not a firmware limit.
