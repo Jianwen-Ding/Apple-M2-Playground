@@ -114,3 +114,4 @@ Document which device and software versions were tested and any uncertainty.
 - [Device atomic gap bits and recovered fault](2026-10-17-atomic-gap-bits/README.md)
 - [Threadgroup atomic ending opcodes, control bits, and hang diagnostics](2026-10-17-tg-atomic-followup/README.md)
 - [Fragment tile → core map (sr20 readback over 30 screen sizes): 2x4-tile blocks on consecutive cores of a cluster, ≤40-tile passes on cluster 0 only; fragment time follows the busiest core; partial renders bimodal; primitive order and tiny instances cost](2026-11-21-fragment-tile-core-map/README.md)
+- [cmpsel `.discard` on a select operand: issue 2.03 -> 4.84 cycles (cache free, compare-operand discard free, 16-bit high half free); sr58 / sr59 under eight divergence masks; ends opcodes end the whole SIMD group whatever the exec mask (stop does not)](2026-11-22-cmpsel-discard-and-end-mask/README.md)
