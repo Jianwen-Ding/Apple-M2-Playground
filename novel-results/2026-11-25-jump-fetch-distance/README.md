@@ -45,7 +45,7 @@ in between. The interleaved-chain orders (fwdK) agree: stride 2/3/4 cost 257/228
 before. A block that had just one line fetched gives nothing: lines 8i then 8i+1, 2, 4 or 7, at reuse windows of 1 to
 128 blocks, cost 412-425. This is the model's rule: "2 or more lines fetched in the target's 512 B block → ~150 ns".
 
-Model fit (AGX-Performance-Simulator `cost::JumpFetch`): over the 79 shapes, mean |error| is 3.0% (median 2.0%), with the 4 / 8 KiB dip as its own entry (325 ns, no block reuse). The
+Model fit (AGX-Performance-Simulator `cost::JumpFetch`): over the 79 shapes, mean |error| is 2.6% (median 2.0%, max 12.5%). The 4 / 8 KiB dip is its own entry (325 ns, no block reuse), and block reuse after a 16-line jump costs 300 ns (interleaved stride-16 chains: 348 per block). The
 earlier flat 300 ns gave 18.2% (median 19.6%). Not fitted:
 
 - interleaved chains of stride 16-64 lines (hw 343-348, rule -31%);
