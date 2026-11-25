@@ -21,3 +21,6 @@ There is a loop over about 48 KB of executed straight code, beyond the 12 KiB i-
   (2026-11-10 code-refetch-stream).
 - Compiler: in code beyond the i-cache, taken branches are nearly free when they end runs of 4 or more lines, but
   1-line blocks cost ~140 ns each.
+- With 1 / 4 / 8 groups per core starting together, jumping code beyond the i-cache takes 304 / 315 / 308 us:
+  followers share the leader's fetches, jumps included. Groups staggered apart (8 groups, K=64) pay 836 us, against
+  735 for straight code.
