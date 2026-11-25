@@ -26,4 +26,4 @@ minus the NOSTORE variant. PRE / POST add n independent iadds before the loads /
 - **Compiler:** stores cost their bytes on top of everything else. Narrow output types and in-place accumulation in
   registers rather than in memory pay off directly.
 - **Simulator:** charge stores by distinct bytes, not by segments, and do not hide them behind compute
-  (AGX-Performance-Simulator results/2026-11-25-store-drain).
+  (AGX-Performance-Simulator results/2026-11-25-store-drain, the default since 2026-11-25: held-out 7.5 -> 6.8%, llama pp512 10.3 -> 8.7%).
