@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-26 Launches without a CDM barrier overlap (0.55 us each), 0x160 orders them for 3.15 us (0xff7ff: 3.9) and keeps other cores' writes visible; submissions pipeline to ~45 us each at 8 in flight; SIMD-group matrix SGEMM reaches 9.4 TFLOP/s from device memory](2026-11-26-dispatch-overlap-and-submission-cost/README.md)
 - [2026-11-26 A ragged grid's last threadgroup runs as a smaller threadgroup: its threads are packed into lanes at the clipped size and SR4-6 (threads_per_threadgroup) read the clipped size, as Metal and OpenCL 2.0 define; threadgroups_per_grid x SR4 is not the grid size there](2026-11-26-partial-threadgroup-size/README.md)
 - [2026-11-12 Device atomics with colliding lanes: same-word lanes serialise (0.86 ns int / 2.5 ns float per lane-op GPU-wide), distinct words of a 32-byte sector combine, sectors of a 128-byte bank follow one another; private words share ~0.11 / 0.42 ns per op GPU-wide; Cycles' film accumulation is ~40% of shade_background](2026-11-12-atomic-collisions/README.md)
 - [2026-11-11 The stack helper needs only as many per-core allocations as the kernel's register occupancy (Cycles: 22 of Mesa's 128, alloc_max 22, 0 refused; scratch 3.57 GB -> 421 MB); GEM memory costs ~65 ms/GB to bind, ~38 ms/GB to free](2026-11-11-scratch-slots-by-occupancy/README.md)
