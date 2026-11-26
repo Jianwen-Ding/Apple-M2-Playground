@@ -1,5 +1,6 @@
 # New hardware findings
 
+- [2026-11-26 A ragged grid's last threadgroup runs as a smaller threadgroup: its threads are packed into lanes at the clipped size and SR4-6 (threads_per_threadgroup) read the clipped size, as Metal and OpenCL 2.0 define; threadgroups_per_grid x SR4 is not the grid size there](2026-11-26-partial-threadgroup-size/README.md)
 - [2026-11-12 Device atomics with colliding lanes: same-word lanes serialise (0.86 ns int / 2.5 ns float per lane-op GPU-wide), distinct words of a 32-byte sector combine, sectors of a 128-byte bank follow one another; private words share ~0.11 / 0.42 ns per op GPU-wide; Cycles' film accumulation is ~40% of shade_background](2026-11-12-atomic-collisions/README.md)
 - [2026-11-11 The stack helper needs only as many per-core allocations as the kernel's register occupancy (Cycles: 22 of Mesa's 128, alloc_max 22, 0 refused; scratch 3.57 GB -> 421 MB); GEM memory costs ~65 ms/GB to bind, ~38 ms/GB to free](2026-11-11-scratch-slots-by-occupancy/README.md)
 - [2026-11-11 Device stores add their bytes at ~365 GB/s to latency-bound kernels (rms_norm 13.0 -> 18.0 us, cpy_scalar, ZLUDA sgemm tile: the whole store time), DRAM-streaming kernels and Halide stencil stages hide ~3/4 of it, soft_max ~1/2; a fence after the store costs nothing](2026-11-11-store-time-not-overlapped/README.md)
